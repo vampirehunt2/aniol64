@@ -1,0 +1,45 @@
+Aniol64 design document
+
+1. Overview
+
+2. Bus organization:
+Bus pin		CPU pin		Type	Symbol	Direction
+1			17			C		NMI		<
+2			16			C		INT		<
+3			6			C		CLK		<
+4			5			A		A15		>
+5			4			A		A14		>
+6			3			A		A13		>
+7			2			A		A12		>
+8			1			A		A11		>
+9			40			A		A10		>
+10			39			A		A9		>
+11			38			A		A8		>
+12			37			A		A7		>
+13			36			A		A6		>
+14			35			A		A5		>
+15			34			A		A4		>
+16			33			A		A3		>
+17			32			A		A2		>
+18			31			A		A1		>
+19			30			A		A0		>
+20			29			P		GND		<
+21			11			P		VCC		<
+22			27			C		M1		>
+23			26			C		RESET	<	
+24			25			C		BUSRQ	<	
+25			24			C		WAIT	<
+26			23			C		BUSACK	>
+27			22			C		WR		>
+28			21			C		RD		>
+29			13			D		D7		<>
+30			10			D		D6		<>
+31			9			D		D5		<>	
+32			7			D		D4		<>
+33			8			D		D3		<>
+34			12			D		D2		<>
+35			15			D		D1		<>
+36			14			D		D0		<>
+37			18			C		HALT	>	
+38			19			C		MEMRQ	>
+39			10			C		IORQ	>

@@ -1,0 +1,108 @@
+;----------------------------------------------------
+; Project: aniol64.zdsp
+; Main File: aniol64.asm
+; Date: 11/21/2019 12:50:17
+;
+; Created with zDevStudio - Z80 Development Studio.
+;
+;----------------------------------------------------
+
+ org 0
+
+        CALL initLcd
+        LD IX, Ready
+        CALL wriStrLcd
+	HALT
+
+Ready:
+defb "Ready", 0
+
+
+; writes a null-terminated string to the LCD screen
+; IX: address of the string
+wriStrLcd:
+        LD C, 11110111b ; data port of the LCD
+        CALL wriStr
+        RET
+
+; writes a null-terminated string to an output port
+; IX: address of the string
+; C: port number
+wriStr:
+        LD A,(IX+0)
+        CP 0
+        RET Z
+        OUT (C),A
+        INC IX
+        JR wriStr
+
+; resets the LCD display
+initLcd:
+        LD C, 11110110b ; command port of the LCD
+        LD A, 00001111b ; init: set display on, cursor on, blinking on
+        OUT (C), A
+        LD A, 00111000b ; set data length: 8b, 2 lines
+        OUT (C), A
+        RET
+
+; compares two null-terminated strings
+; IX, IY: addresses of the strings to compare
+; result in C: 0 if equal, 1 if different
+strCmp:
+        LD A, (IX+0)
+        LD B, (IX+0)
+        CP B
+        JR NZ, strCmpNeq
+        CP 0
+        JR Z, strCmpEq
+        INC IX
+        INC IY
+        JR strCmp
+strCmpEq:
+        LD C, 0
+        RET
+strCmpNeq:
+        LD C, 1
+        RET
+
+; copies a null-terminated string
+; IX: source string address
+; IY: target address
+strCpy:
+        LD A, (IX+0)
+        LD (IY+0), A
+        CP 0
+        RET Z
+        INC IX
+        INC IY
+        JR strCpy
+
+; finds the length of a null-terminated string
+; IX: address of the string
+; result in HL
+strLen:
+        LD HL, 0
+strLenLoop:
+        LD A, (IX+0)
+        CP 0
+        RET Z
+        INC HL
+        INC IX
+        JR strLenLoop
+
+; work in progress
+memTest:
+        LD IX, 0FF00h
+        LD A, 0
+memTestLoop:
+        LD (IX+0), A
+        LD B, (IX+0)
+        CP B
+        INC A
+        INC IX
+
+
+
+
+
+
