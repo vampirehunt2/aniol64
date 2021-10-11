@@ -22,7 +22,7 @@
         ;CALL snd_play  ; startup melody
         HALT
 
-Ready: defb "Ready   ", 0
+Ready: defb "Ready", 0
 
 include dos.asm
 include mon.asm

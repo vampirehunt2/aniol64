@@ -1,7 +1,7 @@
 Aniol64 design document
 
 1. Overview
-
+ 
 2. Bus organization:
 Bus pin		CPU pin		Type	Symbol	Direction
 1			17			C		NMI		<
@@ -43,3 +43,78 @@ Bus pin		CPU pin		Type	Symbol	Direction
 37			18			C		HALT	>	
 38			19			C		MEMRQ	>
 39			10			C		IORQ	>
+
+3. Keyboard
+Chipset:
+1. D-mux: 	'138 *
+2. Mux: 	'151
+3. Counter: '160x2 *
+4. JK:		'109 *
+5. Latch: 	'573
+6. OR:		'32 *
+7. NOT:		'14 *
+8. AND:		'08 *
+
+Connector:
+- keyboard side:
+1. 	R0
+2.	R1
+3.	R2
+4.	R3
+5.	C0
+6.	C1
+7.	C2
+8.	C3
+9.	C4
+10.	C5
+11.	C6
+12.	C7
+13.	NUM
+14.	ALT
+15.	SHIFT
+16.
+
+- processor side:
+1. 	VCC 
+2. 	GND
+3. 	CLK
+4. 	INT
+5. 	M1
+6. 	IORQ
+7. 	ADDR
+8. 	D0
+9. 	D1
+10. D2
+11. D3
+12. D4
+13.	D5
+14.	D6
+15. D7
+16. 
+
+- I/O side:
+1. IEI
+2. IEO	
+
+Keyboard layout:
+(normal/NUM/ALT), SHIFT generates lowercase letters
+	C0		C1		C2		C3		C4		C5		C6		C7		R4
+R0	Q1!		W2@		E3#		R4$		T5%		Y6^		U7&		I8*		O9(		P0)	
+R1	A+		S-		D*		F/		G=		H[Up]:	J_		K [		L ]
+R2	Z<{		X>}		C ?		V ~		B[L]' 	N[Dn]"	M[R];	[Space .][Enter ,]
+
+Keyboard data lines:
+D7 - SHIFT
+D6 - ALT
+D5 - NUM
+D4-D3 - Rows
+D2-D0 - Cols
+
+Keyboard codes:
+000-00-000b		q	71h
+000-00-001b		w	77h
+000-00-010b		e	65h
+000-00-011b		r
+000-00-100b
+000-00-101b
+000
