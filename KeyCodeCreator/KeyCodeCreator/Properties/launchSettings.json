@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "KeyCodeCreator": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\Users\\PiotrAniola\\Documents\\8bit\\keycodes.txt C:\\Users\\PiotrAniola\\Documents\\8bit\\keycodes.asm"
+    }
+  }
+}
