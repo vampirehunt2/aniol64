@@ -11,3 +11,16 @@ C:\Users\PiotrAniola\source\repos\KeyCodeCreator\KeyCodeCreator\obj\Debug\netcor
 C:\Users\PiotrAniola\source\repos\KeyCodeCreator\KeyCodeCreator\obj\Debug\netcoreapp3.1\KeyCodeCreator.dll
 C:\Users\PiotrAniola\source\repos\KeyCodeCreator\KeyCodeCreator\obj\Debug\netcoreapp3.1\KeyCodeCreator.pdb
 C:\Users\PiotrAniola\source\repos\KeyCodeCreator\KeyCodeCreator\obj\Debug\netcoreapp3.1\KeyCodeCreator.genruntimeconfig.cache
+C:\Users\PiotrAniola\Documents\8bit\git\KeyCodeCreator\KeyCodeCreator\bin\Debug\netcoreapp3.1\KeyCodeCreator.exe
+C:\Users\PiotrAniola\Documents\8bit\git\KeyCodeCreator\KeyCodeCreator\bin\Debug\netcoreapp3.1\KeyCodeCreator.deps.json
+C:\Users\PiotrAniola\Documents\8bit\git\KeyCodeCreator\KeyCodeCreator\bin\Debug\netcoreapp3.1\KeyCodeCreator.runtimeconfig.json
+C:\Users\PiotrAniola\Documents\8bit\git\KeyCodeCreator\KeyCodeCreator\bin\Debug\netcoreapp3.1\KeyCodeCreator.runtimeconfig.dev.json
+C:\Users\PiotrAniola\Documents\8bit\git\KeyCodeCreator\KeyCodeCreator\bin\Debug\netcoreapp3.1\KeyCodeCreator.dll
+C:\Users\PiotrAniola\Documents\8bit\git\KeyCodeCreator\KeyCodeCreator\bin\Debug\netcoreapp3.1\KeyCodeCreator.pdb
+C:\Users\PiotrAniola\Documents\8bit\git\KeyCodeCreator\KeyCodeCreator\obj\Debug\netcoreapp3.1\KeyCodeCreator.csprojAssemblyReference.cache
+C:\Users\PiotrAniola\Documents\8bit\git\KeyCodeCreator\KeyCodeCreator\obj\Debug\netcoreapp3.1\KeyCodeCreator.AssemblyInfoInputs.cache
+C:\Users\PiotrAniola\Documents\8bit\git\KeyCodeCreator\KeyCodeCreator\obj\Debug\netcoreapp3.1\KeyCodeCreator.AssemblyInfo.cs
+C:\Users\PiotrAniola\Documents\8bit\git\KeyCodeCreator\KeyCodeCreator\obj\Debug\netcoreapp3.1\KeyCodeCreator.csproj.CoreCompileInputs.cache
+C:\Users\PiotrAniola\Documents\8bit\git\KeyCodeCreator\KeyCodeCreator\obj\Debug\netcoreapp3.1\KeyCodeCreator.dll
+C:\Users\PiotrAniola\Documents\8bit\git\KeyCodeCreator\KeyCodeCreator\obj\Debug\netcoreapp3.1\KeyCodeCreator.pdb
+C:\Users\PiotrAniola\Documents\8bit\git\KeyCodeCreator\KeyCodeCreator\obj\Debug\netcoreapp3.1\KeyCodeCreator.genruntimeconfig.cache

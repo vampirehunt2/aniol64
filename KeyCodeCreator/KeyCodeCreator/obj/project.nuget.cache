@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "SWZxNx/hXXOLbaH0poEmCfhuOakFY+rAyc948u8vXcZnv1Qn6Hq1c2NY3ABUFC1QS87Rqywf7iAiTiDhKS+2UQ==",
+  "dgSpecHash": "3ZaAf65CRIlXTrZsBsUrsJ68bOdAhz09RanCsDN80xl4FQVfH6/n87U9xcmQha12Z+uM+jJBoJ7rSdc3MbKJ5Q==",
   "success": true,
-  "projectFilePath": "C:\\Users\\PiotrAniola\\source\\repos\\KeyCodeCreator\\KeyCodeCreator\\KeyCodeCreator.csproj",
+  "projectFilePath": "C:\\Users\\PiotrAniola\\Documents\\8bit\\git\\KeyCodeCreator\\KeyCodeCreator\\KeyCodeCreator.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\PiotrAniola\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.13\\microsoft.netcore.app.host.win-x64.3.1.13.nupkg.sha512"
   ],

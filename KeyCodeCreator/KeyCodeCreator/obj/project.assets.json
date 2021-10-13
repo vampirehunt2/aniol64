@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\PiotrAniola\\source\\repos\\KeyCodeCreator\\KeyCodeCreator\\KeyCodeCreator.csproj",
+      "projectUniqueName": "C:\\Users\\PiotrAniola\\Documents\\8bit\\git\\KeyCodeCreator\\KeyCodeCreator\\KeyCodeCreator.csproj",
       "projectName": "KeyCodeCreator",
-      "projectPath": "C:\\Users\\PiotrAniola\\source\\repos\\KeyCodeCreator\\KeyCodeCreator\\KeyCodeCreator.csproj",
+      "projectPath": "C:\\Users\\PiotrAniola\\Documents\\8bit\\git\\KeyCodeCreator\\KeyCodeCreator\\KeyCodeCreator.csproj",
       "packagesPath": "C:\\Users\\PiotrAniola\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\PiotrAniola\\source\\repos\\KeyCodeCreator\\KeyCodeCreator\\obj\\",
+      "outputPath": "C:\\Users\\PiotrAniola\\Documents\\8bit\\git\\KeyCodeCreator\\KeyCodeCreator\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\PiotrAniola\\AppData\\Roaming\\NuGet\\NuGet.Config",

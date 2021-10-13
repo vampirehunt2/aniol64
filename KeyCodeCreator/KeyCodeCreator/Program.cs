@@ -4,7 +4,7 @@ using System.IO;
 namespace KeyCodeCreator {
     class Program {
 
-        KeyCode[] keycodes = new KeyCode[256];
+        KeyCode[] keycodes = new KeyCode[128];
         string inFilename;
         string outFilename;
 
@@ -32,13 +32,13 @@ namespace KeyCodeCreator {
         }
 
         void initTable() {
-            for (int i = 0; i < 256; ++i) keycodes[i] = new KeyCode();
+            for (int i = 0; i < 128; ++i) keycodes[i] = new KeyCode();
         }
 
         void outputResult() {
             FileStream fs = File.OpenWrite(outFilename);
             StreamWriter sw = new StreamWriter(fs);
-            for (int i = 0; i < 256; ++i) {
+            for (int i = 0; i < 128; ++i) {
                 sw.Write(
                     "\tdefb " + 
                     keycodes[i].hexValue +
@@ -73,7 +73,7 @@ namespace KeyCodeCreator {
             binaryAddress =
                 binaryAddress.Substring(0, 2) +
                 binaryAddress.Substring(3, 2) +
-                binaryAddress.Substring(6, 4);
+                binaryAddress.Substring(6, 3);
             return Convert.ToInt32(binaryAddress, 2);
         }
 
