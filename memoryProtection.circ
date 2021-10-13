@@ -195,7 +195,7 @@ end TCL_Generic;&#13;
       <a name="bit1" val="0"/>
       <a name="bit2" val="0"/>
       <a name="bit3" val="0"/>
-      <a name="bit4" val="0"/>
+      <a name="bit4" val="1"/>
       <a name="bit5" val="1"/>
       <a name="bit6" val="1"/>
       <a name="bit7" val="1"/>
@@ -218,7 +218,6 @@ end TCL_Generic;&#13;
       <a name="bit16" val="1"/>
       <a name="bit17" val="1"/>
       <a name="bit18" val="1"/>
-      <a name="bit19" val="1"/>
       <a name="bit2" val="0"/>
       <a name="bit3" val="0"/>
       <a name="bit4" val="0"/>
@@ -228,7 +227,7 @@ end TCL_Generic;&#13;
       <a name="bit8" val="0"/>
       <a name="bit9" val="0"/>
       <a name="facing" val="west"/>
-      <a name="incoming" val="20"/>
+      <a name="incoming" val="19"/>
     </comp>
     <comp lib="0" loc="(660,60)" name="Pin">
       <a name="appearance" val="NewPins"/>
@@ -236,7 +235,8 @@ end TCL_Generic;&#13;
       <a name="output" val="true"/>
     </comp>
     <comp lib="1" loc="(200,470)" name="OR Gate"/>
-    <comp lib="1" loc="(290,340)" name="OR Gate"/>
+    <comp lib="1" loc="(260,340)" name="OR Gate"/>
+    <comp lib="1" loc="(310,340)" name="NOT Gate"/>
     <comp lib="1" loc="(410,210)" name="OR Gate"/>
     <comp lib="1" loc="(410,40)" name="OR Gate"/>
     <comp lib="1" loc="(480,300)" name="Controlled Buffer">
@@ -250,7 +250,7 @@ end TCL_Generic;&#13;
       <a name="appearance" val="logisim_evolution"/>
     </comp>
     <comp lib="4" loc="(680,300)" name="RAM">
-      <a name="addrWidth" val="20"/>
+      <a name="addrWidth" val="19"/>
       <a name="appearance" val="logisim_evolution"/>
       <a name="type" val="nonvolatile"/>
     </comp>
@@ -307,12 +307,11 @@ end TCL_Generic;&#13;
     <wire from="(100,60)" to="(210,60)"/>
     <wire from="(170,300)" to="(340,300)"/>
     <wire from="(200,470)" to="(210,470)"/>
-    <wire from="(210,320)" to="(240,320)"/>
     <wire from="(210,360)" to="(210,470)"/>
-    <wire from="(210,360)" to="(240,360)"/>
     <wire from="(210,60)" to="(210,320)"/>
     <wire from="(210,60)" to="(360,60)"/>
-    <wire from="(290,340)" to="(380,340)"/>
+    <wire from="(260,340)" to="(280,340)"/>
+    <wire from="(310,340)" to="(380,340)"/>
     <wire from="(330,230)" to="(330,260)"/>
     <wire from="(330,230)" to="(360,230)"/>
     <wire from="(330,260)" to="(470,260)"/>
