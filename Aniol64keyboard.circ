@@ -189,6 +189,7 @@ end TCL_Generic;&#13;
     <comp lib="0" loc="(340,440)" name="Pin">
       <a name="appearance" val="NewPins"/>
       <a name="facing" val="west"/>
+      <a name="output" val="true"/>
       <a name="width" val="7"/>
     </comp>
     <comp lib="0" loc="(380,130)" name="Splitter">
@@ -331,7 +332,6 @@ end TCL_Generic;&#13;
     <wire from="(420,370)" to="(460,370)"/>
     <wire from="(420,410)" to="(460,410)"/>
     <wire from="(450,240)" to="(460,240)"/>
-    <wire from="(460,410)" to="(470,410)"/>
     <wire from="(480,120)" to="(480,200)"/>
     <wire from="(500,220)" to="(700,220)"/>
     <wire from="(510,390)" to="(580,390)"/>
