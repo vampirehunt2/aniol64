@@ -15,15 +15,6 @@ LCD_CMD_RD equ 11110110b ; read command port of the LCD
 LCD_DAT_RD equ 11110111b ; read data port of the LCD
 BUSY_MASK  equ 10000000b
 
-; checks the BUSY flag (D7) of the lcd display
-; and loops until it's not busy.
-lcd_wait:
-        IN A, (LCD_CMD_RD)
-        AND BUSY_MASK
-        CP 0
-        RET Z
-        JP lcd_wait
-
 ; resets the LCD display
 lcd_init:
         CALL lcd_wait
@@ -86,4 +77,56 @@ lcd_screenLShift:
         OUT (C), A
         RET
 
+; checks the BUSY flag (D7) of the lcd display
+; and loops until it's not busy.
+lcd_wait:
+        IN A, (LCD_CMD_RD)
+        AND BUSY_MASK
+        CP 0
+        RET Z
+        JP lcd_wait
 
+; waits for 37us * 1,8432MHz = 69 clock cycles
+; which is just 11 NOPs, 4 cycles each
+; plus 10 cycles for the RET
+; plus 17 cycles to CALL this routine
+lcd_delay37us:
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        RET
+
+; waits for 1520us,
+; which is 22 calls to lcd_delay37us
+lcd_delay1520us:
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        CALL lcd_delay37us
+        RET

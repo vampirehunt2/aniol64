@@ -9,9 +9,9 @@
 ;
 ;----------------------------------------------------
 
-; sound chip is selected with A7
-SND_CMD equ 01111110b ; control port of the YM2413
-SND_DAT equ 01111111b ; ; content port of the YM241
+; sound chip is selected with A6
+SND_CMD equ 10111110b ; control port of the YM2413
+SND_DAT equ 10111111b ; ; content port of the YM2413
 
 snd_init:
         LD C, SND_CMD
