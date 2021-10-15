@@ -7,6 +7,8 @@
 ;
 ;----------------------------------------------------
 
+; keyboard is selected with A2
+
 KEYCODE_BASE_ADDR equ 0400h
 
 ; Converts keyboard code to ASCII code

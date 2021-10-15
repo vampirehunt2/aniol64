@@ -5,13 +5,19 @@
 ;
 ; Created with zDevStudio - Z80 Development Studio.
 ;
+; Handling of YM2413 sound chip
+;
 ;----------------------------------------------------
 
+; sound chip is selected with A7
+SND_CMD equ 01111110b ; control port of the YM2413
+SND_DAT equ 01111111b ; ; content port of the YM241
+
 snd_init:
-        LD C, 11101110b ; control port of the YM2413
+        LD C, SND_CMD
         LD A, 0Eh       ; rythm control register
         OUT (C), A
-        LD C, 11101111b ; content port of the YM2413
+        LD C, SND_DAT
         LD A, 00011111b ; rythm on, rythm instruments all on
         OUT (C), A
 

@@ -8,6 +8,7 @@
 ; Handling of hd44780 LCD display controller
 ;----------------------------------------------------
 
+; LCD display is selected with A3
 LCD_CMD_WR equ 11110100b ; write command port of the LCD
 LCD_DAT_WR equ 11110101b ; write data port of the LCD
 LCD_CMD_RD equ 11110110b ; read command port of the LCD

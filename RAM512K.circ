@@ -99,7 +99,7 @@ end TCL_Generic;&#13;
       <a name="SocBusSelection" val=""/>
     </tool>
     <tool name="SocBus">
-      <a name="SocBusIdentifier" val="0x0000017C7850964F557cb438"/>
+      <a name="SocBusIdentifier" val="0x0000017C8319E01126325930"/>
     </tool>
     <tool name="Socmem">
       <a name="SocBusSelection" val=""/>
@@ -162,62 +162,53 @@ end TCL_Generic;&#13;
   <circuit name="main">
     <a name="appearance" val="logisim_evolution"/>
     <a name="circuit" val="main"/>
-    <a name="circuitnamedboxfixedsize" val="true"/>
+    <a name="circuitnamedboxfixedsize" val="false"/>
     <a name="circuitvhdlpath" val=""/>
     <a name="clabel" val=""/>
     <a name="clabelfont" val="SansSerif bold 16"/>
     <a name="clabelup" val="east"/>
-    <comp lib="0" loc="(100,190)" name="Pin">
+    <comp lib="0" loc="(110,60)" name="Pin">
       <a name="appearance" val="NewPins"/>
+      <a name="radix" val="16"/>
+      <a name="width" val="14"/>
     </comp>
-    <comp lib="0" loc="(100,20)" name="Pin">
-      <a name="appearance" val="NewPins"/>
-    </comp>
-    <comp lib="0" loc="(100,230)" name="Pin">
-      <a name="appearance" val="NewPins"/>
-    </comp>
-    <comp lib="0" loc="(100,450)" name="Pin">
-      <a name="appearance" val="NewPins"/>
-    </comp>
-    <comp lib="0" loc="(100,490)" name="Pin">
-      <a name="appearance" val="NewPins"/>
-    </comp>
-    <comp lib="0" loc="(100,530)" name="Pin">
-      <a name="appearance" val="NewPins"/>
-    </comp>
-    <comp lib="0" loc="(100,60)" name="Pin">
-      <a name="appearance" val="NewPins"/>
-    </comp>
-    <comp lib="0" loc="(170,300)" name="Pin">
+    <comp lib="0" loc="(160,290)" name="Pin">
       <a name="appearance" val="NewPins"/>
       <a name="width" val="8"/>
     </comp>
-    <comp lib="0" loc="(500,300)" name="Splitter">
+    <comp lib="0" loc="(350,270)" name="Tunnel">
+      <a name="facing" val="south"/>
+      <a name="label" val="Data"/>
+      <a name="width" val="8"/>
+    </comp>
+    <comp lib="0" loc="(400,130)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+    </comp>
+    <comp lib="0" loc="(410,330)" name="Splitter">
       <a name="bit1" val="0"/>
       <a name="bit2" val="0"/>
       <a name="bit3" val="0"/>
-      <a name="bit4" val="1"/>
+      <a name="bit4" val="0"/>
       <a name="bit5" val="1"/>
       <a name="bit6" val="1"/>
       <a name="bit7" val="1"/>
-      <a name="facing" val="south"/>
       <a name="incoming" val="8"/>
     </comp>
-    <comp lib="0" loc="(570,270)" name="Pin">
-      <a name="appearance" val="NewPins"/>
-      <a name="radix" val="16"/>
-      <a name="width" val="15"/>
+    <comp lib="0" loc="(500,310)" name="Pull Resistor"/>
+    <comp lib="0" loc="(550,370)" name="Tunnel">
+      <a name="facing" val="east"/>
+      <a name="label" val="Data"/>
+      <a name="width" val="8"/>
     </comp>
-    <comp lib="0" loc="(570,330)" name="Pull Resistor">
-      <a name="facing" val="north"/>
-    </comp>
-    <comp lib="0" loc="(620,310)" name="Splitter">
+    <comp lib="0" loc="(560,290)" name="Splitter">
       <a name="bit1" val="0"/>
       <a name="bit10" val="0"/>
       <a name="bit11" val="0"/>
       <a name="bit12" val="0"/>
       <a name="bit13" val="0"/>
-      <a name="bit14" val="0"/>
+      <a name="bit14" val="1"/>
       <a name="bit15" val="1"/>
       <a name="bit16" val="1"/>
       <a name="bit17" val="1"/>
@@ -233,123 +224,123 @@ end TCL_Generic;&#13;
       <a name="facing" val="west"/>
       <a name="incoming" val="19"/>
     </comp>
-    <comp lib="0" loc="(660,60)" name="Pin">
+    <comp lib="0" loc="(90,110)" name="Pin">
       <a name="appearance" val="NewPins"/>
-      <a name="facing" val="west"/>
-      <a name="output" val="true"/>
     </comp>
-    <comp lib="1" loc="(200,470)" name="OR Gate"/>
-    <comp lib="1" loc="(260,340)" name="OR Gate"/>
-    <comp lib="1" loc="(310,340)" name="NOT Gate"/>
-    <comp lib="1" loc="(410,210)" name="OR Gate"/>
-    <comp lib="1" loc="(410,40)" name="OR Gate"/>
-    <comp lib="1" loc="(480,300)" name="Controlled Buffer">
+    <comp lib="0" loc="(90,200)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(90,240)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(90,330)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(90,370)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(90,420)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(90,460)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="1" loc="(130,200)" name="NOT Gate"/>
+    <comp lib="1" loc="(130,240)" name="NOT Gate"/>
+    <comp lib="1" loc="(160,350)" name="OR Gate"/>
+    <comp lib="1" loc="(250,370)" name="OR Gate"/>
+    <comp lib="1" loc="(260,130)" name="OR Gate"/>
+    <comp lib="1" loc="(260,220)" name="OR Gate"/>
+    <comp lib="1" loc="(310,370)" name="NOT Gate"/>
+    <comp lib="1" loc="(460,280)" name="NOT Gate">
+      <a name="facing" val="south"/>
+    </comp>
+    <comp lib="1" loc="(470,310)" name="Controlled Buffer">
       <a name="control" val="left"/>
-      <a name="width" val="8"/>
+      <a name="width" val="5"/>
     </comp>
-    <comp lib="1" loc="(500,210)" name="NOT Gate"/>
-    <comp lib="1" loc="(600,190)" name="OR Gate"/>
-    <comp lib="1" loc="(610,60)" name="OR Gate"/>
-    <comp lib="4" loc="(380,270)" name="Register">
+    <comp lib="4" loc="(350,300)" name="Register">
       <a name="appearance" val="logisim_evolution"/>
     </comp>
-    <comp lib="4" loc="(680,300)" name="RAM">
+    <comp lib="4" loc="(560,280)" name="RAM">
       <a name="addrWidth" val="19"/>
       <a name="appearance" val="logisim_evolution"/>
-      <a name="trigger" val="falling"/>
       <a name="type" val="nonvolatile"/>
     </comp>
-    <comp lib="8" loc="(34,24)" name="Text">
+    <comp lib="8" loc="(27,114)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="MEMRQ"/>
     </comp>
-    <comp lib="8" loc="(40,235)" name="Text">
-      <a name="font" val="SansSerif plain 12"/>
-      <a name="text" val="A15"/>
-    </comp>
-    <comp lib="8" loc="(40,303)" name="Text">
+    <comp lib="8" loc="(29,294)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="D7-D0"/>
     </comp>
-    <comp lib="8" loc="(43,452)" name="Text">
+    <comp lib="8" loc="(29,375)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="IORQ"/>
     </comp>
-    <comp lib="8" loc="(44,193)" name="Text">
+    <comp lib="8" loc="(29,63)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
-      <a name="text" val="A14"/>
+      <a name="text" val="A0-A13"/>
     </comp>
-    <comp lib="8" loc="(45,65)" name="Text">
+    <comp lib="8" loc="(35,206)" name="Text">
+      <a name="font" val="SansSerif plain 12"/>
+      <a name="text" val="A15"/>
+    </comp>
+    <comp lib="8" loc="(35,425)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="WR"/>
     </comp>
-    <comp lib="8" loc="(47,536)" name="Text">
+    <comp lib="8" loc="(36,247)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
-      <a name="text" val="RD"/>
+      <a name="text" val="A14"/>
     </comp>
-    <comp lib="8" loc="(48,494)" name="Text">
+    <comp lib="8" loc="(36,335)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="A7"/>
     </comp>
-    <comp lib="8" loc="(532,256)" name="Text">
+    <comp lib="8" loc="(38,463)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
-      <a name="text" val="A14-A0"/>
+      <a name="text" val="RD"/>
     </comp>
-    <comp lib="8" loc="(651,128)" name="Text">
+    <comp lib="8" loc="(422,118)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
-      <a name="text" val="Protects the first 16K of NVRAM from accidental writes"/>
+      <a name="text" val="Memory CS'"/>
     </comp>
-    <comp lib="8" loc="(718,63)" name="Text">
-      <a name="font" val="SansSerif plain 12"/>
-      <a name="text" val="NMI"/>
-    </comp>
-    <comp lib="8" loc="(796,295)" name="Text">
-      <a name="font" val="SansSerif plain 12"/>
-      <a name="text" val="CE pin connects directly to MEMRQ "/>
-    </comp>
-    <wire from="(100,190)" to="(360,190)"/>
-    <wire from="(100,20)" to="(360,20)"/>
-    <wire from="(100,230)" to="(330,230)"/>
-    <wire from="(100,450)" to="(150,450)"/>
-    <wire from="(100,490)" to="(150,490)"/>
-    <wire from="(100,530)" to="(650,530)"/>
-    <wire from="(100,60)" to="(210,60)"/>
-    <wire from="(170,300)" to="(340,300)"/>
-    <wire from="(200,470)" to="(210,470)"/>
-    <wire from="(210,360)" to="(210,470)"/>
-    <wire from="(210,60)" to="(210,320)"/>
-    <wire from="(210,60)" to="(360,60)"/>
-    <wire from="(260,340)" to="(280,340)"/>
-    <wire from="(310,340)" to="(380,340)"/>
-    <wire from="(330,230)" to="(330,260)"/>
-    <wire from="(330,230)" to="(360,230)"/>
-    <wire from="(330,260)" to="(470,260)"/>
-    <wire from="(340,300)" to="(340,390)"/>
-    <wire from="(340,300)" to="(380,300)"/>
-    <wire from="(340,390)" to="(680,390)"/>
-    <wire from="(410,210)" to="(440,210)"/>
-    <wire from="(410,40)" to="(490,40)"/>
-    <wire from="(440,210)" to="(470,210)"/>
-    <wire from="(440,300)" to="(460,300)"/>
-    <wire from="(440,80)" to="(440,210)"/>
-    <wire from="(440,80)" to="(560,80)"/>
-    <wire from="(470,260)" to="(470,290)"/>
-    <wire from="(480,300)" to="(500,300)"/>
-    <wire from="(490,170)" to="(550,170)"/>
-    <wire from="(490,40)" to="(490,170)"/>
-    <wire from="(490,40)" to="(560,40)"/>
-    <wire from="(500,210)" to="(550,210)"/>
-    <wire from="(520,320)" to="(520,330)"/>
-    <wire from="(520,330)" to="(570,330)"/>
-    <wire from="(570,270)" to="(600,270)"/>
-    <wire from="(570,330)" to="(600,330)"/>
-    <wire from="(600,190)" to="(650,190)"/>
-    <wire from="(600,270)" to="(600,320)"/>
-    <wire from="(610,60)" to="(660,60)"/>
-    <wire from="(620,310)" to="(680,310)"/>
-    <wire from="(650,190)" to="(650,350)"/>
-    <wire from="(650,350)" to="(680,350)"/>
-    <wire from="(650,360)" to="(650,530)"/>
-    <wire from="(650,360)" to="(680,360)"/>
+    <wire from="(110,60)" to="(540,60)"/>
+    <wire from="(130,200)" to="(170,200)"/>
+    <wire from="(130,240)" to="(210,240)"/>
+    <wire from="(160,290)" to="(350,290)"/>
+    <wire from="(160,350)" to="(200,350)"/>
+    <wire from="(170,150)" to="(170,200)"/>
+    <wire from="(170,150)" to="(210,150)"/>
+    <wire from="(170,200)" to="(210,200)"/>
+    <wire from="(180,390)" to="(180,420)"/>
+    <wire from="(180,390)" to="(200,390)"/>
+    <wire from="(180,420)" to="(440,420)"/>
+    <wire from="(250,370)" to="(280,370)"/>
+    <wire from="(260,130)" to="(400,130)"/>
+    <wire from="(260,220)" to="(460,220)"/>
+    <wire from="(310,370)" to="(350,370)"/>
+    <wire from="(350,270)" to="(350,290)"/>
+    <wire from="(350,290)" to="(350,330)"/>
+    <wire from="(430,310)" to="(450,310)"/>
+    <wire from="(440,330)" to="(440,420)"/>
+    <wire from="(440,330)" to="(560,330)"/>
+    <wire from="(450,340)" to="(450,460)"/>
+    <wire from="(450,340)" to="(560,340)"/>
+    <wire from="(460,220)" to="(460,250)"/>
+    <wire from="(460,280)" to="(460,300)"/>
+    <wire from="(470,310)" to="(500,310)"/>
+    <wire from="(500,310)" to="(540,310)"/>
+    <wire from="(540,60)" to="(540,300)"/>
+    <wire from="(550,370)" to="(560,370)"/>
+    <wire from="(90,110)" to="(210,110)"/>
+    <wire from="(90,200)" to="(100,200)"/>
+    <wire from="(90,240)" to="(100,240)"/>
+    <wire from="(90,330)" to="(110,330)"/>
+    <wire from="(90,370)" to="(110,370)"/>
+    <wire from="(90,420)" to="(180,420)"/>
+    <wire from="(90,460)" to="(450,460)"/>
   </circuit>
 </project>

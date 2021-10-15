@@ -16,13 +16,25 @@
         CALL lcd_init
         CALL lcd_clrScr
 
-        LD IX, Ready
+        ;LD IX, Ready
+        ;CALL lcd_wriStr
+        CALL memTest ; returns result in A
+        CP 0
+        JR Z, memTestOk
+        LD IX, NvRamNok
+        JP printMemTest
+memTestOk:
+        LD IX, NvRamOk
+        JP printMemTest
+printMemTest:
         CALL lcd_wriStr
 
         ;CALL snd_play  ; startup melody
         HALT
 
 Ready: defb "Ready", 0
+NvRamOk: defb "Mem OK", 0
+NvRamNok: defb "Mem Err", 0
 
 include dos.asm
 include mon.asm

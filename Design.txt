@@ -44,7 +44,17 @@ Bus pin		CPU pin		Type	Symbol	Direction
 38			19			C		MEMRQ	>
 39			10			C		IORQ	>
 
-3. Keyboard
+3. I/O
+A0  internal register select
+A1  internal register select
+A2 	111110xx 	keyboard
+A3  111101xx	LCD display
+A4	111011xx	DART
+A5  
+A6  
+A7  011111xx	sound card/buzzer
+
+4. Keyboard
 Chipset:
 1. D-mux: 	'138 
 2. Mux: 	'151
@@ -81,7 +91,7 @@ Connector:
 4. 	INT
 5. 	M1
 6. 	IORQ
-7. 	ADDR
+7. 	A2
 8. 	D0
 9. 	D1
 10. D2
