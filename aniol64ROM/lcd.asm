@@ -17,13 +17,15 @@ BUSY_MASK  equ 10000000b
 
 ; resets the LCD display
 lcd_init:
-        CALL lcd_wait
+        ;CALL lcd_wait
         LD C, LCD_CMD_WR
         LD A, 00001111b ; init: set display on, cursor on, blinking on
         OUT (C), A
-        CALL lcd_wait
+        CALL lcd_delay37us
+        ;CALL lcd_wait
         LD A, 00111000b ; set data length: 8b, 2 lines
         OUT (C), A
+        CALL lcd_delay37us
         RET
 
 ; writes a null-terminated string to the LCD screen
@@ -31,17 +33,18 @@ lcd_init:
 lcd_wriStr:
         LD C, LCD_DAT_WR
 loop_wriStr:
-        CALL lcd_wait
+        ;CALL lcd_wait
         LD A,(IX+0)
         CP 0
         RET Z
         OUT (C),A
+        CALL lcd_delay37us
         INC IX
         JR loop_wriStr
         RET
 
 lcd_clrScr:
-        CALL lcd_wait
+        ;CALL lcd_wait
         LD C, LCD_CMD_WR
         LD A, 01h
         OUT (C), A

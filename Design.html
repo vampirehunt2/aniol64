@@ -1,0 +1,341 @@
+<html>
+<style>
+table, th, td {
+  border:1px solid black;
+}
+</style>
+<body>
+<h1>Aniol64 design document</h1>
+
+<h2>Overview</h2>
+<h3>Peripheral decoding</h3>
+<pre>
+						  STORAGE
+		ROM'	RAM'	SL		LOE'	DART'
+A15		0		1		x		1		x
+A14		x		x		x		1		x
+A5		x		x		0		x		x
+A4		x		x		x		x		0
+MEMRQ	0		0		x		x		x
+IORQ	x		x		0		x		0
+WR		x		x		0		x		x
+</pre>
+<br/>
+ 
+<h2>Bus organization</h2>
+<table>
+<tr> <th>Bus pin</th>	<th>CPU pin</th>	<th>Type</th>	<th>Symbol</th>	<th>Direction</th></tr>
+
+<tr> <td>1</td>	<td>17</td>	<td>C</td>	<td>NMI</td>	<td>IN</td></tr>
+<tr> <td>2</td>	<td>16</td>	<td>C</td>	<td>INT</td>	<td>IN</td></tr>
+<tr> <td>3</td>	<td>6</td>	<td>C</td>	<td>CLK</td>	<td>IN</td></tr>
+<tr> <td>4</td>	<td>5</td>	<td>A</td>	<td>A15</td>	<td>OUT</td></tr>
+<tr> <td>5</td>	<td>4</td>	<td>A</td>	<td>A14</td>	<td>OUT</td></tr>
+<tr> <td>6</td>	<td>3</td>	<td>A</td>	<td>A13</td>	<td>OUT</td></tr>
+<tr> <td>7</td>	<td>2</td>	<td>A</td>	<td>A12</td>	<td>OUT</td></tr>
+<tr> <td>8</td>	<td>1</td>	<td>A</td>	<td>A11</td>	<td>OUT</td></tr>
+<tr> <td>9</td>	<td>40</td>	<td>A</td>	<td>A10</td>	<td>OUT</td></tr>
+<tr> <td>10</td><td>39</td>	<td>A</td>	<td>A9</td>		<td>OUT</td></tr>
+<tr> <td>11</td><td>38</td>	<td>A</td>	<td>A8</td>		<td>OUT</td></tr>
+<tr> <td>12</td><td>37</td>	<td>A</td>	<td>A7</td>		<td>OUT</td></tr>
+<tr> <td>13</td><td>36</td>	<td>A</td>	<td>A6</td>		<td>OUT</td></tr>
+<tr> <td>14</td><td>35</td>	<td>A</td>	<td>A5</td>		<td>OUT</td></tr>
+<tr> <td>15</td><td>34</td>	<td>A</td>	<td>A4</td>		<td>OUT</td></tr>
+<tr> <td>16</td><td>33</td>	<td>A</td>	<td>A3</td>		<td>OUT</td></tr>
+<tr> <td>17</td><td>32</td>	<td>A</td>	<td>A2</td>		<td>OUT</td></tr>
+<tr> <td>18</td><td>31</td>	<td>A</td>	<td>A1</td>		<td>OUT</td></tr>
+<tr> <td>19</td><td>30</td>	<td>A</td>	<td>A0</td>		<td>OUT</td></tr>
+<tr> <td>20</td><td>29</td>	<td>P</td>	<td>GND</td>	<td></td></tr>
+<tr> <td>21</td><td>11</td>	<td>P</td>	<td>VCC</td>	<td></td></tr>
+<tr> <td>22</td><td>27</td>	<td>C</td>	<td>M1</td>		<td>OUT</td></tr>
+<tr> <td>23</td><td>26</td>	<td>C</td>	<td>RESET</td>	<td>IN</td></tr>
+<tr> <td>24</td><td>25</td>	<td>C</td>	<td>BUSRQ</td>	<td>IN</td></tr>
+<tr> <td>25</td><td>24</td>	<td>C</td>	<td>WAIT</td>	<td>IN</td></tr>
+<tr> <td>26</td><td>23</td>	<td>C</td>	<td>BUSACK</td>	<td>OUT</td></tr>
+<tr> <td>27</td><td>22</td>	<td>C</td>	<td>WR</td>		<td>OUT</td></tr>
+<tr> <td>28</td><td>21</td>	<td>C</td>	<td>RD</td>		<td>OUT</td></tr>
+<tr> <td>29</td><td>13</td>	<td>D</td>	<td>D7</td>		<td>BOTH</td></tr>
+<tr> <td>30</td><td>10</td>	<td>D</td>	<td>D6</td>		<td>BOTH</td></tr>
+<tr> <td>31</td><td>9</td>	<td>D</td>	<td>D5</td>		<td>BOTH</td></tr>
+<tr> <td>32</td><td>7</td>	<td>D</td>	<td>D4</td>		<td>BOTH</td></tr>
+<tr> <td>33</td><td>8</td>	<td>D</td>	<td>D3</td>		<td>BOTH</td></tr>
+<tr> <td>34</td><td>12</td>	<td>D</td>	<td>D2</td>		<td>BOTH</td></tr>
+<tr> <td>35</td><td>15</td>	<td>D</td>	<td>D1</td>		<td>BOTH</td></tr>
+<tr> <td>36</td><td>14</td>	<td>D</td>	<td>D0</td>		<td>BOTH</td></tr>
+<tr> <td>37</td><td>18</td>	<td>C</td>	<td>HALT</td>	<td>OUT</td></tr>
+<tr> <td>38</td><td>19</td>	<td>C</td>	<td>MEMRQ</td>	<td>OUT</td></tr>
+<tr> <td>39</td><td>10</td>	<td>C</td>	<td>IORQ</td>	<td>OUT</td></tr>
+</table>
+<br/>
+
+<h2>I/O</h2>
+<h3>Device address decoding</h3>
+<ol>
+<li>A0  internal register select</li>
+<li>A1  internal register select</li>
+<li>A2 	111110xx 	keyboard</li>
+<li>A3  111101xx	LCD display</li>
+<li>A4	111011xx	DART</li>
+<li>A5  110111xx	mass storage</li>
+<li>A6  101111xx	sound card/buzzer</li>
+<li>A7  011111xx	expansion</li>
+</ol>
+<br/>
+
+<h3>Expansion port interface</h3>
+<ol>
+<li>D0</li>
+<li>D1</li>
+<li>D2</li>
+<li>D3</li>
+<li>D4</li>
+<li>D5</li>
+<li>D6</li>
+<li>D7</li>
+<li>INT</li>
+<li>Interrupt Acknowledge (IORQ + M1)</li>
+<li>IEI</li>
+<li>IEO</li>
+<li>Select (IORQ + A7)</li>
+<li>A0</li>
+<li>A1</li>
+<li>CLK</li>
+<li>RD</li>
+<li>WR</li>
+<li>+5V</li>
+<li>GND</li>
+</ol>
+<br/>
+
+<h2>Keyboard</h2>
+<h3>Chipset</h3>
+<ol>
+<li>D-mux: 	'138</li> 
+<li>Mux: 	'151</li>
+<li>Counter: '160x2</li>
+<li>D:		'74</li>
+<li>Latch: 	'573</li>
+<li>OR:		'32</li>
+<li>NOT:	'14</li>
+<li>AND:	'08</li>
+</ol>
+<br/>
+
+<h3>Key-side connector</h3>
+<ol>
+<li>R0</li>
+<li>R1</li>
+<li>R2</li>
+<li>R3</li>
+<li>C0</li>
+<li>C1</li>
+<li>C2</li>
+<li>C3</li>
+<li>C4</li>
+<li>C5</li>
+<li>C6</li>
+<li>C7</li>
+<li>ALT</li>
+<li>SHIFT</li>
+<li></li>
+<li></li>
+</ol>
+<br/>
+
+<h3>CPU-side connector</h3>
+<ol>
+<li>VCC</li> 
+<li>GND</li>
+<li>CLK</li>
+<li>INT</li>
+<li>M1</li>
+<li>IORQ</li>
+<li>A2</li>
+<li>D0</li>
+<li>D1</li>
+<li>D2</li>
+<li>D3</li>
+<li>D4</li>
+<li>D5</li>
+<li>D6</li>
+<li>IEI</li>
+<li>IEO</li>
+</ol>	
+<br/>
+
+<h3>Keyboard layout</h3>
+<table>
+<tr>
+<td>normal</td>	<td>SHIFT</td>	<td>ALT</td>	<td>ALT+SHIFT</td>
+</tr>
+<tr>
+<td>00</td>	<td>10</td>	<td>01</td>	<td>11</td>
+</tr>
+</table>
+<br/>
+
+<table>
+<tr><th colspan="2" rowspan="3"/>	<th colspan="8"/><th>C0</th><th>C5</th></tr>
+<tr>	<th>C0</th>	<th>C1</th>	<th>C2</th> <th>C3</th>	<th>C4</th>	<th>C5</th>	<th>C6</th> <th>C7</th> <th>R3</th>	<th>R3</th></tr>
+<tr>	<th>000</th><th>001</th><th>010</th><th>011</th><th>100</th><th>101</th><th>110</th><th>111</th><th>11</th><th>11</th></tr>
+<tr><th/>R0</th><th/>00</th><td>qQ1!</td><td>wW2@</td><td>eE3#</td><td>rR4$</td><td>tT5%</td><td>yY6^</td><td>uU7&amp;</td><td>iI8*</td><td>oO9(</td><td>pP0)</td></tr>	
+<tr><th/>R1</th><th/>01</th><td>aA+</td><td>sS-</td><td>dD*</td><td>fF/</td><td>gG=</td><td>hH[:</td><td>jJ]</td><td>kK[Up]</td><td>lL_</td><td>\r,\d</td></tr>
+<tr><th/>R2</th><th/>10</th><td>SHIFT</td><td>ALT</td><td>zZ&lt;{</td><td>xX&gt;}</td><td>cC?~</td><td>vV.\</td><td>bB[L]'</td><td>nN[Dn]"</td><td>mM[R];</td><td>\s\t\b</td></tr>	
+<tr><th colspan="10"/>																			<th>C2</th>		<th>C3</th></tr>
+</table>
+<br/>
+																			
+\s - space
+\r - enter
+\d - delete
+\b - backspace
+\t - tab
+<br/>
+
+<h3>Keyboard data lines</h3>
+D7 - SHIFT
+D6 - ALT
+D5-D4 - Rows
+D3-D0 - Cols
+
+<pre>
+Keyboard codes:
+S
+H
+IA   
+FL
+TT R  C
+00-00-000b		q	71h
+00-00-001b		w	77h
+00-00-010b		e	65h
+00-00-011b		r	72h
+00-00-100b		t	74h
+00-00-101b		y	79h
+00-00-110b		u	75h
+00-00-111b		i	69h
+00-01-000b		a	61h
+00-01-001b		s	73h
+00-01-010b		d	64h
+00-01-011b		f	66h
+00-01-100b		g	67h
+00-01-101b		h	68h
+00-01-110b		j	6Ah
+00-01-111b		k	6Bh
+00-10-010b		z	7Ah
+00-10-011b		x	78h
+00-10-100b		c	63h
+00-10-101b		v	76h
+00-10-110b		b	62h
+00-10-111b		n	6Eh
+00-11-000b		o	6Fh
+00-11-001b		l	6Ch
+00-11-010b		m	6Dh
+00-11-011b		\s	20h
+00-11-100b		\r	0Dh
+00-11-101b		p	70h
+
+SHIFT:
+10-00-000b		Q	51h
+10-00-001b		W	57h
+10-00-010b		E	45h
+10-00-011b		R	52h
+10-00-100b		T	54h
+10-00-101b		Y	59h
+10-00-110b		U	55h
+10-00-111b		I	49h
+10-01-000b		A	41h
+10-01-001b		S	53h
+10-01-010b		D	44h
+10-01-011b		F	46h
+10-01-100b		G	47h
+10-01-101b		H	48h
+10-01-110b		J	4Ah
+10-01-111b		K	4Bh
+10-10-010b		Z	5Ah
+10-10-011b		X	58h
+10-10-100b		C	43h
+10-10-101b		V	56h
+10-10-110b		B	42h
+10-10-111b		N	4Eh
+10-11-000b		O	4Fh
+10-11-001b		L	4Ch
+10-11-010b		M	4Dh
+10-11-011b		\t	09h
+10-11-100b		,	2Ch
+10-11-101b		P	50h
+
+ALT:
+01-00-000b		1	31h
+01-00-001b		2	32h
+01-00-010b		3	33h
+01-00-011b		4	34h
+01-00-100b		5	35h
+01-00-101b		6	36h
+01-00-110b		7	37h
+01-00-111b		8	38h
+01-01-000b		+	2Bh
+01-01-001b		-	2Dh
+01-01-010b		*	2Ah
+01-01-011b		/	2Fh
+01-01-100b		=	3Dh
+01-01-101b		[	5Bh
+01-01-110b		]	5Dh
+01-01-111b		[Up]	11h
+01-10-010b		<	3Ch	
+01-10-011b		>	3Eh
+01-10-100b		?	3Fh
+01-10-101b		.	2Eh
+01-10-110b		[L]	12h
+01-10-111b		[Dn]	13h
+01-11-000b		9	39h
+01-11-001b		_	5Fh
+01-11-010b		[R]	14h
+01-11-011b		\b	08h
+01-11-100b		\d	7Fh
+01-11-101b		0	30h
+
+ALT+SHIFT
+11-00-000b		!	21h
+11-00-001b		@	40h
+11-00-010b		#	23h
+11-00-011b		$	24h
+11-00-100b		%	25h
+11-00-101b		^	5Eh
+11-00-110b		&	26h
+11-00-111b		*	2Ah
+11-01-101b		:	3Ah
+11-10-010b		{	7Bh
+11-10-011b		}	7Dh
+11-10-100b		~	7Eh
+11-10-101b		\	5Ch
+11-10-110b		'	27h
+11-10-111b		"	22h
+11-11-000b		(	28h
+11-11-010b		;	3Bh
+11-11-101b		)	29h
+</pre>
+
+<h2>LCD display</h2>
+<h3>CPU-side connector</h3>
+<ol>
+<li>D0</li>
+<li>D1</li>
+<li>D2</li>
+<li>D3</li>
+<li>D4</li>
+<li>D5</li>
+<li>D6</li>
+<li>D7</li>
+<li>A0</li>
+<li>A1</li>
+<li>A4</li>
+<li>RD</li>
+<li>WR</li>
+<li>+5V</li>
+<li>GND</li>
+<li></li>
+</ol>
+
+</body>
+</html>
+
