@@ -283,6 +283,14 @@ end TCL_Generic;&#13;
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="A0-A13"/>
     </comp>
+    <comp lib="8" loc="(302,217)" name="Text">
+      <a name="font" val="SansSerif plain 12"/>
+      <a name="text" val="bankSwitchOut"/>
+    </comp>
+    <comp lib="8" loc="(320,385)" name="Text">
+      <a name="font" val="SansSerif plain 12"/>
+      <a name="text" val="bankSwitchIn"/>
+    </comp>
     <comp lib="8" loc="(35,206)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="A15"/>
@@ -297,7 +305,7 @@ end TCL_Generic;&#13;
     </comp>
     <comp lib="8" loc="(36,335)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
-      <a name="text" val="A7"/>
+      <a name="text" val="A5"/>
     </comp>
     <comp lib="8" loc="(38,463)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
@@ -305,7 +313,7 @@ end TCL_Generic;&#13;
     </comp>
     <comp lib="8" loc="(422,118)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
-      <a name="text" val="Memory CS'"/>
+      <a name="text" val="RAM SEL'"/>
     </comp>
     <wire from="(110,60)" to="(540,60)"/>
     <wire from="(130,200)" to="(170,200)"/>
