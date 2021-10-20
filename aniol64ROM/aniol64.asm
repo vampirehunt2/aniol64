@@ -10,7 +10,7 @@
  org 0
         LD SP, 0FFFFh   ; initialise stack pointer to the top of available RAM
         IM 1            ; set interupt mode to 1,
-                        ; this may not work after DART is added
+                        ; TODO: this may not work after DART is added
         EI              ; enable interrupts
 
         CALL lcd_init

@@ -17,15 +17,17 @@ BUSY_MASK  equ 10000000b
 
 ; resets the LCD display
 lcd_init:
-        ;CALL lcd_wait
+        CALL lcd_delay10ms      ; 44870 documentation, section Reset Function
+        CALL lcd_delay10ms      ; TODO: although it shouldn't matter
+                                ; because we are manually resetting
+                                ; long after VCC is turned on
         LD C, LCD_CMD_WR
         LD A, 00001111b ; init: set display on, cursor on, blinking on
         OUT (C), A
-        CALL lcd_delay37us
-        ;CALL lcd_wait
+        CALL lcd_delay10ms
         LD A, 00111000b ; set data length: 8b, 2 lines
         OUT (C), A
-        CALL lcd_delay37us
+        CALL lcd_delay10ms
         RET
 
 ; writes a null-terminated string to the LCD screen
@@ -33,24 +35,24 @@ lcd_init:
 lcd_wriStr:
         LD C, LCD_DAT_WR
 loop_wriStr:
-        ;CALL lcd_wait
+        CALL lcd_wait
         LD A,(IX+0)
         CP 0
         RET Z
         OUT (C),A
-        CALL lcd_delay37us
+        ;CALL lcd_delay37us
         INC IX
         JR loop_wriStr
         RET
 
 lcd_clrScr:
-        ;CALL lcd_wait
+        CALL lcd_wait
         LD C, LCD_CMD_WR
         LD A, 01h
         OUT (C), A
         RET
 
-lcd_resetCursorPos:
+lcd_home:
         LD C, LCD_CMD_WR
         LD A, 02h
         OUT (C), A
@@ -58,25 +60,25 @@ lcd_resetCursorPos:
 
 lcd_cursorLShift:
         LD C, LCD_CMD_WR
-        LD A, 04h
+        LD A, 00010000b
         OUT (C), A
         RET
 
 lcd_cursorRShift:
         LD C, LCD_CMD_WR
-        LD A, 06h
+        LD A, 00010100b
         OUT (C), A
         RET
 
 lcd_screenRShift:
         LD C, LCD_CMD_WR
-        LD A, 05h
+        LD A, 05h ;TODO: wrong
         OUT (C), A
         RET
 
 lcd_screenLShift:
         LD C, LCD_CMD_WR
-        LD A, 07h
+        LD A, 07h ;TODO: wrong
         OUT (C), A
         RET
 
@@ -85,7 +87,7 @@ lcd_screenLShift:
 lcd_wait:
         IN A, (LCD_CMD_RD)
         AND BUSY_MASK
-        CP 0
+        CP 0 ;TODO probably redundant
         RET Z
         JP lcd_wait
 
@@ -132,4 +134,15 @@ lcd_delay1520us:
         CALL lcd_delay37us
         CALL lcd_delay37us
         CALL lcd_delay37us
+        RET
+
+lcd_delay10ms:
+        CALL lcd_delay1520us
+        CALL lcd_delay1520us
+        CALL lcd_delay1520us
+        CALL lcd_delay1520us
+        CALL lcd_delay1520us
+        CALL lcd_delay1520us
+        CALL lcd_delay1520us
+        CALL lcd_delay1520us
         RET
