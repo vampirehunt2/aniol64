@@ -1,5 +1,8 @@
 <html>
 <style>
+body {
+	font-family:Courier
+}
 table, th, td {
   border:1px solid black;
 }
@@ -9,17 +12,19 @@ table, th, td {
 
 <h2>Overview</h2>
 <h3>Peripheral decoding</h3>
-<pre>
-						  STORAGE
-		ROM'	RAM'	SL		LOE'	DART'
-A15		0		1		x		1		x
-A14		x		x		x		1		x
-A5		x		x		0		x		x
-A4		x		x		x		x		0
-MEMRQ	0		0		x		x		x
-IORQ	x		x		0		x		0
-WR		x		x		0		x		x
-</pre>
+<table>
+<tr><th colspan="3"/><th colspan="2">Bank Switching</th><th/></tr>
+<tr><th/>			<th>ROM'</th>	<th>RAM'</th>	<th>IN</th>	<th>OUT'</th>	<th>DART'</th>	<th>keybd</th>	<th>buzzer</th></tr>
+<tr><th>A15</th>	<td>0</td>		<td>1</td>		<td>x</td>	<td>1</td>		<td>x</td>		<td>x</td>		<td>x</td></tr>
+<tr><th>A14</th>	<td>x</td>		<td>x</td>		<td>x</td>	<td>1</td>		<td>x</td>		<td>x</td>		<td>x</td></tr>
+<tr><th>A5</th>		<td>x</td>		<td>x</td>		<td>0</td>	<td>x</td>		<td>x</td>		<td>x</td>		<td>x</td></tr>
+<tr><th>A4</th>		<td>x</td>		<td>x</td>		<td>x</td>	<td>x</td>		<td>0</td>		<td>x</td>		<td>x</td></tr>
+<tr><th>A2</th>		<td>x</td>		<td>x</td>		<td>x</td>	<td>x</td>		<td>x</td>		<td>0</td>		<td>0</td></tr>
+<tr><th>MEMRQ</th>	<td>0</td>		<td>0</td>		<td>x</td>	<td>x</td>		<td>x</td>		<td>x</td>		<td>x</td></tr>
+<tr><th>IORQ</th>	<td>x</td>		<td>x</td>		<td>0</td>	<td>x</td>		<td>0</td>		<td>0</td>		<td>0</td></tr>
+<tr><th>WR</th>		<td>x</td>		<td>x</td>		<td>0</td>	<td>x</td>		<td>x</td>		<td>x</td>		<td>0</td></tr>
+<tr><th>RD</th>		<td>x</td>		<td>x</td>		<td>x</td>	<td>x</td>		<td>x</td>		<td>0</td>		<td>x</td></tr>
+</table>
 <br/>
  
 <h2>Bus organization</h2>
@@ -160,10 +165,17 @@ WR		x		x		0		x		x
 <li>D5</li>
 <li>D6</li>
 <li>IEI</li>
+<i>
 <li>IEO</li>
 <li>CLK</li>
 <li>A0</li>
 <li>A1</li>
+</i>
+<br/>
+Legend:
+<ul>
+<li>must have</li>
+<li><i>nice to have</i></li>
 </ol>	
 <br/>
 
@@ -189,11 +201,11 @@ WR		x		x		0		x		x
 </table>
 <br/>
 																			
-\s - space
-\r - enter
-\d - delete
-\b - backspace
-\t - tab
+\s - space<br/>
+\r - enter<br/>
+\d - delete<br/>
+\b - backspace<br/>
+\t - tab<br/>
 <br/>
 
 <h3>Keyboard data lines</h3>
