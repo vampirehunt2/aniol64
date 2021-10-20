@@ -11,6 +11,21 @@ table, th, td {
 <h1>Aniol64 design document</h1>
 
 <h2>Overview</h2>
+Aniol64 is an 8-bit, Z80-based microcomputer with built-in keyboard, display and serial port as well as extendable IO
+<br/>
+
+<h2>Memory</h2>
+<h3>Memory map</h3>
+0000-7FFF: ROM (28C256)<br/>
+8000-FFFF: RAM (62C256 or DS1244Y)<br/>
+8000-BFFF: general purpose RAM (AS6C4008)<br/>
+C000-7FFF: bank-switchable NVRAM (AS6C4008)<br/>
+<br/>
+
+<h3>Bank switching schematic</h3>
+<img src="Design/bankSwitching.png"/>
+<br/>
+
 <h3>Peripheral decoding</h3>
 <table>
 <tr><th colspan="3"/><th colspan="2">Bank Switching</th><th/></tr>
@@ -209,10 +224,10 @@ Legend:
 <br/>
 
 <h3>Keyboard data lines</h3>
-D7 - SHIFT
-D6 - ALT
-D5-D4 - Rows
-D3-D0 - Cols
+D6 - SHIFT<br/>
+D5 - ALT<br/>
+D4-D3 - Rows<br/>
+D2-D0 - Cols<br/>
 
 <pre>
 Keyboard codes:
@@ -331,6 +346,9 @@ ALT+SHIFT
 11-11-101b		)	29h
 </pre>
 
+<h3>Schematic</h3>
+<img src="Design/keyboard-buzzer.png"/>
+
 <h2>LCD display</h2>
 <h3>CPU-side connector</h3>
 <ol>
@@ -351,6 +369,9 @@ ALT+SHIFT
 <li>GND</li>
 <li></li>
 </ol>
+
+<h2>References</h2>
+<a href="http://www.forum-trioda.pl/viewtopic.php?f=48&t=37948">Komputer 8-bitowy</a>
 
 </body>
 </html>
