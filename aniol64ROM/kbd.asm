@@ -9,7 +9,7 @@
 
 ; keyboard is selected with A2
 
-KEYCODE_BASE_ADDR equ 0400h
+KEYCODE_BASE_ADDR equ 4000h
 
 ; Converts keyboard code to ASCII code
 ; C - keycode to convert

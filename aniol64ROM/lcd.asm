@@ -13,21 +13,26 @@ LCD_CMD_WR equ 11110100b ; write command port of the LCD
 LCD_DAT_WR equ 11110101b ; write data port of the LCD
 LCD_CMD_RD equ 11110110b ; read command port of the LCD
 LCD_DAT_RD equ 11110111b ; read data port of the LCD
+
 BUSY_MASK  equ 10000000b
+DDRAM_MASK equ 01111111b
+
+; starting CGRAM addresses for physical display lines
+; note, logical lines don't match the order of physical lines
+LINE1 equ 00d
+LINE2 equ 40d
+LINE3 equ 20d
+LINE4 equ 60d
 
 ; resets the LCD display
 lcd_init:
-        CALL lcd_delay10ms      ; 44870 documentation, section Reset Function
-        CALL lcd_delay10ms      ; TODO: although it shouldn't matter
-                                ; because we are manually resetting
-                                ; long after VCC is turned on
         LD C, LCD_CMD_WR
         LD A, 00001111b ; init: set display on, cursor on, blinking on
         OUT (C), A
-        CALL lcd_delay10ms
+        CALL delay10ms
         LD A, 00111000b ; set data length: 8b, 2 lines
         OUT (C), A
-        CALL lcd_delay10ms
+        CALL delay10ms
         RET
 
 ; writes a null-terminated string to the LCD screen
@@ -37,10 +42,9 @@ lcd_wriStr:
 loop_wriStr:
         CALL lcd_wait
         LD A,(IX+0)
-        CP 0
+        CP 0                                  ;
         RET Z
         OUT (C),A
-        ;CALL lcd_delay37us
         INC IX
         JR loop_wriStr
         RET
@@ -70,15 +74,46 @@ lcd_cursorRShift:
         OUT (C), A
         RET
 
-lcd_screenRShift:
-        LD C, LCD_CMD_WR
-        LD A, 05h ;TODO: wrong
-        OUT (C), A
+; reads the current cursor position
+; result in A
+lcd_getPos:
+        CALL lcd_wait
+        IN A, (LCD_CMD_RD)
+        AND DDRAM_MASK
         RET
 
-lcd_screenLShift:
+; moves cursor to the beginning of a line
+; line number in A
+lcd_gotoLn:
+        CP 1
+        JR Z, lcd_gotoLn1
+        CP 2
+        JR Z, lcd_gotoLn2
+        CP 3
+        JR Z, lcd_gotoLn3
+        CP 4
+        JR Z, lcd_gotoLn4   ; TODO: for some reason this doesn't work
+        RET   ; if line number is not 1-4, do nothing
+lcd_gotoLn1:
+        LD A, LINE1
+        JP lcd_setCursorPos
+lcd_gotoLn2:
+        LD A, LINE2
+        JP lcd_setCursorPos
+lcd_gotoLn3:
+        LD A, LINE3
+        JP lcd_setCursorPos
+lcd_gotoLn4:
+        LD A, LINE4
+        JP lcd_setCursorPos ; redundant, but more clear this way
+; sets cursor position.
+; A - cursor position on lower 7 bits
+lcd_setCursorPos:
+        OR 10000000b ; setting bit DB7 which indicates write to DDRAM address
+        PUSH AF      ; lcd_wait uses A register, so we need to save our value to stack
+        CALL lcd_wait
+        POP AF
         LD C, LCD_CMD_WR
-        LD A, 07h ;TODO: wrong
         OUT (C), A
         RET
 
@@ -90,59 +125,3 @@ lcd_wait:
         CP 0 ;TODO probably redundant
         RET Z
         JP lcd_wait
-
-; waits for 37us * 1,8432MHz = 69 clock cycles
-; which is just 11 NOPs, 4 cycles each
-; plus 10 cycles for the RET
-; plus 17 cycles to CALL this routine
-lcd_delay37us:
-        NOP
-        NOP
-        NOP
-        NOP
-        NOP
-        NOP
-        NOP
-        NOP
-        NOP
-        NOP
-        NOP
-        RET
-
-; waits for 1520us,
-; which is 22 calls to lcd_delay37us
-lcd_delay1520us:
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        CALL lcd_delay37us
-        RET
-
-lcd_delay10ms:
-        CALL lcd_delay1520us
-        CALL lcd_delay1520us
-        CALL lcd_delay1520us
-        CALL lcd_delay1520us
-        CALL lcd_delay1520us
-        CALL lcd_delay1520us
-        CALL lcd_delay1520us
-        CALL lcd_delay1520us
-        RET

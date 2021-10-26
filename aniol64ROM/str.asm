@@ -12,14 +12,14 @@
 ; result in C: 0 if equal, 1 if different
 str_cmp:
         LD A, (IX+0)
-        LD B, (IX+0)
+        LD B, (IY+0)
         CP B
         JR NZ, strCmpNeq
         CP 0
         JR Z, strCmpEq
         INC IX
         INC IY
-        JR str_cmp
+        JP str_cmp
 strCmpEq:
         LD C, 0
         RET

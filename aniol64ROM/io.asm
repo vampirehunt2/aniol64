@@ -17,3 +17,9 @@ wriStr:
         OUT (C),A
         INC IX
         JR wriStr
+
+readLn:
+        RET
+
+readKey:
+        RET

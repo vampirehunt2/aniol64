@@ -8,6 +8,8 @@
 ;----------------------------------------------------
 
 MemTest: defb "MemTest", 0
+MemErr equ 1
+TestAddr equ 8000h  ; points to the beginning of RAM
 
 ; checks if NV RAM is installed
 ; returns 0 in C if non-volatile memory is found
@@ -16,13 +18,13 @@ MemTest: defb "MemTest", 0
 ; or when it's the first run of the computer
 memTest:
         LD IX, MemTest
-        LD IY, 8000h    ; point to the beginning of RAM
+        LD IY, TestAddr
         CALL str_cmp    ; checks if RAM already contains the test string
-        LD A, C
-        CP 0            ; may be redundant
-        RET 0           ; if test string found, return 0 in C
+        LD A, C         ; 0 in C if string found
+        CP 0
+        RET Z           ; if test string found, return 0 in C
         LD IX, MemTest  ; otherwise copy it into the memory
-        LD IY, 8000h
+        LD IY, TestAddr
         CALL str_copy
-        LD A, 1
+        LD A, MemErr
         RET

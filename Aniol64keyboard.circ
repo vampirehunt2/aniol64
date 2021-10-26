@@ -328,6 +328,10 @@ end TCL_Generic;&#13;
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="RD"/>
     </comp>
+    <comp lib="8" loc="(40,452)" name="Text">
+      <a name="font" val="SansSerif plain 12"/>
+      <a name="text" val="SHIFT"/>
+    </comp>
     <comp lib="8" loc="(401,392)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="Interrupt Acknowledge"/>
@@ -343,10 +347,6 @@ end TCL_Generic;&#13;
     <comp lib="8" loc="(456,462)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="D6-D0"/>
-    </comp>
-    <comp lib="8" loc="(46,498)" name="Text">
-      <a name="font" val="SansSerif plain 12"/>
-      <a name="text" val="SHIFT"/>
     </comp>
     <comp lib="8" loc="(768,347)" name="Text">
       <a name="font" val="SansSerif plain 12"/>

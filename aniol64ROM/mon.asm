@@ -32,7 +32,7 @@ asc2hexstr16b:
 
 ; converts a byte to its hex representation in ASCII
 ; B - input byte
-; result in CD
+; result in DE
 hex2asc:
         LD A, B
         AND A         ; clear carry flag
@@ -41,11 +41,11 @@ hex2asc:
         RRA
         RRA           ; upper nibble now in A
         CALL nibble2asc
-        LD C, A
+        LD D, A
         LD A, B       ;
         AND 00001111  ; lower nibble now in A
         CALL nibble2asc
-        LD D, A
+        LD E, A
         RET
 
 ; A - nibble to convert to an ASCII hex digit
