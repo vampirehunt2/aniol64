@@ -17,7 +17,7 @@ LCD_DAT_RD equ 11110111b ; read data port of the LCD
 BUSY_MASK  equ 10000000b
 DDRAM_MASK equ 01111111b
 
-; starting CGRAM addresses for physical display lines
+; starting DDRAM addresses for physical display lines
 ; note, logical lines don't match the order of physical lines
 LINE1 equ 00d
 LINE2 equ 40d

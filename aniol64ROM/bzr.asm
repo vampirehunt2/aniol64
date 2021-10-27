@@ -16,3 +16,12 @@ bzr_beep:
         LD A, 00h
         OUT (C), A
         RET
+
+bzr_click:
+        LD C, 01111111b ; buzzer is activated by A7
+        LD A, 0FFh
+        OUT (C), A
+        CALL delay37us
+        LD A, 00h
+        OUT (C), A
+        RET
