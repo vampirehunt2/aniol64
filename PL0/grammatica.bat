@@ -1,0 +1,1 @@
+java -jar C:\Users\PiotrAniola\Documents\8bit\grammatica-1.6\lib\grammatica-1.6.jar PL0-grammar.txt --csoutput csparser --csnamespace aniol64.pl0plus --csclassname parser

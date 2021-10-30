@@ -34,7 +34,6 @@ init:
         CALL lcd_wriStr
         LD IX, Ready
         CALL lcd_wriStr
-        ;CALL snd_play  ; startup melody
 
         ; check for NVRAM
         CALL memTest ; returns result in A
@@ -59,6 +58,7 @@ printMemTest:
         LD A, 50
         CALL delay
         CALL bzr_beep
+        ;CALL snd_init
 
         ; wait for user input from here on in
         HALT
@@ -67,8 +67,8 @@ Aniol64: defb   "     _ANIOL 64_     ", 0
 Ready: defb     "Ready               ", 0
 Hello: defb     "Hello", 0
 Prompt: defb    ">", 0
-NvRamOk: defb   "Mem OK              ", 0
-NvRamNok: defb  "Mem Err             ", 0
+NvRamOk: defb   "NVRAM OK            ", 0
+NvRamNok: defb  "NVRAM Error         ", 0
 
 include util.asm
 include bzr.asm
@@ -80,6 +80,7 @@ include dart.asm
 include snd.asm
 include mem.asm
 include io.asm
+include clk.asm
 include kbd.asm ; this goes last becasue of the org 4000h inside
 
 

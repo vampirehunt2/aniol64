@@ -4,7 +4,7 @@ Path=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\
 ObjExt=.exe
 
 [File]
-Total=12
+Total=13
 0=aniol64.asm
 1=lcd.asm
 2=str.asm
@@ -17,6 +17,7 @@ Total=12
 9=io.asm
 10=bzr.asm
 11=util.asm
+12=clk.asm
 
 [Directory]
 Total=2
@@ -40,7 +41,7 @@ Total=10
 Total=0
 
 [FileInUse]
-Total=12
+Total=13
 0=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\lcd.asm
 1=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\str.asm
 2=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\kbd.asm
@@ -53,3 +54,4 @@ Total=12
 9=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\bzr.asm
 10=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\util.asm
 11=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\aniol64.asm
+12=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\clk.asm

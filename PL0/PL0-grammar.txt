@@ -1,0 +1,142 @@
+%header%
+
+GRAMMARTYPE = "LL"
+
+DESCRIPTION = "A grammar for PL/0+ translator zo Z80 assembly"
+
+%tokens%
+
+ADD				= "+"
+SUB				= "-"
+MUL				= "*"
+DIV				= "/"
+LEFT_PAREN		= "("
+RIGHT_PAREN		= ")"
+DECNUMBER		= <<[-]?[0-9]+>>
+BINNUMBER		= <<%[0-1]+>>
+HEXNUMBER		= <<$[0-9A-F]+>>
+IDENTIFIER		= <<[a-z][a-zA-Z0-9]*>>
+WHITESPACE		= <<[ \t\n\r]+>> %ignore%
+
+
+PROGRAM			= "program"
+BEGIN			= "begin"
+END				= "end"
+PROC			= "procedure"
+FUNC			= "function"
+RETURN			= "return"
+VAR				= "var"
+CONST			= "const"
+IF				= "if"
+THEN			= "then"
+ELSE			= "else"
+WHILE			= "while"
+DO				= "do"
+FOR				= "for"
+TO				= "to"
+
+INT				= "int"
+POINTER			= "pointer"
+
+SEPARATOR		= ";"
+TERMINATOR		= "."
+COMMA 			= ","
+ASSIGNMENT		= ":="
+EQUAL			= "="
+NOTEQUAL		= "<>"
+GREATER			= ">"
+LESSER			= "<"
+GREATEREQUAL	= ">="
+LESSEREQUAL		= "<="
+COLON 			= ":"
+
+
+
+%productions%
+
+PL0Program = PROGRAM 
+			[ ConstDeclaration ]
+			[ VarDeclaration ]
+			{ ProcDeclaration }
+			Block 
+			TERMINATOR ;
+
+Number = DECNUMBER
+		| HEXNUMBER
+		| BINNUMBER
+		;
+
+Type = 	INT
+		| POINTER 
+		;
+		
+Block = BEGIN [ StatementList ] END ;
+
+StatementList = Statement { Statement } ;
+		
+ConstDeclaration = CONST { IDENTIFIER EQUAL Number SEPARATOR } ;		
+		
+VarDeclaration = VAR { IDENTIFIER COLON Type SEPARATOR } ;
+
+FormalArgumentDeclaration = LEFT_PAREN [IDENTIFIER COLON Type] { COMMA IDENTIFIER COLON Type} RIGHT_PAREN ;
+
+ActualParameterList = LEFT_PAREN Expression {COMMA Expression} RIGHT_PAREN ;
+
+ProcDeclaration = PROC IDENTIFIER [FormalArgumentDeclaration] Block ;
+
+FuncDeclaration = FUNC IDENTIFIER [FormalArgumentDeclaration] COLON Type Block ;
+
+IfStatement = IF Condition THEN Statement [ELSE Statement] ;
+			
+WhileStatement = WHILE Condition DO Statement ;
+
+ForStatement = FOR VarAssignment TO Expression DO Statement ;
+
+ReturnStatement = RETURN [Expression] ;
+
+Statement = Instruction SEPARATOR 
+			| Block
+			| IfStatement
+			| WhileStatement
+			| ForStatement
+			| ReturnStatement
+			;
+
+Instruction = VarAssignment
+			| Call 
+			;
+			
+Condition = Expression ConditionalOperator Expression ;
+			
+ConditionalOperator = EQUAL
+					| NOTEQUAL
+					| GREATER
+					| LESSER
+					| GREATEREQUAL
+					| LESSEREQUAL
+					;
+				
+Call = IDENTIFIER ActualParameterList ;
+
+VarAssignment = IDENTIFIER ASSIGNMENT Expression ;
+
+Expression = Term [ExpressionTail] 
+			| Call
+			;
+
+ExpressionTail = "+" Expression
+               | "-" Expression 
+			   ;
+
+Term = Factor [TermTail] ;
+     
+TermTail = "*" Term
+         | "/" Term ;
+
+Factor = Atom
+       | "(" Expression ")" 
+	   ;
+
+Atom = Number
+     | IDENTIFIER 
+	 ;
