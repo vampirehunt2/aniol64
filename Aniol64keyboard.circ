@@ -168,7 +168,6 @@ end TCL_Generic;&#13;
     <a name="clabelup" val="east"/>
     <comp lib="0" loc="(110,340)" name="Pull Resistor">
       <a name="facing" val="north"/>
-      <a name="pull" val="1"/>
     </comp>
     <comp lib="0" loc="(180,40)" name="Pin">
       <a name="appearance" val="NewPins"/>
@@ -249,7 +248,7 @@ end TCL_Generic;&#13;
     <comp lib="1" loc="(110,410)" name="NOT Gate"/>
     <comp lib="1" loc="(110,470)" name="NOT Gate"/>
     <comp lib="1" loc="(140,590)" name="OR Gate"/>
-    <comp lib="1" loc="(160,100)" name="AND Gate"/>
+    <comp lib="1" loc="(160,100)" name="OR Gate"/>
     <comp lib="1" loc="(210,550)" name="OR Gate"/>
     <comp lib="1" loc="(210,630)" name="OR Gate"/>
     <comp lib="1" loc="(310,630)" name="NOT Gate"/>
@@ -259,6 +258,7 @@ end TCL_Generic;&#13;
     <comp lib="1" loc="(380,440)" name="Controlled Buffer">
       <a name="width" val="7"/>
     </comp>
+    <comp lib="1" loc="(510,340)" name="AND Gate"/>
     <comp lib="1" loc="(530,710)" name="OR Gate"/>
     <comp lib="1" loc="(580,350)" name="NOT Gate">
       <a name="facing" val="north"/>
@@ -310,10 +310,6 @@ end TCL_Generic;&#13;
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="IORQ"/>
     </comp>
-    <comp lib="8" loc="(33,615)" name="Text">
-      <a name="font" val="SansSerif plain 12"/>
-      <a name="text" val="A2"/>
-    </comp>
     <comp lib="8" loc="(337,576)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="D0"/>
@@ -329,6 +325,10 @@ end TCL_Generic;&#13;
     <comp lib="8" loc="(39,535)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="RD"/>
+    </comp>
+    <comp lib="8" loc="(39,615)" name="Text">
+      <a name="font" val="SansSerif plain 12"/>
+      <a name="text" val="A6"/>
     </comp>
     <comp lib="8" loc="(390,694)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
@@ -370,8 +370,9 @@ end TCL_Generic;&#13;
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="INT"/>
     </comp>
-    <wire from="(110,120)" to="(110,340)"/>
-    <wire from="(110,340)" to="(420,340)"/>
+    <wire from="(110,120)" to="(110,320)"/>
+    <wire from="(110,320)" to="(110,340)"/>
+    <wire from="(110,320)" to="(420,320)"/>
     <wire from="(110,410)" to="(200,410)"/>
     <wire from="(110,470)" to="(230,470)"/>
     <wire from="(140,590)" to="(150,590)"/>
@@ -402,17 +403,21 @@ end TCL_Generic;&#13;
     <wire from="(380,440)" to="(420,440)"/>
     <wire from="(400,110)" to="(530,110)"/>
     <wire from="(400,120)" to="(480,120)"/>
-    <wire from="(420,240)" to="(420,340)"/>
+    <wire from="(420,240)" to="(420,320)"/>
     <wire from="(420,240)" to="(450,240)"/>
-    <wire from="(420,340)" to="(550,340)"/>
+    <wire from="(420,320)" to="(460,320)"/>
     <wire from="(420,590)" to="(480,590)"/>
     <wire from="(440,690)" to="(480,690)"/>
     <wire from="(440,730)" to="(480,730)"/>
     <wire from="(450,240)" to="(460,240)"/>
+    <wire from="(450,360)" to="(450,410)"/>
+    <wire from="(450,360)" to="(460,360)"/>
+    <wire from="(450,410)" to="(680,410)"/>
     <wire from="(480,120)" to="(480,220)"/>
     <wire from="(50,410)" to="(70,410)"/>
     <wire from="(50,470)" to="(70,470)"/>
     <wire from="(500,220)" to="(540,220)"/>
+    <wire from="(510,340)" to="(550,340)"/>
     <wire from="(530,710)" to="(560,710)"/>
     <wire from="(540,130)" to="(540,150)"/>
     <wire from="(540,170)" to="(540,220)"/>
@@ -428,7 +433,8 @@ end TCL_Generic;&#13;
     <wire from="(640,300)" to="(640,450)"/>
     <wire from="(660,500)" to="(660,530)"/>
     <wire from="(660,530)" to="(700,530)"/>
-    <wire from="(680,380)" to="(680,440)"/>
+    <wire from="(680,380)" to="(680,410)"/>
+    <wire from="(680,410)" to="(680,440)"/>
     <wire from="(680,440)" to="(680,450)"/>
     <wire from="(680,440)" to="(750,440)"/>
     <wire from="(70,410)" to="(80,410)"/>
