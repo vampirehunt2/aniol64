@@ -1,0 +1,21 @@
+640x480x60Hz
+
+Pixel clock = 25.175MHz/4
+
+Horizontal timing (line)
+Scanline part	Pixels	Time [µs]			/4 pixels	total 	bin			chars
+Visible area	640		25.422045680238		160			160		1010 0000	20	
+Front porch		16		0.63555114200596	  4			164		1010 0100
+Sync pulse		96		3.8133068520357		 24			188		1011 1100
+Back porch		48		1.9066534260179		 12			200		1100 1000
+Whole line		800		31.777557100298		200								25
+
+couter reset at 200d = 11001000b
+
+Vertical timing (frame)
+Frame part		Lines	Time [ms]						total	bin
+Visible area	480		15.253227408143					480		01 1110 0000
+Front porch		10		0.31777557100298				490		01 1110 1010
+Sync pulse		2		0.063555114200596				492		01 1110 1100
+Back porch		33		1.0486593843098					525		10 0000 1101
+Whole frame		525		16.683217477656
