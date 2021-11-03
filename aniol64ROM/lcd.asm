@@ -49,6 +49,14 @@ loop_wriStr:
         JR loop_wriStr
         RET
 
+; puts a single character on the screen
+; A - character to be written
+lcd_putChar:
+        LD C, LCD_DAT_WR
+        CALL lcd_wait
+        OUT (C), A
+        RET
+
 lcd_clrScr:
         CALL lcd_wait
         LD C, LCD_CMD_WR

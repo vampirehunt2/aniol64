@@ -8,8 +8,8 @@
 ; handles the DS1244 Phantom clock
 ;----------------------------------------------------
 
-CLKSCRATCHPAD equ 8008h
-CLKDATA equ 8009h
+ClkScratchpad equ 8008h
+ClkData equ 8009h
 CLKMASK equ 00000001b
 
 ; Phantom clock recognition sequence
@@ -18,7 +18,7 @@ PhantomSeq: defb 0C5h, 03Ah, 0A3h, 05Ch, 0C5h, 03Ah, 0A3h, 05Ch, 0
 ; initiates the phantom clock mode
 clk_on:
         LD BC, PhantomSeq
-        LD DE, CLKSCRATCHPAD
+        LD DE, ClkScratchpad
         LD A, (DE)      ; any read operation will reset the
                         ; recognition register pointer
                         ; and therefore allow to initiate the
@@ -49,8 +49,8 @@ clk_onLoop:
 ; to a DS1244
 clk_write:
         LD H, 8         ; loop counter
-        LD BC, CLKDATA
-        LD DE, CLKSCRATCHPAD
+        LD BC, ClkData
+        LD DE, ClkScratchpad
 clk_writeLoop:
         LD A, (BC)
         LD (DE), A
@@ -77,8 +77,8 @@ clk_writeLoop:
 ; reads clock data from a DS1244 and puts it in 8 bytes starting with address CLKDATA
 ; must be preceded with clk_on
 clk_read:
-        LD BC, CLKDATA
-        LD DE, CLKSCRATCHPAD
+        LD BC, ClkData
+        LD DE, ClkScratchpad
         LD A, 8 ; loop counter
 clk_readLoop:
         PUSH AF

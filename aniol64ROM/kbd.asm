@@ -7,19 +7,48 @@
 ;
 ;----------------------------------------------------
 
-; keyboard is selected with A2
+; keyboard is selected with A6
 
 KEYCODE_BASE_ADDR equ 4000h
+KBD_PORT equ 10111111b
+
+KbdBuff equ 8012h         ; 8012h-8028h, but only using the first byte for now, for a 1-byte buffer
+KbdBuffHead equ 8029h    ; reserverd for future use
+KbdBuffTail equ 802Ah    ; reserved for future use
 
 ; Converts keyboard code to ASCII code
 ; C - keycode to convert
 ; zeroes B
 ; result in A
-kbd_keycode2ascii
+kbd_keycode2ascii:
         LD HL, KEYCODE_BASE_ADDR
         LD B, 00h
         ADD HL, BC
         LD A, (HL)
+        RET
+
+; reads a keycode from the keyboard and converts to an ascii character
+; then stores it in the keyboard buffer.
+; To be called from interrupt routine
+kbd_input:
+        LD C, KBD_PORT
+        IN A, (C)
+        LD C, A
+        CALL kbd_keycode2ascii
+        LD (KbdBuff), A
+        RET
+
+; reads a single key from the buffer
+kbd_readKey:
+        LD A, (KbdBuff)
+        CP 0
+        JR Z, kbd_readKey
+        DI
+        PUSH AF
+        LD A, 0
+        LD (KbdBuff), A
+        POP AF
+        EI
         RET
 
 org KEYCODE_BASE_ADDR

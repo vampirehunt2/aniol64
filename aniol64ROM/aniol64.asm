@@ -12,19 +12,25 @@ org 0000h
         IM 1            ; set interupt mode to 1,
                         ; TODO: this may not work after DART is added
         EI              ; enable interrupts
+        JP boot ; jump over the interrupt handlers for NMI and mode 1 INT
 
-        ;JP init ; jump over the interrupt handlers for NMI and mode 1 INT
-        ;org 0038h
+org 0038h
         ; respond to interrupt
-        ;EI
-        ;RETI
+        EX AF, AF'
+        EXX
+        CALL kbd_input
+        CALL lcd_putChar ; echo the character to screen, but don't remove it from the keyboard buffer
+        EXX
+        EX AF, AF'
+        EI
+        RETI
 
-        ;org 0066h
+org 0066h
         ; respond to NMI
-        ;EI
-        ;RETN
+        EI
+        RETN
 
-init:
+boot:
         ; init LCD
         CALL lcd_init
         CALL lcd_clrScr

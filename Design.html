@@ -161,20 +161,14 @@ C000-7FFF: bank-switchable NVRAM (AS6C4008)<br/>
 <li>ALT</li>
 <li>SHIFT</li>
 <li>buzzer</li>
-<li></li>
+<li>GND</li>
 </ol>
 <br/>
 
 <h3>CPU-side connector</h3>
 <ol>
 <li>INT</li>
-<li>CLK</li>
-<li>A6</li>
-<li>A0</li>
-<li>M1</li>
-<li>RESET</li>
-<li>WR</li>
-<li>RD</li>
+<li>+5V</li>
 <li>D7</li>
 <li>D6</li>
 <li>D5</li>
@@ -183,9 +177,14 @@ C000-7FFF: bank-switchable NVRAM (AS6C4008)<br/>
 <li>D2</li>
 <li>D1</li>
 <li>D0</li>
-<li>GND</li> 
-<li>VCC</li>
-<li>IORQ</li>
+<li>GND</li>
+<li>WR</li>
+<li>RD</li>
+<li>IORQ</li> 
+<li>CLK</li>
+<li>A6</li>
+<li>M1</li>
+<li>RESET</li>
 <li>IEI</li>
 <li>IEO</li>
 </ol>
@@ -349,13 +348,7 @@ ALT+SHIFT
 <h2>LCD display</h2>
 <h3>CPU-side connector</h3>
 <ol>
-<li>A3</li>
-<li>A1</li>
-<li>A0</li>
-<li>GND</li>
 <li>+5V</li>
-<li>WR</li>
-<li>RD</li>
 <li>D7</li>
 <li>D6</li>
 <li>D5</li>
@@ -364,8 +357,22 @@ ALT+SHIFT
 <li>D2</li>
 <li>D1</li>
 <li>D0</li>
+<li>GND</li>
+<li>WR</li>
+<li>RD</li>
 <li>IORQ</li>
+<li>A3</li>
+<li>A1</li>
+<li>A0</li>
 </ol>
+
+<h2>RAM locations</h2>
+8000h-8007h		"TestMem", 0 <br/>
+8008h			ClkScratchpad<br/>
+8009h-8011h		ClkData<br/>
+8012h-8028h		KbdBuff<br/>
+8029h			KbdBuffHead<br/>
+802Ah			KbdBuffTail<br/>
 
 <h2>References</h2>
 <a href="http://www.forum-trioda.pl/viewtopic.php?f=48&t=37948">Komputer 8-bitowy</a>
