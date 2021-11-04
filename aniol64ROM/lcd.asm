@@ -53,7 +53,9 @@ loop_wriStr:
 ; A - character to be written
 lcd_putChar:
         LD C, LCD_DAT_WR
+        PUSH AF
         CALL lcd_wait
+        POP AF
         OUT (C), A
         RET
 

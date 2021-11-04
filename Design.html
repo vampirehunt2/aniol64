@@ -367,12 +367,17 @@ ALT+SHIFT
 </ol>
 
 <h2>RAM locations</h2>
-8000h-8007h		"TestMem", 0 <br/>
-8008h			ClkScratchpad<br/>
-8009h-8011h		ClkData<br/>
-8012h-8028h		KbdBuff<br/>
-8029h			KbdBuffHead<br/>
-802Ah			KbdBuffTail<br/>
+<table>
+<tr><th/><th>ANIOL64</th><th>ANIOL32</th><th>ANIOL640</th></tr>
+<tr><td>"TestMem", 0</td><td> 8000h-8007h</td></tr>	
+<tr><td>ClkScratchpad</td><td> 8008h</td></tr>		
+<tr><td>ClkData</td><td> 8009h-8011h</td></tr>		
+<tr><td>KbdBuff</td><td> 8012h-8028h</td></tr>		
+<tr><td>KbdBuffHead</td><td> 8029h</td></tr>			
+<tr><td>KbdBuffTail</td><td> 802Ah</td></tr>
+<tr><td>SP</td><td>FFFFh</td></tr>	
+</table>
+<br/>		
 
 <h2>References</h2>
 <a href="http://www.forum-trioda.pl/viewtopic.php?f=48&t=37948">Komputer 8-bitowy</a>
