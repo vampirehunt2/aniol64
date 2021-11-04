@@ -15,7 +15,7 @@ org 0000h
         JP boot ; jump over the interrupt handlers for NMI and mode 1 INT
 
 org 0038h
-        ; respond to interrupt
+        ; respond to mode 1 interrupt
         EX AF, AF'
         EXX
         CALL kbd_input
@@ -27,6 +27,12 @@ org 0038h
 
 org 0066h
         ; respond to NMI
+        EX AF, AF'
+        EXX
+        CALL kbd_input
+        CALL lcd_putChar ; echo the character to screen, but don't remove it from the keyboard buffer
+        EXX
+        EX AF, AF'
         EI
         RETN
 
