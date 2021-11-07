@@ -9,7 +9,7 @@
 
 ; keyboard is selected with A6
 
-KEYCODE_BASE_ADDR equ 4000h
+KEYCODE_BASE_ADDR equ 2000h
 KBD_PORT equ 10111111b
 
 KbdBuff equ 8012h         ; 8012h-8028h, but only using the first byte for now, for a 1-byte buffer

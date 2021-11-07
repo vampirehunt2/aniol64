@@ -9,8 +9,9 @@
 
 org 0000h
         LD SP, 0FFFFh   ; initialise stack pointer to the top of available RAM
-        IM 1            ; set interupt mode to 1,
-                        ; TODO: this may not work after DART is added
+        IM 2            ; set interupt mode to 2
+        LD A, 01h       ; higher byte of the interrupt vector table
+        LD I, A         ; set the vector table address
         EI              ; enable interrupts
         JP boot ; jump over the interrupt handlers for NMI and mode 1 INT
 
@@ -20,21 +21,27 @@ org 0038h
         EXX
         CALL kbd_input
         CALL lcd_putChar ; echo the character to screen, but don't remove it from the keyboard buffer
+        CALL bzr_click
         EXX
         EX AF, AF'
         EI
         RETI
 
 org 0066h
+        ; NMI handler
+        ;EX AF, AF'
+        ;EXX
         ; respond to NMI
-        EX AF, AF'
-        EXX
-        CALL kbd_input
-        CALL lcd_putChar ; echo the character to screen, but don't remove it from the keyboard buffer
-        EXX
-        EX AF, AF'
-        EI
+        ;EXX
+        ;EX AF, AF'
+        ;EI
         RETN
+
+org 0100h
+        ; interrupt vector table
+        KeyClickHandler: defb 38h, 00h ; we're pointing back at the mode 1 INT handler
+                                        ; so that the routine works for both mode 1 and 2
+                                        ; note, low order byte goes first
 
 boot:
         ; init LCD
