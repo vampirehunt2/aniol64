@@ -1,0 +1,200 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 2 3
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L 74xx:74LS32 U?
+U 2 1 61ADA71C
+P 2450 1600
+F 0 "U?" H 2450 1925 50  0000 C CNN
+F 1 "74LS32" H 2450 1834 50  0000 C CNN
+F 2 "" H 2450 1600 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 2450 1600 50  0001 C CNN
+	2    2450 1600
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74LS32 U?
+U 3 1 61ADA722
+P 1850 1250
+F 0 "U?" H 1850 1575 50  0000 C CNN
+F 1 "74LS32" H 1850 1484 50  0000 C CNN
+F 2 "" H 1850 1250 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 1850 1250 50  0001 C CNN
+	3    1850 1250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2150 1250 2150 1500
+Text GLabel 1350 1150 0    50   Input ~ 0
+IORQ
+Wire Wire Line
+	1350 1150 1550 1150
+Text GLabel 1300 1350 0    50   Input ~ 0
+A3
+Wire Wire Line
+	1300 1350 1550 1350
+$Comp
+L 74xx:74LS08 U?
+U 2 1 61ADA72D
+P 1850 1900
+F 0 "U?" H 1850 2225 50  0000 C CNN
+F 1 "74LS08" H 1850 2134 50  0000 C CNN
+F 2 "" H 1850 1900 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS08" H 1850 1900 50  0001 C CNN
+	2    1850 1900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2150 1900 2150 1700
+Text GLabel 1300 1800 0    50   Input ~ 0
+RD
+Wire Wire Line
+	1300 1800 1550 1800
+Text GLabel 1300 2000 0    50   Input ~ 0
+WR
+Wire Wire Line
+	1300 2000 1550 2000
+$Comp
+L 74xx:74LS14 U?
+U 1 1 61ADA738
+P 3050 1600
+F 0 "U?" H 3050 1917 50  0000 C CNN
+F 1 "74LS14" H 3050 1826 50  0000 C CNN
+F 2 "" H 3050 1600 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS14" H 3050 1600 50  0001 C CNN
+	1    3050 1600
+	1    0    0    -1  
+$EndComp
+Text GLabel 3350 1600 2    50   Input ~ 0
+LCDE
+$Comp
+L Connector:Conn_01x16_Male J?
+U 1 1 61ADAD92
+P 2150 2950
+F 0 "J?" V 1985 2878 50  0000 C CNN
+F 1 "Conn_01x16_Male" V 2076 2878 50  0000 C CNN
+F 2 "" H 2150 2950 50  0001 C CNN
+F 3 "~" H 2150 2950 50  0001 C CNN
+	1    2150 2950
+	0    1    1    0   
+$EndComp
+Text GLabel 2650 3150 3    50   Input ~ 0
+CONTRAST
+Text GLabel 2350 3150 3    50   Input ~ 0
+LCDE
+$Comp
+L power:GND #PWR?
+U 1 1 61ADEFAF
+P 2850 3800
+F 0 "#PWR?" H 2850 3550 50  0001 C CNN
+F 1 "GND" H 2855 3627 50  0000 C CNN
+F 2 "" H 2850 3800 50  0001 C CNN
+F 3 "" H 2850 3800 50  0001 C CNN
+	1    2850 3800
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 61ADF325
+P 1350 3800
+F 0 "#PWR?" H 1350 3550 50  0001 C CNN
+F 1 "GND" H 1355 3627 50  0000 C CNN
+F 2 "" H 1350 3800 50  0001 C CNN
+F 3 "" H 1350 3800 50  0001 C CNN
+	1    1350 3800
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR?
+U 1 1 61ADF9CB
+P 1050 2950
+F 0 "#PWR?" H 1050 2800 50  0001 C CNN
+F 1 "+5V" H 1065 3123 50  0000 C CNN
+F 2 "" H 1050 2950 50  0001 C CNN
+F 3 "" H 1050 2950 50  0001 C CNN
+	1    1050 2950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2850 3800 2850 3150
+Wire Wire Line
+	1350 3800 1350 3150
+Wire Wire Line
+	2750 3150 2750 3750
+Wire Wire Line
+	2750 3750 1450 3750
+Wire Wire Line
+	1050 3750 1050 2950
+Wire Wire Line
+	1450 3150 1450 3750
+Connection ~ 1450 3750
+Wire Wire Line
+	1450 3750 1050 3750
+Text GLabel 2250 3150 3    50   Input ~ 0
+D0
+Text GLabel 2150 3150 3    50   Input ~ 0
+D1
+Text GLabel 2050 3150 3    50   Input ~ 0
+D2
+Text GLabel 1950 3150 3    50   Input ~ 0
+D3
+Text GLabel 1850 3150 3    50   Input ~ 0
+D4
+Text GLabel 1750 3150 3    50   Input ~ 0
+D5
+Text GLabel 1650 3150 3    50   Input ~ 0
+D6
+Text GLabel 1550 3150 3    50   Input ~ 0
+D7
+$Comp
+L Device:R_POT_TRIM RV?
+U 1 1 61AE3A01
+P 3000 2350
+F 0 "RV?" H 2930 2396 50  0000 R CNN
+F 1 "R_POT_TRIM" H 2930 2305 50  0000 R CNN
+F 2 "" H 3000 2350 50  0001 C CNN
+F 3 "~" H 3000 2350 50  0001 C CNN
+	1    3000 2350
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 61AE450B
+P 3000 2500
+F 0 "#PWR?" H 3000 2250 50  0001 C CNN
+F 1 "GND" H 3005 2327 50  0000 C CNN
+F 2 "" H 3000 2500 50  0001 C CNN
+F 3 "" H 3000 2500 50  0001 C CNN
+	1    3000 2500
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR?
+U 1 1 61AE48A7
+P 3000 2200
+F 0 "#PWR?" H 3000 2050 50  0001 C CNN
+F 1 "+5V" H 3015 2373 50  0000 C CNN
+F 2 "" H 3000 2200 50  0001 C CNN
+F 3 "" H 3000 2200 50  0001 C CNN
+	1    3000 2200
+	1    0    0    -1  
+$EndComp
+Text GLabel 3150 2350 2    50   Input ~ 0
+CONTRAST
+Text GLabel 2550 3150 3    50   Input ~ 0
+A0
+Text GLabel 2450 3150 3    50   Input ~ 0
+A1
+$EndSCHEMATC

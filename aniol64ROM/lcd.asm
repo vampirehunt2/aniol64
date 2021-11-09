@@ -37,17 +37,19 @@ lcd_init:
 
 ; writes a null-terminated string to the LCD screen
 ; IX: address of the string
+PROC
 lcd_wriStr:
         LD C, LCD_DAT_WR
-loop_wriStr:
+_loop:
         CALL lcd_wait
         LD A,(IX+0)
         CP 0                                  ;
         RET Z
         OUT (C),A
         INC IX
-        JR loop_wriStr
+        JR _loop
         RET
+ENDP
 
 ; puts a single character on the screen
 ; A - character to be written

@@ -42,14 +42,16 @@ str_copy:
 ; finds the length of a null-terminated string
 ; IX: address of the string
 ; result in HL
+PROC
 str_len:
         LD HL, 0
-strLenLoop:
+_loop:
         LD A, (IX+0)
         CP 0
         RET Z
         INC HL
         INC IX
-        JR strLenLoop
+        JR _loop
+ENDP
 
 

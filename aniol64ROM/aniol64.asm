@@ -8,12 +8,12 @@
 ;----------------------------------------------------
 
 org 0000h
-        LD SP, 0FFFFh   ; initialise stack pointer to the top of available RAM
+        LD SP, RAMTOP   ; initialise stack pointer to the top of available RAM
         IM 2            ; set interupt mode to 2
         LD A, 01h       ; higher byte of the interrupt vector table
         LD I, A         ; set the vector table address
         EI              ; enable interrupts
-        JP boot ; jump over the interrupt handlers for NMI and mode 1 INT
+        JP boot         ; jump over the interrupt handlers for NMI and mode 1 INT
 
 org 0038h
         ; respond to mode 1 interrupt
@@ -49,7 +49,7 @@ boot:
         CALL lcd_clrScr
 
         ; greetings
-        LD IX, Aniol64
+        LD IX, Aniol
         CALL lcd_wriStr
         LD IX, Ready
         CALL lcd_wriStr
@@ -82,13 +82,13 @@ printMemTest:
         ; wait for user input from here on in
         HALT
 
-Aniol64: defb   "     _ANIOL 64_     ", 0
 Ready: defb     "Ready               ", 0
 Hello: defb     "Hello", 0
 Prompt: defb    ">", 0
 NvRamOk: defb   "NVRAM OK            ", 0
 NvRamNok: defb  "NVRAM Error         ", 0
 
+include var.asm
 include util.asm
 include bzr.asm
 include dos.asm
@@ -100,7 +100,7 @@ include snd.asm
 include mem.asm
 include io.asm
 include clk.asm
-include kbd.asm ; this goes last becasue of the org 4000h inside
+include kbd.asm ; this goes last becasue of the org 2000h inside
 
 
 
