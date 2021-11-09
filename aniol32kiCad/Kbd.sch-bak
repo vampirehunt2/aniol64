@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 2 3
+Sheet 2 4
 Title ""
 Date ""
 Rev ""
@@ -557,4 +557,43 @@ Wire Wire Line
 Connection ~ 7800 1750
 Wire Wire Line
 	7800 1750 6650 1750
+Text GLabel 1900 2300 0    50   Input ~ 0
+D7
+Text GLabel 1900 2400 0    50   Input ~ 0
+BZRWR
+$Comp
+L Connector:Conn_01x02_Male J?
+U 1 1 61B45D9D
+P 2950 2400
+F 0 "J?" H 2922 2282 50  0000 R CNN
+F 1 "Conn_01x02_Male" H 2922 2373 50  0000 R CNN
+F 2 "" H 2950 2400 50  0001 C CNN
+F 3 "~" H 2950 2400 50  0001 C CNN
+	1    2950 2400
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	2750 2300 2500 2300
+$Comp
+L power:GND #PWR?
+U 1 1 61B4867B
+P 2750 2400
+F 0 "#PWR?" H 2750 2150 50  0001 C CNN
+F 1 "GND" H 2755 2227 50  0000 C CNN
+F 2 "" H 2750 2400 50  0001 C CNN
+F 3 "" H 2750 2400 50  0001 C CNN
+	1    2750 2400
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 61B48E69
+P 2200 2700
+F 0 "#PWR?" H 2200 2450 50  0001 C CNN
+F 1 "GND" H 2205 2527 50  0000 C CNN
+F 2 "" H 2200 2700 50  0001 C CNN
+F 3 "" H 2200 2700 50  0001 C CNN
+	1    2200 2700
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC

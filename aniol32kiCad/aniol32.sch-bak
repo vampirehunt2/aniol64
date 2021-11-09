@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 3
+Sheet 1 4
 Title ""
 Date ""
 Rev ""
@@ -695,27 +695,6 @@ Entry Wire Line
 Connection ~ 9750 650 
 Wire Bus Line
 	9750 650  11000 650 
-Wire Wire Line
-	1750 1200 1000 1200
-Text GLabel 1000 1200 0    50   Input ~ 0
-A4
-Wire Wire Line
-	1750 1000 1000 1000
-Text GLabel 1000 1000 0    50   Input ~ 0
-IORQ
-Text GLabel 2350 1100 2    50   Input ~ 0
-DARTSEL
-$Comp
-L 74xx:74LS32 U?
-U 4 1 61834289
-P 2050 1100
-F 0 "U?" H 2050 1425 50  0000 C CNN
-F 1 "74LS32" H 2050 1334 50  0000 C CNN
-F 2 "" H 2050 1100 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 2050 1100 50  0001 C CNN
-	4    2050 1100
-	1    0    0    -1  
-$EndComp
 NoConn ~ 8350 3100
 NoConn ~ 6950 4000
 Wire Bus Line
@@ -726,17 +705,23 @@ Wire Bus Line
 $Sheet
 S 1200 1900 500  150 
 U 61AEA36E
-F0 "Sheet61AEA36D" 50
+F0 "keyboard" 50
 F1 "Kbd.sch" 50
 $EndSheet
 $Sheet
-S 1250 2200 500  150 
+S 1200 2300 500  150 
 U 61ACCEA5
-F0 "Sheet61ACCEA4" 50
+F0 "HD44780 LCD" 50
 F1 "LCD.sch" 50
 $EndSheet
 Wire Wire Line
 	3100 7550 4600 7550
+$Sheet
+S 1200 2800 500  150 
+U 618A74E4
+F0 "Z80DART" 50
+F1 "DART.sch" 50
+$EndSheet
 Wire Bus Line
 	11000 650  11000 4700
 Wire Bus Line
