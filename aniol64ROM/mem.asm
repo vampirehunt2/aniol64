@@ -9,7 +9,6 @@
 
 MemTest: defb "MemTest", 0
 MemErr equ 1
-TestAddr equ 8000h  ; points to the beginning of RAM
 
 ; checks if NV RAM is installed
 ; returns 0 in C if non-volatile memory is found
