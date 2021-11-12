@@ -19,10 +19,10 @@ DDRAM_MASK equ 01111111b
 
 ; starting DDRAM addresses for physical display lines
 ; note, logical lines don't match the order of physical lines
-LINE1 equ 00d
-LINE2 equ 40d
-LINE3 equ 20d
-LINE4 equ 60d
+LINE1 equ 00h
+LINE2 equ 40h
+LINE3 equ 14h
+LINE4 equ 54h
 
 ; resets the LCD display
 lcd_init:

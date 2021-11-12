@@ -22,6 +22,12 @@ org 0038h
         CALL kbd_input
         CALL lcd_putChar ; echo the character to screen, but don't remove it from the keyboard buffer
         CALL bzr_click
+        CALL lcd_getPos
+        CALL hex2asc
+        LD A, D
+        CALL lcd_putChar
+        LD A, E
+        CALL lcd_putChar
         EXX
         EX AF, AF'
         EI
@@ -48,13 +54,21 @@ boot:
         CALL lcd_init
         CALL lcd_clrScr
 
+        ; <TEST>
+        ;LD A, 45
+        ;CALL lcd_setCursorPos
+        ;LD IX, Hello
+        ;CALL lcd_wriStr
+        ;HALT
+        ; </TEST>
+
         ; greetings
         LD IX, Aniol
         CALL lcd_wriStr
-        LD IX, Ready
-        CALL lcd_wriStr
+
 
         ; check for NVRAM
+        CALL lcd_gotoLn2
         CALL memTest ; returns result in A
         CP 0
         JR Z, memTestOk
@@ -66,9 +80,14 @@ memTestOk:
 printMemTest:
         CALL lcd_wriStr
 
-        ; display prompt
-        LD IX, Prompt
+        CALL lcd_gotoLn3
+        LD IX, Ready
         CALL lcd_wriStr
+        CALL lcd_gotoLn4
+
+        ; display prompt
+        ;LD IX, Prompt
+        ;CALL lcd_wriStr
 
         CALL bzr_beep
         LD A, 50
@@ -80,15 +99,16 @@ printMemTest:
         ;CALL snd_init
 
         ; wait for user input from here on in
+        ;CALL cmd_main
 loop:
         HALT
         JP loop
 
-Ready: defb     "Ready               ", 0
+Ready: defb     "Ready", 0
 Hello: defb     "Hello", 0
 Prompt: defb    ">", 0
-NvRamOk: defb   "NVRAM OK            ", 0
-NvRamNok: defb  "NVRAM Error         ", 0
+NvRamOk: defb   "NVRAM OK", 0
+NvRamNok: defb  "NVRAM Error", 0
 
 include var.asm
 include util.asm

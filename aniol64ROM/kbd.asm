@@ -9,7 +9,7 @@
 
 ; keyboard is selected with A6
 
-KEYCODE_BASE_ADDR equ 2000h
+KEYCODE_BASE_ADDR equ 1000h
 KBD_PORT equ 10111111b
 
 ; Converts keyboard code to ASCII code
