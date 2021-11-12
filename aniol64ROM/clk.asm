@@ -8,8 +8,7 @@
 ; handles the DS1244 Phantom clock
 ;----------------------------------------------------
 
-ClkScratchpad equ 8008h
-ClkData equ 8009h
+
 CLKMASK equ 00000001b
 
 ; Phantom clock recognition sequence

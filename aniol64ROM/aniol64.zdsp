@@ -4,7 +4,7 @@ Path=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\
 ObjExt=.exe
 
 [File]
-Total=14
+Total=15
 0=aniol64.asm
 1=lcd.asm
 2=str.asm
@@ -19,6 +19,7 @@ Total=14
 11=util.asm
 12=clk.asm
 13=var.asm
+14=cmd.asm
 
 [Directory]
 Total=2
@@ -44,18 +45,19 @@ Total=12
 Total=0
 
 [FileInUse]
-Total=14
-0=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\str.asm
-1=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\kbd.asm
-2=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\dart.asm
-3=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\snd.asm
-4=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\dos.asm
-5=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\mon.asm
-6=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\mem.asm
-7=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\io.asm
-8=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\bzr.asm
-9=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\util.asm
-10=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\clk.asm
-11=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\lcd.asm
-12=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\var.asm
-13=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\aniol64.asm
+Total=15
+0=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\kbd.asm
+1=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\dart.asm
+2=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\snd.asm
+3=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\dos.asm
+4=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\mon.asm
+5=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\mem.asm
+6=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\io.asm
+7=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\bzr.asm
+8=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\util.asm
+9=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\clk.asm
+10=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\lcd.asm
+11=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\var.asm
+12=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\aniol64.asm
+13=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\cmd.asm
+14=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\str.asm

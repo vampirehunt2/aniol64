@@ -54,4 +54,41 @@ _loop:
         JR _loop
 ENDP
 
+; returns the first token of a string
+; and modifies the input string to cut out the token
+; IX: address of the string
+; result in HL
+PROC
+str_tok:
+        PUSH IX
+        POP HL          ; save beginning of line in HL
+_loop:
+        LD A, (IX)
+        CP 20h          ; check if we've reached a space
+        JR Z, _space
+        CP 0            ; check if we've reached end of line
+        RET Z
+        INC IX
+        JR _loop
+_space:
+        LD A, 0
+        LD (IX), A
+        RET
+ENDP
+
+; skips leading spaces in a string
+; IX - string to trim
+; result in IX
+PROC
+str_ltrim:
+        LD A, (IX)
+        CP 20h
+        JR Z, _loop
+        RET
+_loop:
+        INC IX
+        JR str_ltrim
+ENDP
+
+
 

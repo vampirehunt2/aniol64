@@ -12,10 +12,6 @@
 KEYCODE_BASE_ADDR equ 2000h
 KBD_PORT equ 10111111b
 
-KbdBuff equ 8012h         ; 8012h-8028h, but only using the first byte for now, for a 1-byte buffer
-KbdBuffHead equ 8029h    ; reserverd for future use
-KbdBuffTail equ 802Ah    ; reserved for future use
-
 ; Converts keyboard code to ASCII code
 ; C - keycode to convert
 ; zeroes B
@@ -50,6 +46,38 @@ kbd_readKey:
         POP AF
         EI
         RET
+
+; reads a line from keyboard
+; result in IX
+; result is only valid until next call of kbd_readLine
+; if the result needs to persist, it needs to be copied to elswhere in memory
+; TODO: check for max line length (buffer overflow)
+PROC
+kbd_readLine:
+        LD BC, LineBuff       ; point BC to the beginning of the keyboard buffer
+_loop:
+        CALL kbd_readKey     ; wait for a key to be pressed
+        CP 13                ; check if RETURN key was pressed
+        JR Z, _return
+        CP 08                 ; check if BACKSPACE was pressed
+        JR Z, _bkspc
+        CP 20h                ; checks if the key corresponds to a control character
+        JR C, _loop           ; skip if less
+        LD (BC), A            ; store the character in the keyboard buffer
+        INC C                 ; point BC to the new position of keyboard buffer
+        JR _loop
+_bkspc:
+        LD C, A                ; check if line buffer not empty
+        CP 0
+        JR Z, _loop             ; TODO: beep if buffer is empty
+        DEC C                   ; go back one character
+        JR _loop
+_return:
+        LD A, 0                ; store end of line
+        LD (BC), A
+        LD IX, LineBuff         ; return result in IX for further processing
+        RET
+ENDP
 
 org KEYCODE_BASE_ADDR
        	defb 71h	; 00-00-000b	q

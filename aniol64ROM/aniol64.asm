@@ -80,7 +80,9 @@ printMemTest:
         ;CALL snd_init
 
         ; wait for user input from here on in
+loop:
         HALT
+        JP loop
 
 Ready: defb     "Ready               ", 0
 Hello: defb     "Hello", 0
@@ -100,6 +102,7 @@ include snd.asm
 include mem.asm
 include io.asm
 include clk.asm
+include cmd.asm
 include kbd.asm ; this goes last becasue of the org 2000h inside
 
 
