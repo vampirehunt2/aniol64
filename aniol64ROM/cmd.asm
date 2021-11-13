@@ -7,7 +7,7 @@
 ;
 ;----------------------------------------------------
 
-Clr: defb "clr", 0
+Clr: defb "cl", 0
 Mon: defb "mon", 0
 Clk: defb "clk", 0
 Reset: defb "rst", 0
@@ -15,8 +15,11 @@ Echo: defb "eco", 0
 UnknownCmd: defb "Unknown command", 0
 
 PROC
+defb "cmd_main"
 cmd_main:
         CALL kbd_readLine
+        CALL lcd_nextLine
+        LD IX, LineBuff
         ; clear screen command
         LD IY, Clr
         CALL str_cmp
@@ -29,7 +32,7 @@ cmd_main:
         LD A, C
         CP 0
         JR Z, _rst
-        ; Echo command
+        ; echo command
         LD IY, Echo
         CALL str_cmp
         LD A, C
@@ -38,6 +41,8 @@ cmd_main:
         ; unknown command
         LD IX, UnknownCmd
         CALL lcd_wriStr
+_wrap:
+        CALL lcd_nextLine
         JP cmd_main
 _clr:
         CALL lcd_clrScr
@@ -45,10 +50,10 @@ _clr:
         JP cmd_main
 _rst:
         RST 00h
-        JP cmd_main
+        JP _wrap
 
 _echo:
-        JP cmd_main
+        JP _wrap
 ;
         RET
 ENDP

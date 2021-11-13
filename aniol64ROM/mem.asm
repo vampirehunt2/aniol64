@@ -27,3 +27,8 @@ memTest:
         CALL str_copy
         LD A, MemErr
         RET
+
+IF version=32
+org TestAddr
+defb "MemTest", 0
+ENDIF

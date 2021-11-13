@@ -48,7 +48,7 @@ kbd_readKey:
         RET
 
 ; reads a line from keyboard
-; result in IX
+; result in LineBuff
 ; result is only valid until next call of kbd_readLine
 ; if the result needs to persist, it needs to be copied to elswhere in memory
 ; TODO: check for max line length (buffer overflow)
@@ -75,7 +75,6 @@ _bkspc:
 _return:
         LD A, 0                ; store end of line
         LD (BC), A
-        LD IX, LineBuff         ; return result in IX for further processing
         RET
 ENDP
 

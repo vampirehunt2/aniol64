@@ -17,20 +17,7 @@ org 0000h
 
 org 0038h
         ; respond to mode 1 interrupt
-        EX AF, AF'
-        EXX
-        CALL kbd_input
-        CALL lcd_putChar ; echo the character to screen, but don't remove it from the keyboard buffer
-        CALL bzr_click
-        CALL lcd_getPos
-        CALL hex2asc
-        LD A, D
-        CALL lcd_putChar
-        LD A, E
-        CALL lcd_putChar
-        EXX
-        EX AF, AF'
-        EI
+        CALL handleInt
         RETI
 
 org 0066h
@@ -53,6 +40,8 @@ boot:
         ; init LCD
         CALL lcd_init
         CALL lcd_clrScr
+        LD A, 0
+        LD (KbdBuff), A
 
         ; <TEST>
         ;LD A, 45
@@ -99,7 +88,7 @@ printMemTest:
         ;CALL snd_init
 
         ; wait for user input from here on in
-        ;CALL cmd_main
+        CALL cmd_main
 loop:
         HALT
         JP loop
@@ -124,6 +113,30 @@ include io.asm
 include clk.asm
 include cmd.asm
 include kbd.asm ; this goes last becasue of the org 2000h inside
+
+PROC
+handleInt:
+        EX AF, AF'
+        EXX
+        CALL kbd_input
+        CP 08                 ; check if BACKSPACE was pressed
+        JR Z, _bkspc
+        CP 20h                ; checks if the key corresponds to a control character
+        JR C, _noEcho         ; skip echo if less
+        CALL lcd_putChar      ; echo the character to screen, but don't remove it from the keyboard buffer
+_noEcho:
+        CALL bzr_click
+        EXX
+        EX AF, AF'
+        EI
+        RET
+_bkspc:
+        CALL lcd_cursorLShift
+        LD A, ' '
+        CALL lcd_putChar
+        CALL lcd_cursorLShift
+        JR _noEcho
+ENDP
 
 
 

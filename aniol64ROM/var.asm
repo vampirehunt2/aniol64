@@ -25,6 +25,7 @@ TestAddr equ 4000h  ; points to the beginning of RAM
 ClkScratchpad equ 4008h
 ClkData equ 4009h
 KbdBuff equ 4012h         ; a 1-byte buffer
+LcdBuff equ 4020h
 LineBuff equ 4100h
 ENDIF
 
@@ -35,5 +36,6 @@ TestAddr equ 8000h  ; points to the beginning of RAM
 ClkScratchpad equ 8008h
 ClkData equ 8009h
 KbdBuff equ 8012h         ; a 1-byte buffer
+LcdBuff equ 8020h
 LineBuff equ 8100h
 ENDIF
