@@ -40,16 +40,9 @@ boot:
         ; init LCD
         CALL lcd_init
         CALL lcd_clrScr
+        ; init the keyboard buffer to avoid a bogus character during the first read
         LD A, 0
         LD (KbdBuff), A
-
-        ; <TEST>
-        ;LD A, 45
-        ;CALL lcd_setCursorPos
-        ;LD IX, Hello
-        ;CALL lcd_wriStr
-        ;HALT
-        ; </TEST>
 
         ; greetings
         LD IX, Aniol
@@ -73,10 +66,6 @@ printMemTest:
         LD IX, Ready
         CALL lcd_wriStr
         CALL lcd_gotoLn4
-
-        ; display prompt
-        ;LD IX, Prompt
-        ;CALL lcd_wriStr
 
         CALL bzr_beep
         LD A, 50

@@ -41,6 +41,7 @@ cmd_main:
         ; unknown command
         LD IX, UnknownCmd
         CALL lcd_wriStr
+        CALL bzr_beep
 _wrap:
         CALL lcd_nextLine
         JP cmd_main
