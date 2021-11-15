@@ -23,7 +23,7 @@ asc2hexstr8b:
 ; result in string pointed to by IX
 asc2hexstr16b:
         LD (IX+0), '$' ;arbitrary character indicating a hex number
-        CALL hex2asc
+        CALL byte2asc
         LD (IX+1), B
         LD (IX+2), C
         LD (IX+3), D
@@ -34,7 +34,7 @@ asc2hexstr16b:
 ; converts a byte to its hex representation in ASCII
 ; A - input byte
 ; result in DE
-hex2asc:
+byte2asc:
         PUSH AF
         AND A         ; clear carry flag
         SRA A
@@ -63,6 +63,47 @@ numbers:
         AND A   ; clear carry flag
         ADD A, 30h ; ASCII code for '0'
         RET
+
+; A - the binary number to convert
+; Result:
+; hundreds in C
+; tens in B
+; units in A
+PROC
+bin2Bcd:
+        LD B, 0
+        LD C, 0
+_hundreds:
+        CP 100
+        JR C, _tens   ; if less than 100
+        SUB 100
+        INC C         ; hundreds counted in C
+        JR _hundreds
+_tens:
+        CP 10
+        JR C, _units   ; if less than 10
+        SUB 10
+        INC B           ; tens and hundreds counted in B
+        JR _tens
+_units:                 ; least significant digit now in A
+        RET
+ENDP
+
+; converts a bcd number stored in C, B, A to ASCII
+; result in C, B, A
+PROC
+bcd2asc:
+        PUSH AF
+        LD A, C
+        ADD A, 30h        ; ASCII code of the digit 0
+        LD C, A
+        LD A, B
+        ADD A, 30h        ; ASCII code of the digit 0
+        LD B, A
+        POP AF
+        ADD A, 30h        ; ASCII code of the digit 0
+        RET
+ENDP
 
 ; A - delay x10ms
 delay:

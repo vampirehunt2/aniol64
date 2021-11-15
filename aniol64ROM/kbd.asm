@@ -67,7 +67,7 @@ _loop:
         INC C                 ; point BC to the new position of keyboard buffer
         JR _loop
 _bkspc:
-        LD C, A                ; check if line buffer not empty
+        LD A, C                ; check if line buffer not empty
         CP 0
         JR Z, _loop             ; TODO: beep if buffer is empty
         DEC C                   ; go back one character
