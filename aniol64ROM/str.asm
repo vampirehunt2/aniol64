@@ -21,10 +21,10 @@ str_cmp:
         INC IY
         JP str_cmp
 strCmpEq:
-        LD C, 0
+        LD A, 0
         RET
 strCmpNeq:
-        LD C, 1
+        LD A, 1
         RET
 
 ; copies a null-terminated string
@@ -59,11 +59,12 @@ ENDP
 ; IX: address of the string
 ; result in IX
 ; rest of string in HL
+defb "str_tok"
 PROC
 str_tok:
         PUSH IX
 _loop:
-        LD A, (IX)
+        LD A, (IX+0)
         CP 20h          ; check if we've reached a space
         JR Z, _space
         CP 0            ; check if we've reached end of line
@@ -72,7 +73,7 @@ _loop:
         JR _loop
 _space:
         LD A, 0
-        LD (IX), A
+        LD (IX+0), A
         INC IX
 _end:
         PUSH IX
@@ -86,7 +87,7 @@ ENDP
 ; result in IX
 PROC
 str_ltrim:
-        LD A, (IX)
+        LD A, (IX+0)
         CP 20h
         JR Z, _loop
         RET

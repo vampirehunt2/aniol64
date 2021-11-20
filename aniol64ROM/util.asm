@@ -31,9 +31,27 @@ asc2hexstr16b:
         LD (IX+5), 0
         RET
 
+; converts a two digit hex number in ASCII to its value
+; BA - two hex digits in ASCII
+; result in B
+; status code in A: 0 - parsed correctly, non-0 - parse error
+PROC
+asc2byte:
+        PUSH AF
+        LD A, B
+
+        POP AF
+_parseOk:
+        LD A, 0
+        RET
+_parseError:
+        LD A, 1
+        RET
+ENDP
+
 ; converts a byte to its hex representation in ASCII
 ; A - input byte
-; result in DE
+; result in BA
 byte2asc:
         PUSH AF
         AND A         ; clear carry flag
@@ -42,11 +60,10 @@ byte2asc:
         SRA A
         SRA A          ; upper nibble now in A
         CALL nibble2asc
-        LD D, A
+        LD B, A
         POP AF       ;
         AND 00001111b  ; lower nibble now in A
         CALL nibble2asc
-        LD E, A
         RET
 
 ; A - nibble to convert to an ASCII hex digit

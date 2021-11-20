@@ -19,7 +19,6 @@ memTest:
         LD IX, MemTest
         LD IY, TestAddr
         CALL str_cmp    ; checks if RAM already contains the test string
-        LD A, C         ; 0 in C if string found
         CP 0
         RET Z           ; if test string found, return 0 in C
         LD IX, MemTest  ; otherwise copy it into the memory

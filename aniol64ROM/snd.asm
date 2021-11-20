@@ -20,6 +20,7 @@ snd_init:
         LD A, 0Eh       ; rythm control register
         OUT (C), A
         LD C, SND_DAT
+        CALL snd_dataDelay
         LD A, 00011111b ; melody sound on, rythm instruments all on
         OUT (C), A
         CALL snd_dataDelay
@@ -80,6 +81,7 @@ snd_beep:
         LD A, 30h ; channel 0 (30 + 0) for instrument selection
         LD C, SND_CMD
         OUT (C), A
+        CALL snd_dataDelay
         LD A, 4Fh ; flute at max volume
         LD C, SND_DAT
         OUT (C), A
@@ -88,6 +90,7 @@ snd_beep:
         LD A, 10h ; channel 0 (10 + 0)
         LD C, SND_CMD
         OUT (C), A
+        CALL snd_dataDelay
         LD A, 9Fh ; some random F number
         LD C, SND_DAT
         OUT (C), A
@@ -96,6 +99,7 @@ snd_beep:
         LD A, 20h ; channel 0 (20 + 0)
         LD C, SND_CMD
         OUT (C), A
+        CALL snd_dataDelay
         LD A, 0001000b ; D5: sustain off, D4: key ON, D3-D1: octave 4, D0: octave number MSB 0
         LD C, SND_DAT
         OUT (C), A
@@ -104,6 +108,7 @@ snd_beep:
         CALL delay
         LD A, 20h ; channel 0 (20 + 0)
         LD C, SND_CMD
+        CALL snd_dataDelay
         OUT (C), A
         LD A, 0000000b ; D5: sustain off, D4: key OFF, D3-D1: octave 4, D0: octave number MSB 0
         LD C, SND_DAT

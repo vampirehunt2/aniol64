@@ -17,17 +17,22 @@ org 0000h
 
 org 0038h
         ; respond to mode 1 interrupt
+        EX AF, AF'
+        EXX
         CALL handleInt
+        EXX
+        EX AF, AF'
+        EI
         RETI
 
 org 0066h
         ; NMI handler
-        ;EX AF, AF'
-        ;EXX
-        ; respond to NMI
-        ;EXX
-        ;EX AF, AF'
-        ;EI
+        EX AF, AF'
+        EXX
+        CALL handleNmi
+        EXX
+        EX AF, AF'
+        EI
         RETN
 
 org 0100h
@@ -47,7 +52,6 @@ boot:
         ; greetings
         LD IX, Aniol
         CALL lcd_wriStr
-
 
         ; check for NVRAM
         CALL lcd_gotoLn2
@@ -105,8 +109,9 @@ include kbd.asm ; this goes last becasue of the org 2000h inside
 
 PROC
 handleInt:
-        EX AF, AF'
-        EXX
+        LD A, (KbdBuff)
+        CP 0                  ; checking if keyboard buffer is empty
+        RET NZ                ; this is essentially software debouncing
         CALL kbd_input
         CP 08                 ; check if BACKSPACE was pressed
         JR Z, _bkspc
@@ -115,16 +120,23 @@ handleInt:
         CALL lcd_putChar      ; echo the character to screen, but don't remove it from the keyboard buffer
 _noEcho:
         CALL bzr_click
-        EXX
-        EX AF, AF'
-        EI
         RET
 _bkspc:
-        CALL lcd_cursorLShift
+        CALL lcd_cursorLShift  ; TODO: check if you're already in the beginning of line
         LD A, ' '
         CALL lcd_putChar
         CALL lcd_cursorLShift
         JR _noEcho
+ENDP
+
+PROC
+handleNmi:
+        LD A, (NmiCount)
+        INC A
+        LD (NmiCount), A
+        ;CALL byte2asc
+        ;CALL lcd_putChar
+        RET
 ENDP
 
 

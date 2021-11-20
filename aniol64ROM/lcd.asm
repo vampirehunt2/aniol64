@@ -6,6 +6,7 @@
 ; Created with zDevStudio - Z80 Development Studio.
 ;
 ; Handling of hd44780 LCD display controller
+; Note: only the 20x4 charater display is supported
 ;----------------------------------------------------
 
 ; LCD display is selected with A3
@@ -135,7 +136,7 @@ lcd_gotoLn:
         CP 3
         JR Z, lcd_gotoLn3
         CP 4
-        JR Z, lcd_gotoLn4   ; TODO: for some reason this doesn't work
+        JR Z, lcd_gotoLn4
         RET   ; if line number is not 1-4, do nothing
 lcd_gotoLn1:
         LD A, LINE1

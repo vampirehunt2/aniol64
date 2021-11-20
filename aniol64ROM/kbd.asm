@@ -39,12 +39,10 @@ kbd_readKey:
         LD A, (KbdBuff)
         CP 0
         JR Z, kbd_readKey
-        DI
         PUSH AF
         LD A, 0
         LD (KbdBuff), A
         POP AF
-        EI
         RET
 
 ; reads a line from keyboard

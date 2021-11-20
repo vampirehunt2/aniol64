@@ -15,7 +15,10 @@ ClkScratchpad equ 8008h
 ClkData equ 8009h
 KbdBuff equ 8012h         ; a 1-byte buffer
 LcdBuff equ 8020h
-LineBuff equ 8100h
+LineBuff equ 8100h         ; 20 byte long buffer + 1 byte for the trailing 0
+NmiCount equ 8115h         ; reserving 4 bytes for the counter
+MonCurrAddrL equ 8119h
+MonCurrAddrH equ 811Ah
 ENDIF
 
 IF version=32
@@ -27,6 +30,9 @@ ClkData equ 4009h
 KbdBuff equ 4012h         ; a 1-byte buffer
 LcdBuff equ 4020h
 LineBuff equ 4100h
+NmiCount equ 4115h         ; reserving 4 bytes for the counter
+MonCurrAddrL equ 4119h
+MonCurrAddrH equ 411Ah
 ENDIF
 
 IF version=640

@@ -12,38 +12,38 @@ Mon: defb "mon", 0
 Clk: defb "clk", 0
 Reset: defb "rst", 0
 Echo: defb "echo", 0
-UnknownCmd: defb ": unknown", 0
+UnknownCmd: defb "Unknown cmd", 0
 
 PROC
 defb "cmd_main"
 cmd_main:
-        CALL kbd_readLine
+        CALL cmd_readLn
         CALL str_tok
-        CALL lcd_nextLine
         ; clear screen command
         LD IX, LineBuff
         LD IY, Clr
         CALL str_cmp
-        LD A, C
         CP 0
         JR Z, _clr
         ; reset command
         LD IX, LineBuff
         LD IY, Reset
         CALL str_cmp
-        LD A, C
         CP 0
         JR Z, _rst
         ; echo command
         LD IX, LineBuff
         LD IY, Echo
         CALL str_cmp
-        LD A, C
         CP 0
         JR Z, _echo
-        ; unknown command
+        ; monitor program
         LD IX, LineBuff
-        CALL lcd_wriStr
+        LD IY, Mon
+        CALL str_cmp
+        CP 0
+        JR Z, _mon
+        ; unknown command
         LD IX, UnknownCmd
         CALL lcd_wriStr
         CALL bzr_beep
@@ -57,11 +57,19 @@ _clr:
 _rst:
         RST 00h
         JP _wrap
-
 _echo:
         PUSH HL
         POP IX
         CALL lcd_wriStr
         JP _wrap
+_mon:
+        CALL mon_main
+        JP _wrap
         RET
 ENDP
+
+cmd_readLn:
+        CALL kbd_readLine
+        CALL lcd_nextLine
+        LD IX, LineBuff
+        RET
