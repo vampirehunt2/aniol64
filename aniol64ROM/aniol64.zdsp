@@ -39,7 +39,7 @@ Total=12
 8=USERCOMMAND:
 9=TOTALSYMBOL:1
 10=SLABEL0:version
-11=SVALUE0:64
+11=SVALUE0:32
 
 [External]
 Total=0
@@ -58,6 +58,6 @@ Total=15
 9=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\lcd.asm
 10=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\var.asm
 11=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\cmd.asm
-12=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\mem.asm
-13=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\aniol64.asm
-14=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\str.asm
+12=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\str.asm
+13=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\mem.asm
+14=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\aniol64.asm

@@ -1,0 +1,1727 @@
+
+AVRGCC1.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000013ae  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .bss          00000304  00800060  00800060  00001422  2**0
+                  ALLOC
+  2 .stab         00000738  00000000  00000000  00001424  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  3 .stabstr      00000101  00000000  00000000  00001b5c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  4 .debug_aranges 00000020  00000000  00000000  00001c5d  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_pubnames 000000ef  00000000  00000000  00001c7d  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_info   00000540  00000000  00000000  00001d6c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_abbrev 000001e9  00000000  00000000  000022ac  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_line   00000aae  00000000  00000000  00002495  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_frame  00000070  00000000  00000000  00002f44  2**2
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_str    000001ce  00000000  00000000  00002fb4  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_loc    00000218  00000000  00000000  00003182  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 12 .debug_pubtypes 00000039  00000000  00000000  0000339a  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 13 .debug_ranges 000000c0  00000000  00000000  000033d3  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+       0:	3a c6       	rjmp	.+3188   	; 0xc76 <__ctors_end>
+       2:	49 c6       	rjmp	.+3218   	; 0xc96 <__bad_interrupt>
+       4:	48 c6       	rjmp	.+3216   	; 0xc96 <__bad_interrupt>
+       6:	47 c6       	rjmp	.+3214   	; 0xc96 <__bad_interrupt>
+       8:	46 c6       	rjmp	.+3212   	; 0xc96 <__bad_interrupt>
+       a:	45 c6       	rjmp	.+3210   	; 0xc96 <__bad_interrupt>
+       c:	b8 c6       	rjmp	.+3440   	; 0xd7e <__vector_6>
+       e:	43 c6       	rjmp	.+3206   	; 0xc96 <__bad_interrupt>
+      10:	42 c6       	rjmp	.+3204   	; 0xc96 <__bad_interrupt>
+      12:	42 c6       	rjmp	.+3204   	; 0xc98 <__vector_9>
+      14:	40 c6       	rjmp	.+3200   	; 0xc96 <__bad_interrupt>
+      16:	3f c6       	rjmp	.+3198   	; 0xc96 <__bad_interrupt>
+      18:	3e c6       	rjmp	.+3196   	; 0xc96 <__bad_interrupt>
+      1a:	3d c6       	rjmp	.+3194   	; 0xc96 <__bad_interrupt>
+      1c:	3c c6       	rjmp	.+3192   	; 0xc96 <__bad_interrupt>
+      1e:	3b c6       	rjmp	.+3190   	; 0xc96 <__bad_interrupt>
+      20:	3a c6       	rjmp	.+3188   	; 0xc96 <__bad_interrupt>
+      22:	39 c6       	rjmp	.+3186   	; 0xc96 <__bad_interrupt>
+      24:	38 c6       	rjmp	.+3184   	; 0xc96 <__bad_interrupt>
+
+00000026 <symbol>:
+      26:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+      36:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+      46:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+      56:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+      66:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+      76:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+      86:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+      96:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+      a6:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+      b6:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+      c6:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+      d6:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+      e6:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+      f6:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+     106:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+     116:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+     126:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+     136:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+     146:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+     156:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+     166:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+     176:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+     186:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+     196:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+     1a6:	ff ff ff ff ff ff ff ff ff ff ff ff ff ef ef ef     ................
+     1b6:	ef ef ef ef ff ef ff ff ff d7 d7 d7 ff ff ff ff     ................
+     1c6:	ff ff ff ff ff eb eb 81 d7 d7 d7 03 af af ff ff     ................
+     1d6:	ff ef c7 bb bf c7 fb bb c7 ef ff ff ff bf 5d bb     ..............].
+     1e6:	f7 ef df bb 75 fb ff ff ff cf af af df 9f 6d 6b     ....u.........mk
+     1f6:	77 89 ff ff ff ef ef ef ff ff ff ff ff ff ff ff     w...............
+     206:	ff f7 ef ef df df df df df ef ef f7 ff df ef ef     ................
+     216:	f7 f7 f7 f7 f7 ef ef df ff ff ff 93 c7 01 c7 93     ................
+     226:	ff ff ff ff ff ff ff ef ef ef 01 ef ef ef ff ff     ................
+     236:	ff ff ff ff ff ff ff ff ff ef df ff ff ff ff ff     ................
+     246:	ff ff 01 ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+     256:	ff ef ff ff ff ff fd fb f7 ef df bf 7f ff ff ff     ................
+     266:	ff c7 bb bb bb bb bb bb bb c7 ff ff ff ef 8f ef     ................
+     276:	ef ef ef ef ef 83 ff ff ff c7 bb fb fb f7 ef df     ................
+     286:	bf 83 ff ff ff c7 bb fb fb e7 fb fb bb c7 ff ff     ................
+     296:	ff f7 e7 e7 d7 d7 b7 83 f7 e3 ff ff ff 83 bf bf     ................
+     2a6:	bf 87 fb fb bb c7 ff ff ff e7 df bf bf 87 bb bb     ................
+     2b6:	bb c7 ff ff ff 83 bb fb f7 f7 ef ef df df ff ff     ................
+     2c6:	ff c7 bb bb bb c7 bb bb bb c7 ff ff ff c7 bb bb     ................
+     2d6:	bb c3 fb fb f7 cf ff ff ff ff ff ff ef ff ff ff     ................
+     2e6:	ff ef ff ff ff ff ff ff ef ff ff ff ff ef df ff     ................
+     2f6:	ff ff ff f7 ef df bf df ef f7 ff ff ff ff ff ff     ................
+     306:	83 ff 83 ff ff ff ff ff ff ff ff df ef f7 fb f7     ................
+     316:	ef df ff ff ff c7 bb fb fb f7 ef ef ff ef ff ff     ................
+     326:	ff c3 bd 65 55 55 55 63 bf c7 ff ff ff cf ef ef     ...eUUUc........
+     336:	d7 d7 bb 83 bb 11 ff ff ff 03 bd bd bd 83 bd bd     ................
+     346:	bd 03 ff ff ff c3 bd 7f 7f 7f 7f 7f bd c3 ff ff     ................
+     356:	ff 07 bb bd bd bd bd bd bb 07 ff ff ff 01 bd bf     ................
+     366:	b7 87 b7 bf bd 01 ff ff ff 01 bd bf b7 87 b7 bf     ................
+     376:	bf 0f ff ff ff c3 bd 7f 7f 7f 71 7d bd c3 ff ff     ..........q}....
+     386:	ff 11 bb bb bb 83 bb bb bb 11 ff ff ff 83 ef ef     ................
+     396:	ef ef ef ef ef 83 ff ff ff c3 f7 f7 f7 f7 f7 77     ...............w
+     3a6:	77 8f ff ff ff 19 bb b7 b7 af 8f b7 bb 19 ff ff     w...............
+     3b6:	ff 07 df df df df df df dd 01 ff ff ff 39 bb 93     .............9..
+     3c6:	93 ab ab bb bb 11 ff ff ff 31 bb 9b 9b ab b3 b3     .........1......
+     3d6:	bb 1b ff ff ff c7 bb 7d 7d 7d 7d 7d bb c7 ff ff     .......}}}}}....
+     3e6:	ff 03 bd bd bd 83 bf bf bf 0f ff ff ff c7 bb 7d     ...............}
+     3f6:	7d 7d 7d 7d bb c7 c9 ff ff 03 bd bd bd 83 b7 b7     }}}}............
+     406:	bb 19 ff ff ff 83 7d 7f 7f 83 fd fd 7d 83 ff ff     ......}.....}...
+     416:	ff 01 6d ef ef ef ef ef ef c7 ff ff ff 11 bb bb     ..m.............
+     426:	bb bb bb bb bb c7 ff ff ff 11 bb bb bb d7 d7 d7     ................
+     436:	ef ef ff ff ff 11 bb bb bb ab ab ab d7 d7 ff ff     ................
+     446:	ff 11 bb d7 d7 ef d7 d7 bb 11 ff ff ff 11 bb bb     ................
+     456:	d7 d7 ef ef ef c7 ff ff ff 01 7b f7 f7 ef df df     ..........{.....
+     466:	bd 01 ff ff ff c7 df df df df df df df df c7 ff     ................
+     476:	ff ff 7f bf df ef f7 fb fd ff ff ff ff c7 f7 f7     ................
+     486:	f7 f7 f7 f7 f7 f7 c7 ff ef d7 bb ff ff ff ff ff     ................
+     496:	ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+     4a6:	ff df ef ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+     4b6:	87 fb 83 7b 7b 85 ff ff ff 3f bf bf 83 bd bd bd     ...{{....?......
+     4c6:	bd 03 ff ff ff ff ff ff 83 7d 7f 7f 7d 83 ff ff     .........}..}...
+     4d6:	ff f3 fb fb 83 7b 7b 7b 7b 81 ff ff ff ff ff ff     .....{{{{.......
+     4e6:	83 7d 01 7f 7d 83 ff ff ff e7 df df 87 df df df     .}..}...........
+     4f6:	df 87 ff ff ff ff ff ff 81 7b 7b 7b 83 fb fb c7     .........{{{....
+     506:	ff 3f bf bf a7 9b bb bb bb 11 ff ff ff ef ff ff     .?..............
+     516:	8f ef ef ef ef 83 ff ff ff f7 ff ff 87 f7 f7 f7     ................
+     526:	f7 f7 c7 ff ff 3f bf bf b3 b7 af 8f b7 39 ff ff     .....?.......9..
+     536:	ff cf ef ef ef ef ef ef ef 83 ff ff ff ff ff ff     ................
+     546:	17 ab ab ab ab 29 ff ff ff ff ff ff 27 9b bb bb     .....)......'...
+     556:	bb 11 ff ff ff ff ff ff 83 7d 7d 7d 7d 83 ff ff     .........}}}}...
+     566:	ff ff ff ff 03 bd bd bd bd 83 bf 1f ff ff ff ff     ................
+     576:	81 7b 7b 7b 7b 83 fb f1 ff ff ff ff 13 cd df df     .{{{{...........
+     586:	df 07 ff ff ff ff ff ff 83 7d 8f f3 7d 83 ff ff     .........}..}...
+     596:	ff ff df df 87 df df df db e7 ff ff ff ff ff ff     ................
+     5a6:	33 bb bb bb b3 c9 ff ff ff ff ff ff 11 bb bb d7     3...............
+     5b6:	d7 ef ff ff ff ff ff ff 11 bb ab ab d7 d7 ff ff     ................
+     5c6:	ff ff ff ff 11 bb c7 c7 bb 11 ff ff ff ff ff ff     ................
+     5d6:	11 bb bb d7 d7 ef ef cf ff ff ff ff 03 77 ef df     .............w..
+     5e6:	bb 03 ff ff ff f3 ef ef ef ef 9f ef ef ef ef f3     ................
+     5f6:	ef ef ef ef ef ef ef ef ef ef ef ef ff 9f ef ef     ................
+     606:	ef ef f3 ef ef ef ef 9f ff ff 9d 6d 73 ff ff ff     ...........ms...
+     616:	ff ff ff ff ff ff c7 c7 c7 c7 c7 c7 c7 c7 c7 ff     ................
+     626:	ff 01 6d ef ef e1 ee ee ea e9 ff ff f7 c0 ee ef     ..m.............
+     636:	ef ef ef ef ef c7 ff ff ff ff ff ff ff ff ff ff     ................
+     646:	ff f7 ef ff fb f7 ff c1 ed ef ef ef ef c7 ff ff     ................
+     656:	ff ff ff ff ff ff ff ff ff db b7 ff ff ff ff ff     ................
+     666:	ff ff ff ff ff ab ff ff ff ef ef 83 ef ef ef ef     ................
+     676:	ef ef ff ff ff ef ef 83 ef ef ef 83 ef ef ff ff     ................
+     686:	ff ff e3 e3 e3 e3 e3 e3 e3 e3 e3 ff ff de ad db     ................
+     696:	f7 ef df ad 52 ed ff ff ff 07 b7 b7 b7 b1 b6 b6     ....R...........
+     6a6:	36 31 ff ff ff ff ff ff ff fb f7 ef f7 fb ff ff     61..............
+     6b6:	ff 13 b7 b7 b7 81 b6 b6 b6 11 ff ff f7 8c dd db     ................
+     6c6:	db c7 db db dd 8c ff ff ff 01 6d ef ef e1 ee ee     ..........m.....
+     6d6:	ee c6 ff ff ff 88 dd dd dd dd dd dd dd 80 f7 ff     ................
+     6e6:	ff df 83 df d3 cd dd dd dd 8d fd ff ff ef f7 ff     ................
+     6f6:	ff ff ff ff ff ff ff ff ff f7 ef ff ff ff ff ff     ................
+     706:	ff ff ff ff ff b7 db ff ff ff ff ff ff ff ff ff     ................
+     716:	ff ed db ff ff ff ff ff ff ff ff ff ff ff ff ff     ................
+     726:	e7 c3 e7 ff ff ff ff ff ff ff ff ff ff 8f ff ff     ................
+     736:	ff ff ff ff ff ff ff ff ff 03 ff ff ff ff ff ff     ................
+     746:	ff ff e3 e3 e3 e3 e3 e3 e3 e3 e3 ff ff 04 aa ae     ................
+     756:	ff ff ff ff ff ff ff ff ff ff ff ff e7 d7 d1 b6     ................
+     766:	b6 31 ff ff ff ff ff ff ff df ef f7 ef df ff ff     .1..............
+     776:	ff ff ff ff 33 b7 81 b6 b6 11 ff ff ff fb f7 ff     ....3...........
+     786:	99 db c7 db db 9c ff ff ff df 83 df d3 cd dd dd     ................
+     796:	dd 88 ff ff ff ff ff ff 99 dd dd dd dd c1 f7 ff     ................
+     7a6:	ff ff ff ff ff ff ff ff ff ff ff ff f7 80 dd dd     ................
+     7b6:	dd dd e1 fd dd e3 ff ff ff ff c9 f7 80 dd dd dd     ................
+     7c6:	e1 fd dd e3 ff e1 fb fb fb fb fb bb bb c7 ff ff     ................
+     7d6:	ff be c1 dd dd dd c1 be ff ff ff ff fc c0 ef ef     ................
+     7e6:	ef ef ef ef ef c7 ff ff ff f7 f7 f7 f7 f7 ff f7     ................
+     7f6:	f7 f7 f7 ff ff e1 dd af b7 db ed f5 bb 87 ff ff     ................
+     806:	dd ff 80 de db c3 db df de 80 ff ff ff e3 dd b2     ................
+     816:	ae ae b2 dd e3 ff ff ff ff e1 de bf bb 83 bb bf     ................
+     826:	de e1 ff ff ff ff ff ff ff ee dd bb dd ee ff ff     ................
+     836:	ff ff ff ff c1 fd ff ff ff ff ff ff ff ff ff ff     ................
+     846:	ff ff 80 ff ff ff ff ff ff e3 dd a6 aa a6 aa dd     ................
+     856:	e3 ff ff ff ff c1 f7 f7 f7 f7 f7 f7 f7 c1 ff ff     ................
+     866:	ff f7 eb f7 ff ff ff ff ff ff ff ff ff f7 f7 f7     ................
+     876:	80 f7 f7 f7 ff 80 ff ff ff c1 f7 f7 f7 f7 f7 f7     ................
+     886:	f7 c1 ff ff ff f7 ff ff c7 f7 f7 f7 f7 c1 ff ff     ................
+     896:	ff ff fd e1 ef ef ef ef ef c7 ff ff ff ff ff ff     ................
+     8a6:	dd dd dd dd dd c3 df ff ff c0 85 85 85 c5 f5 f5     ................
+     8b6:	f5 e4 ff ff ff ff ff ff ff ff f7 ff ff ff ff ff     ................
+     8c6:	ff dd ff ff c1 be 80 bf be c1 ff ff ff 39 bb 98     .............9..
+     8d6:	88 ab b0 b3 bb 39 ff ff ff ff ff ff c1 be 87 bf     .....9..........
+     8e6:	be c1 ff ff ff ff ff ff ff bb dd ee dd bb ff ff     ................
+     8f6:	ff fb ff ff c3 fb fb fb fb fb fb ff ff c1 be bf     ................
+     906:	bf c1 fe fe be c1 ff ff ff ff ff ff c1 be c7 f9     ................
+     916:	be c1 ff ff ff db ff ff c7 f7 f7 f7 f7 c1 ff ff     ................
+     926:	ff fb f3 eb eb db c3 bb bb 11 ff ff ff 01 bd bf     ................
+     936:	bf 83 bd bd bd 03 ff ff ff 03 bd bd bd 83 bd bd     ................
+     946:	bd 03 ff ff ff 81 dd df df df df df df 8f ff ff     ................
+     956:	ff 01 bb bb bb bb bb bb bb 01 7d ff ff 01 bd bf     ..........}.....
+     966:	b7 87 b7 bf bd 01 ff ff ff 6d ab ab ab c7 ab ab     .........m......
+     976:	ab 6d ff ff ff 83 7d fd fd c3 fd fd 7d 83 ff ff     .m....}.....}...
+     986:	ff 39 bb b3 b3 ab 9b 9b bb 11 ff ff e7 29 9b b3     .9...........)..
+     996:	b3 ab 9b 9b bb 11 ff ff ff 19 bb b7 b7 8f b7 b7     ................
+     9a6:	bb 19 ff ff ff 81 db db db db db db 5b 11 ff ff     ............[...
+     9b6:	ff 39 bb 93 93 ab ab bb bb 11 ff ff ff 11 bb bb     .9..............
+     9c6:	bb 83 bb bb bb 11 ff ff ff c7 bb 7d 7d 7d 7d 7d     ...........}}}}}
+     9d6:	bb c7 ff ff ff 01 bb bb bb bb bb bb bb 11 ff ff     ................
+     9e6:	ff 03 bd bd bd 83 bf bf bf 0f ff ff ff c3 bd 7f     ................
+     9f6:	7f 7f 7f 7f bd c3 ff ff ff 01 6d ef ef ef ef ef     ..........m.....
+     a06:	ef c7 ff ff ff 11 bb bb bb bb c3 fb bb c7 ff ff     ................
+     a16:	ff c7 ef 83 6d 6d 6d 83 ef c7 ff ff ff 11 bb d7     ....mmm.........
+     a26:	d7 ef d7 d7 bb 11 ff ff ff 11 bb bb bb bb bb bb     ................
+     a36:	bb 81 fd ff ff 11 bb bb bb bb c3 fb fb f1 ff ff     ................
+     a46:	ff 29 ab ab ab ab ab ab ab 83 ff ff ff 29 ab ab     .)...........)..
+     a56:	ab ab ab ab ab 81 fd ff ff 0f 5f 5f c3 dd dd dd     ..........__....
+     a66:	dd 83 ff ff ff 18 bd bd 8d b5 b5 b5 b5 08 ff ff     ................
+     a76:	ff 1f bf bf 83 bd bd bd bd 03 ff ff ff 87 7b fd     ..............{.
+     a86:	dd c1 dd fd 7b 87 ff ff ff 33 ad ad ad 8d ad ad     ....{....3......
+     a96:	ad 33 ff ff ff 81 7b 7b 7b 83 db db bb 21 ff ff     .3....{{{....!..
+     aa6:	ff ff ff ff 87 fb 83 7b 7b 85 ff ff ff ff 01 7f     .......{{.......
+     ab6:	bf 83 7d 7d 7d 83 ff ff ff ff 8f 77 77 07 7b 7b     ..}}}......ww.{{
+     ac6:	7b 87 ff ff ff ff ff ff 87 7b e7 9f 7b 87 ff ff     {........{..{...
+     ad6:	ff ff ff ff 81 7b 7b 7b 83 fb bb c7 ff ff ff ff     .....{{{........
+     ae6:	83 7d 01 7f 7d 83 ff ff ff ff ff ff 6d ab c7 ab     .}..}.......m...
+     af6:	ab 6d ff ff ff ff ff ff 83 7d e3 fb 7d 83 ff ff     .m.......}..}...
+     b06:	ff ff ff ff 33 bb bb bb b3 c9 ff ff ff f7 ef ff     ....3...........
+     b16:	33 bb bb bb b3 c9 ff ff ff ff ff ff 33 b7 8f b7     3...........3...
+     b26:	b7 39 ff ff ff ff ff ff f1 eb eb db db 39 ff ff     .9...........9..
+     b36:	ff ff ff ff bb 93 93 ab bb 39 ff ff ff ff ff ff     .........9......
+     b46:	39 bb 83 bb bb 11 ff ff ff ff ff ff 83 7d 7d 7d     9............}}}
+     b56:	7d 83 ff ff ff ff ff ff 27 9b bb bb bb 11 ff ff     }.......'.......
+     b66:	ff ff ff ff 03 bd bd bd bd 83 bf 1f ff ff ff ff     ................
+     b76:	83 7d 7f 7f 7d 83 ff ff ff ff ff ff 17 ab ab ab     .}..}...........
+     b86:	ab 29 ff ff ff ff ff ff 11 bb bb bb c3 fb bb c7     .)..............
+     b96:	ff ff ff c7 ef 83 6d 6d 6d 83 ef c7 ff ff ff ff     ......mmm.......
+     ba6:	11 bb c7 c7 bb 11 ff ff ff ff ff ff 33 bb bb bb     ............3...
+     bb6:	b3 c9 fd ff ff ff ff ff 11 bb bb c3 fb f1 ff ff     ................
+     bc6:	ff ff ff ff 29 ab ab ab ab 83 ff ff ff ff ff ff     ....)...........
+     bd6:	29 ab ab ab ab 81 fd ff ff ff ff ff 1f 5f 43 dd     )............_C.
+     be6:	dd c3 ff ff ff ff ff ff 1d bd 8d b5 b5 0d ff ff     ................
+     bf6:	ff ff ff ff 1f bf 83 bd bd 03 ff ff ff ff ff ff     ................
+     c06:	83 7d e1 fd 7d 83 ff ff ff ff ff ff 33 ad 8d ad     .}..}.......3...
+     c16:	ad 33 ff ff ff ff ff ff c1 bb bb c3 db 99 ff ff     .3..............
+
+00000c26 <str1>:
+     c26:	53 69 6d 70 6c 65 20 50 41 4c 20 74 65 72 6d 69     Simple PAL termi
+     c36:	6e 61 6c 20 76 31 2e 32 20 55 41 52 54 2d 31 39     nal v1.2 UART-19
+     c46:	32 30 30 62 70 73 00                                200bps.
+
+00000c4d <str2>:
+     c4d:	53 69 6d 70 6c 65 20 56 47 41 20 74 65 72 6d 69     Simple VGA termi
+     c5d:	6e 61 6c 00                                         nal.
+
+00000c61 <str3>:
+     c61:	76 31 2e 32 20 55 41 52 54 2d 31 39 32 30 30 20     v1.2 UART-19200 
+     c71:	62 70 73 00 00                                      bps..
+
+00000c76 <__ctors_end>:
+     c76:	11 24       	eor	r1, r1
+     c78:	1f be       	out	0x3f, r1	; 63
+     c7a:	cf e5       	ldi	r28, 0x5F	; 95
+     c7c:	d4 e0       	ldi	r29, 0x04	; 4
+     c7e:	de bf       	out	0x3e, r29	; 62
+     c80:	cd bf       	out	0x3d, r28	; 61
+
+00000c82 <__do_clear_bss>:
+     c82:	13 e0       	ldi	r17, 0x03	; 3
+     c84:	a0 e6       	ldi	r26, 0x60	; 96
+     c86:	b0 e0       	ldi	r27, 0x00	; 0
+     c88:	01 c0       	rjmp	.+2      	; 0xc8c <.do_clear_bss_start>
+
+00000c8a <.do_clear_bss_loop>:
+     c8a:	1d 92       	st	X+, r1
+
+00000c8c <.do_clear_bss_start>:
+     c8c:	a4 36       	cpi	r26, 0x64	; 100
+     c8e:	b1 07       	cpc	r27, r17
+     c90:	e1 f7       	brne	.-8      	; 0xc8a <.do_clear_bss_loop>
+     c92:	41 d3       	rcall	.+1666   	; 0x1316 <main>
+     c94:	8a c3       	rjmp	.+1812   	; 0x13aa <_exit>
+
+00000c96 <__bad_interrupt>:
+     c96:	b4 c9       	rjmp	.-3224   	; 0x0 <__vectors>
+
+00000c98 <__vector_9>:
+
+static void avr_init(void);
+
+//All VGA sincronize made here..
+SIGNAL(SIG_OVERFLOW0)
+{
+     c98:	1f 92       	push	r1
+     c9a:	0f 92       	push	r0
+     c9c:	0f b6       	in	r0, 0x3f	; 63
+     c9e:	0f 92       	push	r0
+     ca0:	11 24       	eor	r1, r1
+     ca2:	2f 93       	push	r18
+     ca4:	8f 93       	push	r24
+     ca6:	9f 93       	push	r25
+ TCNT0 = 0xC3; //reload counter value
+     ca8:	83 ec       	ldi	r24, 0xC3	; 195
+     caa:	82 bf       	out	0x32, r24	; 50
+		//******Syncronization Handler********
+
+			//Count number of lines
+			if (++linecount == vga_field_line_count)
+     cac:	80 91 66 00 	lds	r24, 0x0066
+     cb0:	90 91 67 00 	lds	r25, 0x0067
+     cb4:	01 96       	adiw	r24, 0x01	; 1
+     cb6:	90 93 67 00 	sts	0x0067, r25
+     cba:	80 93 66 00 	sts	0x0066, r24
+     cbe:	80 91 66 00 	lds	r24, 0x0066
+     cc2:	90 91 67 00 	lds	r25, 0x0067
+     cc6:	22 e0       	ldi	r18, 0x02	; 2
+     cc8:	8d 30       	cpi	r24, 0x0D	; 13
+     cca:	92 07       	cpc	r25, r18
+     ccc:	41 f4       	brne	.+16     	; 0xcde <__vector_9+0x46>
+			{
+			linecount = 0;
+     cce:	10 92 67 00 	sts	0x0067, r1
+     cd2:	10 92 66 00 	sts	0x0066, r1
+			
+			//clear pointers for render display buffer
+			raw_render = 0; 
+     cd6:	10 92 62 03 	sts	0x0362, r1
+			y_line_render = 0;
+     cda:	10 92 68 00 	sts	0x0068, r1
+			}
+
+			//Make Vsync length 2 VGA lines 
+			if ((linecount == 10 )||(linecount == 11 ))
+     cde:	80 91 66 00 	lds	r24, 0x0066
+     ce2:	90 91 67 00 	lds	r25, 0x0067
+     ce6:	8a 30       	cpi	r24, 0x0A	; 10
+     ce8:	91 05       	cpc	r25, r1
+     cea:	39 f0       	breq	.+14     	; 0xcfa <__vector_9+0x62>
+     cec:	80 91 66 00 	lds	r24, 0x0066
+     cf0:	90 91 67 00 	lds	r25, 0x0067
+     cf4:	8b 30       	cpi	r24, 0x0B	; 11
+     cf6:	91 05       	cpc	r25, r1
+     cf8:	11 f4       	brne	.+4      	; 0xcfe <__vector_9+0x66>
+			{
+				//Make here vertical syncronization & HSYNC syncro level on
+				vsync_on;
+     cfa:	12 ba       	out	0x12, r1	; 18
+     cfc:	02 c0       	rjmp	.+4      	; 0xd02 <__vector_9+0x6a>
+			}
+			else
+			{
+				//.. & HSYNC syncro level on
+				vsync_off;
+     cfe:	84 e0       	ldi	r24, 0x04	; 4
+     d00:	82 bb       	out	0x12, r24	; 18
+			}
+		
+		
+			video_enable_flg = true;
+     d02:	81 e0       	ldi	r24, 0x01	; 1
+     d04:	80 93 63 03 	sts	0x0363, r24
+
+
+			if (linecount < 45)
+     d08:	80 91 66 00 	lds	r24, 0x0066
+     d0c:	90 91 67 00 	lds	r25, 0x0067
+     d10:	8d 32       	cpi	r24, 0x2D	; 45
+     d12:	91 05       	cpc	r25, r1
+     d14:	90 f4       	brcc	.+36     	; 0xd3a <__vector_9+0xa2>
+			{
+				video_enable_flg = false;
+     d16:	10 92 63 03 	sts	0x0363, r1
+	...
+					NOP;
+					NOP;
+					NOP;
+					NOP;
+					NOP;
+					NOP;
+     d36:	00 00       	nop
+     d38:	19 c0       	rjmp	.+50     	; 0xd6c <__vector_9+0xd4>
+					
+			}
+			else
+			{
+				 //Forming current string for rendering
+				 if (++y_line_render == vga_symbol_height)
+     d3a:	80 91 68 00 	lds	r24, 0x0068
+     d3e:	8f 5f       	subi	r24, 0xFF	; 255
+     d40:	80 93 68 00 	sts	0x0068, r24
+     d44:	80 91 68 00 	lds	r24, 0x0068
+     d48:	88 31       	cpi	r24, 0x18	; 24
+     d4a:	41 f4       	brne	.+16     	; 0xd5c <__vector_9+0xc4>
+				 {
+				  raw_render++;
+     d4c:	80 91 62 03 	lds	r24, 0x0362
+     d50:	8f 5f       	subi	r24, 0xFF	; 255
+     d52:	80 93 62 03 	sts	0x0362, r24
+				  y_line_render = 0;
+     d56:	10 92 68 00 	sts	0x0068, r1
+     d5a:	08 c0       	rjmp	.+16     	; 0xd6c <__vector_9+0xd4>
+	...
+					NOP;
+				 }
+		
+			}
+		
+			hsync_off; //HSYNC syncro level off
+     d6c:	93 9a       	sbi	0x12, 3	; 18
+		
+		//******Syncronization Handler********
+
+}
+     d6e:	9f 91       	pop	r25
+     d70:	8f 91       	pop	r24
+     d72:	2f 91       	pop	r18
+     d74:	0f 90       	pop	r0
+     d76:	0f be       	out	0x3f, r0	; 63
+     d78:	0f 90       	pop	r0
+     d7a:	1f 90       	pop	r1
+     d7c:	18 95       	reti
+
+00000d7e <__vector_6>:
+
+//All PAL sincronize made here..
+SIGNAL(SIG_OUTPUT_COMPARE1A)
+{
+     d7e:	1f 92       	push	r1
+     d80:	0f 92       	push	r0
+     d82:	0f b6       	in	r0, 0x3f	; 63
+     d84:	0f 92       	push	r0
+     d86:	11 24       	eor	r1, r1
+     d88:	2f 93       	push	r18
+     d8a:	8f 93       	push	r24
+     d8c:	9f 93       	push	r25
+			
+	//Count number of lines
+	
+	if (++linecount == pal_field_line_count)
+     d8e:	80 91 66 00 	lds	r24, 0x0066
+     d92:	90 91 67 00 	lds	r25, 0x0067
+     d96:	01 96       	adiw	r24, 0x01	; 1
+     d98:	90 93 67 00 	sts	0x0067, r25
+     d9c:	80 93 66 00 	sts	0x0066, r24
+     da0:	80 91 66 00 	lds	r24, 0x0066
+     da4:	90 91 67 00 	lds	r25, 0x0067
+     da8:	21 e0       	ldi	r18, 0x01	; 1
+     daa:	88 33       	cpi	r24, 0x38	; 56
+     dac:	92 07       	cpc	r25, r18
+     dae:	41 f4       	brne	.+16     	; 0xdc0 <__vector_6+0x42>
+	{
+		linecount = 0;
+     db0:	10 92 67 00 	sts	0x0067, r1
+     db4:	10 92 66 00 	sts	0x0066, r1
+		//clear pointers for render display buffer
+		raw_render = 0; 
+     db8:	10 92 62 03 	sts	0x0362, r1
+		y_line_render = 0;
+     dbc:	10 92 68 00 	sts	0x0068, r1
+	}
+	
+	//Invert HSYNC for VSYNC
+	
+	if (linecount > 305 && linecount < 309)
+     dc0:	80 91 66 00 	lds	r24, 0x0066
+     dc4:	90 91 67 00 	lds	r25, 0x0067
+     dc8:	21 e0       	ldi	r18, 0x01	; 1
+     dca:	82 33       	cpi	r24, 0x32	; 50
+     dcc:	92 07       	cpc	r25, r18
+     dce:	78 f0       	brcs	.+30     	; 0xdee <__vector_6+0x70>
+     dd0:	80 91 66 00 	lds	r24, 0x0066
+     dd4:	90 91 67 00 	lds	r25, 0x0067
+     dd8:	21 e0       	ldi	r18, 0x01	; 1
+     dda:	85 33       	cpi	r24, 0x35	; 53
+     ddc:	92 07       	cpc	r25, r18
+     dde:	38 f4       	brcc	.+14     	; 0xdee <__vector_6+0x70>
+	{
+		//Make here vertical syncronization
+		
+		sbi(PORTC,0); //inverted syncro level on
+     de0:	a8 9a       	sbi	0x15, 0	; 21
+		char i = 15;
+		while (--i)
+     de2:	8e e0       	ldi	r24, 0x0E	; 14
+		{ NOP;}
+     de4:	00 00       	nop
+	{
+		//Make here vertical syncronization
+		
+		sbi(PORTC,0); //inverted syncro level on
+		char i = 15;
+		while (--i)
+     de6:	81 50       	subi	r24, 0x01	; 1
+     de8:	e9 f7       	brne	.-6      	; 0xde4 <__vector_6+0x66>
+		{ NOP;}
+		//And "black" = 8 mksk;
+		cbi(PORTC,0); //inverted syncro level off
+     dea:	a8 98       	cbi	0x15, 0	; 21
+	}
+	
+	//Invert HSYNC for VSYNC
+	
+	if (linecount > 305 && linecount < 309)
+	{
+     dec:	06 c0       	rjmp	.+12     	; 0xdfa <__vector_6+0x7c>
+		cbi(PORTC,0); //inverted syncro level off
+	    }
+	else
+	{
+		//Make HSYHC = 4 mksk;
+		cbi(PORTC,0); //syncro level on
+     dee:	a8 98       	cbi	0x15, 0	; 21
+     df0:	8d e1       	ldi	r24, 0x1D	; 29
+		char i = 30;
+		while (--i)
+		{ NOP;}
+     df2:	00 00       	nop
+     df4:	81 50       	subi	r24, 0x01	; 1
+	else
+	{
+		//Make HSYHC = 4 mksk;
+		cbi(PORTC,0); //syncro level on
+		char i = 30;
+		while (--i)
+     df6:	e9 f7       	brne	.-6      	; 0xdf2 <__vector_6+0x74>
+		{ NOP;}
+
+		//And "black" = 8 mksk;
+		sbi(PORTC,0); //syncro level off
+     df8:	a8 9a       	sbi	0x15, 0	; 21
+	}
+			video_enable_flg = true;
+     dfa:	81 e0       	ldi	r24, 0x01	; 1
+     dfc:	80 93 63 03 	sts	0x0363, r24
+			if ((linecount < 40) || (linecount > 278))
+     e00:	80 91 66 00 	lds	r24, 0x0066
+     e04:	90 91 67 00 	lds	r25, 0x0067
+     e08:	88 32       	cpi	r24, 0x28	; 40
+     e0a:	91 05       	cpc	r25, r1
+     e0c:	40 f0       	brcs	.+16     	; 0xe1e <__vector_6+0xa0>
+     e0e:	80 91 66 00 	lds	r24, 0x0066
+     e12:	90 91 67 00 	lds	r25, 0x0067
+     e16:	21 e0       	ldi	r18, 0x01	; 1
+     e18:	87 31       	cpi	r24, 0x17	; 23
+     e1a:	92 07       	cpc	r25, r18
+     e1c:	90 f0       	brcs	.+36     	; 0xe42 <__vector_6+0xc4>
+			{
+				video_enable_flg = false;
+     e1e:	10 92 63 03 	sts	0x0363, r1
+	...
+					NOP;
+					NOP;
+					NOP;
+					NOP;
+					NOP;
+					NOP;
+     e3e:	00 00       	nop
+     e40:	19 c0       	rjmp	.+50     	; 0xe74 <__vector_6+0xf6>
+			}
+			else
+			{
+				 //Forming current string for rendering
+				 if (++y_line_render == pal_symbol_height)
+     e42:	80 91 68 00 	lds	r24, 0x0068
+     e46:	8f 5f       	subi	r24, 0xFF	; 255
+     e48:	80 93 68 00 	sts	0x0068, r24
+     e4c:	80 91 68 00 	lds	r24, 0x0068
+     e50:	8c 30       	cpi	r24, 0x0C	; 12
+     e52:	41 f4       	brne	.+16     	; 0xe64 <__vector_6+0xe6>
+				 {
+				  raw_render++;
+     e54:	80 91 62 03 	lds	r24, 0x0362
+     e58:	8f 5f       	subi	r24, 0xFF	; 255
+     e5a:	80 93 62 03 	sts	0x0362, r24
+				  y_line_render = 0;
+     e5e:	10 92 68 00 	sts	0x0068, r1
+     e62:	08 c0       	rjmp	.+16     	; 0xe74 <__vector_6+0xf6>
+	...
+					NOP;
+				 }
+		
+			}
+
+}
+     e74:	9f 91       	pop	r25
+     e76:	8f 91       	pop	r24
+     e78:	2f 91       	pop	r18
+     e7a:	0f 90       	pop	r0
+     e7c:	0f be       	out	0x3f, r0	; 63
+     e7e:	0f 90       	pop	r0
+     e80:	1f 90       	pop	r1
+     e82:	18 95       	reti
+
+00000e84 <spi_init>:
+
+void spi_init (void)
+{
+    //Set SPI PORT DDR bits
+	sbi(DDRB, 7); //SCK
+     e84:	bf 9a       	sbi	0x17, 7	; 23
+	cbi(DDRB, 6); //MISO
+     e86:	be 98       	cbi	0x17, 6	; 23
+	sbi(DDRB, 5); //MOSI
+     e88:	bd 9a       	sbi	0x17, 5	; 23
+	sbi(DDRB, 4); //SS
+     e8a:	bc 9a       	sbi	0x17, 4	; 23
+	SPSR = 1 << SPI2X;
+     e8c:	81 e0       	ldi	r24, 0x01	; 1
+     e8e:	8e b9       	out	0x0e, r24	; 14
+	SPCR = (1 << SPE) | (1 << MSTR); //SPI enable as master ,FREQ = fclk/2
+     e90:	80 e5       	ldi	r24, 0x50	; 80
+     e92:	8d b9       	out	0x0d, r24	; 13
+	//That's a great pity, that we can't work with SPI with FREQ = fclk,
+	//because may be possible build terminal up 40 symbol per row!!!
+}
+     e94:	08 95       	ret
+
+00000e96 <pal_render>:
+					}
+	}
+}
+
+void pal_render(void)
+{
+     e96:	8f 92       	push	r8
+     e98:	9f 92       	push	r9
+     e9a:	af 92       	push	r10
+     e9c:	bf 92       	push	r11
+     e9e:	cf 92       	push	r12
+     ea0:	df 92       	push	r13
+     ea2:	ef 92       	push	r14
+     ea4:	ff 92       	push	r15
+     ea6:	0f 93       	push	r16
+     ea8:	1f 93       	push	r17
+     eaa:	cf 93       	push	r28
+     eac:	df 93       	push	r29
+	unsigned char i;
+	char * _ptr;
+	const char * _ptr1;
+	//Initialize display buffer with StartUp strings
+	strcpy_P(&str_array[pal_symbols_per_row*(pal_row_count-1)],&str1[0]); 	
+     eae:	8b e3       	ldi	r24, 0x3B	; 59
+     eb0:	93 e0       	ldi	r25, 0x03	; 3
+     eb2:	66 e2       	ldi	r22, 0x26	; 38
+     eb4:	7c e0       	ldi	r23, 0x0C	; 12
+     eb6:	72 d2       	rcall	.+1252   	; 0x139c <strcpy_P>
+	
+	//Enable global interrupt
+	asm ("sei");
+     eb8:	78 94       	sei
+     eba:	c0 91 62 00 	lds	r28, 0x0062
+     ebe:	d0 91 63 00 	lds	r29, 0x0063
+					  //TAB
+					  case  0x09: 
+					  if((current_symbol + 5) < (pal_row_count*pal_symbols_per_row))
+					    {
+							//Add 5 Space
+							str_array[current_symbol] = 0x0;
+     ec2:	29 e6       	ldi	r18, 0x69	; 105
+     ec4:	30 e0       	ldi	r19, 0x00	; 0
+						}
+					  break;
+
+					  //RETURN
+					  case  0x0D: 
+					  current_line = current_symbol / pal_symbols_per_row;
+     ec6:	0f 2e       	mov	r0, r31
+     ec8:	f6 e2       	ldi	r31, 0x26	; 38
+     eca:	cf 2e       	mov	r12, r31
+     ecc:	dd 24       	eor	r13, r13
+     ece:	f0 2d       	mov	r31, r0
+	while(UCSRA & (1<<RXC))
+	{
+		unsigned char current_line, received_symbol;
+		received_symbol = UDR;
+		//Check for overflow display buffer
+		if(current_symbol == (pal_row_count*pal_symbols_per_row))
+     ed0:	00 e0       	ldi	r16, 0x00	; 0
+     ed2:	10 e0       	ldi	r17, 0x00	; 0
+
+		//Wait compare interrupt signal from Timer1
+		sleep_mode();
+		
+		//Check symbol on UART
+		if (UCSRA & (1<<RXC))
+     ed4:	0f 2e       	mov	r0, r31
+     ed6:	fe e0       	ldi	r31, 0x0E	; 14
+     ed8:	ff 2e       	mov	r15, r31
+     eda:	f0 2d       	mov	r31, r0
+						{
+							str_array[current_symbol] = ' ';
+						}
+						else
+						{
+							str_array[current_symbol] = 0x7F;
+     edc:	0f 2e       	mov	r0, r31
+     ede:	ff e7       	ldi	r31, 0x7F	; 127
+     ee0:	9f 2e       	mov	r9, r31
+     ee2:	f0 2d       	mov	r31, r0
+					static unsigned int framecount;
+					framecount++;
+					//Here draw cursor
+						if (framecount&0x800)
+						{
+							str_array[current_symbol] = ' ';
+     ee4:	88 24       	eor	r8, r8
+     ee6:	68 94       	set
+     ee8:	85 f8       	bld	r8, 5
+		if(video_enable_flg)
+		{
+		//OK, visible
+		//Main render routine
+				//Set pointer for render line (display bufffer)
+				_ptr = &str_array[raw_render * pal_symbols_per_row];
+     eea:	0f 2e       	mov	r0, r31
+     eec:	f6 e2       	ldi	r31, 0x26	; 38
+     eee:	ef 2e       	mov	r14, r31
+     ef0:	f0 2d       	mov	r31, r0
+				//Set pointer for render line (character generator)
+				_ptr1 = &symbol[0][y_line_render];
+	
+				//Cycle for render line 
+				i = pal_symbols_per_row;
+				video_on;
+     ef2:	0f 2e       	mov	r0, r31
+     ef4:	f0 eb       	ldi	r31, 0xB0	; 176
+     ef6:	bf 2e       	mov	r11, r31
+     ef8:	f0 2d       	mov	r31, r0
+				while(i--)
+				{
+					SPDR = PRG_RDB(_ptr1 + (* _ptr++)*pal_symbol_height);
+     efa:	4c e0       	ldi	r20, 0x0C	; 12
+				}
+				//Delay for draw last symbol
+				i=6;
+				while(i--) NOP;
+				
+				video_off;
+     efc:	0f 2e       	mov	r0, r31
+     efe:	f0 e9       	ldi	r31, 0x90	; 144
+     f00:	af 2e       	mov	r10, r31
+     f02:	f0 2d       	mov	r31, r0
+
+	for(;;)
+    {
+
+		//Wait compare interrupt signal from Timer1
+		sleep_mode();
+     f04:	85 b7       	in	r24, 0x35	; 53
+     f06:	80 68       	ori	r24, 0x80	; 128
+     f08:	85 bf       	out	0x35, r24	; 53
+     f0a:	88 95       	sleep
+     f0c:	85 b7       	in	r24, 0x35	; 53
+     f0e:	8f 77       	andi	r24, 0x7F	; 127
+     f10:	85 bf       	out	0x35, r24	; 53
+		
+		//Check symbol on UART
+		if (UCSRA & (1<<RXC))
+     f12:	5f 99       	sbic	0x0b, 7	; 11
+     f14:	a9 c0       	rjmp	.+338    	; 0x1068 <pal_render+0x1d2>
+     f16:	8f 2d       	mov	r24, r15
+     f18:	aa c0       	rjmp	.+340    	; 0x106e <pal_render+0x1d8>
+{
+	// Parser received symbols from UART
+	while(UCSRA & (1<<RXC))
+	{
+		unsigned char current_line, received_symbol;
+		received_symbol = UDR;
+     f1a:	5c b1       	in	r21, 0x0c	; 12
+		//Check for overflow display buffer
+		if(current_symbol == (pal_row_count*pal_symbols_per_row))
+     f1c:	80 91 64 00 	lds	r24, 0x0064
+     f20:	90 91 65 00 	lds	r25, 0x0065
+     f24:	62 e0       	ldi	r22, 0x02	; 2
+     f26:	88 3f       	cpi	r24, 0xF8	; 248
+     f28:	96 07       	cpc	r25, r22
+     f2a:	99 f5       	brne	.+102    	; 0xf92 <pal_render+0xfc>
+     f2c:	c8 01       	movw	r24, r16
+					  default: str_array[current_symbol++] = received_symbol;
+					}
+	}
+}
+
+void pal_render(void)
+     f2e:	fc 01       	movw	r30, r24
+     f30:	e7 59       	subi	r30, 0x97	; 151
+     f32:	ff 4f       	sbci	r31, 0xFF	; 255
+			//Set pointers for clear string array
+			ptr = &str_array[0];
+			while(i--)
+			{
+				//Don't use here loop, to fastest clear display buffer
+				*ptr++ = 0x0;
+     f34:	10 82       	st	Z, r1
+				*ptr++ = 0x0;
+     f36:	11 82       	std	Z+1, r1	; 0x01
+				*ptr++ = 0x0;
+     f38:	12 82       	std	Z+2, r1	; 0x02
+				*ptr++ = 0x0;
+     f3a:	13 82       	std	Z+3, r1	; 0x03
+				*ptr++ = 0x0;
+     f3c:	14 82       	std	Z+4, r1	; 0x04
+				*ptr++ = 0x0;
+     f3e:	15 82       	std	Z+5, r1	; 0x05
+				*ptr++ = 0x0;
+     f40:	16 82       	std	Z+6, r1	; 0x06
+				*ptr++ = 0x0;
+     f42:	17 82       	std	Z+7, r1	; 0x07
+				*ptr++ = 0x0;
+     f44:	10 86       	std	Z+8, r1	; 0x08
+				*ptr++ = 0x0;
+     f46:	11 86       	std	Z+9, r1	; 0x09
+				*ptr++ = 0x0;
+     f48:	12 86       	std	Z+10, r1	; 0x0a
+				*ptr++ = 0x0;
+     f4a:	13 86       	std	Z+11, r1	; 0x0b
+				*ptr++ = 0x0;
+     f4c:	14 86       	std	Z+12, r1	; 0x0c
+				*ptr++ = 0x0;
+     f4e:	15 86       	std	Z+13, r1	; 0x0d
+				*ptr++ = 0x0;
+     f50:	16 86       	std	Z+14, r1	; 0x0e
+				*ptr++ = 0x0;
+     f52:	17 86       	std	Z+15, r1	; 0x0f
+				*ptr++ = 0x0;
+     f54:	10 8a       	std	Z+16, r1	; 0x10
+				*ptr++ = 0x0;
+     f56:	11 8a       	std	Z+17, r1	; 0x11
+				*ptr++ = 0x0;
+     f58:	12 8a       	std	Z+18, r1	; 0x12
+				*ptr++ = 0x0;
+     f5a:	13 8a       	std	Z+19, r1	; 0x13
+				*ptr++ = 0x0;
+     f5c:	14 8a       	std	Z+20, r1	; 0x14
+				*ptr++ = 0x0;
+     f5e:	15 8a       	std	Z+21, r1	; 0x15
+				*ptr++ = 0x0;
+     f60:	16 8a       	std	Z+22, r1	; 0x16
+				*ptr++ = 0x0;
+     f62:	17 8a       	std	Z+23, r1	; 0x17
+				*ptr++ = 0x0;
+     f64:	10 8e       	std	Z+24, r1	; 0x18
+				*ptr++ = 0x0;
+     f66:	11 8e       	std	Z+25, r1	; 0x19
+				*ptr++ = 0x0;
+     f68:	12 8e       	std	Z+26, r1	; 0x1a
+				*ptr++ = 0x0;
+     f6a:	13 8e       	std	Z+27, r1	; 0x1b
+				*ptr++ = 0x0;
+     f6c:	14 8e       	std	Z+28, r1	; 0x1c
+				*ptr++ = 0x0;
+     f6e:	15 8e       	std	Z+29, r1	; 0x1d
+				*ptr++ = 0x0;
+     f70:	16 8e       	std	Z+30, r1	; 0x1e
+				*ptr++ = 0x0;
+     f72:	17 8e       	std	Z+31, r1	; 0x1f
+				*ptr++ = 0x0;
+     f74:	10 a2       	std	Z+32, r1	; 0x20
+				*ptr++ = 0x0;
+     f76:	11 a2       	std	Z+33, r1	; 0x21
+				*ptr++ = 0x0;
+     f78:	12 a2       	std	Z+34, r1	; 0x22
+				*ptr++ = 0x0;
+     f7a:	13 a2       	std	Z+35, r1	; 0x23
+				*ptr++ = 0x0;
+     f7c:	14 a2       	std	Z+36, r1	; 0x24
+				*ptr++ = 0x0;
+     f7e:	15 a2       	std	Z+37, r1	; 0x25
+     f80:	86 96       	adiw	r24, 0x26	; 38
+
+			unsigned char i = pal_row_count;
+			char * ptr;
+			//Set pointers for clear string array
+			ptr = &str_array[0];
+			while(i--)
+     f82:	62 e0       	ldi	r22, 0x02	; 2
+     f84:	88 3f       	cpi	r24, 0xF8	; 248
+     f86:	96 07       	cpc	r25, r22
+     f88:	91 f6       	brne	.-92     	; 0xf2e <pal_render+0x98>
+				*ptr++ = 0x0;
+				*ptr++ = 0x0;
+				*ptr++ = 0x0;
+				*ptr++ = 0x0;
+			};
+			current_symbol = 0x0;
+     f8a:	10 93 65 00 	sts	0x0065, r17
+     f8e:	00 93 64 00 	sts	0x0064, r16
+		}
+					switch ( received_symbol )
+     f92:	59 30       	cpi	r21, 0x09	; 9
+     f94:	21 f1       	breq	.+72     	; 0xfde <pal_render+0x148>
+     f96:	5d 30       	cpi	r21, 0x0D	; 13
+     f98:	e1 f1       	breq	.+120    	; 0x1012 <pal_render+0x17c>
+     f9a:	58 30       	cpi	r21, 0x08	; 8
+     f9c:	09 f0       	breq	.+2      	; 0xfa0 <pal_render+0x10a>
+     f9e:	57 c0       	rjmp	.+174    	; 0x104e <pal_render+0x1b8>
+					{
+					  //BackSpace
+					  case  0x08: 
+					  if(current_symbol)
+     fa0:	80 91 64 00 	lds	r24, 0x0064
+     fa4:	90 91 65 00 	lds	r25, 0x0065
+     fa8:	00 97       	sbiw	r24, 0x00	; 0
+     faa:	09 f4       	brne	.+2      	; 0xfae <pal_render+0x118>
+     fac:	5d c0       	rjmp	.+186    	; 0x1068 <pal_render+0x1d2>
+					    {
+							str_array[current_symbol] = 0x0;
+     fae:	e0 91 64 00 	lds	r30, 0x0064
+     fb2:	f0 91 65 00 	lds	r31, 0x0065
+     fb6:	e2 0f       	add	r30, r18
+     fb8:	f3 1f       	adc	r31, r19
+     fba:	10 82       	st	Z, r1
+							str_array[--current_symbol] = 0x0;
+     fbc:	80 91 64 00 	lds	r24, 0x0064
+     fc0:	90 91 65 00 	lds	r25, 0x0065
+     fc4:	01 97       	sbiw	r24, 0x01	; 1
+     fc6:	90 93 65 00 	sts	0x0065, r25
+     fca:	80 93 64 00 	sts	0x0064, r24
+     fce:	e0 91 64 00 	lds	r30, 0x0064
+     fd2:	f0 91 65 00 	lds	r31, 0x0065
+     fd6:	e2 0f       	add	r30, r18
+     fd8:	f3 1f       	adc	r31, r19
+     fda:	10 82       	st	Z, r1
+     fdc:	45 c0       	rjmp	.+138    	; 0x1068 <pal_render+0x1d2>
+						}
+					  break;
+					  
+					  //TAB
+					  case  0x09: 
+					  if((current_symbol + 5) < (pal_row_count*pal_symbols_per_row))
+     fde:	80 91 64 00 	lds	r24, 0x0064
+     fe2:	90 91 65 00 	lds	r25, 0x0065
+     fe6:	05 96       	adiw	r24, 0x05	; 5
+     fe8:	52 e0       	ldi	r21, 0x02	; 2
+     fea:	88 3f       	cpi	r24, 0xF8	; 248
+     fec:	95 07       	cpc	r25, r21
+     fee:	e0 f5       	brcc	.+120    	; 0x1068 <pal_render+0x1d2>
+					    {
+							//Add 5 Space
+							str_array[current_symbol] = 0x0;
+     ff0:	e0 91 64 00 	lds	r30, 0x0064
+     ff4:	f0 91 65 00 	lds	r31, 0x0065
+     ff8:	e2 0f       	add	r30, r18
+     ffa:	f3 1f       	adc	r31, r19
+     ffc:	10 82       	st	Z, r1
+							current_symbol += 5;
+     ffe:	80 91 64 00 	lds	r24, 0x0064
+    1002:	90 91 65 00 	lds	r25, 0x0065
+    1006:	05 96       	adiw	r24, 0x05	; 5
+    1008:	90 93 65 00 	sts	0x0065, r25
+    100c:	80 93 64 00 	sts	0x0064, r24
+    1010:	2b c0       	rjmp	.+86     	; 0x1068 <pal_render+0x1d2>
+						}
+					  break;
+
+					  //RETURN
+					  case  0x0D: 
+					  current_line = current_symbol / pal_symbols_per_row;
+    1012:	80 91 64 00 	lds	r24, 0x0064
+    1016:	90 91 65 00 	lds	r25, 0x0065
+    101a:	b6 01       	movw	r22, r12
+    101c:	ab d1       	rcall	.+854    	; 0x1374 <__udivmodhi4>
+					  if((current_line) < 19)
+    101e:	63 31       	cpi	r22, 0x13	; 19
+    1020:	18 f5       	brcc	.+70     	; 0x1068 <pal_render+0x1d2>
+					    {
+							str_array[current_symbol] = 0x0;
+    1022:	e0 91 64 00 	lds	r30, 0x0064
+    1026:	f0 91 65 00 	lds	r31, 0x0065
+    102a:	e2 0f       	add	r30, r18
+    102c:	f3 1f       	adc	r31, r19
+    102e:	10 82       	st	Z, r1
+							current_symbol = current_line*pal_symbols_per_row + pal_symbols_per_row;
+    1030:	70 e0       	ldi	r23, 0x00	; 0
+    1032:	6f 5f       	subi	r22, 0xFF	; 255
+    1034:	7f 4f       	sbci	r23, 0xFF	; 255
+    1036:	6c 9d       	mul	r22, r12
+    1038:	c0 01       	movw	r24, r0
+    103a:	6d 9d       	mul	r22, r13
+    103c:	90 0d       	add	r25, r0
+    103e:	7c 9d       	mul	r23, r12
+    1040:	90 0d       	add	r25, r0
+    1042:	11 24       	eor	r1, r1
+    1044:	90 93 65 00 	sts	0x0065, r25
+    1048:	80 93 64 00 	sts	0x0064, r24
+    104c:	0d c0       	rjmp	.+26     	; 0x1068 <pal_render+0x1d2>
+						}
+					  break;
+					  default: str_array[current_symbol++] = received_symbol;
+    104e:	80 91 64 00 	lds	r24, 0x0064
+    1052:	90 91 65 00 	lds	r25, 0x0065
+    1056:	f9 01       	movw	r30, r18
+    1058:	e8 0f       	add	r30, r24
+    105a:	f9 1f       	adc	r31, r25
+    105c:	50 83       	st	Z, r21
+    105e:	01 96       	adiw	r24, 0x01	; 1
+    1060:	90 93 65 00 	sts	0x0065, r25
+    1064:	80 93 64 00 	sts	0x0064, r24
+
+
+static void pal_terminal_handle(void)
+{
+	// Parser received symbols from UART
+	while(UCSRA & (1<<RXC))
+    1068:	5f 99       	sbic	0x0b, 7	; 11
+    106a:	57 cf       	rjmp	.-338    	; 0xf1a <pal_render+0x84>
+    106c:	4b cf       	rjmp	.-362    	; 0xf04 <pal_render+0x6e>
+			//to avoid display flickering
+			continue;
+		}
+		//To make horizontal shift rendered image
+		i=14;
+		while(i--) NOP;
+    106e:	00 00       	nop
+    1070:	81 50       	subi	r24, 0x01	; 1
+    1072:	e9 f7       	brne	.-6      	; 0x106e <pal_render+0x1d8>
+		//Check visible field
+		if(video_enable_flg)
+    1074:	80 91 63 03 	lds	r24, 0x0363
+    1078:	88 23       	and	r24, r24
+    107a:	21 f1       	breq	.+72     	; 0x10c4 <pal_render+0x22e>
+		{
+		//OK, visible
+		//Main render routine
+				//Set pointer for render line (display bufffer)
+				_ptr = &str_array[raw_render * pal_symbols_per_row];
+    107c:	a0 91 62 03 	lds	r26, 0x0362
+    1080:	6e 2d       	mov	r22, r14
+    1082:	a6 9f       	mul	r26, r22
+    1084:	d0 01       	movw	r26, r0
+    1086:	11 24       	eor	r1, r1
+    1088:	a7 59       	subi	r26, 0x97	; 151
+    108a:	bf 4f       	sbci	r27, 0xFF	; 255
+
+				//Set pointer for render line (character generator)
+				_ptr1 = &symbol[0][y_line_render];
+    108c:	80 91 68 00 	lds	r24, 0x0068
+    1090:	90 e0       	ldi	r25, 0x00	; 0
+    1092:	8a 5d       	subi	r24, 0xDA	; 218
+    1094:	9f 4f       	sbci	r25, 0xFF	; 255
+	
+				//Cycle for render line 
+				i = pal_symbols_per_row;
+				video_on;
+    1096:	b7 ba       	out	0x17, r11	; 23
+    1098:	5e 2d       	mov	r21, r14
+				while(i--)
+				{
+					SPDR = PRG_RDB(_ptr1 + (* _ptr++)*pal_symbol_height);
+    109a:	ed 91       	ld	r30, X+
+    109c:	e4 9f       	mul	r30, r20
+    109e:	f0 01       	movw	r30, r0
+    10a0:	11 24       	eor	r1, r1
+    10a2:	e8 0f       	add	r30, r24
+    10a4:	f9 1f       	adc	r31, r25
+    10a6:	e4 91       	lpm	r30, Z+
+    10a8:	ef b9       	out	0x0f, r30	; 15
+					//That's a great pity can't shift data faster (8Mhz at FOSC=16Mhz)!!
+					NOP;
+    10aa:	00 00       	nop
+					NOP;
+    10ac:	00 00       	nop
+					NOP;
+    10ae:	00 00       	nop
+    10b0:	51 50       	subi	r21, 0x01	; 1
+				_ptr1 = &symbol[0][y_line_render];
+	
+				//Cycle for render line 
+				i = pal_symbols_per_row;
+				video_on;
+				while(i--)
+    10b2:	99 f7       	brne	.-26     	; 0x109a <pal_render+0x204>
+	...
+				}
+				//Delay for draw last symbol
+				i=6;
+				while(i--) NOP;
+				
+				video_off;
+    10c0:	a7 ba       	out	0x17, r10	; 23
+    10c2:	20 cf       	rjmp	.-448    	; 0xf04 <pal_render+0x6e>
+		//Not visible
+		//Can do something else..	
+					//******Cursor handle
+					//Count frame
+					static unsigned int framecount;
+					framecount++;
+    10c4:	21 96       	adiw	r28, 0x01	; 1
+					//Here draw cursor
+						if (framecount&0x800)
+    10c6:	d3 ff       	sbrs	r29, 3
+    10c8:	08 c0       	rjmp	.+16     	; 0x10da <pal_render+0x244>
+						{
+							str_array[current_symbol] = ' ';
+    10ca:	e0 91 64 00 	lds	r30, 0x0064
+    10ce:	f0 91 65 00 	lds	r31, 0x0065
+    10d2:	e2 0f       	add	r30, r18
+    10d4:	f3 1f       	adc	r31, r19
+    10d6:	80 82       	st	Z, r8
+    10d8:	15 cf       	rjmp	.-470    	; 0xf04 <pal_render+0x6e>
+						}
+						else
+						{
+							str_array[current_symbol] = 0x7F;
+    10da:	e0 91 64 00 	lds	r30, 0x0064
+    10de:	f0 91 65 00 	lds	r31, 0x0065
+    10e2:	e2 0f       	add	r30, r18
+    10e4:	f3 1f       	adc	r31, r19
+    10e6:	90 82       	st	Z, r9
+    10e8:	0d cf       	rjmp	.-486    	; 0xf04 <pal_render+0x6e>
+
+000010ea <vga_render>:
+					}
+	}
+}
+
+void vga_render()
+{
+    10ea:	9f 92       	push	r9
+    10ec:	af 92       	push	r10
+    10ee:	bf 92       	push	r11
+    10f0:	cf 92       	push	r12
+    10f2:	df 92       	push	r13
+    10f4:	ef 92       	push	r14
+    10f6:	ff 92       	push	r15
+    10f8:	0f 93       	push	r16
+    10fa:	1f 93       	push	r17
+    10fc:	cf 93       	push	r28
+    10fe:	df 93       	push	r29
+	unsigned char i;
+	char * _ptr;
+	const char * _ptr1;
+
+	//Initialize display buffer with StartUp strings
+	strcpy_P(&str_array[vga_symbols_per_row*(vga_row_count-2)],&str2[0]); 	
+    1100:	c1 ed       	ldi	r28, 0xD1	; 209
+    1102:	d1 e0       	ldi	r29, 0x01	; 1
+    1104:	ce 01       	movw	r24, r28
+    1106:	6d e4       	ldi	r22, 0x4D	; 77
+    1108:	7c e0       	ldi	r23, 0x0C	; 12
+    110a:	48 d1       	rcall	.+656    	; 0x139c <strcpy_P>
+	strcpy_P(&str_array[vga_symbols_per_row*(vga_row_count-1)],&str3[0]); 	
+    110c:	ce 01       	movw	r24, r28
+    110e:	44 96       	adiw	r24, 0x14	; 20
+    1110:	61 e6       	ldi	r22, 0x61	; 97
+    1112:	7c e0       	ldi	r23, 0x0C	; 12
+    1114:	43 d1       	rcall	.+646    	; 0x139c <strcpy_P>
+
+	//Enable global interrupt
+	asm ("sei");
+    1116:	78 94       	sei
+    1118:	c0 91 60 00 	lds	r28, 0x0060
+    111c:	d0 91 61 00 	lds	r29, 0x0061
+					  //TAB
+					  case  0x09: 
+					  if((current_symbol + 5) < (vga_row_count*vga_symbols_per_row))
+					    {
+							//Add 5 Space
+							str_array[current_symbol] = 0x0;
+    1120:	29 e6       	ldi	r18, 0x69	; 105
+    1122:	30 e0       	ldi	r19, 0x00	; 0
+						}
+					  break;
+
+					  //RETURN
+					  case  0x0D: 
+					  current_line = current_symbol / vga_symbols_per_row;
+    1124:	0f 2e       	mov	r0, r31
+    1126:	f4 e1       	ldi	r31, 0x14	; 20
+    1128:	cf 2e       	mov	r12, r31
+    112a:	dd 24       	eor	r13, r13
+    112c:	f0 2d       	mov	r31, r0
+	while(UCSRA & (1<<RXC))
+	{
+		unsigned char current_line, received_symbol;
+		received_symbol = UDR;
+		//Check for overflow display buffer
+		if(current_symbol == (vga_row_count*vga_symbols_per_row))
+    112e:	ee 24       	eor	r14, r14
+    1130:	ff 24       	eor	r15, r15
+						{
+							str_array[current_symbol] = ' ';
+						}
+						else
+						{
+							str_array[current_symbol] = 0x7F;
+    1132:	0f 2e       	mov	r0, r31
+    1134:	ff e7       	ldi	r31, 0x7F	; 127
+    1136:	af 2e       	mov	r10, r31
+    1138:	f0 2d       	mov	r31, r0
+					static unsigned int framecount;
+					framecount++;
+					//Here draw cursor
+						if (framecount&0x800)
+						{
+							str_array[current_symbol] = ' ';
+    113a:	99 24       	eor	r9, r9
+    113c:	68 94       	set
+    113e:	95 f8       	bld	r9, 5
+		if(video_enable_flg)
+		{
+		//OK, visible
+		//Main render routine
+				//Set pointer for render line (display bufffer)
+				_ptr = &str_array[raw_render * vga_symbols_per_row];
+    1140:	04 e1       	ldi	r16, 0x14	; 20
+	
+				//Cycle for render line 
+				i = vga_symbols_per_row;
+				while(i--)
+				{
+					SPDR = PRG_RDB(_ptr1 + (* _ptr++)*vga_symbol_height/2);
+    1142:	18 e1       	ldi	r17, 0x18	; 24
+				    video_on;
+    1144:	40 eb       	ldi	r20, 0xB0	; 176
+				NOP;
+				NOP;
+				NOP;
+				NOP;
+				NOP;
+				video_off;
+    1146:	0f 2e       	mov	r0, r31
+    1148:	f0 e9       	ldi	r31, 0x90	; 144
+    114a:	bf 2e       	mov	r11, r31
+    114c:	f0 2d       	mov	r31, r0
+
+	for(;;)
+    {
+
+		//Wait compare interrupt signal from Timer1
+		sleep_mode();
+    114e:	85 b7       	in	r24, 0x35	; 53
+    1150:	80 68       	ori	r24, 0x80	; 128
+    1152:	85 bf       	out	0x35, r24	; 53
+    1154:	88 95       	sleep
+    1156:	85 b7       	in	r24, 0x35	; 53
+    1158:	8f 77       	andi	r24, 0x7F	; 127
+    115a:	85 bf       	out	0x35, r24	; 53
+		
+		//Check symbol on UART
+		if (UCSRA & (1<<RXC))
+    115c:	5f 9b       	sbis	0x0b, 7	; 11
+    115e:	9e c0       	rjmp	.+316    	; 0x129c <vga_render+0x1b2>
+    1160:	9a c0       	rjmp	.+308    	; 0x1296 <vga_render+0x1ac>
+{
+	// Parser received symbols from UART
+	while(UCSRA & (1<<RXC))
+	{
+		unsigned char current_line, received_symbol;
+		received_symbol = UDR;
+    1162:	5c b1       	in	r21, 0x0c	; 12
+		//Check for overflow display buffer
+		if(current_symbol == (vga_row_count*vga_symbols_per_row))
+    1164:	80 91 64 00 	lds	r24, 0x0064
+    1168:	90 91 65 00 	lds	r25, 0x0065
+    116c:	61 e0       	ldi	r22, 0x01	; 1
+    116e:	80 39       	cpi	r24, 0x90	; 144
+    1170:	96 07       	cpc	r25, r22
+    1172:	09 f5       	brne	.+66     	; 0x11b6 <vga_render+0xcc>
+    1174:	c7 01       	movw	r24, r14
+					  default: str_array[current_symbol++] = received_symbol;
+					}
+	}
+}
+
+void vga_render()
+    1176:	fc 01       	movw	r30, r24
+    1178:	e7 59       	subi	r30, 0x97	; 151
+    117a:	ff 4f       	sbci	r31, 0xFF	; 255
+			//Set pointers for clear string array
+			ptr = &str_array[0];
+			while(i--)
+			{
+				//Don't use here loop, to fastest clear display buffer
+				*ptr++ = 0x0;
+    117c:	10 82       	st	Z, r1
+				*ptr++ = 0x0;
+    117e:	11 82       	std	Z+1, r1	; 0x01
+				*ptr++ = 0x0;
+    1180:	12 82       	std	Z+2, r1	; 0x02
+				*ptr++ = 0x0;
+    1182:	13 82       	std	Z+3, r1	; 0x03
+				*ptr++ = 0x0;
+    1184:	14 82       	std	Z+4, r1	; 0x04
+				*ptr++ = 0x0;
+    1186:	15 82       	std	Z+5, r1	; 0x05
+				*ptr++ = 0x0;
+    1188:	16 82       	std	Z+6, r1	; 0x06
+				*ptr++ = 0x0;
+    118a:	17 82       	std	Z+7, r1	; 0x07
+				*ptr++ = 0x0;
+    118c:	10 86       	std	Z+8, r1	; 0x08
+				*ptr++ = 0x0;
+    118e:	11 86       	std	Z+9, r1	; 0x09
+				*ptr++ = 0x0;
+    1190:	12 86       	std	Z+10, r1	; 0x0a
+				*ptr++ = 0x0;
+    1192:	13 86       	std	Z+11, r1	; 0x0b
+				*ptr++ = 0x0;
+    1194:	14 86       	std	Z+12, r1	; 0x0c
+				*ptr++ = 0x0;
+    1196:	15 86       	std	Z+13, r1	; 0x0d
+				*ptr++ = 0x0;
+    1198:	16 86       	std	Z+14, r1	; 0x0e
+				*ptr++ = 0x0;
+    119a:	17 86       	std	Z+15, r1	; 0x0f
+				*ptr++ = 0x0;
+    119c:	10 8a       	std	Z+16, r1	; 0x10
+				*ptr++ = 0x0;
+    119e:	11 8a       	std	Z+17, r1	; 0x11
+				*ptr++ = 0x0;
+    11a0:	12 8a       	std	Z+18, r1	; 0x12
+				*ptr++ = 0x0;
+    11a2:	13 8a       	std	Z+19, r1	; 0x13
+    11a4:	44 96       	adiw	r24, 0x14	; 20
+
+			unsigned char i = vga_row_count;
+			char * ptr;
+			//Set pointers for clear string array
+			ptr = &str_array[0];
+			while(i--)
+    11a6:	61 e0       	ldi	r22, 0x01	; 1
+    11a8:	80 39       	cpi	r24, 0x90	; 144
+    11aa:	96 07       	cpc	r25, r22
+    11ac:	21 f7       	brne	.-56     	; 0x1176 <vga_render+0x8c>
+				*ptr++ = 0x0;
+				*ptr++ = 0x0;
+				*ptr++ = 0x0;
+				*ptr++ = 0x0;
+			};
+			current_symbol = 0x0;
+    11ae:	f0 92 65 00 	sts	0x0065, r15
+    11b2:	e0 92 64 00 	sts	0x0064, r14
+		}
+					switch ( received_symbol )
+    11b6:	59 30       	cpi	r21, 0x09	; 9
+    11b8:	21 f1       	breq	.+72     	; 0x1202 <vga_render+0x118>
+    11ba:	5d 30       	cpi	r21, 0x0D	; 13
+    11bc:	e9 f1       	breq	.+122    	; 0x1238 <vga_render+0x14e>
+    11be:	58 30       	cpi	r21, 0x08	; 8
+    11c0:	09 f0       	breq	.+2      	; 0x11c4 <vga_render+0xda>
+    11c2:	5c c0       	rjmp	.+184    	; 0x127c <vga_render+0x192>
+					{
+					  //BackSpace
+					  case  0x08: 
+					  if(current_symbol)
+    11c4:	80 91 64 00 	lds	r24, 0x0064
+    11c8:	90 91 65 00 	lds	r25, 0x0065
+    11cc:	00 97       	sbiw	r24, 0x00	; 0
+    11ce:	09 f4       	brne	.+2      	; 0x11d2 <vga_render+0xe8>
+    11d0:	62 c0       	rjmp	.+196    	; 0x1296 <vga_render+0x1ac>
+					    {
+							str_array[current_symbol] = 0x0;
+    11d2:	e0 91 64 00 	lds	r30, 0x0064
+    11d6:	f0 91 65 00 	lds	r31, 0x0065
+    11da:	e2 0f       	add	r30, r18
+    11dc:	f3 1f       	adc	r31, r19
+    11de:	10 82       	st	Z, r1
+							str_array[--current_symbol] = 0x0;
+    11e0:	80 91 64 00 	lds	r24, 0x0064
+    11e4:	90 91 65 00 	lds	r25, 0x0065
+    11e8:	01 97       	sbiw	r24, 0x01	; 1
+    11ea:	90 93 65 00 	sts	0x0065, r25
+    11ee:	80 93 64 00 	sts	0x0064, r24
+    11f2:	e0 91 64 00 	lds	r30, 0x0064
+    11f6:	f0 91 65 00 	lds	r31, 0x0065
+    11fa:	e2 0f       	add	r30, r18
+    11fc:	f3 1f       	adc	r31, r19
+    11fe:	10 82       	st	Z, r1
+    1200:	4a c0       	rjmp	.+148    	; 0x1296 <vga_render+0x1ac>
+						}
+					  break;
+					  
+					  //TAB
+					  case  0x09: 
+					  if((current_symbol + 5) < (vga_row_count*vga_symbols_per_row))
+    1202:	80 91 64 00 	lds	r24, 0x0064
+    1206:	90 91 65 00 	lds	r25, 0x0065
+    120a:	05 96       	adiw	r24, 0x05	; 5
+    120c:	51 e0       	ldi	r21, 0x01	; 1
+    120e:	80 39       	cpi	r24, 0x90	; 144
+    1210:	95 07       	cpc	r25, r21
+    1212:	08 f0       	brcs	.+2      	; 0x1216 <vga_render+0x12c>
+    1214:	40 c0       	rjmp	.+128    	; 0x1296 <vga_render+0x1ac>
+					    {
+							//Add 5 Space
+							str_array[current_symbol] = 0x0;
+    1216:	e0 91 64 00 	lds	r30, 0x0064
+    121a:	f0 91 65 00 	lds	r31, 0x0065
+    121e:	e2 0f       	add	r30, r18
+    1220:	f3 1f       	adc	r31, r19
+    1222:	10 82       	st	Z, r1
+							current_symbol += 5;
+    1224:	80 91 64 00 	lds	r24, 0x0064
+    1228:	90 91 65 00 	lds	r25, 0x0065
+    122c:	05 96       	adiw	r24, 0x05	; 5
+    122e:	90 93 65 00 	sts	0x0065, r25
+    1232:	80 93 64 00 	sts	0x0064, r24
+    1236:	2f c0       	rjmp	.+94     	; 0x1296 <vga_render+0x1ac>
+						}
+					  break;
+
+					  //RETURN
+					  case  0x0D: 
+					  current_line = current_symbol / vga_symbols_per_row;
+    1238:	80 91 64 00 	lds	r24, 0x0064
+    123c:	90 91 65 00 	lds	r25, 0x0065
+    1240:	b6 01       	movw	r22, r12
+    1242:	98 d0       	rcall	.+304    	; 0x1374 <__udivmodhi4>
+					  if((current_line) < 19)
+    1244:	63 31       	cpi	r22, 0x13	; 19
+    1246:	38 f5       	brcc	.+78     	; 0x1296 <vga_render+0x1ac>
+					    {
+							str_array[current_symbol] = 0x0;
+    1248:	e0 91 64 00 	lds	r30, 0x0064
+    124c:	f0 91 65 00 	lds	r31, 0x0065
+    1250:	e2 0f       	add	r30, r18
+    1252:	f3 1f       	adc	r31, r19
+    1254:	10 82       	st	Z, r1
+							current_symbol = current_line*vga_symbols_per_row + vga_symbols_per_row;
+    1256:	86 2f       	mov	r24, r22
+    1258:	90 e0       	ldi	r25, 0x00	; 0
+    125a:	01 96       	adiw	r24, 0x01	; 1
+    125c:	88 0f       	add	r24, r24
+    125e:	99 1f       	adc	r25, r25
+    1260:	88 0f       	add	r24, r24
+    1262:	99 1f       	adc	r25, r25
+    1264:	bc 01       	movw	r22, r24
+    1266:	66 0f       	add	r22, r22
+    1268:	77 1f       	adc	r23, r23
+    126a:	66 0f       	add	r22, r22
+    126c:	77 1f       	adc	r23, r23
+    126e:	86 0f       	add	r24, r22
+    1270:	97 1f       	adc	r25, r23
+    1272:	90 93 65 00 	sts	0x0065, r25
+    1276:	80 93 64 00 	sts	0x0064, r24
+    127a:	0d c0       	rjmp	.+26     	; 0x1296 <vga_render+0x1ac>
+						}
+					  break;
+					  default: str_array[current_symbol++] = received_symbol;
+    127c:	80 91 64 00 	lds	r24, 0x0064
+    1280:	90 91 65 00 	lds	r25, 0x0065
+    1284:	f9 01       	movw	r30, r18
+    1286:	e8 0f       	add	r30, r24
+    1288:	f9 1f       	adc	r31, r25
+    128a:	50 83       	st	Z, r21
+    128c:	01 96       	adiw	r24, 0x01	; 1
+    128e:	90 93 65 00 	sts	0x0065, r25
+    1292:	80 93 64 00 	sts	0x0064, r24
+}
+
+static void vga_terminal_handle(void)
+{
+	// Parser received symbols from UART
+	while(UCSRA & (1<<RXC))
+    1296:	5f 99       	sbic	0x0b, 7	; 11
+    1298:	64 cf       	rjmp	.-312    	; 0x1162 <vga_render+0x78>
+    129a:	59 cf       	rjmp	.-334    	; 0x114e <vga_render+0x64>
+			vga_terminal_handle();
+			continue;
+		}
+		
+		//Check visible field
+		if(video_enable_flg)
+    129c:	80 91 63 03 	lds	r24, 0x0363
+    12a0:	88 23       	and	r24, r24
+    12a2:	31 f1       	breq	.+76     	; 0x12f0 <vga_render+0x206>
+		{
+		//OK, visible
+		//Main render routine
+				//Set pointer for render line (display bufffer)
+				_ptr = &str_array[raw_render * vga_symbols_per_row];
+    12a4:	a0 91 62 03 	lds	r26, 0x0362
+    12a8:	a0 9f       	mul	r26, r16
+    12aa:	d0 01       	movw	r26, r0
+    12ac:	11 24       	eor	r1, r1
+    12ae:	a7 59       	subi	r26, 0x97	; 151
+    12b0:	bf 4f       	sbci	r27, 0xFF	; 255
+
+				//Set pointer for render line (character generator)
+				_ptr1 = &symbol[0][y_line_render >> 1];
+    12b2:	80 91 68 00 	lds	r24, 0x0068
+    12b6:	86 95       	lsr	r24
+    12b8:	90 e0       	ldi	r25, 0x00	; 0
+    12ba:	8a 5d       	subi	r24, 0xDA	; 218
+    12bc:	9f 4f       	sbci	r25, 0xFF	; 255
+    12be:	50 2f       	mov	r21, r16
+	
+				//Cycle for render line 
+				i = vga_symbols_per_row;
+				while(i--)
+				{
+					SPDR = PRG_RDB(_ptr1 + (* _ptr++)*vga_symbol_height/2);
+    12c0:	ec 91       	ld	r30, X
+    12c2:	e1 9f       	mul	r30, r17
+    12c4:	f0 01       	movw	r30, r0
+    12c6:	11 24       	eor	r1, r1
+    12c8:	f5 95       	asr	r31
+    12ca:	e7 95       	ror	r30
+    12cc:	e8 0f       	add	r30, r24
+    12ce:	f9 1f       	adc	r31, r25
+    12d0:	11 96       	adiw	r26, 0x01	; 1
+    12d2:	e4 91       	lpm	r30, Z+
+    12d4:	ef b9       	out	0x0f, r30	; 15
+				    video_on;
+    12d6:	47 bb       	out	0x17, r20	; 23
+					//That's a great pity can't shift data faster (8Mhz at FOSC=16Mhz)!!
+					NOP;
+    12d8:	00 00       	nop
+					NOP;
+    12da:	00 00       	nop
+    12dc:	51 50       	subi	r21, 0x01	; 1
+				//Set pointer for render line (character generator)
+				_ptr1 = &symbol[0][y_line_render >> 1];
+	
+				//Cycle for render line 
+				i = vga_symbols_per_row;
+				while(i--)
+    12de:	81 f7       	brne	.-32     	; 0x12c0 <vga_render+0x1d6>
+	...
+				NOP;
+				NOP;
+				NOP;
+				NOP;
+				NOP;
+				video_off;
+    12ec:	b7 ba       	out	0x17, r11	; 23
+    12ee:	2f cf       	rjmp	.-418    	; 0x114e <vga_render+0x64>
+		//Not visible
+		//Can do something else..	
+					//******Cursor handle
+					//Count frame
+					static unsigned int framecount;
+					framecount++;
+    12f0:	21 96       	adiw	r28, 0x01	; 1
+					//Here draw cursor
+						if (framecount&0x800)
+    12f2:	d3 ff       	sbrs	r29, 3
+    12f4:	08 c0       	rjmp	.+16     	; 0x1306 <vga_render+0x21c>
+						{
+							str_array[current_symbol] = ' ';
+    12f6:	e0 91 64 00 	lds	r30, 0x0064
+    12fa:	f0 91 65 00 	lds	r31, 0x0065
+    12fe:	e2 0f       	add	r30, r18
+    1300:	f3 1f       	adc	r31, r19
+    1302:	90 82       	st	Z, r9
+    1304:	24 cf       	rjmp	.-440    	; 0x114e <vga_render+0x64>
+						}
+						else
+						{
+							str_array[current_symbol] = 0x7F;
+    1306:	e0 91 64 00 	lds	r30, 0x0064
+    130a:	f0 91 65 00 	lds	r31, 0x0065
+    130e:	e2 0f       	add	r30, r18
+    1310:	f3 1f       	adc	r31, r19
+    1312:	a0 82       	st	Z, r10
+    1314:	1c cf       	rjmp	.-456    	; 0x114e <vga_render+0x64>
+
+00001316 <main>:
+
+static void avr_init(void)
+{
+
+  //Set pin jumper VGA/PAL
+  cbi(DDRC,1);
+    1316:	a1 98       	cbi	0x14, 1	; 20
+  sbi(PORTC,1);
+    1318:	a9 9a       	sbi	0x15, 1	; 21
+  
+  //Enable SPI
+  spi_init();
+    131a:	b4 dd       	rcall	.-1176   	; 0xe84 <spi_init>
+	//because may be possible build terminal up 40 symbol per row!!!
+}
+
+static void uart_init(void)
+{
+	 UCSRB = 0x00; //disable while setting baud rate
+    131c:	1a b8       	out	0x0a, r1	; 10
+	 UCSRA = 0x00;
+    131e:	1b b8       	out	0x0b, r1	; 11
+	 UCSRC = 0x86;	//8 bits data & 2 stop bits
+    1320:	86 e8       	ldi	r24, 0x86	; 134
+    1322:	80 bd       	out	0x20, r24	; 32
+	//UART SPEED 19200 bs
+	UBRRL = 0x33; //set baud rate lo
+    1324:	83 e3       	ldi	r24, 0x33	; 51
+    1326:	89 b9       	out	0x09, r24	; 9
+	UBRRH = 0x00; //set baud rate hi
+    1328:	10 bc       	out	0x20, r1	; 32
+	//UBRRH = 0x00; //set baud rate hi
+	//UART SPEED 115200 bs
+	//UBRRL = 0x08; //set baud rate lo
+	//UBRRH = 0x00; //set baud rate hi
+	//UART RX Enable
+	UCSRB = (1 << RXEN);
+    132a:	80 e1       	ldi	r24, 0x10	; 16
+    132c:	8a b9       	out	0x0a, r24	; 10
+
+  //init uart
+  uart_init();
+
+  //Set power mode
+  set_sleep_mode(SLEEP_MODE_IDLE); 	
+    132e:	85 b7       	in	r24, 0x35	; 53
+    1330:	8f 78       	andi	r24, 0x8F	; 143
+    1332:	85 bf       	out	0x35, r24	; 53
+
+  //Check pin mode VGA/PAL
+  if(check_PAL_jumper)
+    1334:	99 99       	sbic	0x13, 1	; 19
+    1336:	0b c0       	rjmp	.+22     	; 0x134e <main+0x38>
+  {
+	  //init PAL SYNC port
+	  sbi(DDRC,0);
+    1338:	a0 9a       	sbi	0x14, 0	; 20
+	  //C.0 is sync:1000 ohm + diode to 75 ohm resistor
+	  //MOSI is video:330 ohm + diode to 75 ohm resistor
+	  
+	  // Initialize Sync for PAL
+	  OCR1A = 1024; 			 //One PAL line 64us
+    133a:	80 e0       	ldi	r24, 0x00	; 0
+    133c:	94 e0       	ldi	r25, 0x04	; 4
+    133e:	9b bd       	out	0x2b, r25	; 43
+    1340:	8a bd       	out	0x2a, r24	; 42
+	  TCCR1B = (1<<WGM12)|(1<<CS10);//full speed; clear-on-match
+    1342:	89 e0       	ldi	r24, 0x09	; 9
+    1344:	8e bd       	out	0x2e, r24	; 46
+	  TCCR1A = 0x00;			//turn off pwm and oc lines
+    1346:	1f bc       	out	0x2f, r1	; 47
+	  TIMSK = 1<<OCIE1A;		//enable interrupt from Timer1 CompareA
+    1348:	80 e1       	ldi	r24, 0x10	; 16
+    134a:	89 bf       	out	0x39, r24	; 57
+    134c:	0b c0       	rjmp	.+22     	; 0x1364 <main+0x4e>
+  }	
+  else
+  {
+	  //init VGA SYNC ports
+	  //HSYNC
+	  sbi(PORTD,3);
+    134e:	93 9a       	sbi	0x12, 3	; 18
+	  sbi(DDRD,3);
+    1350:	8b 9a       	sbi	0x11, 3	; 17
+	  //VSYNC
+	  sbi(PORTD,2);
+    1352:	92 9a       	sbi	0x12, 2	; 18
+	  sbi(DDRD,2);
+    1354:	8a 9a       	sbi	0x11, 2	; 17
+	
+	  // Initialize Sync for VGA
+	 TCCR0 = 0x00; //stop
+    1356:	13 be       	out	0x33, r1	; 51
+	 TCNT0 = 0xC3; //set count, One VGA line 31.77us
+    1358:	83 ec       	ldi	r24, 0xC3	; 195
+    135a:	82 bf       	out	0x32, r24	; 50
+	 TCCR0 = 1<<CS01; //start timer with prescaler select 1/8
+    135c:	82 e0       	ldi	r24, 0x02	; 2
+    135e:	83 bf       	out	0x33, r24	; 51
+	 TIMSK = 1<<TOV0; //enable interrupt from Timer0 overflow
+    1360:	81 e0       	ldi	r24, 0x01	; 1
+    1362:	89 bf       	out	0x39, r24	; 57
+
+int main(void)
+{
+    avr_init();
+	  //Check pin VGA/PAL
+	if(check_PAL_jumper)
+    1364:	99 99       	sbic	0x13, 1	; 19
+    1366:	02 c0       	rjmp	.+4      	; 0x136c <main+0x56>
+	pal_render();
+    1368:	96 dd       	rcall	.-1236   	; 0xe96 <pal_render>
+    136a:	01 c0       	rjmp	.+2      	; 0x136e <main+0x58>
+	else
+	vga_render();
+    136c:	be de       	rcall	.-644    	; 0x10ea <vga_render>
+	
+    return(0);
+}
+    136e:	80 e0       	ldi	r24, 0x00	; 0
+    1370:	90 e0       	ldi	r25, 0x00	; 0
+    1372:	08 95       	ret
+
+00001374 <__udivmodhi4>:
+    1374:	aa 1b       	sub	r26, r26
+    1376:	bb 1b       	sub	r27, r27
+    1378:	51 e1       	ldi	r21, 0x11	; 17
+    137a:	07 c0       	rjmp	.+14     	; 0x138a <__udivmodhi4_ep>
+
+0000137c <__udivmodhi4_loop>:
+    137c:	aa 1f       	adc	r26, r26
+    137e:	bb 1f       	adc	r27, r27
+    1380:	a6 17       	cp	r26, r22
+    1382:	b7 07       	cpc	r27, r23
+    1384:	10 f0       	brcs	.+4      	; 0x138a <__udivmodhi4_ep>
+    1386:	a6 1b       	sub	r26, r22
+    1388:	b7 0b       	sbc	r27, r23
+
+0000138a <__udivmodhi4_ep>:
+    138a:	88 1f       	adc	r24, r24
+    138c:	99 1f       	adc	r25, r25
+    138e:	5a 95       	dec	r21
+    1390:	a9 f7       	brne	.-22     	; 0x137c <__udivmodhi4_loop>
+    1392:	80 95       	com	r24
+    1394:	90 95       	com	r25
+    1396:	bc 01       	movw	r22, r24
+    1398:	cd 01       	movw	r24, r26
+    139a:	08 95       	ret
+
+0000139c <strcpy_P>:
+    139c:	fb 01       	movw	r30, r22
+    139e:	dc 01       	movw	r26, r24
+    13a0:	05 90       	lpm	r0, Z+
+    13a2:	0d 92       	st	X+, r0
+    13a4:	00 20       	and	r0, r0
+    13a6:	e1 f7       	brne	.-8      	; 0x13a0 <strcpy_P+0x4>
+    13a8:	08 95       	ret
+
+000013aa <_exit>:
+    13aa:	f8 94       	cli
+
+000013ac <__stop_program>:
+    13ac:	ff cf       	rjmp	.-2      	; 0x13ac <__stop_program>

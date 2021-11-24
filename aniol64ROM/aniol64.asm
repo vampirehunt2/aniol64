@@ -27,11 +27,9 @@ org 0038h
 
 org 0066h
         ; NMI handler
-        EX AF, AF'
-        EXX
+        PUSH AF
         CALL handleNmi
-        EXX
-        EX AF, AF'
+        POP AF
         EI
         RETN
 
@@ -134,8 +132,6 @@ handleNmi:
         LD A, (NmiCount)
         INC A
         LD (NmiCount), A
-        ;CALL byte2asc
-        ;CALL lcd_putChar
         RET
 ENDP
 

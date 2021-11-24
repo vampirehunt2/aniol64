@@ -11,6 +11,7 @@ St: defb "set", 0
 Dsp: defb "dsp", 0
 Bye: defb "bye", 0
 Exit: defb "Exiting...", 0
+ParseErr: defb "Parse error", 0
 
 PROC
 mon_main:

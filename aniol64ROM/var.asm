@@ -14,11 +14,11 @@ TestAddr equ 8000h              ; points to the beginning of RAM
 ClkScratchpad equ 8008h
 ClkData equ 8009h
 KbdBuff equ 8012h         ; a 1-byte buffer
-LcdBuff equ 8020h
-LineBuff equ 8100h         ; 20 byte long buffer + 1 byte for the trailing 0
-NmiCount equ 8115h         ; reserving 4 bytes for the counter
-MonCurrAddrL equ 8119h
-MonCurrAddrH equ 811Ah
+LcdBuff equ 8020h         ; 20 byte long buffer + 1 byte for the trailing 0
+NmiCount equ 8035h         ; reserving 4 bytes for the counter
+MonCurrAddrL equ 8036h
+MonCurrAddrH equ 8037h
+LineBuff equ 8100h         ; 256 byte long buffer, including 1 byte for the trailing 0
 ENDIF
 
 IF version=32
