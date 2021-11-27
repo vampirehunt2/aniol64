@@ -8,44 +8,61 @@
 ;----------------------------------------------------
 
 St: defb "set", 0
-Dsp: defb "dsp", 0
+Adr: defb "adr", 0
 Bye: defb "bye", 0
+Nxt: defb "nxt", 0
 Exit: defb "Exiting...", 0
 ParseErr: defb "Parse error", 0
+InvAddr: defb "Invalid address", 0
 
 PROC
 mon_main:
         LD A, 0
-        LD (MonCurrAddrL), A
-        LD (MonCurrAddrH), A
+        LD (MonCurrAddr), A
+        LD (MonCurrAddr + 1), A
         CALL mon_dsp
 _loop:
-        CALL lcd_gotoLn4
-        CALL cmd_readLn
+        CALL mon_blank
+        CALL kbd_readLine
+        LD IX, LineBuff
         CALL str_tok
         ; dsp command
         LD IX, LineBuff
-        LD IY, Dsp
+        LD IY, Adr
         CALL str_cmp
         CP 0
-        JR Z, _dsp
-        JR _loop
+        JR Z, _adr
+        ; nxt command
+        LD IX, LineBuff
+        LD IY, Nxt
+        CALL str_cmp
+        CP 0
+        JR Z, _nxt
         ; set command
         LD IX, LineBuff
         LD IY, St
         CALL str_cmp
         CP 0
         JR Z, _set
+        ; bye command
+        LD IX, LineBuff
+        LD IY, Bye
+        CALL str_cmp
+        CP 0
+        JR Z, _bye
         ; unknown command
         LD IX, UnknownCmd
         CALL lcd_gotoLn4
         CALL lcd_wriStr
         JR _loop
-_dsp:
-        CALL mon_dsp
+_adr:
+        CALL mon_adr
         JR _loop
 _set:
         CALL mon_set
+        JR _loop
+_nxt:
+        CALL mon_nextPage
         JR _loop
 _bye:
         LD IX, Exit
@@ -56,19 +73,16 @@ ENDP
 PROC
 mon_dsp:
         CALL lcd_hideCursor
-        LD A, (MonCurrAddrH)
-        LD B, A
-        LD A, (MonCurrAddrL)
-        LD C, A
-        PUSH BC
-        POP HL                 ; puts the current mon address in HL
+        LD HL, (MonCurrAddr)              ; puts the current mon address in HL
         CALL lcd_gotoLn1
         CALL mon_printAddrs
         CALL mon_printVals
         CALL lcd_gotoLn2
+        CALL mon_nextAddrs
         CALL mon_printAddrs
         CALL mon_printVals
         CALL lcd_gotoLn3
+        CALL mon_nextAddrs
         CALL mon_printAddrs
         CALL mon_printVals
         CALL lcd_gotoLn4
@@ -81,13 +95,14 @@ mon_set:
         RET
 ENDP
 
+; prints the addresses for a single line of output of the dsp command
+; the first address in is HL
 mon_printAddrs:
         PUSH HL
         POP IX
         CALL mon_printDByte
         LD A, '-'
         CALL lcd_putChar
-        INC IX
         INC IX
         INC IX
         INC IX
@@ -98,6 +113,8 @@ mon_printAddrs:
         CALL lcd_putChar
         RET
 
+; prints the values for a single line of output of the dsp command
+; the first address in is HL
 mon_printVals:
         PUSH HL
         POP IX
@@ -161,6 +178,47 @@ mon_printLByte
         CALL lcd_putChar
         RET
 
+mon_nextAddrs:
+        INC HL
+        INC HL
+        INC HL
+        INC HL
+        RET
+
+mon_nextPage:
+        LD HL, (MonCurrAddr)
+        CALL mon_nextAddrs
+        CALL mon_nextAddrs
+        CALL mon_nextAddrs
+        LD (MonCurrAddr), HL
+        CALL mon_dsp
+        RET
+
+PROC
+mon_adr:
+        PUSH HL
+        POP IX  ; setting IX to point to the argument of the adr command
+        CALL parseDByte
+        CP 0
+        JR NZ, _parseError
+        LD (MonCurrAddr), HL
+        CALL mon_dsp
+        RET
+_parseError:
+        CALL lcd_gotoLn4
+        LD IX, InvAddr
+        CALL lcd_wriStr
+        CALL kbd_readKey
+        CALL mon_blank
+        RET
+ENDP
+
+mon_blank:
+        CALL lcd_gotoLn4
+        LD IX, BlankLine
+        CALL lcd_wriStr
+        CALL lcd_gotoLn4
+        RET
 
 
 

@@ -34,18 +34,115 @@ asc2hexstr16b:
 ; converts a two digit hex number in ASCII to its value
 ; BA - two hex digits in ASCII
 ; result in B
-; status code in A: 0 - parsed correctly, non-0 - parse error
 PROC
 asc2byte:
         PUSH AF
         LD A, B
 
         POP AF
+        RET
+ENDP
+
+; parses a double byte - four hex digits
+; IX: null-terminated string containing the double byte digits
+; result in HL
+; parse errors reported in A
+defb "parseDByte"
+PROC
+parseDByte:
+        CALL isDByteStr
+        CP 0
+        JR Z, _parseError
+        LD A, (IX + 0)
+        CALL hexDigit2nibble
+        SLA A
+        SLA A
+        SLA A
+        SLA A
+        LD B, A
+        LD A, (IX + 1)
+        CALL hexDigit2nibble
+        OR B
+        LD B, A
+        LD A, (IX + 2)
+        CALL hexDigit2nibble
+        SLA A
+        SLA A
+        SLA A
+        SLA A
+        LD C, A
+        LD A, (IX + 3)
+        CALL hexDigit2nibble
+        OR C
+        LD C, A
+        PUSH BC
+        POP HL
 _parseOk:
         LD A, 0
         RET
 _parseError:
         LD A, 1
+        RET
+ENDP
+
+PROC
+hexDigit2nibble:
+        CP 3Ah
+        JR C, _numbers
+        JR _letters
+_numbers:
+        SUB 30h
+        RET
+_letters:
+        SUB 57h
+        RET
+ENDP
+
+PROC
+isHexDigit:
+        CP 30h
+        JR C, _no ; if less than '0' then it's not a hex digit
+        CP 67h
+        JR NC, _no ; if equal or more than 'g' then it's not a hex digit
+        CP 3Ah
+        JR C, _yes ; if less than ':' (which is the next ascii code after '9' then it's a hex digit
+        CP 61h
+        JR C, _yes ; if equal or more than 'a' then it's a hex digit
+_yes
+        LD A, 1
+        RET
+_no
+        LD A, 0
+        RET
+ENDP
+
+PROC
+isDByteStr:
+        PUSH IX
+        CALL str_len
+        POP IX
+        CP 4              ; checks if the string is exactly 4 digits
+        JR NZ, _parseError
+        LD A, (IX+0)
+        CALL isHexDigit
+        CP 0
+        JR Z, _parseError
+        LD A, (IX+1)
+        CALL isHexDigit
+        CP 0
+        JR Z, _parseError
+        LD A, (IX+2)
+        CALL isHexDigit
+        CP 0
+        JR Z, _parseError
+        LD A, (IX+3)
+        CALL isHexDigit
+        CP 0
+        JR Z, _parseError
+        LD A, 1
+        RET
+_parseError:
+        LD A, 0
         RET
 ENDP
 
@@ -58,7 +155,8 @@ byte2asc:
         SRA A
         SRA A
         SRA A
-        SRA A          ; upper nibble now in A
+        SRA A
+        AND 00001111b  ; upper nibble now in A
         CALL nibble2asc
         LD B, A
         POP AF       ;
@@ -74,7 +172,7 @@ nibble2asc:
         JR C, numbers
         AND A   ; clear carry flag
         SUB 0Ah
-        ADD A, 41h ; ASCII code for 'A'
+        ADD A, 61h ; ASCII code for 'A'
         RET
 numbers:
         AND A   ; clear carry flag

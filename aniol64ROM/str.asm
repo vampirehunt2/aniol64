@@ -41,17 +41,20 @@ str_copy:
 
 ; finds the length of a null-terminated string
 ; IX: address of the string
-; result in HL
+; result in A
 PROC
 str_len:
-        LD HL, 0
+        LD B, 0
 _loop:
         LD A, (IX+0)
         CP 0
-        RET Z
-        INC HL
+        JR Z, _eos
+        INC B
         INC IX
         JR _loop
+_eos:
+        LD A, B
+        RET
 ENDP
 
 ; returns the first token of a string
@@ -59,7 +62,6 @@ ENDP
 ; IX: address of the string
 ; result in IX
 ; rest of string in HL
-defb "str_tok"
 PROC
 str_tok:
         PUSH IX
