@@ -10,6 +10,7 @@
 IF version=64
 Aniol: defb   "     _ANIOL 64_     ", 0
 RAMTOP equ 0FFFFh
+FirstRamPage equ 80h
 TestAddr equ 8000h              ; points to the beginning of RAM
 ClkScratchpad equ 8008h
 ClkData equ 8009h

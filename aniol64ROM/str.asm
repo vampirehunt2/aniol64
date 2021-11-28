@@ -40,11 +40,13 @@ str_copy:
         JR str_copy
 
 ; finds the length of a null-terminated string
+; only supports strings up to 255 characters
 ; IX: address of the string
 ; result in A
 PROC
 str_len:
         LD B, 0
+        PUSH IX
 _loop:
         LD A, (IX+0)
         CP 0
@@ -54,6 +56,7 @@ _loop:
         JR _loop
 _eos:
         LD A, B
+        POP IX
         RET
 ENDP
 

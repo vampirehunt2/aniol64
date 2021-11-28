@@ -43,11 +43,39 @@ asc2byte:
         RET
 ENDP
 
+; parses a byte - two hex digits
+; IX: null-terminated string containing the byte digits
+; result in B
+; parse errors reported in A
+PROC
+parseByte:
+        CALL isByteStr
+        CP 0
+        JR Z, _parseError
+        LD A, (IX + 0)
+        CALL hexDigit2nibble
+        SLA A
+        SLA A
+        SLA A
+        SLA A
+        LD B, A
+        LD A, (IX + 1)
+        CALL hexDigit2nibble
+        OR B
+        LD B, A
+_parseOk:
+        LD A, 0
+        RET
+_parseError:
+        LD A, 1
+        RET
+        RET
+ENDP
+
 ; parses a double byte - four hex digits
 ; IX: null-terminated string containing the double byte digits
 ; result in HL
 ; parse errors reported in A
-defb "parseDByte"
 PROC
 parseDByte:
         CALL isDByteStr
@@ -118,9 +146,7 @@ ENDP
 
 PROC
 isDByteStr:
-        PUSH IX
         CALL str_len
-        POP IX
         CP 4              ; checks if the string is exactly 4 digits
         JR NZ, _parseError
         LD A, (IX+0)
@@ -136,6 +162,26 @@ isDByteStr:
         CP 0
         JR Z, _parseError
         LD A, (IX+3)
+        CALL isHexDigit
+        CP 0
+        JR Z, _parseError
+        LD A, 1
+        RET
+_parseError:
+        LD A, 0
+        RET
+ENDP
+
+PROC
+isByteStr:
+        CALL str_len
+        CP 2              ; checks if the string is exactly 2 digits
+        JR NZ, _parseError
+        LD A, (IX+0)
+        CALL isHexDigit
+        CP 0
+        JR Z, _parseError
+        LD A, (IX+1)
         CALL isHexDigit
         CP 0
         JR Z, _parseError

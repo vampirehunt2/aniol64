@@ -27,3 +27,6 @@ memTest:
         LD A, MemErr
         RET
 
+mem_cpy:
+        RET
+

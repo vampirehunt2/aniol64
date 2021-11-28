@@ -7,43 +7,87 @@
 ;
 ;----------------------------------------------------
 
-St: defb "set", 0
-Adr: defb "adr", 0
+SetValue: defb "s", 0
+SetAddress: defb "a", 0
+NextScreen: defb "n", 0
+PrevScreen: defb "p", 0
+NextLine: defb "d", 0
+PrevLine: defb "u", 0
+Fill: defb "f", 0
+Copy: defb "c", 0
+
 Bye: defb "bye", 0
-Nxt: defb "nxt", 0
 Exit: defb "Exiting...", 0
 ParseErr: defb "Parse error", 0
 InvAddr: defb "Invalid address", 0
+InvVal: defb "Invalid value", 0
 
+defb "mon_main"
 PROC
 mon_main:
         LD A, 0
         LD (MonCurrAddr), A
         LD (MonCurrAddr + 1), A
         CALL mon_dsp
-_loop:
+mon_main_loop:
         CALL mon_blank
         CALL kbd_readLine
         LD IX, LineBuff
         CALL str_tok
-        ; dsp command
+        ; set value command
         LD IX, LineBuff
-        LD IY, Adr
+        LD IY, SetValue
         CALL str_cmp
         CP 0
-        JR Z, _adr
-        ; nxt command
+        JP Z, mon_setValue
+        ; fill command
         LD IX, LineBuff
-        LD IY, Nxt
+        LD IY, Fill
         CALL str_cmp
         CP 0
-        JR Z, _nxt
+        JP Z, mon_fill
+        ; copy command
+        LD IX, LineBuff
+        LD IY, Copy
+        CALL str_cmp
+        CP 0
+        JP Z, mon_copy
+        ; set address command
+        LD IX, LineBuff
+        LD IY, SetAddress
+        CALL str_cmp
+        CP 0
+        JP Z, mon_setAddress
+        ; next screen command
+        LD IX, LineBuff
+        LD IY, NextScreen
+        CALL str_cmp
+        CP 0
+        JP Z, mon_nextScreen
+        ; prev screen command
+        LD IX, LineBuff
+        LD IY, PrevScreen
+        CALL str_cmp
+        CP 0
+        JP Z, mon_prevScreen
+        ; next line command
+        LD IX, LineBuff
+        LD IY, NextLine
+        CALL str_cmp
+        CP 0
+        JP Z, mon_nextLine
+         ; prev line command
+        LD IX, LineBuff
+        LD IY, PrevLine
+        CALL str_cmp
+        CP 0
+        JP Z, mon_prevLine
         ; set command
         LD IX, LineBuff
-        LD IY, St
+        LD IY, SetValue
         CALL str_cmp
         CP 0
-        JR Z, _set
+        JP Z, mon_setValue
         ; bye command
         LD IX, LineBuff
         LD IY, Bye
@@ -54,16 +98,7 @@ _loop:
         LD IX, UnknownCmd
         CALL lcd_gotoLn4
         CALL lcd_wriStr
-        JR _loop
-_adr:
-        CALL mon_adr
-        JR _loop
-_set:
-        CALL mon_set
-        JR _loop
-_nxt:
-        CALL mon_nextPage
-        JR _loop
+        JP mon_main_loop
 _bye:
         LD IX, Exit
         CALL lcd_wriStr
@@ -71,9 +106,179 @@ _bye:
 ENDP
 
 PROC
+mon_setAddress:
+        PUSH HL
+        POP IX  ; setting IX to point to the argument of the adr command
+        CALL parseDByte
+        CP 0
+        JR NZ, _parseError
+        LD (MonCurrAddr), HL
+        CALL mon_dsp
+        JP mon_main_loop
+_parseError:
+        CALL lcd_gotoLn4
+        LD IX, InvAddr
+        CALL lcd_wriStr
+        CALL kbd_readKey
+        CALL mon_blank
+        JP mon_main_loop
+ENDP
+
+defb "mon_setValue"
+PROC
+mon_setValue:
+        PUSH HL
+        POP IX                  ; put the arguments of the set command in IX
+        CALL str_len
+        CP 0                    ; if we've reached the end of argument list
+        JP Z, _completed         ; return from this routine
+        CALL str_tok            ; extract the first of the remaining arguments
+        PUSH HL                 ; save the rest of the arguments on stack
+        CALL parseByte
+        CP 0                    ; check if parse is successful
+        JR NZ, _parseError
+        LD A, B                 ; transfer the parsed value to A
+        LD HL, (MonCurrAddr)
+        LD (HL), A
+        INC HL
+        LD (MonCurrAddr), HL
+        POP HL
+        JR mon_setValue
+_parseError:
+        CALL lcd_gotoLn4
+        LD IX, InvVal
+        CALL lcd_wriStr
+        CALL kbd_readKey
+        CALL mon_blank
+        JP mon_main_loop
+_completed:
+        CALL mon_dsp
+        JP Z, mon_main_loop
+ENDP
+
+PROC
+mon_fill:
+        PUSH HL
+        POP IX                  ; put the arguments of the fill command in IX
+        CALL str_tok            ; number of bytes now in a string pointed to by IX
+                                ; value now in a string pointed to by HL
+        CALL parseByte
+        CP 0
+        JP NZ, _parseError
+        PUSH BC                 ; saving the parsed number in B
+        PUSH HL
+        POP IX
+        CALL parseByte          ; now parsing the value
+        CP 0
+        JP NZ, _parseError
+        LD A, B                 ; value to fill now in A
+        POP BC                  ; number of fills now in B
+_loop:
+        LD HL, (MonCurrAddr)
+        LD (HL), A
+        INC HL
+        LD (MonCurrAddr), HL    ; moving to the next address
+        DJNZ _loop              ; if B is not zero, repeat
+        CALL mon_dsp
+        JP mon_main_loop
+_parseError:
+        CALL lcd_gotoLn4
+        LD IX, InvVal
+        CALL lcd_wriStr
+        CALL kbd_readKey
+        CALL mon_blank
+        JP mon_main_loop
+ENDP
+
+PROC
+mon_copy:
+        PUSH HL
+        POP IX                  ; put the arguments of the copy command in IX
+        CALL str_tok            ; number of bytes now in a string pointed to by IX
+                                ; source address is now in a string pointed to by HL
+        CALL parseByte
+        CP 0
+        JP NZ, _invalidValue
+        PUSH BC                 ; saving the parsed number in B
+        PUSH HL
+        POP IX                  ; source address is now in a string pointed to by IX
+        CALL parseDByte         ; now parsing the value
+        CP 0
+        JP NZ, _invalidAddress
+        PUSH HL
+        POP IX
+        POP BC
+_loop:
+        LD A, (IX + 0)
+        LD HL, (MonCurrAddr)
+        LD (HL), A
+        INC HL
+        LD (MonCurrAddr), HL    ; moving to the next address
+        INC IX
+        DJNZ _loop              ; if B is not zero, repeat
+        CALL mon_dsp
+        JP mon_main_loop
+_invalidValue:
+        CALL lcd_gotoLn4
+        LD IX, InvVal
+        CALL lcd_wriStr
+        CALL kbd_readKey
+        CALL mon_blank
+        JP mon_main_loop
+_invalidAddress:
+        CALL lcd_gotoLn4
+        LD IX, InvAddr
+        CALL lcd_wriStr
+        CALL kbd_readKey
+        CALL mon_blank
+        JP mon_main_loop
+ENDP
+
+; displays the next 3 lines
+mon_nextScreen:
+        LD HL, (MonCurrAddr)
+        CALL mon_nextAddrs
+        CALL mon_nextAddrs
+        CALL mon_nextAddrs
+        LD (MonCurrAddr), HL
+        CALL mon_dsp
+        JP mon_main_loop
+
+; displays the previous 3 lines
+mon_prevScreen:
+        LD HL, (MonCurrAddr)
+        CALL mon_prevAddrs
+        CALL mon_prevAddrs
+        CALL mon_prevAddrs
+        LD (MonCurrAddr), HL
+        CALL mon_dsp
+        JP mon_main_loop
+
+; scrolls one line down
+mon_nextLine:
+        LD HL, (MonCurrAddr)
+        CALL mon_nextAddrs
+        LD (MonCurrAddr), HL
+        CALL mon_dsp
+        JP mon_main_loop
+
+; scrolls one line up
+mon_prevLine:
+        LD HL, (MonCurrAddr)
+        CALL mon_prevAddrs
+        LD (MonCurrAddr), HL
+        CALL mon_dsp
+        JP mon_main_loop
+
+PROC
 mon_dsp:
         CALL lcd_hideCursor
-        LD HL, (MonCurrAddr)              ; puts the current mon address in HL
+        LD BC, (MonCurrAddr)              ; puts the current mon address in HL
+        LD A, C
+        AND 11111100    ; make sure the address from which you star displaying is at a 4 byte alignement
+        LD C, A
+        PUSH BC
+        POP HL
         CALL lcd_gotoLn1
         CALL mon_printAddrs
         CALL mon_printVals
@@ -87,11 +292,6 @@ mon_dsp:
         CALL mon_printVals
         CALL lcd_gotoLn4
         CALL lcd_showCursor
-        RET
-ENDP
-
-PROC
-mon_set:
         RET
 ENDP
 
@@ -178,6 +378,7 @@ mon_printLByte
         CALL lcd_putChar
         RET
 
+; moves the address in HL by one line (4 memory cells)
 mon_nextAddrs:
         INC HL
         INC HL
@@ -185,31 +386,24 @@ mon_nextAddrs:
         INC HL
         RET
 
-mon_nextPage:
-        LD HL, (MonCurrAddr)
-        CALL mon_nextAddrs
-        CALL mon_nextAddrs
-        CALL mon_nextAddrs
-        LD (MonCurrAddr), HL
-        CALL mon_dsp
+; moves back the address in HL by one line (4 memory cells)
+mon_prevAddrs:
+        DEC HL
+        DEC HL
+        DEC HL
+        DEC HL
         RET
 
 PROC
-mon_adr:
-        PUSH HL
-        POP IX  ; setting IX to point to the argument of the adr command
-        CALL parseDByte
-        CP 0
-        JR NZ, _parseError
-        LD (MonCurrAddr), HL
-        CALL mon_dsp
+mon_isWriteable:
+        LD BC, HL
+        LD A, B
+        CP FirstRamPage
+        JR C, _nonWriteable
+        LD A, 1
         RET
-_parseError:
-        CALL lcd_gotoLn4
-        LD IX, InvAddr
-        CALL lcd_wriStr
-        CALL kbd_readKey
-        CALL mon_blank
+_nonWriteable:
+        LD A, 0
         RET
 ENDP
 
