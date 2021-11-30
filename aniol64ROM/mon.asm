@@ -22,7 +22,6 @@ ParseErr: defb "Parse error", 0
 InvAddr: defb "Invalid address", 0
 InvVal: defb "Invalid value", 0
 
-defb "mon_main"
 PROC
 mon_main:
         LD A, 0
@@ -124,7 +123,6 @@ _parseError:
         JP mon_main_loop
 ENDP
 
-defb "mon_setValue"
 PROC
 mon_setValue:
         PUSH HL
@@ -273,12 +271,12 @@ mon_prevLine:
 PROC
 mon_dsp:
         CALL lcd_hideCursor
-        LD BC, (MonCurrAddr)              ; puts the current mon address in HL
+        LD BC, (MonCurrAddr)
         LD A, C
-        AND 11111100    ; make sure the address from which you star displaying is at a 4 byte alignement
+        AND 11111100b    ; make sure the address from which you star displaying is at a 4 byte alignement
         LD C, A
         PUSH BC
-        POP HL
+        POP HL          ; puts the current mon address in HL
         CALL lcd_gotoLn1
         CALL mon_printAddrs
         CALL mon_printVals
@@ -396,14 +394,14 @@ mon_prevAddrs:
 
 PROC
 mon_isWriteable:
-        LD BC, HL
-        LD A, B
-        CP FirstRamPage
-        JR C, _nonWriteable
-        LD A, 1
-        RET
+        ;LD BC, HL
+        ;LD A, B
+        ;CP FirstRamPage
+        ;JR C, _nonWriteable
+        ;LD A, 1
+        ;RET
 _nonWriteable:
-        LD A, 0
+        ;LD A, 0
         RET
 ENDP
 
