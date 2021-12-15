@@ -21,10 +21,10 @@ Disassembly of section .text:
        6:	47 c6       	rjmp	.+3214   	; 0xc96 <__bad_interrupt>
        8:	46 c6       	rjmp	.+3212   	; 0xc96 <__bad_interrupt>
        a:	45 c6       	rjmp	.+3210   	; 0xc96 <__bad_interrupt>
-       c:	b8 c6       	rjmp	.+3440   	; 0xd7e <__vector_6>
+       c:	44 c6       	rjmp	.+3208   	; 0xc96 <__bad_interrupt>
        e:	43 c6       	rjmp	.+3206   	; 0xc96 <__bad_interrupt>
       10:	42 c6       	rjmp	.+3204   	; 0xc96 <__bad_interrupt>
-      12:	42 c6       	rjmp	.+3204   	; 0xc98 <__vector_9>
+      12:	41 c6       	rjmp	.+3202   	; 0xc96 <__bad_interrupt>
       14:	40 c6       	rjmp	.+3200   	; 0xc96 <__bad_interrupt>
       16:	3f c6       	rjmp	.+3198   	; 0xc96 <__bad_interrupt>
       18:	3e c6       	rjmp	.+3196   	; 0xc96 <__bad_interrupt>
@@ -269,7 +269,7 @@ Disassembly of section .text:
 00000c96 <__bad_interrupt>:
      c96:	b4 c9       	rjmp	.-3224   	; 0x0 <__vectors>
 
-00000c98 <__vector_9>:
+00000c98 <SIG_OVERFLOW0>:
      c98:	1f 92       	push	r1
      c9a:	0f 92       	push	r0
      c9c:	0f b6       	in	r0, 0x3f	; 63
@@ -290,7 +290,7 @@ Disassembly of section .text:
      cc6:	22 e0       	ldi	r18, 0x02	; 2
      cc8:	8d 30       	cpi	r24, 0x0D	; 13
      cca:	92 07       	cpc	r25, r18
-     ccc:	41 f4       	brne	.+16     	; 0xcde <__vector_9+0x46>
+     ccc:	41 f4       	brne	.+16     	; 0xcde <SIG_OVERFLOW0+0x46>
      cce:	10 92 67 00 	sts	0x0067, r1
      cd2:	10 92 66 00 	sts	0x0066, r1
      cd6:	10 92 62 03 	sts	0x0362, r1
@@ -299,14 +299,14 @@ Disassembly of section .text:
      ce2:	90 91 67 00 	lds	r25, 0x0067
      ce6:	8a 30       	cpi	r24, 0x0A	; 10
      ce8:	91 05       	cpc	r25, r1
-     cea:	39 f0       	breq	.+14     	; 0xcfa <__vector_9+0x62>
+     cea:	39 f0       	breq	.+14     	; 0xcfa <SIG_OVERFLOW0+0x62>
      cec:	80 91 66 00 	lds	r24, 0x0066
      cf0:	90 91 67 00 	lds	r25, 0x0067
      cf4:	8b 30       	cpi	r24, 0x0B	; 11
      cf6:	91 05       	cpc	r25, r1
-     cf8:	11 f4       	brne	.+4      	; 0xcfe <__vector_9+0x66>
+     cf8:	11 f4       	brne	.+4      	; 0xcfe <SIG_OVERFLOW0+0x66>
      cfa:	12 ba       	out	0x12, r1	; 18
-     cfc:	02 c0       	rjmp	.+4      	; 0xd02 <__vector_9+0x6a>
+     cfc:	02 c0       	rjmp	.+4      	; 0xd02 <SIG_OVERFLOW0+0x6a>
      cfe:	84 e0       	ldi	r24, 0x04	; 4
      d00:	82 bb       	out	0x12, r24	; 18
      d02:	81 e0       	ldi	r24, 0x01	; 1
@@ -315,22 +315,22 @@ Disassembly of section .text:
      d0c:	90 91 67 00 	lds	r25, 0x0067
      d10:	8d 32       	cpi	r24, 0x2D	; 45
      d12:	91 05       	cpc	r25, r1
-     d14:	90 f4       	brcc	.+36     	; 0xd3a <__vector_9+0xa2>
+     d14:	90 f4       	brcc	.+36     	; 0xd3a <SIG_OVERFLOW0+0xa2>
      d16:	10 92 63 03 	sts	0x0363, r1
 	...
      d36:	00 00       	nop
-     d38:	19 c0       	rjmp	.+50     	; 0xd6c <__vector_9+0xd4>
+     d38:	19 c0       	rjmp	.+50     	; 0xd6c <SIG_OVERFLOW0+0xd4>
      d3a:	80 91 68 00 	lds	r24, 0x0068
      d3e:	8f 5f       	subi	r24, 0xFF	; 255
      d40:	80 93 68 00 	sts	0x0068, r24
      d44:	80 91 68 00 	lds	r24, 0x0068
      d48:	88 31       	cpi	r24, 0x18	; 24
-     d4a:	41 f4       	brne	.+16     	; 0xd5c <__vector_9+0xc4>
+     d4a:	41 f4       	brne	.+16     	; 0xd5c <SIG_OVERFLOW0+0xc4>
      d4c:	80 91 62 03 	lds	r24, 0x0362
      d50:	8f 5f       	subi	r24, 0xFF	; 255
      d52:	80 93 62 03 	sts	0x0362, r24
      d56:	10 92 68 00 	sts	0x0068, r1
-     d5a:	08 c0       	rjmp	.+16     	; 0xd6c <__vector_9+0xd4>
+     d5a:	08 c0       	rjmp	.+16     	; 0xd6c <SIG_OVERFLOW0+0xd4>
 	...
      d6c:	93 9a       	sbi	0x12, 3	; 18
      d6e:	9f 91       	pop	r25
@@ -342,7 +342,7 @@ Disassembly of section .text:
      d7a:	1f 90       	pop	r1
      d7c:	18 95       	reti
 
-00000d7e <__vector_6>:
+00000d7e <SIG_OUTPUT_COMPARE1A>:
      d7e:	1f 92       	push	r1
      d80:	0f 92       	push	r0
      d82:	0f b6       	in	r0, 0x3f	; 63
@@ -361,7 +361,7 @@ Disassembly of section .text:
      da8:	21 e0       	ldi	r18, 0x01	; 1
      daa:	88 33       	cpi	r24, 0x38	; 56
      dac:	92 07       	cpc	r25, r18
-     dae:	41 f4       	brne	.+16     	; 0xdc0 <__vector_6+0x42>
+     dae:	41 f4       	brne	.+16     	; 0xdc0 <SIG_OUTPUT_COMPARE1A+0x42>
      db0:	10 92 67 00 	sts	0x0067, r1
      db4:	10 92 66 00 	sts	0x0066, r1
      db8:	10 92 62 03 	sts	0x0362, r1
@@ -371,27 +371,27 @@ Disassembly of section .text:
      dc8:	21 e0       	ldi	r18, 0x01	; 1
      dca:	82 33       	cpi	r24, 0x32	; 50
      dcc:	92 07       	cpc	r25, r18
-     dce:	80 f0       	brcs	.+32     	; 0xdf0 <__vector_6+0x72>
+     dce:	80 f0       	brcs	.+32     	; 0xdf0 <SIG_OUTPUT_COMPARE1A+0x72>
      dd0:	80 91 66 00 	lds	r24, 0x0066
      dd4:	90 91 67 00 	lds	r25, 0x0067
      dd8:	21 e0       	ldi	r18, 0x01	; 1
      dda:	85 33       	cpi	r24, 0x35	; 53
      ddc:	92 07       	cpc	r25, r18
-     dde:	40 f4       	brcc	.+16     	; 0xdf0 <__vector_6+0x72>
+     dde:	40 f4       	brcc	.+16     	; 0xdf0 <SIG_OUTPUT_COMPARE1A+0x72>
      de0:	a8 9a       	sbi	0x15, 0	; 21
      de2:	8f e0       	ldi	r24, 0x0F	; 15
-     de4:	01 c0       	rjmp	.+2      	; 0xde8 <__vector_6+0x6a>
+     de4:	01 c0       	rjmp	.+2      	; 0xde8 <SIG_OUTPUT_COMPARE1A+0x6a>
      de6:	00 00       	nop
      de8:	81 50       	subi	r24, 0x01	; 1
-     dea:	e9 f7       	brne	.-6      	; 0xde6 <__vector_6+0x68>
+     dea:	e9 f7       	brne	.-6      	; 0xde6 <SIG_OUTPUT_COMPARE1A+0x68>
      dec:	a8 98       	cbi	0x15, 0	; 21
-     dee:	07 c0       	rjmp	.+14     	; 0xdfe <__vector_6+0x80>
+     dee:	07 c0       	rjmp	.+14     	; 0xdfe <SIG_OUTPUT_COMPARE1A+0x80>
      df0:	a8 98       	cbi	0x15, 0	; 21
      df2:	8e e1       	ldi	r24, 0x1E	; 30
-     df4:	01 c0       	rjmp	.+2      	; 0xdf8 <__vector_6+0x7a>
+     df4:	01 c0       	rjmp	.+2      	; 0xdf8 <SIG_OUTPUT_COMPARE1A+0x7a>
      df6:	00 00       	nop
      df8:	81 50       	subi	r24, 0x01	; 1
-     dfa:	e9 f7       	brne	.-6      	; 0xdf6 <__vector_6+0x78>
+     dfa:	e9 f7       	brne	.-6      	; 0xdf6 <SIG_OUTPUT_COMPARE1A+0x78>
      dfc:	a8 9a       	sbi	0x15, 0	; 21
      dfe:	81 e0       	ldi	r24, 0x01	; 1
      e00:	80 93 63 03 	sts	0x0363, r24
@@ -399,28 +399,28 @@ Disassembly of section .text:
      e08:	90 91 67 00 	lds	r25, 0x0067
      e0c:	88 32       	cpi	r24, 0x28	; 40
      e0e:	91 05       	cpc	r25, r1
-     e10:	40 f0       	brcs	.+16     	; 0xe22 <__vector_6+0xa4>
+     e10:	40 f0       	brcs	.+16     	; 0xe22 <SIG_OUTPUT_COMPARE1A+0xa4>
      e12:	80 91 66 00 	lds	r24, 0x0066
      e16:	90 91 67 00 	lds	r25, 0x0067
      e1a:	21 e0       	ldi	r18, 0x01	; 1
      e1c:	87 31       	cpi	r24, 0x17	; 23
      e1e:	92 07       	cpc	r25, r18
-     e20:	90 f0       	brcs	.+36     	; 0xe46 <__vector_6+0xc8>
+     e20:	90 f0       	brcs	.+36     	; 0xe46 <SIG_OUTPUT_COMPARE1A+0xc8>
      e22:	10 92 63 03 	sts	0x0363, r1
 	...
      e42:	00 00       	nop
-     e44:	19 c0       	rjmp	.+50     	; 0xe78 <__vector_6+0xfa>
+     e44:	19 c0       	rjmp	.+50     	; 0xe78 <SIG_OUTPUT_COMPARE1A+0xfa>
      e46:	80 91 68 00 	lds	r24, 0x0068
      e4a:	8f 5f       	subi	r24, 0xFF	; 255
      e4c:	80 93 68 00 	sts	0x0068, r24
      e50:	80 91 68 00 	lds	r24, 0x0068
      e54:	8c 30       	cpi	r24, 0x0C	; 12
-     e56:	41 f4       	brne	.+16     	; 0xe68 <__vector_6+0xea>
+     e56:	41 f4       	brne	.+16     	; 0xe68 <SIG_OUTPUT_COMPARE1A+0xea>
      e58:	80 91 62 03 	lds	r24, 0x0362
      e5c:	8f 5f       	subi	r24, 0xFF	; 255
      e5e:	80 93 62 03 	sts	0x0362, r24
      e62:	10 92 68 00 	sts	0x0068, r1
-     e66:	08 c0       	rjmp	.+16     	; 0xe78 <__vector_6+0xfa>
+     e66:	08 c0       	rjmp	.+16     	; 0xe78 <SIG_OUTPUT_COMPARE1A+0xfa>
 	...
      e78:	9f 91       	pop	r25
      e7a:	8f 91       	pop	r24
@@ -432,10 +432,10 @@ Disassembly of section .text:
      e86:	18 95       	reti
 
 00000e88 <spi_init>:
-     e88:	bf 9a       	sbi	0x17, 7	; 23
-     e8a:	be 98       	cbi	0x17, 6	; 23
-     e8c:	bd 9a       	sbi	0x17, 5	; 23
-     e8e:	bc 9a       	sbi	0x17, 4	; 23
+     e88:	bd 9a       	sbi	0x17, 5	; 23
+     e8a:	bc 98       	cbi	0x17, 4	; 23
+     e8c:	bb 9a       	sbi	0x17, 3	; 23
+     e8e:	ba 9a       	sbi	0x17, 2	; 23
      e90:	81 e0       	ldi	r24, 0x01	; 1
      e92:	8e b9       	out	0x0e, r24	; 14
      e94:	80 e5       	ldi	r24, 0x50	; 80

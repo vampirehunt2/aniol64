@@ -1,0 +1,201 @@
+program VgaGenGen;
+
+uses crt, dos;
+
+const
+     X_ADDRESS_MASK = 63;    {  0000000000111111b }
+     Y_ADDRESS_MASK = 65472; {  1111111111000000b }
+     PIXEL_DATA_WIDTH = 5 * 8;
+     PIXEL_DATA_HEIGHT = 3 * 8;
+
+     pixelData: array[0..PIXEL_DATA_HEIGHT - 1]
+                of string[PIXEL_DATA_WIDTH] = (
+                  '                                        ',
+                  '                                        ',
+                  '                                        ',
+                  '                                        ',
+                  '      ***** *   *  *** ****** *         ',
+                  '      *   * **  *   *  *    * *         ',
+                  '      *   * * * *   *  *    * *         ',
+                  '      ***** *  **   *  *    * *         ',
+                  '      *   * *   *   *  *    * *         ',
+                  '      *   * *   *  *** ****** *****     ',
+                  '                                        ',
+                  '                                        ',
+                  '            ***** *   *                 ',
+                  '            *     *   *                 ',
+                  '            ***** *   *                 ',
+                  '            *   * *****                 ',
+                  '            *   *     *                 ',
+                  '            *****     *                 ',
+                  '                                        ',
+                  '                                        ',
+                  '                                        ',
+                  '                                        ',
+                  '                                        ',
+                  '                                        '
+                  );
+
+
+var
+   address: word;
+   xAddress: word;
+   yAddress: word;
+   b: byte;
+   f: file of byte;
+   v: text;
+
+
+function getXAddress: word;
+var x: word;
+begin
+x := address and X_ADDRESS_MASK;
+x := x shl 2;
+write(v, 'x: ', x, chr(9));
+getXAddress := x;
+end;
+
+function getYAddress: word;
+var y: word;
+begin
+y := address and Y_ADDRESS_MASK;
+y := y shr 6;
+write(v, 'y:', y, chr(9));
+getYAddress := y;
+end;
+
+{ output on D0 }
+{ active low }
+function vSync: byte;
+var d: byte;
+begin
+if (yAddress >= 490) and (yAddress < 492) then
+   d := 0
+else
+    d := 1;
+write(v, 'vSnc: ');
+if (d = 0) then write(v, 0) else write(v, 1);
+write(v, chr(9));
+vSync := d;
+end;
+
+{ output on D1 }
+{ active low }
+function hSync: byte;
+var d: byte;
+begin
+if (xAddress >= 164) and (xAddress < 188) then
+   d := 0
+else
+    d := 2;
+write(v, 'hSnc: ');
+if (d = 0) then write(v, 0) else write(v, 1);
+write(v, '; ');
+hSync := d;
+end;
+
+{ output on D2 }
+{ active high }
+{ this signal can be directly used to enable the chargen ROM }
+function blanking: byte;
+begin
+if (xAddress >= 160) or (yAddress >= 480) then
+   blanking := 4
+else
+   blanking := 0;
+end;
+
+{ output on D3 }
+{ active high }
+{ this signal resets the horizontal counter }
+function hReset: byte;
+var d: byte;
+begin
+if (xAddress >= 200) or (yAddress >= 525) then
+   d := 8
+else
+    d := 0;
+write(v, 'hReset: ');
+if (d = 0) then write(v, 0) else write(v, 1);
+write(v, chr(9));
+hReset := d;
+end;
+
+{ output on D4 }
+{ active high }
+{ this signal resets the vertical counter }
+function vReset: byte;
+var d: byte;
+begin
+if yAddress >= 525 then
+   d := 16
+else
+    d := 0;
+write(v, 'vReset: ');
+if (d = 0) then write(v, 0) else write(v, 1);
+write(v, chr(9));
+vReset := d;
+end;
+
+{ output on D5 }
+{ active low }
+{ this signal clocks the vertical counter }
+function vClock: byte;
+var d: byte;
+begin
+if (xAddress >= 200) or (xAddress < 80) then
+   d := 0
+else
+    d := 32;
+write(v, 'vClock: ');
+if (d = 0) then write(v, 0) else write(v, 1);
+write(v, chr(9));
+vClock := d;
+end;
+
+{ output on D6 }
+{ active high }
+function getPixelData: byte;
+var
+   pixelX, pixelY: word;
+   px: char;
+begin
+pixelX := xAddress;
+pixelY := yAddress shr 2;
+getPixelData := 0;
+if (pixelX < PIXEL_DATA_WIDTH) and (pixelY < PIXEL_DATA_HEIGHT) then
+   begin
+   px := pixelData[pixelY, pixelX + 1];
+   if (px <> ' ') then getPixelData := 64;
+   end;
+end;
+
+
+begin
+writeln('begin generating ROM');
+assign(f, 'vgagg.bin');
+rewrite(f);
+assign(v, 'vgagg.txt');
+rewrite(v);
+for address := 0 to $FFFF do
+    begin
+    if address mod $FF = 0 then write('.');
+    write(v, '@', address, chr(9));
+    xAddress := getXAddress;
+    yAddress := getYAddress;
+    b := 0;
+    b := b or vSync;
+    b := b or hSync;
+    b := b or blanking;
+    b := b or hReset;
+    b := b or vReset;
+    b := b or vClock;
+    b := b or getPixelData;
+    write(f, b);
+    writeln(v);
+    end;
+close(f);
+close(v);
+writeln('done');
+readkey;
+end.

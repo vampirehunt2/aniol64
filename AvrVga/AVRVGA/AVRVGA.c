@@ -229,10 +229,10 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
 void spi_init (void)
 {
     //Set SPI PORT DDR bits
-	sbi(DDRB, 7); //SCK
-	cbi(DDRB, 6); //MISO
-	sbi(DDRB, 5); //MOSI
-	sbi(DDRB, 4); //SS
+	sbi(DDRB, 5); //SCK
+	cbi(DDRB, 4); //MISO
+	sbi(DDRB, 3); //MOSI
+	sbi(DDRB, 2); //SS
 	SPSR = 1 << SPI2X;
 	SPCR = (1 << SPE) | (1 << MSTR); //SPI enable as master ,FREQ = fclk/2
 	//That's a great pity, that we can't work with SPI with FREQ = fclk,
