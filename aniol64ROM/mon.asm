@@ -15,6 +15,7 @@ NextLine: defb "d", 0
 PrevLine: defb "u", 0
 Fill: defb "f", 0
 Copy: defb "c", 0
+Run: defb "r", 0
 
 Bye: defb "bye", 0
 Exit: defb "Exiting...", 0
@@ -87,6 +88,12 @@ mon_main_loop:
         CALL str_cmp
         CP 0
         JP Z, mon_setValue
+        ; run command
+        LD IX, LineBuff
+        LD IY, Run
+        CALL str_cmp
+        CP 0
+        JP Z, mon_run
         ; bye command
         LD IX, LineBuff
         LD IY, Bye
@@ -121,6 +128,25 @@ _parseError:
         CALL kbd_readKey
         CALL mon_blank
         JP mon_main_loop
+ENDP
+
+PROC
+mon_run:
+        PUSH HL
+        POP IX  ; setting IX to point to the argument of the adr command
+        CALL parseDByte
+        CP 0
+        JR NZ, _parseError
+        JP (HL)  ; we are assuming whatever program we call will
+                ;either continue running until system reset or jump back to a known location, such as mon_main
+_parseError:
+        CALL lcd_gotoLn4
+        LD IX, InvAddr
+        CALL lcd_wriStr
+        CALL kbd_readKey
+        CALL mon_blank
+        JP mon_main_loop
+        RET
 ENDP
 
 PROC
