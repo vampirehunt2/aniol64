@@ -19,6 +19,7 @@ LcdBuff equ 8020h         ; 20 byte long buffer + 1 byte for the trailing 0
 NmiCount equ 8035h         ; reserving 4 bytes for the counter
 MonCurrAddr equ 8036h
 LineBuff equ 8100h         ; 256 byte long buffer, including 1 byte for the trailing 0
+PROGRAM_DATA equ 8200h
 ENDIF
 
 IF version=32

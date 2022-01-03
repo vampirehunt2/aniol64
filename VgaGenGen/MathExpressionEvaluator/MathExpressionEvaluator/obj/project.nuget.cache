@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "PXSar+whlS5XHavyLSCuU8S4B3LjUDO3AkK7BInjiDIz80mLwki281BopV+kMnJow1q9/ufgI41eqXKj/4zLwQ==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\PiotrAniola\\Documents\\8bit\\git\\VgaGenGen\\MathExpressionEvaluator\\MathExpressionEvaluator\\MathExpressionEvaluator.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\PiotrAniola\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.13\\microsoft.netcore.app.host.win-x64.3.1.13.nupkg.sha512"
+  ],
+  "logs": []
+}

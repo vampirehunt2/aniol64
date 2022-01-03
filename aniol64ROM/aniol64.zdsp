@@ -4,7 +4,7 @@ Path=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\
 ObjExt=.exe
 
 [File]
-Total=15
+Total=16
 0=aniol64.asm
 1=lcd.asm
 2=str.asm
@@ -20,6 +20,7 @@ Total=15
 12=clk.asm
 13=var.asm
 14=cmd.asm
+15=cal.asm
 
 [Directory]
 Total=2
@@ -45,7 +46,7 @@ Total=12
 Total=0
 
 [FileInUse]
-Total=15
+Total=16
 0=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\kbd.asm
 1=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\dart.asm
 2=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\snd.asm
@@ -61,3 +62,4 @@ Total=15
 12=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\mem.asm
 13=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\aniol64.asm
 14=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\util.asm
+15=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\cal.asm

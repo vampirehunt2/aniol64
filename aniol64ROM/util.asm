@@ -72,6 +72,11 @@ _parseError:
         RET
 ENDP
 
+PROC
+parseByteDec:
+        RET
+ENDP
+
 ; parses a double byte - four hex digits
 ; IX: null-terminated string containing the double byte digits
 ; result in HL
@@ -126,6 +131,9 @@ _letters:
         RET
 ENDP
 
+; checks if the byte in A is between 0 and 9 or between a dn f.
+; only lowercase letters are supported
+; result in A
 PROC
 isHexDigit:
         CP 30h
@@ -144,6 +152,26 @@ _no
         RET
 ENDP
 
+; checks if the byte in A is between 0 and 9
+; result in A
+PROC
+isDecDigit:
+        CP 30h
+        JR C, _no ; if less than '0' then it's not a hex digit
+        CP 3Ah
+        JR C, _yes ; if less than ':' (which is the next ascii code after '9' then it's a hex digit
+        JR _no
+_yes
+        LD A, 1
+        RET
+_no
+        LD A, 0
+        RET
+ENDP
+
+; checks if a string represents a two-byte hex value
+; IX - address of the input string
+; result in A: 0 - false, 1 - true
 PROC
 isDByteStr:
         CALL str_len
@@ -172,6 +200,9 @@ _parseError:
         RET
 ENDP
 
+; checks if a string represents a one-byte hex value
+; IX - address of the input string
+; result in A: 0 - false, 1 - true
 PROC
 isByteStr:
         CALL str_len
@@ -189,6 +220,18 @@ isByteStr:
         RET
 _parseError:
         LD A, 0
+        RET
+ENDP
+
+PROC
+isByteDecStr:
+        CALL str_len
+        CP 4
+        LD A, 1
+        RET
+_parseError:
+        LD A, 0
+        RET
         RET
 ENDP
 
@@ -224,6 +267,8 @@ numbers:
         AND A   ; clear carry flag
         ADD A, 30h ; ASCII code for '0'
         RET
+
+
 
 ; A - the binary number to convert
 ; Result:

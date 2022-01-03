@@ -116,7 +116,7 @@ L Device:R R13
 U 1 1 615B39BC
 P 2300 2800
 F 0 "R13" V 2200 2800 50  0000 C CNN
-F 1 "1k" V 2300 2800 50  0000 C CNN
+F 1 "4k7" V 2300 2800 50  0000 C CNN
 F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" V 2230 2800 50  0001 C CNN
 F 3 "~" H 2300 2800 50  0001 C CNN
 	1    2300 2800
@@ -1154,12 +1154,6 @@ NoConn ~ 9650 2200
 NoConn ~ 9650 2300
 NoConn ~ 9650 2400
 NoConn ~ 9650 2500
-Wire Wire Line
-	9650 1850 9700 1850
-Wire Wire Line
-	9700 1850 9700 1650
-Wire Wire Line
-	9700 1650 9650 1650
 $Comp
 L Connector_Generic:Conn_02x08_Counter_Clockwise SERIAL1
 U 1 1 61CEB7DC
@@ -1178,8 +1172,6 @@ Wire Wire Line
 Wire Wire Line
 	9650 2950 10450 2950
 Wire Wire Line
-	9650 3050 10550 3050
-Wire Wire Line
 	9650 3250 10650 3250
 Wire Wire Line
 	9650 3350 10750 3350
@@ -1194,18 +1186,11 @@ Wire Wire Line
 Wire Wire Line
 	9650 1550 10850 1550
 Wire Wire Line
-	9700 1650 10750 1650
-Connection ~ 9700 1650
-Wire Wire Line
 	9650 1750 10650 1750
-Wire Wire Line
-	9650 1950 10550 1950
 Wire Wire Line
 	10350 2850 10350 2650
 Wire Wire Line
 	10450 2950 10450 2650
-Wire Wire Line
-	10550 3050 10550 2650
 Wire Wire Line
 	10650 3250 10650 2650
 Wire Wire Line
@@ -1223,12 +1208,6 @@ Wire Wire Line
 Wire Wire Line
 	10650 1750 10650 2150
 Wire Wire Line
-	10550 1950 10550 2150
-Wire Wire Line
-	9650 2050 10450 2050
-Wire Wire Line
-	10450 2050 10450 2150
-Wire Wire Line
 	10350 2150 10350 2100
 Wire Wire Line
 	10350 2100 9850 2100
@@ -1244,7 +1223,7 @@ Wire Wire Line
 Wire Wire Line
 	2900 2200 2550 2200
 Wire Wire Line
-	2900 2800 2450 2800
+	2900 2800 2550 2800
 Wire Wire Line
 	2900 3900 2450 3900
 NoConn ~ 2900 2900
@@ -1291,4 +1270,27 @@ $EndComp
 Connection ~ 1150 7550
 Wire Wire Line
 	1150 7550 850  7550
+Wire Wire Line
+	9650 1650 10750 1650
+Wire Wire Line
+	10550 1850 10550 2150
+Wire Wire Line
+	9650 1850 10550 1850
+Wire Wire Line
+	9650 1950 10450 1950
+Wire Wire Line
+	10450 1950 10450 2150
+Text GLabel 2450 3050 0    50   Input ~ 0
+WAIT
+Wire Wire Line
+	2450 3050 2550 3050
+Wire Wire Line
+	2550 3050 2550 2800
+Connection ~ 2550 2800
+Wire Wire Line
+	2550 2800 2450 2800
+Text GLabel 9650 3050 2    50   Input ~ 0
+WAIT
+NoConn ~ 10550 2650
+NoConn ~ 9650 2050
 $EndSCHEMATC

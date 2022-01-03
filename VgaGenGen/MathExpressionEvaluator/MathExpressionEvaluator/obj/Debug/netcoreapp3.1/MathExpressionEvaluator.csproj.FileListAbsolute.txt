@@ -1,0 +1,13 @@
+C:\Users\PiotrAniola\Documents\8bit\git\VgaGenGen\MathExpressionEvaluator\MathExpressionEvaluator\bin\Debug\netcoreapp3.1\MathExpressionEvaluator.exe
+C:\Users\PiotrAniola\Documents\8bit\git\VgaGenGen\MathExpressionEvaluator\MathExpressionEvaluator\bin\Debug\netcoreapp3.1\MathExpressionEvaluator.deps.json
+C:\Users\PiotrAniola\Documents\8bit\git\VgaGenGen\MathExpressionEvaluator\MathExpressionEvaluator\bin\Debug\netcoreapp3.1\MathExpressionEvaluator.runtimeconfig.json
+C:\Users\PiotrAniola\Documents\8bit\git\VgaGenGen\MathExpressionEvaluator\MathExpressionEvaluator\bin\Debug\netcoreapp3.1\MathExpressionEvaluator.runtimeconfig.dev.json
+C:\Users\PiotrAniola\Documents\8bit\git\VgaGenGen\MathExpressionEvaluator\MathExpressionEvaluator\bin\Debug\netcoreapp3.1\MathExpressionEvaluator.dll
+C:\Users\PiotrAniola\Documents\8bit\git\VgaGenGen\MathExpressionEvaluator\MathExpressionEvaluator\bin\Debug\netcoreapp3.1\MathExpressionEvaluator.pdb
+C:\Users\PiotrAniola\Documents\8bit\git\VgaGenGen\MathExpressionEvaluator\MathExpressionEvaluator\obj\Debug\netcoreapp3.1\MathExpressionEvaluator.csprojAssemblyReference.cache
+C:\Users\PiotrAniola\Documents\8bit\git\VgaGenGen\MathExpressionEvaluator\MathExpressionEvaluator\obj\Debug\netcoreapp3.1\MathExpressionEvaluator.AssemblyInfoInputs.cache
+C:\Users\PiotrAniola\Documents\8bit\git\VgaGenGen\MathExpressionEvaluator\MathExpressionEvaluator\obj\Debug\netcoreapp3.1\MathExpressionEvaluator.AssemblyInfo.cs
+C:\Users\PiotrAniola\Documents\8bit\git\VgaGenGen\MathExpressionEvaluator\MathExpressionEvaluator\obj\Debug\netcoreapp3.1\MathExpressionEvaluator.csproj.CoreCompileInputs.cache
+C:\Users\PiotrAniola\Documents\8bit\git\VgaGenGen\MathExpressionEvaluator\MathExpressionEvaluator\obj\Debug\netcoreapp3.1\MathExpressionEvaluator.dll
+C:\Users\PiotrAniola\Documents\8bit\git\VgaGenGen\MathExpressionEvaluator\MathExpressionEvaluator\obj\Debug\netcoreapp3.1\MathExpressionEvaluator.pdb
+C:\Users\PiotrAniola\Documents\8bit\git\VgaGenGen\MathExpressionEvaluator\MathExpressionEvaluator\obj\Debug\netcoreapp3.1\MathExpressionEvaluator.genruntimeconfig.cache
