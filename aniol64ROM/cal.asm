@@ -128,7 +128,7 @@ _storeSymbol:                  ; saving the currently process math symbol in the
         ADD IY, DE
         LD (IY), A             ; store the symbol to the tokens table at current index
         LD A, 0
-        LD (IY + 1), A         ; store a trailing zero, as the second byte of the token is not used for symbols
+        LD (IY + 1), A         ; padding, as the second byte of the token is not used for symbols
         INC E
         INC E
         INC IX                 ; discard the processed token

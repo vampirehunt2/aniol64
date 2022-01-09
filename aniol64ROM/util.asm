@@ -374,3 +374,60 @@ delay10ms:
         CALL delay1520us
         CALL delay1520us
         RET
+
+defb "Rnd"
+PROC
+rnd:
+        PUSH BC
+        LD A, (Random)
+        CP 0               ; if Random is unitialised
+        JR NZ, _doRnd
+        LD A, (Random + 1)  ; checking both bytes of Random for 0
+        CP 0
+        CALL Z, randomize  ; we initialise it
+_doRnd:
+        AND A ; clear carry
+        LD A, (Random + 1) ; load high byte of Random in case randomize overworte it
+         ; first we XOR bit 2 with bit 0
+        SLA A
+        SLA A
+        SLA A
+        SLA A
+        SLA A ; bit 2 now in bit 7
+        LD B, A
+        SLA A
+        SLA A ; bit 0 now in bit 7
+        XOR B ; XORing bit 2 and 0 together
+        AND 10000000b ; discarding lower bits
+        LD B, A
+        LD A, (Random + 1)
+        SLA A  ; processing bit 3
+        SLA A
+        SLA A
+        SLA A
+        XOR B
+        AND 10000000b
+        LD B, A
+        LD A, (Random + 1)
+        SLA A ; processing bit 5
+        SLA A
+        XOR B
+        AND 10000000b ; all bits now XORed and in bit 7
+        SLA A ; moving bit 7 to carry
+        LD A, (Random)
+        RRA
+        LD (Random), A
+        LD A, (Random + 1)
+        RRA
+        LD (Random + 1), A
+        POP BC
+        RET
+ENDP
+
+
+randomize:
+        LD A, (NmiCount)
+        CP 0
+        JR Z, randomize
+        LD (Random), A
+        RET

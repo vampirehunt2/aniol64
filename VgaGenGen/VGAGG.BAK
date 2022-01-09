@@ -5,8 +5,8 @@ uses crt, dos;
 const
      X_ADDRESS_MASK = 63;    {  0000000000111111b }
      Y_ADDRESS_MASK = 65472; {  1111111111000000b }
-     PIXEL_DATA_WIDTH = 5 * 8;
-     PIXEL_DATA_HEIGHT = 3 * 8;
+     PIXEL_DATA_WIDTH = 40;
+     PIXEL_DATA_HEIGHT = 30;
 
      pixelData: array[0..PIXEL_DATA_HEIGHT - 1]
                 of string[PIXEL_DATA_WIDTH] = (
@@ -28,6 +28,12 @@ const
                   '            *   * *****                 ',
                   '            *   *     *                 ',
                   '            *****     *                 ',
+                  '                                        ',
+                  '                                        ',
+                  '                                        ',
+                  '                                        ',
+                  '                                        ',
+                  '                                        ',
                   '                                        ',
                   '                                        ',
                   '                                        ',
@@ -106,15 +112,15 @@ else
 end;
 
 { output on D3 }
-{ active low }
+{ active high }
 { this signal resets the horizontal counter }
 function hReset: byte;
 var d: byte;
 begin
 if (xAddress >= 200) or (yAddress >= 525) then
-   d := 0
+   d := 8
 else
-    d := 8;
+    d := 0;
 write(v, 'hReset: ');
 if (d = 0) then write(v, 0) else write(v, 1);
 write(v, chr(9));
@@ -159,15 +165,20 @@ function getPixelData: byte;
 var
    pixelX, pixelY: word;
    px: char;
+   d: byte;
 begin
 pixelX := xAddress;
-pixelY := yAddress shr 2;
-getPixelData := 0;
+pixelY := yAddress shr 4;
+d := 0;
 if (pixelX < PIXEL_DATA_WIDTH) and (pixelY < PIXEL_DATA_HEIGHT) then
    begin
    px := pixelData[pixelY, pixelX + 1];
-   if (px <> ' ') then getPixelData := 64;
+   if (px <> ' ') then d := 64;
    end;
+write(v, 'px: ');
+if (d = 0) then write(v, 0) else write(v, 1);
+write(v, chr(9));
+getPixelData := d;
 end;
 
 
