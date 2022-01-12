@@ -117,7 +117,7 @@ end;
 function hReset: byte;
 var d: byte;
 begin
-if (xAddress >= 200) or (yAddress >= 525) then
+if xAddress = 200 then
    d := 8
 else
     d := 0;
@@ -133,7 +133,7 @@ end;
 function vReset: byte;
 var d: byte;
 begin
-if yAddress >= 525 then
+if yAddress = 525 then
    d := 16
 else
     d := 0;
@@ -167,7 +167,7 @@ var
    px: char;
    d: byte;
 begin
-pixelX := xAddress;
+pixelX := xAddress shr 2;
 pixelY := yAddress shr 4;
 d := 0;
 if (pixelX < PIXEL_DATA_WIDTH) and (pixelY < PIXEL_DATA_HEIGHT) then

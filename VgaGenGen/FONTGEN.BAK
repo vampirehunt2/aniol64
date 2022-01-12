@@ -1,0 +1,24 @@
+program FontGen;
+
+uses crt, graph;
+
+const RASTER_SIZE = 256;
+
+var gd, gm: integer;
+    font: array[0..127, 0..7] of byte;
+
+procedure displayRaster;
+var x, y: byte;
+begin
+for x := 0 to 8 do line(x, 0, x, RASTER_SIZE);
+for y := 0 to 8 do line(0, y, RASTER_SIZE, y);
+end;
+
+begin
+detectGraph(gd, gm);
+initGraph(gd, gm, '');
+setColor(white)
+setBkColor(black);
+displayRaster;
+readKey;
+end.

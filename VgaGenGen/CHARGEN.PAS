@@ -272,21 +272,17 @@ var
 begin
 assign(f, 'chargen.bin');
 rewrite(f);
-writeln('begin generating character generator');
 for i := 0 to 255 do
-    begin
-    write('.');
     for l := 0 to 7 do
         begin
-	d0 := charData[i, l];
+		d0 := charData[i, l];
         for c := 0 to 7 do
             begin
-	    d := d0 and 128;
-	    write(f, d);
-	    d0 := d0 shl 1;
+			d := d0 and 128;
+			write(f, d);
+			d0 := d0 shl 1;
             end;
-	end;
-    end;
+		end;
 close(f);
 writeln('done');
 readkey;
