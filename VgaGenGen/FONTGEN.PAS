@@ -23,7 +23,7 @@ var gd, gm: integer;
 procedure cleanMenuArea;
 begin
 setFillStyle(solidFill, black);
-bar(MENU_AREA_X, MENU_AREA_Y, MENU_AREA_X + 256, MENU_AREA_Y + 20);
+bar(MENU_AREA_X, MENU_AREA_Y, GetMaxX, GetMaxY);
 end;
 
 procedure printMenu(s: string);
@@ -44,15 +44,20 @@ for x := 0 to 8 do line(x * CELL_SIZE, 0, x * CELL_SIZE, RASTER_SIZE);
 for y := 0 to 8 do line(0, y * CELL_SIZE, RASTER_SIZE, y * CELL_SIZE);
 end;
 
-function getCell(x, y: word): boolean;
+function getCellForChar(x, y: word; ch: char): boolean;
 var b, d, mask: byte;
 begin
-b := byte(currChar);
+b := byte(ch);
 d := font[b, y];
 mask := 1;
 mask := mask shl x;
 d := d and mask;
-getCell := d > 0;
+getCellForChar := d > 0;
+end;
+
+function getCell(x, y: word): boolean;
+begin
+getCell := getCellForChar(x, y, currChar);
 end;
 
 procedure setCell(x, y: word);
@@ -125,6 +130,14 @@ begin
 paintCell(curX, curY);
 end;
 
+procedure put2x2Pixel(x, y, c: word);
+begin
+putPixel(x, y, c);
+putPixel(x + 1, y, c);
+putPixel(x, y + 1, c);
+putPixel(x + 1, y + 1, c);
+end;
+
 procedure paintFont;
 var col, row, x, y, px, py: word;
     b: byte;
@@ -135,10 +148,23 @@ col := b mod 16;
 for x := 0 to 7 do
     for y := 0 to 7 do
         begin
-        px := FONT_AREA_X + col * 8 + x;
-        py := FONT_AREA_Y + row * 8 + y;
-        if getCell(x, y) then putPixel(px, py, white)
-        else putPixel(px, py, black);
+        px := FONT_AREA_X + col * 16 + x * 2;
+        py := FONT_AREA_Y + row * 16 + y * 2;
+        if getCell(x, y) then put2x2Pixel(px, py, white)
+        else put2x2Pixel(px, py, black);
+        end;
+end;
+
+procedure paintFontXY(x0, y0: word; ch: char);
+var x, y, px, py: word;
+begin
+for x := 0 to 7 do
+    for y := 0 to 7 do
+        begin
+        px := x0 + x * 2;
+        py := y0 + y * 2;
+        if getCellForChar(x, y, ch) then put2x2Pixel(px, py, white)
+        else put2x2Pixel(px, py, black);
         end;
 end;
 
@@ -222,7 +248,7 @@ end;
 procedure cleanMenu;
 begin
 setFillStyle(SolidFill, black);
-bar(MENU_AREA_X, MENU_AREA_Y, 256, getMaxY);
+bar(MENU_AREA_X, MENU_AREA_Y, getMaxX, getMaxY);
 end;
 
 procedure runSave;
@@ -244,14 +270,33 @@ load(filename);
 paintAllFonts;
 end;
 
+procedure test;
+var x, y: word;
+    k: char;
+begin
+x := MENU_AREA_X;
+y := MENU_AREA_Y;
+cleanMenuArea;
+repeat
+      k := readKey;
+      if (byte(k) >= 32) and (byte(k) <= 127) then
+         begin
+         paintFontXY(x, y, k);
+         x := x + 16;
+         end;
+until k = char(13);
+cleanMenuArea;
+end;
+
 procedure runMenu;
 var k: char;
 begin
-printMenu('[L]oad, [S]ave, [Q]uit, [C]ancel');
+printMenu('[L]oad, [S]ave, [Q]uit, [T]est, [C]ancel');
 k := readKey;
 case k of
      'L': runLoad;
      'S': runSave;
+     'T': test;
      'Q': halt;
 end;
 cleanMenu;
