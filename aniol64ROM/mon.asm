@@ -359,6 +359,7 @@ mon_printVals:
 
 mon_printByte:
         LD A, (IX + 0)
+mon_printByteA:
         CALL byte2asc
         PUSH AF
         LD A, B
@@ -438,7 +439,19 @@ mon_blank:
         CALL lcd_gotoLn4
         RET
 
-
-
+PROC
+mon_peek:
+        CALL parseDByte
+        CP 0
+        JR NZ, _parseError
+        LD A, (HL)
+        CALL mon_printByteA
+        RET
+_parseError:
+        CALL lcd_gotoLn4
+        LD IX, InvAddr
+        CALL lcd_wriStr
+        RET
+ENDP
 
 

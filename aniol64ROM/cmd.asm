@@ -13,6 +13,7 @@ Clk: defb "clk", 0
 Reset: defb "rst", 0
 Echo: defb "echo", 0
 Rnd: defb "rnd", 0
+Peek: defb "peek", 0
 UnknownCmd: defb "Unknown cmd", 0
 
 PROC
@@ -50,6 +51,12 @@ cmd_main:
         CALL str_cmp
         CP 0
         JR Z, _mon
+        ; peek command
+        LD IX, LineBuff
+        LD IY, Peek
+        CALL str_cmp
+        CP 0
+        JR Z, _peek
         ; unknown command
         LD IX, UnknownCmd
         CALL lcd_wriStr
@@ -68,6 +75,11 @@ _echo:
         PUSH HL
         POP IX
         CALL lcd_wriStr
+        JP _wrap
+_peek:
+        PUSH HL
+        POP IX
+        CALL mon_peek
         JP _wrap
 _rnd:
         CALL rnd
