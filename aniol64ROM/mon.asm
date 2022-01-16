@@ -448,8 +448,33 @@ mon_peek:
         CALL mon_printByteA
         RET
 _parseError:
-        CALL lcd_gotoLn4
         LD IX, InvAddr
+        CALL lcd_wriStr
+        RET
+ENDP
+
+PROC
+mon_poke:
+        CALL str_tok        ; address now in a string pointe to by IX, value in a string pointed to by HL
+        PUSH HL             ; copying the value string
+        POP IY              ; to IY for safekeeping
+        CALL parseDByte     ; assuming parsing is OK, address is now in HL
+        CP 0
+        JR NZ, _addrError
+        PUSH IY             ; transferring the value string
+        POP IX              ; to IX
+        CALL parseByte
+        CP 0
+        JR NZ, _valError
+        LD A, B
+        LD (HL), A
+        RET
+_addrError:
+        LD IX, InvAddr
+        CALL lcd_wriStr
+        RET
+_valError:
+        LD IX, InvVal
         CALL lcd_wriStr
         RET
 ENDP

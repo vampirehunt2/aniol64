@@ -14,6 +14,7 @@ Reset: defb "rst", 0
 Echo: defb "echo", 0
 Rnd: defb "rnd", 0
 Peek: defb "peek", 0
+Poke: defb "poke", 0
 UnknownCmd: defb "Unknown cmd", 0
 
 PROC
@@ -57,6 +58,12 @@ cmd_main:
         CALL str_cmp
         CP 0
         JR Z, _peek
+        ; poke command
+        LD IX, LineBuff
+        LD IY, Poke
+        CALL str_cmp
+        CP 0
+        JR Z, _poke
         ; unknown command
         LD IX, UnknownCmd
         CALL lcd_wriStr
@@ -81,6 +88,11 @@ _peek:
         POP IX
         CALL mon_peek
         JP _wrap
+_poke:
+        PUSH HL
+        POP IX
+        CALL mon_poke
+        JP cmd_main
 _rnd:
         CALL rnd
         CALL byte2asc
