@@ -7,8 +7,10 @@
 ;
 ;----------------------------------------------------
 
+BZR_PORT equ 10111111b  ; buzzer is activated by A6
+
 bzr_beep:
-        LD C, 01111111b ; buzzer is activated by A7
+        LD C, BZR_PORT
         LD A, 0FFh
         OUT (C), A
         LD A, 20 ; delay 200ms
@@ -18,7 +20,7 @@ bzr_beep:
         RET
 
 bzr_click:
-        LD C, 01111111b ; buzzer is activated by A7
+        LD C, BZR_PORT
         LD A, 0FFh
         OUT (C), A
         CALL delay37us
