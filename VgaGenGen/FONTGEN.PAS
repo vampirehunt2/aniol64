@@ -2,7 +2,8 @@ program FontGen;
 
 uses crt,
      graph,
-     dos;
+     dos,
+     Font8x8;
 
 const RASTER_SIZE = 256;
       CELL_SIZE = 32;
@@ -12,7 +13,6 @@ const RASTER_SIZE = 256;
       MENU_AREA_Y = 300;
 
 var gd, gm: integer;
-    font: array[0..127, 0..7] of byte;
     curX, curY: word;
     showCursor: boolean;
     k, currChar: char;
@@ -49,8 +49,8 @@ var b, d, mask: byte;
 begin
 b := byte(ch);
 d := font[b, y];
-mask := 1;
-mask := mask shl x;
+mask := 128;
+mask := mask shr x;
 d := d and mask;
 getCellForChar := d > 0;
 end;
@@ -65,8 +65,8 @@ var b, d, mask: byte;
 begin
 b := byte(currChar);
 d := font[b, y];
-mask := 1;
-mask := mask shl x;
+mask := 128;
+mask := mask shr x;
 d := d or mask;
 font[b, y] := d;
 end;
@@ -76,8 +76,8 @@ var b, d, mask: byte;
 begin
 b := byte(currChar);
 d := font[b, y];
-mask := 1;
-mask := mask shl x;
+mask := 128;
+mask := mask shr x;
 mask := not mask;
 d := d and mask;
 font[b, y] := d;
@@ -218,33 +218,6 @@ for c := 0 to 127 do
         font[c, l] := 0;
 end;
 
-procedure save(path: string);
-var f: file of byte;
-    c, l: byte;
-begin
-assign(f, path);
-rewrite(f);
-for c := 0 to 127 do
-    for l := 0 to 7 do
-        write(f, font[c, l]);
-close(f);
-end;
-
-procedure load(path: string);
-var f: file of byte;
-    c, l, d: byte;
-begin
-assign(f, path);
-reset(f);
-for c := 0 to 127 do
-    for l := 0 to 7 do
-        begin
-        read(f, d);
-        font[c, l] := d;
-        end;
-close(f);
-end;
-
 procedure cleanMenu;
 begin
 setFillStyle(SolidFill, black);
@@ -256,7 +229,7 @@ var filename: string;
 begin
 printMenu('Enter filename');
 readLn(filename);
-save(filename);
+saveFont8x8(filename);
 printCurrentChar;
 end;
 
@@ -266,7 +239,7 @@ begin
 printMenu('Enter filename');
 goToXy(2, 21);
 readLn(filename);
-load(filename);
+loadFont8x8(filename);
 paintAllFonts;
 end;
 

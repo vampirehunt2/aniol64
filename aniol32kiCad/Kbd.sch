@@ -496,17 +496,6 @@ F 3 "" H 3850 3250 50  0001 C CNN
 	1    3850 3250
 	1    0    0    -1  
 $EndComp
-$Comp
-L power:GND #PWR023
-U 1 1 61B48E69
-P 3300 3550
-F 0 "#PWR023" H 3300 3300 50  0001 C CNN
-F 1 "GND" H 3305 3377 50  0000 C CNN
-F 2 "" H 3300 3550 50  0001 C CNN
-F 3 "" H 3300 3550 50  0001 C CNN
-	1    3300 3550
-	1    0    0    -1  
-$EndComp
 Text GLabel 4050 5350 3    50   Input ~ 0
 R1
 Text GLabel 3950 5350 3    50   Input ~ 0
@@ -1067,4 +1056,21 @@ Wire Wire Line
 	6700 3700 6700 3600
 Wire Wire Line
 	6800 3800 6700 3800
+$Comp
+L power:+5V #PWR?
+U 1 1 61EA6585
+P 3600 3800
+F 0 "#PWR?" H 3600 3650 50  0001 C CNN
+F 1 "+5V" H 3615 3973 50  0000 C CNN
+F 2 "" H 3600 3800 50  0001 C CNN
+F 3 "" H 3600 3800 50  0001 C CNN
+	1    3600 3800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3600 3800 3600 3950
+Wire Wire Line
+	3600 3950 3300 3950
+Wire Wire Line
+	3300 3950 3300 3550
 $EndSCHEMATC
