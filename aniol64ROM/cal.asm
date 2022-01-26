@@ -71,34 +71,49 @@ cal_eval:
         RET
 ENDP
 
+; evaluates an expression that does not contain parantheses
+; start - index of the first byte of the first token of the expression
+;   in the tokens table
+; stop - index of the first byte of the last token of the expression
+;   in the tokens table
 PROC
+db "cal_eval_simple"
 cal_eval_simple:
-        LD IX, tokens     ; initialise the data
+; save state
+        PUSH IX
+        PUSH BC
+; initialise the data
+        LD IX, tokens    ; point IX to the beginning of the tokens table
         LD B, 0
         LD A, (start)
         LD (cti), A       ; point cti to the start index of the expression
         LD C, A
         ADD IX, BC        ; point IX to the first byte of the first token
         LD A, (stop)
-        LD B, A         ; from now on the stop variable is stored in B
+        LD B, A           ; from now on the stop variable is stored in B
 _loop:
         LD A, (IX)        ; load the first byte of the current token
         CP ASTERISK
-        CALL Z, cal_mul
-        CP SLASH
+        CALL Z, cal_mul    ; do multiplication and division first...
+        CP SLASH           ; ...to maintain operator priority
         CALL Z, cal_div
         LD A, (cti)
         CP B
-        JP Z, _end
-        INC IX  ; move two bytes to the next token
+        JP Z, _end      ; if reached the end of the expression, exit
+        INC IX          ; else move two bytes over, to the next token
         INC IX
         INC A
         INC A
         LD (cti), A
+        JP _loop
 _end:
+        POP BC
+        POP IX
         RET
 ENDP
 
+; prepares operands for a binary arithmetic operation
+; by putting the first one in B and the second one in C
 cal_prep_operands:
         PUSH IX
         DEC IX  ; second byte of the previous token
@@ -113,6 +128,38 @@ cal_prep_operands:
         POP IX
         RET
 
+PROC
+cal_shift_expr:
+; IX at this point contains address of the first byte of the operator token
+        PUSH IX
+        PUSH AF
+        DEC IX
+        DEC IX  ; point IX to the first byte of the first operand
+        LD A, NUMBER
+        LD (IX), A  ; store the token type indicating number
+        POP AF  ; A now contains the result of the previously executed arithmetic operation
+        INC IX
+        LD (IX), A  ; store the number value
+        INC IX ; now pointing IX to the first byte of the first token that needs to be overwritten
+_loop:
+        LD A, (IX + 4) ; skipping over 2 tokens - the operator and the second operand
+        LD (IX), A
+        CP EOL      ; check if we've reached the end of the expression
+        INC IX
+        INC IX
+        JR NZ, _loop   ; if not, proceed on
+_end:
+        LD A, (stop)  ; after the shift the expression is now two tokens shorter...
+        DEC A         ; ...because we've replaced two operands and one operator...
+        DEC A         ; ...with a single result, so decreasing stop by 4
+        DEC A
+        DEC A
+        LD (stop), A
+        POP IX
+        RET
+ENDP
+
+;
 PROC
 cal_mul:
         AND A ; clear carry
@@ -132,6 +179,7 @@ _zero:
         POP AF  ; if first operand is 0 then return 0 in A
         LD A, 0
 _end:
+        CALL cal_shift_expr
         POP BC
         RET
 ENDP
@@ -151,6 +199,7 @@ _loop:
         JR _loop
 _end:
         LD A, B
+        CALL cal_shift_expr
         POP BC
         RET
 ENDP
@@ -161,6 +210,7 @@ cal_add:
         AND A ; clear carry
         LD A, B
         ADD A, C
+        CALL cal_shift_expr
         POP BC
         RET
 
@@ -169,6 +219,7 @@ cal_sub:
         CALL cal_prep_operands
         LD A, B
         SUB C
+        CALL cal_shift_expr
         POP BC
         RET
 
