@@ -44,7 +44,7 @@ for textLine := 0 to 29 do
            charCount := min(VISIBLE_CHARS, length(line));
            for i := 1 to CHAR_PER_LINE do
                begin
-               if i < charCount then
+               if i <= charCount then
                   begin
                   c := line[i];
                   b := byte(c);

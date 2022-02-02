@@ -1,0 +1,41 @@
+def
+byte
+int
+ptr
+dim
+prc
+fun
+ret
+if
+else
+fi
+end
+for 
+to
+next
+while
+loop
+
+
+def WIDTH 40
+def HEIGHT 30
+def SIZE 10
+
+var i, d
+
+dim tab SIZE
+
+fun findIdx x
+for i<-0 to SIZE
+	if tab[i]=x ret i
+end
+
+prc init
+i<-0
+while i<=SIZE
+	if i%2=0 
+		tab[i]=i
+	else
+		tab[i]=i-1
+	endif
+end

@@ -55,7 +55,7 @@ F 1 "CXO_DIP14" H 2906 2295 50  0000 R CNN
 F 2 "Oscillator:Oscillator_DIP-14" H 3700 1900 50  0001 C CNN
 F 3 "http://cdn-reichelt.de/documents/datenblatt/B400/OSZI.pdf" H 3150 2250 50  0001 C CNN
 	1    3250 2250
-	-1   0    0    1   
+	-1   0    0    -1  
 $EndComp
 Wire Wire Line
 	2950 2250 2300 2250
@@ -302,8 +302,8 @@ $Comp
 L 74xx:74LS165 U?
 U 1 1 61EC8A7A
 P 6750 4150
-F 0 "U?" H 6750 5231 50  0000 C CNN
-F 1 "74LS165" H 6750 5140 50  0000 C CNN
+F 0 "U?" H 6750 4450 50  0000 C CNN
+F 1 "74LS165" V 6750 4150 50  0000 C CNN
 F 2 "" H 6750 4150 50  0001 C CNN
 F 3 "https://www.ti.com/lit/ds/symlink/sn74ls165a.pdf" H 6750 4150 50  0001 C CNN
 	1    6750 4150
@@ -454,44 +454,38 @@ Wire Wire Line
 	2800 5800 2100 5800
 Text GLabel 2800 5800 2    50   Input ~ 0
 TestScreenVideo
-Wire Bus Line
-	5550 1850 5850 1850
-Wire Bus Line
-	5850 1850 5850 3650
-Wire Bus Line
-	5850 3650 6050 3650
 Entry Wire Line
-	5550 1050 5450 1150
+	6050 1050 5950 1150
 Entry Wire Line
-	5550 1150 5450 1250
+	6050 1150 5950 1250
 Entry Wire Line
-	5550 1250 5450 1350
+	6050 1250 5950 1350
 Entry Wire Line
-	5550 1350 5450 1450
+	6050 1350 5950 1450
 Entry Wire Line
-	5550 1450 5450 1550
+	6050 1450 5950 1550
 Entry Wire Line
-	5550 1550 5450 1650
+	6050 1550 5950 1650
 Entry Wire Line
-	5550 1650 5450 1750
+	6050 1650 5950 1750
 Entry Wire Line
-	5550 1750 5450 1850
+	6050 1750 5950 1850
 Wire Wire Line
-	5450 1850 5350 1850
+	5950 1850 5850 1850
 Wire Wire Line
-	5450 1750 5350 1750
+	5950 1750 5850 1750
 Wire Wire Line
-	5450 1650 5350 1650
+	5950 1650 5850 1650
 Wire Wire Line
-	5450 1550 5350 1550
+	5950 1550 5850 1550
 Wire Wire Line
-	5450 1450 5350 1450
+	5950 1450 5850 1450
 Wire Wire Line
-	5450 1350 5350 1350
+	5950 1350 5850 1350
 Wire Wire Line
-	5450 1250 5350 1250
+	5950 1250 5850 1250
 Wire Wire Line
-	5450 1150 5350 1150
+	5950 1150 5850 1150
 Entry Wire Line
 	6050 4450 6150 4350
 Entry Wire Line
@@ -574,12 +568,230 @@ Entry Wire Line
 	950  4450 1050 4550
 Wire Wire Line
 	4200 4550 1050 4550
-Wire Bus Line
-	6050 3650 6050 4450
-Wire Bus Line
-	5550 1050 5550 1850
-Wire Bus Line
-	950  1000 950  6700
 Text Label 1050 4550 0    50   ~ 0
 h0
+$Comp
+L Memory_EEPROM:28C256 U?
+U 1 1 61FAAC9C
+P 5450 2050
+F 0 "U?" H 5450 2350 50  0000 C CNN
+F 1 "28C256" V 5450 2050 50  0000 C CNN
+F 2 "" H 5450 2050 50  0001 C CNN
+F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/doc0006.pdf" H 5450 2050 50  0001 C CNN
+	1    5450 2050
+	1    0    0    -1  
+$EndComp
+Text GLabel 7250 3550 2    50   Input ~ 0
+Video
+NoConn ~ 7250 3650
+NoConn ~ 6250 3550
+Text GLabel 1300 2450 3    50   Input ~ 0
+PixelClock
+Wire Wire Line
+	1300 2450 1300 2250
+Text GLabel 6250 4750 0    50   Input ~ 0
+PixelClock
+Wire Bus Line
+	950  700  4700 700 
+Wire Wire Line
+	5050 3150 5450 3150
+Wire Wire Line
+	5050 2950 5050 3150
+$Comp
+L power:GND #PWR?
+U 1 1 61FC32A6
+P 5450 3150
+F 0 "#PWR?" H 5450 2900 50  0001 C CNN
+F 1 "GND" H 5455 2977 50  0000 C CNN
+F 2 "" H 5450 3150 50  0001 C CNN
+F 3 "" H 5450 3150 50  0001 C CNN
+	1    5450 3150
+	1    0    0    -1  
+$EndComp
+Connection ~ 5450 3150
+Connection ~ 5050 2950
+Wire Wire Line
+	5050 2850 5050 2950
+$Comp
+L power:+5V #PWR?
+U 1 1 61FC442F
+P 5450 950
+F 0 "#PWR?" H 5450 800 50  0001 C CNN
+F 1 "+5V" H 5465 1123 50  0000 C CNN
+F 2 "" H 5450 950 50  0001 C CNN
+F 3 "" H 5450 950 50  0001 C CNN
+	1    5450 950 
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR?
+U 1 1 61FC4AAE
+P 4950 2750
+F 0 "#PWR?" H 4950 2600 50  0001 C CNN
+F 1 "+5V" H 4850 2750 50  0000 C CNN
+F 2 "" H 4950 2750 50  0001 C CNN
+F 3 "" H 4950 2750 50  0001 C CNN
+	1    4950 2750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5050 2750 4950 2750
+Entry Wire Line
+	950  1850 1050 1950
+Entry Wire Line
+	950  1950 1050 2050
+Entry Wire Line
+	950  2050 1050 2150
+Wire Wire Line
+	1300 2150 1050 2150
+Wire Wire Line
+	1300 2050 1050 2050
+Wire Wire Line
+	1300 1950 1050 1950
+Entry Wire Line
+	4700 1050 4800 1150
+Entry Wire Line
+	4700 1150 4800 1250
+Entry Wire Line
+	4700 1250 4800 1350
+Entry Wire Line
+	4700 1350 4800 1450
+Entry Wire Line
+	4700 1450 4800 1550
+Entry Wire Line
+	4700 1550 4800 1650
+Entry Wire Line
+	4700 1650 4800 1750
+Entry Wire Line
+	4700 1750 4800 1850
+Entry Wire Line
+	4700 1850 4800 1950
+Entry Wire Line
+	4700 1950 4800 2050
+Entry Wire Line
+	4700 2050 4800 2150
+Entry Wire Line
+	4700 2150 4800 2250
+Entry Wire Line
+	4700 2250 4800 2350
+Entry Wire Line
+	4700 2350 4800 2450
+Wire Wire Line
+	5050 2450 4800 2450
+Wire Wire Line
+	5050 2350 4800 2350
+Wire Wire Line
+	5050 2250 4800 2250
+Wire Wire Line
+	5050 2150 4800 2150
+Wire Wire Line
+	5050 2050 4800 2050
+Wire Wire Line
+	5050 1950 4800 1950
+Wire Wire Line
+	5050 1850 4800 1850
+Wire Wire Line
+	5050 1750 4800 1750
+Wire Wire Line
+	5050 1650 4800 1650
+Wire Wire Line
+	5050 1550 4800 1550
+Wire Wire Line
+	5050 1450 4800 1450
+Wire Wire Line
+	5050 1350 4800 1350
+Wire Wire Line
+	5050 1250 4800 1250
+Wire Wire Line
+	5050 1150 4800 1150
+Text Label 1150 1950 0    50   ~ 0
+Px2
+Text Label 1150 2050 0    50   ~ 0
+Px1
+Text Label 1150 2150 0    50   ~ 0
+Px0
+Text Label 4850 1150 0    50   ~ 0
+Px0
+Text Label 4850 1250 0    50   ~ 0
+Px1
+Text Label 4850 1350 0    50   ~ 0
+Px2
+Text Label 4850 1450 0    50   ~ 0
+h0
+Text Label 4850 1550 0    50   ~ 0
+h1
+Text Label 4850 1650 0    50   ~ 0
+h2
+Text Label 4850 1750 0    50   ~ 0
+h3
+Text Label 4850 1850 0    50   ~ 0
+h4
+Text Label 4850 1950 0    50   ~ 0
+h5
+Text Label 4850 2050 0    50   ~ 0
+v1
+Text Label 4850 2150 0    50   ~ 0
+v2
+Text Label 4850 2250 0    50   ~ 0
+v3
+Text Label 4850 2350 0    50   ~ 0
+v4
+Text Label 4850 2450 0    50   ~ 0
+v5
+NoConn ~ 5050 2550
+NoConn ~ 1300 3100
+NoConn ~ 1300 3200
+NoConn ~ 1300 1150
+NoConn ~ 1300 1250
+Wire Bus Line
+	6050 1050 6050 4450
+Wire Bus Line
+	4700 700  4700 2550
+Wire Bus Line
+	950  700  950  6700
+$Comp
+L power:GND #PWR?
+U 1 1 62070222
+P 3250 2550
+F 0 "#PWR?" H 3250 2300 50  0001 C CNN
+F 1 "GND" H 3255 2377 50  0000 C CNN
+F 2 "" H 3250 2550 50  0001 C CNN
+F 3 "" H 3250 2550 50  0001 C CNN
+	1    3250 2550
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR?
+U 1 1 6207080C
+P 3250 1950
+F 0 "#PWR?" H 3250 1800 50  0001 C CNN
+F 1 "+5V" H 3265 2123 50  0000 C CNN
+F 2 "" H 3250 1950 50  0001 C CNN
+F 3 "" H 3250 1950 50  0001 C CNN
+	1    3250 1950
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 62070E16
+P 6750 5150
+F 0 "#PWR?" H 6750 4900 50  0001 C CNN
+F 1 "GND" H 6755 4977 50  0000 C CNN
+F 2 "" H 6750 5150 50  0001 C CNN
+F 3 "" H 6750 5150 50  0001 C CNN
+	1    6750 5150
+	1    0    0    -1  
+$EndComp
+Connection ~ 6750 5150
+$Comp
+L power:+5V #PWR?
+U 1 1 620715ED
+P 6750 3250
+F 0 "#PWR?" H 6750 3100 50  0001 C CNN
+F 1 "+5V" H 6765 3423 50  0000 C CNN
+F 2 "" H 6750 3250 50  0001 C CNN
+F 3 "" H 6750 3250 50  0001 C CNN
+	1    6750 3250
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
