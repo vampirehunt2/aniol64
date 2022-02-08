@@ -33,7 +33,9 @@ KbdBuff equ 4012h         ; a 1-byte buffer
 LcdBuff equ 4020h
 NmiCount equ 4035h         ; reserving 4 bytes for the counter
 MonCurrAddr equ 4036h
+Random equ 4038h
 LineBuff equ 4100h
+PROGRAM_DATA equ 4200h
 ENDIF
 
 IF version=640
