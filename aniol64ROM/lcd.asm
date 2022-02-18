@@ -9,11 +9,20 @@
 ; Note: only the 20x4 charater display is supported
 ;----------------------------------------------------
 
+IF version=640
+; LCD display sits in the expansion port and is selected with A7
+LCD_CMD_WR equ 01111100b ; write command port of the LCD
+LCD_DAT_WR equ 01111101b ; write data port of the LCD
+LCD_CMD_RD equ 01111110b ; read command port of the LCD
+LCD_DAT_RD equ 01111111b ; read data port of the LCD
+ELSE
 ; LCD display is selected with A3
 LCD_CMD_WR equ 11110100b ; write command port of the LCD
 LCD_DAT_WR equ 11110101b ; write data port of the LCD
 LCD_CMD_RD equ 11110110b ; read command port of the LCD
 LCD_DAT_RD equ 11110111b ; read data port of the LCD
+ENDIF
+
 
 BUSY_MASK  equ 10000000b
 DDRAM_MASK equ 01111111b

@@ -1,0 +1,146 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 2 2
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L 74xx:74LS14 U?
+U 1 1 621248B2
+P 2000 4750
+F 0 "U?" H 2000 5067 50  0000 C CNN
+F 1 "74LS14" H 2000 4976 50  0000 C CNN
+F 2 "" H 2000 4750 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS14" H 2000 4750 50  0001 C CNN
+	1    2000 4750
+	0    -1   -1   0   
+$EndComp
+$Comp
+L 74xx:74LS14 U?
+U 2 1 621248B8
+P 2600 4750
+F 0 "U?" H 2600 5067 50  0000 C CNN
+F 1 "74LS14" H 2600 4976 50  0000 C CNN
+F 2 "" H 2600 4750 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS14" H 2600 4750 50  0001 C CNN
+	2    2600 4750
+	0    -1   -1   0   
+$EndComp
+$Comp
+L 74xx:74LS14 U?
+U 3 1 621248BE
+P 3550 1700
+F 0 "U?" H 3550 2017 50  0000 C CNN
+F 1 "74LS14" H 3550 1926 50  0000 C CNN
+F 2 "" H 3550 1700 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS14" H 3550 1700 50  0001 C CNN
+	3    3550 1700
+	0    -1   -1   0   
+$EndComp
+$Comp
+L 74xx:74LS08 U?
+U 1 1 621248C4
+P 2300 3800
+F 0 "U?" H 2300 4125 50  0000 C CNN
+F 1 "74LS08" H 2300 4034 50  0000 C CNN
+F 2 "" H 2300 3800 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS08" H 2300 3800 50  0001 C CNN
+	1    2300 3800
+	0    -1   -1   0   
+$EndComp
+$Comp
+L 74xx:74LS08 U?
+U 2 1 621248CA
+P 3050 3800
+F 0 "U?" H 3050 4125 50  0000 C CNN
+F 1 "74LS08" H 3050 4034 50  0000 C CNN
+F 2 "" H 3050 3800 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS08" H 3050 3800 50  0001 C CNN
+	2    3050 3800
+	0    -1   -1   0   
+$EndComp
+$Comp
+L 74xx:74LS08 U?
+U 3 1 621248D0
+P 2650 3150
+F 0 "U?" H 2650 3475 50  0000 C CNN
+F 1 "74LS08" H 2650 3384 50  0000 C CNN
+F 2 "" H 2650 3150 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS08" H 2650 3150 50  0001 C CNN
+	3    2650 3150
+	0    -1   -1   0   
+$EndComp
+$Comp
+L 74xx:74LS08 U?
+U 4 1 621248D6
+P 2750 2400
+F 0 "U?" H 2750 2725 50  0000 C CNN
+F 1 "74LS08" H 2750 2634 50  0000 C CNN
+F 2 "" H 2750 2400 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS08" H 2750 2400 50  0001 C CNN
+	4    2750 2400
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	2550 3450 2300 3450
+Wire Wire Line
+	2300 3450 2300 3500
+Wire Wire Line
+	2750 3450 3050 3450
+Wire Wire Line
+	3050 3450 3050 3500
+Wire Wire Line
+	2200 4100 2200 4250
+Wire Wire Line
+	2200 4250 2000 4250
+Wire Wire Line
+	2000 4250 2000 4450
+Wire Wire Line
+	2600 4450 2600 4250
+Wire Wire Line
+	2600 4250 2400 4250
+Wire Wire Line
+	2400 4250 2400 4100
+Wire Wire Line
+	2750 2100 3550 2100
+Wire Wire Line
+	3550 2100 3550 2000
+Wire Wire Line
+	2650 2850 2650 2700
+Text GLabel 3550 1400 1    50   Input ~ 0
+VRAMSEL
+Text GLabel 2750 1450 1    50   Input ~ 0
+VRAMSEL'
+Connection ~ 2750 2100
+Text GLabel 2600 5050 3    50   Input ~ 0
+A14
+Text GLabel 2000 5050 3    50   Input ~ 0
+A15
+Text GLabel 2950 5050 3    50   Input ~ 0
+A13
+Text GLabel 3150 5050 3    50   Input ~ 0
+A12
+Text GLabel 3400 5050 3    50   Input ~ 0
+A11
+Wire Wire Line
+	2950 5050 2950 4100
+Wire Wire Line
+	3150 4100 3150 5050
+Wire Wire Line
+	3400 5050 3400 2700
+Wire Wire Line
+	2850 2700 3400 2700
+Wire Wire Line
+	3550 1500 3550 1400
+Wire Wire Line
+	2750 1450 2750 2100
+$EndSCHEMATC

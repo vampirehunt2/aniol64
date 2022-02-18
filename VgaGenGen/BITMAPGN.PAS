@@ -24,8 +24,8 @@ end;
 
 begin
 {initializing files}
-inputFn := 'bitmapgn.pas'; { ParamStr(1);}
-fontFn := 'lazenby.fnt'; {ParamStr(2);}
+inputFn := 'rogue.txt'; { ParamStr(1);}
+fontFn := 'test.fnt'; {ParamStr(2);}
 writeLn('input file: ', inputFn);
 outputFn := 'bitmapgn.bin';
 assign(input, inputFn);

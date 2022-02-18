@@ -1,0 +1,280 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L 74xx:74LS08 U?
+U 1 1 620A01BB
+P 2050 3900
+F 0 "U?" V 2096 3720 50  0000 R CNN
+F 1 "74LS08" V 2005 3720 50  0000 R CNN
+F 2 "" H 2050 3900 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS08" H 2050 3900 50  0001 C CNN
+	1    2050 3900
+	0    -1   -1   0   
+$EndComp
+$Comp
+L 74xx:74LS08 U?
+U 2 1 620A21FE
+P 2850 3900
+F 0 "U?" V 2896 3720 50  0000 R CNN
+F 1 "74LS08" V 2805 3720 50  0000 R CNN
+F 2 "" H 2850 3900 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS08" H 2850 3900 50  0001 C CNN
+	2    2850 3900
+	0    -1   -1   0   
+$EndComp
+$Comp
+L 74xx:74LS08 U?
+U 3 1 620A2848
+P 2450 3050
+F 0 "U?" V 2496 2870 50  0000 R CNN
+F 1 "74LS08" V 2405 2870 50  0000 R CNN
+F 2 "" H 2450 3050 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS08" H 2450 3050 50  0001 C CNN
+	3    2450 3050
+	0    -1   -1   0   
+$EndComp
+$Comp
+L 74xx:74LS08 U?
+U 4 1 620A6EFD
+P 3200 2200
+F 0 "U?" V 3246 2020 50  0000 R CNN
+F 1 "74LS08" V 3155 2020 50  0000 R CNN
+F 2 "" H 3200 2200 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS08" H 3200 2200 50  0001 C CNN
+	4    3200 2200
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	2450 2750 2450 2500
+Wire Wire Line
+	2450 2500 3100 2500
+Wire Wire Line
+	2050 3600 2050 3350
+Wire Wire Line
+	2050 3350 2350 3350
+Wire Wire Line
+	2550 3350 2850 3350
+Wire Wire Line
+	2850 3350 2850 3600
+$Comp
+L 74xx:74LS04 U?
+U 1 1 620A8FF2
+P 1600 4850
+F 0 "U?" V 1646 4670 50  0000 R CNN
+F 1 "74LS04" V 1555 4670 50  0000 R CNN
+F 2 "" H 1600 4850 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 1600 4850 50  0001 C CNN
+	1    1600 4850
+	0    -1   -1   0   
+$EndComp
+$Comp
+L 74xx:74LS04 U?
+U 2 1 620AADA4
+P 2200 4850
+F 0 "U?" V 2246 4670 50  0000 R CNN
+F 1 "74LS04" V 2155 4670 50  0000 R CNN
+F 2 "" H 2200 4850 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 2200 4850 50  0001 C CNN
+	2    2200 4850
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	1600 4550 1600 4200
+Wire Wire Line
+	1600 4200 1950 4200
+Wire Wire Line
+	2200 4200 2150 4200
+Wire Wire Line
+	2200 4200 2200 4550
+Text GLabel 1600 5400 3    50   Input ~ 0
+A15
+Text GLabel 2200 5400 3    50   Input ~ 0
+A14
+Text GLabel 2750 5400 3    50   Input ~ 0
+A13
+Text GLabel 2950 5400 3    50   Input ~ 0
+A12
+Text GLabel 3300 5400 3    50   Input ~ 0
+A11
+Wire Wire Line
+	1600 5400 1600 5150
+Wire Wire Line
+	2200 5400 2200 5150
+Wire Wire Line
+	2750 5400 2750 4200
+Wire Wire Line
+	2950 4200 2950 5400
+Wire Wire Line
+	3300 5400 3300 2500
+Text GLabel 3200 1050 1    50   Input ~ 0
+VRAMSEL'
+$Comp
+L 74xx:74LS04 U?
+U 3 1 620AF2A3
+P 2600 1600
+F 0 "U?" V 2646 1420 50  0000 R CNN
+F 1 "74LS04" V 2555 1420 50  0000 R CNN
+F 2 "" H 2600 1600 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 2600 1600 50  0001 C CNN
+	3    2600 1600
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	3200 1050 3200 1900
+Wire Wire Line
+	3200 1900 2600 1900
+Connection ~ 3200 1900
+Text GLabel 2600 1050 1    50   Input ~ 0
+VRAMSEL
+Wire Wire Line
+	2600 1050 2600 1300
+$Comp
+L 74xx:74LS151 U?
+U 1 1 620C289C
+P 6700 3000
+F 0 "U?" H 6700 3350 50  0000 C CNN
+F 1 "74LS151" V 6700 3050 50  0000 C CNN
+F 2 "" H 6700 3000 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS151" H 6700 3000 50  0001 C CNN
+	1    6700 3000
+	1    0    0    -1  
+$EndComp
+Text GLabel 7500 2400 2    50   Input ~ 0
+VRAMSEL
+Wire Wire Line
+	7500 2400 7300 2400
+Text GLabel 7500 2500 2    50   Input ~ 0
+VRAMSEL'
+Wire Wire Line
+	7500 2500 7300 2500
+Text GLabel 5950 3700 0    50   Input ~ 0
+A15
+Wire Wire Line
+	5950 3700 6200 3700
+Text GLabel 5950 3500 0    50   Input ~ 0
+A13
+Wire Wire Line
+	5950 3500 6200 3500
+Text GLabel 5950 3400 0    50   Input ~ 0
+A12
+Wire Wire Line
+	5950 3400 6200 3400
+Text GLabel 5950 3300 0    50   Input ~ 0
+A11
+Wire Wire Line
+	5950 3300 6200 3300
+Text GLabel 5950 3100 0    50   Input ~ 0
+A14
+Wire Wire Line
+	5950 3100 6200 3100
+Wire Wire Line
+	6200 3000 6200 2900
+Wire Wire Line
+	6200 2100 6700 2100
+Connection ~ 6200 2400
+Wire Wire Line
+	6200 2400 6200 2100
+Connection ~ 6200 2500
+Wire Wire Line
+	6200 2500 6200 2400
+Connection ~ 6200 2600
+Wire Wire Line
+	6200 2600 6200 2500
+Connection ~ 6200 2700
+Wire Wire Line
+	6200 2700 6200 2600
+Connection ~ 6200 2800
+Wire Wire Line
+	6200 2800 6200 2700
+Connection ~ 6200 2900
+Wire Wire Line
+	6200 2900 6200 2800
+$Comp
+L power:+5V #PWR?
+U 1 1 620C73C7
+P 6700 2100
+F 0 "#PWR?" H 6700 1950 50  0001 C CNN
+F 1 "+5V" H 6715 2273 50  0000 C CNN
+F 2 "" H 6700 2100 50  0001 C CNN
+F 3 "" H 6700 2100 50  0001 C CNN
+	1    6700 2100
+	1    0    0    -1  
+$EndComp
+Connection ~ 6700 2100
+$Comp
+L power:GND #PWR?
+U 1 1 620C790A
+P 6700 4100
+F 0 "#PWR?" H 6700 3850 50  0001 C CNN
+F 1 "GND" H 6705 3927 50  0000 C CNN
+F 2 "" H 6700 4100 50  0001 C CNN
+F 3 "" H 6700 4100 50  0001 C CNN
+	1    6700 4100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R_Small R?
+U 1 1 620C80E8
+P 7300 2100
+F 0 "R?" H 7359 2146 50  0000 L CNN
+F 1 "R_Small" H 7359 2055 50  0000 L CNN
+F 2 "" H 7300 2100 50  0001 C CNN
+F 3 "~" H 7300 2100 50  0001 C CNN
+	1    7300 2100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R_Small R?
+U 1 1 620C8752
+P 7300 2850
+F 0 "R?" H 7359 2896 50  0000 L CNN
+F 1 "R_Small" H 7359 2805 50  0000 L CNN
+F 2 "" H 7300 2850 50  0001 C CNN
+F 3 "~" H 7300 2850 50  0001 C CNN
+	1    7300 2850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7300 2750 7300 2500
+Connection ~ 7300 2500
+Wire Wire Line
+	7300 2500 7200 2500
+Wire Wire Line
+	7300 2400 7300 2200
+Connection ~ 7300 2400
+Wire Wire Line
+	7300 2400 7200 2400
+$Comp
+L power:+5V #PWR?
+U 1 1 620C9C2E
+P 7300 2000
+F 0 "#PWR?" H 7300 1850 50  0001 C CNN
+F 1 "+5V" H 7315 2173 50  0000 C CNN
+F 2 "" H 7300 2000 50  0001 C CNN
+F 3 "" H 7300 2000 50  0001 C CNN
+	1    7300 2000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6700 4100 6700 4050
+Wire Wire Line
+	6700 4050 7300 4050
+Wire Wire Line
+	7300 4050 7300 2950
+Connection ~ 6700 4050
+Wire Wire Line
+	6700 4050 6700 4000
+$EndSCHEMATC
