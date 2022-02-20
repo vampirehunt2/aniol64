@@ -1010,17 +1010,6 @@ NoConn ~ 9650 2200
 NoConn ~ 9650 2300
 NoConn ~ 9650 2400
 NoConn ~ 9650 2500
-$Comp
-L Connector_Generic:Conn_02x08_Counter_Clockwise SERIAL1
-U 1 1 61CEB7DC
-P 10650 2350
-F 0 "SERIAL1" V 10700 2300 50  0000 C CNN
-F 1 "Conn_02x08" H 10700 2776 50  0000 C CNN
-F 2 "Connector_PinSocket_2.54mm:PinSocket_2x08_P2.54mm_Horizontal" H 10650 2350 50  0001 C CNN
-F 3 "~" H 10650 2350 50  0001 C CNN
-	1    10650 2350
-	0    1    1    0   
-$EndComp
 Wire Wire Line
 	9650 2850 10350 2850
 Wire Wire Line
@@ -1152,4 +1141,15 @@ NoConn ~ 9650 2050
 Text GLabel 6100 3350 0    50   Input ~ 0
 MEMRQ
 NoConn ~ 4300 3100
+$Comp
+L Connector_Generic:Conn_02x08_Odd_Even J3
+U 1 1 621728BB
+P 10650 2350
+F 0 "J3" V 10654 2730 50  0000 L CNN
+F 1 "Conn_02x08_Odd_Even" V 10745 2730 50  0000 L CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_2x08_P2.54mm_Horizontal" H 10650 2350 50  0001 C CNN
+F 3 "~" H 10650 2350 50  0001 C CNN
+	1    10650 2350
+	0    1    1    0   
+$EndComp
 $EndSCHEMATC
