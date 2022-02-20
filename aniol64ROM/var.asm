@@ -34,6 +34,7 @@ LcdBuff equ 4020h
 NmiCount equ 4035h         ; reserving 4 bytes for the counter
 MonCurrAddr equ 4036h
 Random equ 4038h
+Banks equ 4039h
 LineBuff equ 4100h
 PROGRAM_DATA equ 4200h
 ENDIF
