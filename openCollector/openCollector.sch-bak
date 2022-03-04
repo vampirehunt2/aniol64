@@ -1,0 +1,170 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+Text GLabel 2400 1650 0    50   Input ~ 0
+7132-totemPole
+Text GLabel 3450 1650 2    50   Input ~ 0
+DART-openDrain
+Text GLabel 3100 2150 3    50   Input ~ 0
+INT
+$Comp
+L Device:D_Schottky D?
+U 1 1 62168F70
+P 2800 1650
+F 0 "D?" H 2800 1867 50  0000 C CNN
+F 1 "D_Schottky" H 2800 1776 50  0000 C CNN
+F 2 "" H 2800 1650 50  0001 C CNN
+F 3 "~" H 2800 1650 50  0001 C CNN
+	1    2800 1650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2650 1650 2400 1650
+$Comp
+L Device:R_Small R?
+U 1 1 621697D7
+P 3100 1300
+F 0 "R?" H 3159 1346 50  0000 L CNN
+F 1 "R_Small" H 3159 1255 50  0000 L CNN
+F 2 "" H 3100 1300 50  0001 C CNN
+F 3 "~" H 3100 1300 50  0001 C CNN
+	1    3100 1300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3100 1400 3100 1650
+Wire Wire Line
+	3100 1650 2950 1650
+Wire Wire Line
+	3450 1650 3100 1650
+Connection ~ 3100 1650
+Wire Wire Line
+	3100 2150 3100 1650
+$Comp
+L power:+5V #PWR?
+U 1 1 62169E9B
+P 3100 1000
+F 0 "#PWR?" H 3100 850 50  0001 C CNN
+F 1 "+5V" H 3115 1173 50  0000 C CNN
+F 2 "" H 3100 1000 50  0001 C CNN
+F 3 "" H 3100 1000 50  0001 C CNN
+	1    3100 1000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3100 1000 3100 1200
+Text GLabel 5350 1700 0    50   Input ~ 0
+7132-totemPole
+Text GLabel 6400 1700 2    50   Input ~ 0
+DART-openDrain
+Text GLabel 6150 2150 3    50   Input ~ 0
+INT
+$Comp
+L Device:R_Small R?
+U 1 1 6216ABDD
+P 5850 1300
+F 0 "R?" H 5909 1346 50  0000 L CNN
+F 1 "R_Small" H 5909 1255 50  0000 L CNN
+F 2 "" H 5850 1300 50  0001 C CNN
+F 3 "~" H 5850 1300 50  0001 C CNN
+	1    5850 1300
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR?
+U 1 1 6216ABE8
+P 5850 1000
+F 0 "#PWR?" H 5850 850 50  0001 C CNN
+F 1 "+5V" H 5865 1173 50  0000 C CNN
+F 2 "" H 5850 1000 50  0001 C CNN
+F 3 "" H 5850 1000 50  0001 C CNN
+	1    5850 1000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5850 1000 5850 1200
+$Comp
+L Device:Q_NPN_BCE Q?
+U 1 1 6216ADFE
+P 5850 1600
+F 0 "Q?" V 6085 1600 50  0000 C CNN
+F 1 "Q_NPN_BCE" V 6176 1600 50  0000 C CNN
+F 2 "" H 6050 1700 50  0001 C CNN
+F 3 "~" H 5850 1600 50  0001 C CNN
+	1    5850 1600
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	5350 1700 5650 1700
+Wire Wire Line
+	6050 1700 6150 1700
+Wire Wire Line
+	6150 2150 6150 1700
+Connection ~ 6150 1700
+Wire Wire Line
+	6150 1700 6400 1700
+Text GLabel 1850 3600 0    50   Input ~ 0
+7132-totemPole
+Text GLabel 3950 3350 2    50   Input ~ 0
+DART-openDrain
+Text GLabel 3600 4200 3    50   Input ~ 0
+INT
+Wire Wire Line
+	2100 3600 1850 3600
+$Comp
+L Device:Q_NPN_BCE Q?
+U 1 1 6216C5CA
+P 2900 3600
+F 0 "Q?" H 3091 3646 50  0000 L CNN
+F 1 "Q_NPN_BCE" H 3091 3555 50  0000 L CNN
+F 2 "" H 3100 3700 50  0001 C CNN
+F 3 "~" H 2900 3600 50  0001 C CNN
+	1    2900 3600
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74LS14 U?
+U 1 1 6216CC63
+P 2400 3600
+F 0 "U?" H 2400 3917 50  0000 C CNN
+F 1 "74LS14" H 2400 3826 50  0000 C CNN
+F 2 "" H 2400 3600 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS14" H 2400 3600 50  0001 C CNN
+	1    2400 3600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3950 3350 3600 3350
+Wire Wire Line
+	3000 3350 3000 3400
+Wire Wire Line
+	3600 4200 3600 3350
+Connection ~ 3600 3350
+Wire Wire Line
+	3600 3350 3000 3350
+$Comp
+L power:GND #PWR?
+U 1 1 6216D8DC
+P 3000 4200
+F 0 "#PWR?" H 3000 3950 50  0001 C CNN
+F 1 "GND" H 3005 4027 50  0000 C CNN
+F 2 "" H 3000 4200 50  0001 C CNN
+F 3 "" H 3000 4200 50  0001 C CNN
+	1    3000 4200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3000 4200 3000 3800
+$EndSCHEMATC

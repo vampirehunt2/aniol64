@@ -1,4 +1,4 @@
-update=2/20/2022 9:35:43 AM
+update=2/23/2022 11:21:58 AM
 version=1
 last_client=kicad
 [general]
@@ -25,7 +25,7 @@ ERC_TestSimilarLabels=1
 [pcbnew]
 version=1
 PageLayoutDescrFile=
-LastNetListRead=
+LastNetListRead=aniol32.net
 CopperLayerCount=2
 BoardThickness=1.6
 AllowMicroVias=0
@@ -70,7 +70,7 @@ OthersTextUpright=1
 SolderMaskClearance=0
 SolderMaskMinWidth=0
 SolderPasteClearance=0
-SolderPasteRatio=-0
+SolderPasteRatio=0
 [pcbnew/Layer.F.Cu]
 Name=F.Cu
 Type=0

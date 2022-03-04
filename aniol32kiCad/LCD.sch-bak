@@ -13,37 +13,10 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
-$Comp
-L 74xx:74LS32 U1
-U 3 1 61ADA722
-P 1850 1250
-F 0 "U1" H 1850 1575 50  0000 C CNN
-F 1 "74LS32" H 1850 1484 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm_Socket" H 1850 1250 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 1850 1250 50  0001 C CNN
-	3    1850 1250
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	2150 1250 2150 1500
-Text GLabel 1350 1150 0    50   Input ~ 0
+Text GLabel 1950 1500 0    50   Input ~ 0
 IORQ
-Wire Wire Line
-	1350 1150 1550 1150
-Text GLabel 1300 1350 0    50   Input ~ 0
+Text GLabel 1900 1700 0    50   Input ~ 0
 A3
-Wire Wire Line
-	1300 1350 1550 1350
-Wire Wire Line
-	2150 1900 2150 1700
-Text GLabel 1300 1800 0    50   Input ~ 0
-RD
-Wire Wire Line
-	1300 1800 1550 1800
-Text GLabel 1300 2000 0    50   Input ~ 0
-WR
-Wire Wire Line
-	1300 2000 1550 2000
 Text GLabel 3350 1600 2    50   Input ~ 0
 LCDE
 $Comp
@@ -165,36 +138,23 @@ A0
 Text GLabel 2450 3150 3    50   Input ~ 0
 A1
 $Comp
-L 74xx:74LS32 U1
-U 4 1 61CF0CC8
-P 2450 1600
-F 0 "U1" H 2450 1925 50  0000 C CNN
-F 1 "74LS32" H 2450 1834 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm_Socket" H 2450 1600 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 2450 1600 50  0001 C CNN
-	4    2450 1600
+L 74xx:74LS02 U6
+U 1 1 621E8D35
+P 2700 1600
+F 0 "U6" H 2700 1925 50  0000 C CNN
+F 1 "74LS02" H 2700 1834 50  0000 C CNN
+F 2 "Package_DIP:DIP-14_W7.62mm_Socket" H 2700 1600 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74ls02" H 2700 1600 50  0001 C CNN
+	1    2700 1600
 	1    0    0    -1  
 $EndComp
-$Comp
-L 74xx:74LS14 U2
-U 2 1 61CF53F8
-P 3050 1600
-F 0 "U2" H 3050 1917 50  0000 C CNN
-F 1 "74LS14" H 3050 1826 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm_Socket" H 3050 1600 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS14" H 3050 1600 50  0001 C CNN
-	2    3050 1600
-	1    0    0    -1  
-$EndComp
-$Comp
-L 74xx:74LS08 U5
-U 4 1 61D0B6D4
-P 1850 1900
-F 0 "U5" H 1850 2225 50  0000 C CNN
-F 1 "74LS08" H 1850 2134 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm_Socket" H 1850 1900 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS08" H 1850 1900 50  0001 C CNN
-	4    1850 1900
-	1    0    0    -1  
-$EndComp
+Wire Wire Line
+	1950 1500 2400 1500
+Connection ~ 2400 1500
+Wire Wire Line
+	2400 1500 2450 1500
+Wire Wire Line
+	1900 1700 2400 1700
+Wire Wire Line
+	3350 1600 3000 1600
 $EndSCHEMATC

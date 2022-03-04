@@ -14,7 +14,7 @@ table, th, td {
 Aniol64 is an 8-bit, Z80-based microcomputer with built-in keyboard, display and serial port as well as extendable IO
 <br/>
 <h3>Lead colour coding</h3>
-Power supply: <font color="blue">Blue</font><br/>
+Power supply: <font color="blue">Blue</font> or <font color="purple">Purple</font><br/>
 Ground: <font color="black">Black</font> or <font color="gray">Gray</font><br/>
 Data: <font color="red">Red</font><br/>
 Address: <font color="green">Green</font><br/>
@@ -100,16 +100,17 @@ C000-7FFF: bank-switchable NVRAM (AS6C4008)<br/>
 
 <h2>I/O</h2>
 <h3>Device address decoding</h3>
-<ol>
-<li>A0  internal register select</li>
-<li>A1  internal register select</li>
-<li>A2 	internal register select</li>	
-<li>A3  111101xx	LCD display</li>
-<li>A4	111011xx	DART</li>
-<li>A5  110111xx	NVRAM bank switching </li>
-<li>A6  101111xx	keyboard/buzzer</li>
-<li>A7  011111xx	expansion</li>
-</ol>
+<table>
+<tr><th>Address line</th><th>Address</th><th>Aniol 32/64</th><th>Aniola 640</th></tr>
+<tr><td>A0</td><td colspan=3>internal register select</td></tr>
+<tr><td>A1</td><td colspan=3>internal register select</td></tr>
+<tr><td>A2</td><td colspan=3>internal register select</td></tr>	
+<tr><td>A3</td><td>11110xxx</td><td>LCD display</td><td>empty</td></tr>
+<tr><td>A4</td><td>11101xxx</td><td colspan=2>DART</td></tr>
+<tr><td>A5</td><td>11011xxx</td><td>empty</td><td>NVRAM bank switching</td></tr>
+<tr><td>A6</td><td>10111xxx</td><td colspan=2>	keyboard/buzzer</td></tr>
+<tr><td>A7</td><td>01111xxx</td><td colspan=2>	expansion</td></tr>
+</table>
 <br/>
 
 <h3>Expansion port interface</h3>
@@ -136,7 +137,7 @@ C000-7FFF: bank-switchable NVRAM (AS6C4008)<br/>
 <li>A0</li>
 <li>M1</li>
 <li>RESET</li>
-<li>IEI</li>
+<li>IEI/empty</li>
 <li>IEO</li>
 </ol>
 <br/>
@@ -197,7 +198,7 @@ C000-7FFF: bank-switchable NVRAM (AS6C4008)<br/>
 <li>M1</li>
 <li>RESET</li>
 <li>IEI</li>
-<li>IEO</li>
+<li>IEO/NMI</li>
 </ol>
 <br/>
 
@@ -391,10 +392,19 @@ ALT+SHIFT
 <br/>		
 
 <h2>VGA generation</h2>
-<img src="Design/VgaGen.png"/>
+<h3>Schematic</h3>
+<img src="Design/VGAWithCharGen.png"/>
+
+<h3>Connector</h3>
+<table>
+<tr><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th></tr>
+<tr><td>A12	<td>A13</td>	<td>A14</td> <td>A15</td> <td>CLK</td> <td>D4</td>	<td>D3</td>	<td>D5</td>	<td>D6</td>	<td>+5V</td>	<td>D2</td>	<td>D7</td>	<td>D0</td>	<td>D1</td>	<td>NMI</td>		<td>MEMRQ</td>	<td>IORQ</td></tr>
+<tr><td>A11	<td>A10</td>	<td>A9</td>	<td>A8</td>	<td>A7</td>	<td>A6</td>	<td>A5</td>	<td>A4</td>	<td>A3</td>	<td>A2</td>	<td>A1</td>	<td>A0</td>	<td>WR</td>	<td>RD</td>	<td>WAIT</td>	<td>VRAM'</td>	<td>GND</td></tr>
+</table>
 
 <h2>References</h2>
 <a href="http://www.forum-trioda.pl/viewtopic.php?f=48&t=37948">Komputer 8-bitowy</a>
+<a href="https://github.com/vampirehunt2/aniol64">GIT repository</a>
 
 </body>
 </html>
