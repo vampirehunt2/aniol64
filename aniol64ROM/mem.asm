@@ -53,9 +53,9 @@ setRomBank:
 ; A - RAM bank to switch in, 0-31, top three bits are ignored.
 setRamBank:
         PUSH BC         ; save current state of BC
-        SLA
-        SLA
-        SLA             ; make sure the ROM bank is not switched by accident
+        SLA A
+        SLA A
+        SLA A            ; make sure the ROM bank is not switched by accident
         LD B, A         ; move the RAM bank number to B
         LD A, (Banks)   ; load the currently switched in banks for ROM and RAM
         AND 00000111b   ; clear the current RAM bank, leave the current ROM bank intact
@@ -76,9 +76,9 @@ getRomBank:
 ; result in A
 getRamBank:
         LD A, (Banks)
-        SRA
-        SRA
-        SRA
+        SRA A
+        SRA A
+        SRA A
         RET
 
 ENDIF

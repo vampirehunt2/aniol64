@@ -34,7 +34,6 @@ LcdBuff equ 4020h
 NmiCount equ 4035h         ; reserving 4 bytes for the counter
 MonCurrAddr equ 4036h
 Random equ 4038h
-Banks equ 4039h
 LineBuff equ 4100h
 PROGRAM_DATA equ 4200h
 ENDIF
@@ -48,4 +47,9 @@ ClkData equ 8009h
 KbdBuff equ 8012h         ; a 1-byte buffer
 LcdBuff equ 8020h
 LineBuff equ 8100h
+NmiCount equ 8035h         ; reserving 4 bytes for the counter
+MonCurrAddr equ 8036h
+Random equ 8038h
+Banks equ 8039h
+PROGRAM_DATA equ 8200h
 ENDIF

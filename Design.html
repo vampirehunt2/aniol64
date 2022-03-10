@@ -24,15 +24,24 @@ Key rows: <font color="red">Red</font><br/>
 Key coluns: <font color="green">Green</font><br/>
 Special keys: <font color="yellow">Yellow</font><br/>
 
-<h2>Memory</h2>
-<h3>Memory map</h3>
+<h2>Memory map</h2>
+<h3>Aniol 32</h3>
+0000-7FFF: NVRAM (1244Y)<br/>
+8000-FFFF: NVRAM (mirrored)<br/>
+
+<h3>Aniol 64</h3>
 0000-7FFF: ROM (28C256)<br/>
-8000-FFFF: RAM (62C256 or DS1244Y)<br/>
-8000-BFFF: general purpose RAM (AS6C4008)<br/>
-C000-7FFF: bank-switchable NVRAM (AS6C4008)<br/>
+8000-FFFF: RAM (62C256 or 1244Y)<br/>
+
+<h3>Aniol 640</h3>
+0000-3800: ROM (28F010)<br/>
+3800-4000: Video RAM (7132)<br/>
+4000-7FFF: bank-switchable ROM - 8x16KB (28F010)<br/>
+8000-BFFF: general purpose NVRAM (AS6C4008)<br/>
+C000-7FFF: bank-switchable NVRAM (AS6C4008) - 32x16KB<br/>
 <br/>
 
-<h3>Bank switching schematic</h3>
+<h4>Bank switching schematic</h4>
 <img src="Design/bankSwitching.png"/>
 <br/>
 
@@ -114,6 +123,7 @@ C000-7FFF: bank-switchable NVRAM (AS6C4008)<br/>
 <br/>
 
 <h3>Expansion port interface</h3>
+Viewed from the front of the motherboard, left to right.
 <ol>
 <li>NMI</li>
 <li>INT</li>
@@ -376,20 +386,7 @@ ALT+SHIFT
 <li>A3</li>
 <li>A1</li>
 <li>A0</li>
-</ol>
-
-<h2>RAM locations</h2>
-<table>
-<tr><th/><th>ANIOL64</th><th>ANIOL32</th><th>ANIOL640</th></tr>
-<tr><td>"TestMem", 0</td><td> 8000h-8007h</td></tr>	
-<tr><td>ClkScratchpad</td><td> 8008h</td></tr>		
-<tr><td>ClkData</td><td> 8009h-8011h</td></tr>		
-<tr><td>KbdBuff</td><td> 8012h-8028h</td></tr>		
-<tr><td>KbdBuffHead</td><td> 8029h</td></tr>			
-<tr><td>KbdBuffTail</td><td> 802Ah</td></tr>
-<tr><td>SP</td><td>FFFFh</td></tr>	
-</table>
-<br/>		
+</ol>	
 
 <h2>VGA generation</h2>
 <h3>Schematic</h3>

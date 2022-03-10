@@ -541,11 +541,11 @@ F 3 "" H 9200 2150 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	1050 4550 3150 4550
-Text GLabel 10100 1150 2    50   Input ~ 0
+Text GLabel 10750 1150 2    50   Input ~ 0
 WAIT
 Text GLabel 7400 950  0    50   Input ~ 0
 Blanking
-Text GLabel 10100 950  2    50   Input ~ 0
+Text GLabel 10600 950  2    50   Input ~ 0
 VRAMSEL
 Text GLabel 10100 1450 2    50   Input ~ 0
 A0
@@ -1128,6 +1128,55 @@ F 3 "" H 4100 2700 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	4100 2700 4100 2800
+Connection ~ 4100 2800
+$Comp
+L power:+5V #PWR?
+U 1 1 622602D6
+P 10900 700
+F 0 "#PWR?" H 10900 550 50  0001 C CNN
+F 1 "+5V" H 10915 873 50  0000 C CNN
+F 2 "" H 10900 700 50  0001 C CNN
+F 3 "" H 10900 700 50  0001 C CNN
+	1    10900 700 
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R_Small R?
+U 1 1 62260EEC
+P 10450 800
+F 0 "R?" V 10254 800 50  0000 C CNN
+F 1 "R_Small" V 10345 800 50  0000 C CNN
+F 2 "" H 10450 800 50  0001 C CNN
+F 3 "~" H 10450 800 50  0001 C CNN
+	1    10450 800 
+	0    1    1    0   
+$EndComp
+Connection ~ 10100 950 
+$Comp
+L Device:D_Schottky D?
+U 1 1 6227D84D
+P 10450 1150
+F 0 "D?" H 10600 1200 50  0000 C CNN
+F 1 "D_Schottky" H 10550 1050 50  0000 C CNN
+F 2 "" H 10450 1150 50  0001 C CNN
+F 3 "~" H 10450 1150 50  0001 C CNN
+	1    10450 1150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	10600 1150 10750 1150
+Wire Wire Line
+	10300 1150 10100 1150
+Wire Wire Line
+	10100 950  10600 950 
+Wire Wire Line
+	10350 800  10100 800 
+Wire Wire Line
+	10100 800  10100 950 
+Wire Wire Line
+	10550 800  10900 800 
+Wire Wire Line
+	10900 800  10900 700 
 Wire Bus Line
 	6100 1650 6100 4250
 Wire Bus Line
@@ -1138,5 +1187,4 @@ Wire Bus Line
 	7950 700  7950 3250
 Wire Bus Line
 	950  700  950  6700
-Connection ~ 4100 2800
 $EndSCHEMATC
