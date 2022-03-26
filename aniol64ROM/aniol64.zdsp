@@ -1,10 +1,10 @@
 [Project]
 Name=aniol64.zdsp
 Path=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\
-ObjExt=.exe
+ObjExt=.bin
 
 [File]
-Total=16
+Total=17
 0=aniol64.asm
 1=lcd.asm
 2=str.asm
@@ -21,6 +21,7 @@ Total=16
 13=var.asm
 14=cmd.asm
 15=cal.asm
+16=vga.asm
 
 [Directory]
 Total=2
@@ -40,13 +41,13 @@ Total=12
 8=USERCOMMAND:
 9=TOTALSYMBOL:1
 10=SLABEL0:version
-11=SVALUE0:64
+11=SVALUE0:640
 
 [External]
 Total=0
 
 [FileInUse]
-Total=16
+Total=17
 0=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\kbd.asm
 1=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\dart.asm
 2=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\snd.asm
@@ -55,11 +56,12 @@ Total=16
 5=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\io.asm
 6=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\bzr.asm
 7=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\clk.asm
-8=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\lcd.asm
-9=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\var.asm
-10=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\cmd.asm
-11=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\str.asm
-12=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\mem.asm
-13=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\aniol64.asm
-14=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\util.asm
-15=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\cal.asm
+8=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\var.asm
+9=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\cmd.asm
+10=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\str.asm
+11=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\mem.asm
+12=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\util.asm
+13=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\cal.asm
+14=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\aniol64.asm
+15=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\lcd.asm
+16=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\vga.asm

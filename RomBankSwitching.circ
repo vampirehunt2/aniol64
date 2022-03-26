@@ -197,6 +197,9 @@ end TCL_Generic;&#13;
       <a name="appearance" val="NewPins"/>
       <a name="width" val="8"/>
     </comp>
+    <comp lib="0" loc="(190,250)" name="Pull Resistor">
+      <a name="facing" val="north"/>
+    </comp>
     <comp lib="0" loc="(340,120)" name="Pin">
       <a name="appearance" val="NewPins"/>
       <a name="facing" val="west"/>
@@ -337,7 +340,7 @@ end TCL_Generic;&#13;
     <wire from="(100,360)" to="(130,360)"/>
     <wire from="(100,400)" to="(130,400)"/>
     <wire from="(100,60)" to="(180,60)"/>
-    <wire from="(110,250)" to="(270,250)"/>
+    <wire from="(110,250)" to="(190,250)"/>
     <wire from="(120,20)" to="(530,20)"/>
     <wire from="(150,100)" to="(150,210)"/>
     <wire from="(150,100)" to="(180,100)"/>
@@ -347,6 +350,7 @@ end TCL_Generic;&#13;
     <wire from="(190,140)" to="(190,170)"/>
     <wire from="(190,140)" to="(240,140)"/>
     <wire from="(190,170)" to="(200,170)"/>
+    <wire from="(190,250)" to="(270,250)"/>
     <wire from="(210,100)" to="(240,100)"/>
     <wire from="(210,60)" to="(430,60)"/>
     <wire from="(250,190)" to="(260,190)"/>

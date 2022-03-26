@@ -9,6 +9,9 @@
     <tool name="Probe">
       <a name="appearance" val="NewPins"/>
     </tool>
+    <tool name="Pull Resistor">
+      <a name="facing" val="north"/>
+    </tool>
   </lib>
   <lib desc="#Gates" name="1">
     <tool name="PLA">
@@ -137,6 +140,7 @@ end TCL_Generic;&#13;
     <sep/>
     <tool lib="0" name="Pin">
       <a name="appearance" val="NewPins"/>
+      <a name="facing" val="north"/>
     </tool>
     <tool lib="0" name="Pin">
       <a name="appearance" val="NewPins"/>
@@ -166,6 +170,11 @@ end TCL_Generic;&#13;
     <a name="clabel" val=""/>
     <a name="clabelfont" val="SansSerif bold 16"/>
     <a name="clabelup" val="east"/>
+    <comp lib="0" loc="(290,610)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="north"/>
+      <a name="label" val="A15_2"/>
+    </comp>
     <comp lib="0" loc="(300,190)" name="Pin">
       <a name="appearance" val="NewPins"/>
       <a name="label" val="A15"/>
@@ -173,6 +182,32 @@ end TCL_Generic;&#13;
     <comp lib="0" loc="(300,280)" name="Pin">
       <a name="appearance" val="NewPins"/>
       <a name="label" val="MEMRQ"/>
+    </comp>
+    <comp lib="0" loc="(370,610)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="north"/>
+      <a name="label" val="MEMRQ2"/>
+    </comp>
+    <comp lib="0" loc="(460,610)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="north"/>
+      <a name="label" val="VRAM"/>
+    </comp>
+    <comp lib="0" loc="(540,520)" name="Pull Resistor">
+      <a name="facing" val="north"/>
+      <a name="pull" val="1"/>
+    </comp>
+    <comp lib="0" loc="(600,500)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="label" val="RAMSEL2"/>
+      <a name="output" val="true"/>
+    </comp>
+    <comp lib="0" loc="(600,520)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="label" val="ROMSEL2"/>
+      <a name="output" val="true"/>
     </comp>
     <comp lib="0" loc="(730,340)" name="Pin">
       <a name="appearance" val="NewPins"/>
@@ -186,15 +221,23 @@ end TCL_Generic;&#13;
       <a name="label" val="ROMSEL"/>
       <a name="output" val="true"/>
     </comp>
+    <comp lib="1" loc="(470,520)" name="Controlled Buffer"/>
     <comp lib="1" loc="(510,190)" name="NAND Gate"/>
     <comp lib="1" loc="(510,280)" name="NAND Gate"/>
     <comp lib="1" loc="(640,210)" name="NAND Gate"/>
     <comp lib="1" loc="(640,340)" name="NAND Gate"/>
+    <comp lib="2" loc="(370,530)" name="Decoder"/>
+    <wire from="(290,570)" to="(290,610)"/>
+    <wire from="(290,570)" to="(360,570)"/>
     <wire from="(300,190)" to="(330,190)"/>
     <wire from="(300,280)" to="(390,280)"/>
     <wire from="(330,190)" to="(330,360)"/>
     <wire from="(330,190)" to="(390,190)"/>
     <wire from="(330,360)" to="(580,360)"/>
+    <wire from="(360,530)" to="(360,570)"/>
+    <wire from="(370,530)" to="(370,610)"/>
+    <wire from="(380,500)" to="(600,500)"/>
+    <wire from="(380,520)" to="(450,520)"/>
     <wire from="(390,170)" to="(390,190)"/>
     <wire from="(390,170)" to="(450,170)"/>
     <wire from="(390,190)" to="(390,210)"/>
@@ -203,8 +246,11 @@ end TCL_Generic;&#13;
     <wire from="(390,260)" to="(450,260)"/>
     <wire from="(390,280)" to="(390,300)"/>
     <wire from="(390,300)" to="(450,300)"/>
+    <wire from="(460,530)" to="(460,610)"/>
+    <wire from="(470,520)" to="(540,520)"/>
     <wire from="(510,190)" to="(580,190)"/>
     <wire from="(510,280)" to="(550,280)"/>
+    <wire from="(540,520)" to="(600,520)"/>
     <wire from="(550,230)" to="(550,280)"/>
     <wire from="(550,230)" to="(580,230)"/>
     <wire from="(550,280)" to="(550,320)"/>

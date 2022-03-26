@@ -40,6 +40,12 @@ org 0100h
                                         ; note, low order byte goes first
 
 boot:
+;IF version=640
+;        LD A, 1
+;        CALL setRomBank
+;        LD A, 1
+;        CALL setRamBank
+;ENDIF
         ; init LCD
         CALL lcd_init
         CALL lcd_clrScr

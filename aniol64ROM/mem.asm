@@ -69,7 +69,7 @@ setRamBank:
 ; result in A
 getRomBank:
         LD A, (Banks)
-        AND 00000111
+        AND 00000111b
         RET
 
 ; gets the currently switched in RAM bank number 0-31
