@@ -119,7 +119,7 @@ org KEYCODE_BASE_ADDR
 	defb 38h	; 01-00-111b	8
 	defb 2Bh	; 01-01-000b	+
 	defb 2Dh	; 01-01-001b	-
-	defb 2Ah	; 01-01-010b	*
+	defb 3Ah	; 01-01-010b	:
 	defb 2Fh	; 01-01-011b	/
 	defb 3Dh	; 01-01-100b	=
 	defb 5Bh	; 01-01-101b	[
