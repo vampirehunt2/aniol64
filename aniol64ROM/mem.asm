@@ -51,6 +51,7 @@ setRomBank:
 
 ; sets the currently switched in RAM bank
 ; A - RAM bank to switch in, 0-31, top three bits are ignored.
+db "setRamBank"
 setRamBank:
         PUSH BC         ; save current state of BC
         SLA A
@@ -59,6 +60,7 @@ setRamBank:
         LD B, A         ; move the RAM bank number to B
         LD A, (Banks)   ; load the currently switched in banks for ROM and RAM
         AND 00000111b   ; clear the current RAM bank, leave the current ROM bank intact
+        OR B
         LD C, BANK_PORT
         OUT (C), A      ; write the bank numbers to the bank switch register
         LD (Banks), A   ; save the bank numbers to memory
