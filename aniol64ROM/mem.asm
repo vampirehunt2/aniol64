@@ -51,7 +51,6 @@ setRomBank:
 
 ; sets the currently switched in RAM bank
 ; A - RAM bank to switch in, 0-31, top three bits are ignored.
-db "setRamBank"
 setRamBank:
         PUSH BC         ; save current state of BC
         SLA A
