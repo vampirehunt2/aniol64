@@ -1163,17 +1163,17 @@ F 3 "" H 5150 4350 50  0001 C CNN
 	1    5150 4350
 	1    0    0    -1  
 $EndComp
-Text GLabel 4050 6050 0    50   Input ~ 0
+Text GLabel 3100 6050 0    50   Input ~ 0
 A14
 $Comp
 L 74xx:74LS14 U?
 U 6 1 6253E7E7
-P 4350 6050
-F 0 "U?" H 4350 6367 50  0000 C CNN
-F 1 "74LS14" H 4350 6276 50  0000 C CNN
-F 2 "" H 4350 6050 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS14" H 4350 6050 50  0001 C CNN
-	6    4350 6050
+P 4000 6050
+F 0 "U?" H 4000 6367 50  0000 C CNN
+F 1 "74LS14" H 4000 6276 50  0000 C CNN
+F 2 "" H 4000 6050 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS14" H 4000 6050 50  0001 C CNN
+	6    4000 6050
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
@@ -1210,4 +1210,8 @@ Wire Wire Line
 	2100 6550 3000 6550
 Wire Wire Line
 	2100 7550 3000 7550
+Wire Wire Line
+	3100 6050 3700 6050
+Wire Wire Line
+	4300 6050 4650 6050
 $EndSCHEMATC

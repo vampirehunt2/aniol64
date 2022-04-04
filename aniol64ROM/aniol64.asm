@@ -110,6 +110,7 @@ include io.asm
 include clk.asm
 include cmd.asm
 include cal.asm
+include vga.asm
 include kbd.asm ; this goes last becasue of the org 2000h inside
 
 PROC

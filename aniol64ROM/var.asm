@@ -49,6 +49,8 @@ NmiCount equ 8035h
 MonCurrAddr equ 8036h
 Random equ 8038h
 Banks equ 8039h
+VgaCurX equ 8040h
+VgaCurY equ 8041h
 LineBuff equ 8100h
 PROGRAM_DATA equ 8200h
 ENDIF
