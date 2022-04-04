@@ -8,6 +8,8 @@
 ;----------------------------------------------------
 
 VRAM equ 3800h
+MAX_X equ 39
+MAX_Y equ 29
 
 PROC
 vga_clrscr:
@@ -31,12 +33,20 @@ vga_clrscr:
 ENDP
 
 PROC
-vga_cursorOn:
+vga_curOn:
+        CALL vga_getAddr
+        LD A, (HL)      ; get character at current cursor position
+        OR 10000000b    ; set the cursor bit (D7)
+        LD (HL), A
         RET
 ENDP
 
 PROC
-vga_cursorOff:
+vga_curOff:
+        CALL vga_getAddr
+        LD A, (HL)      ; get character at current cursor position
+        AND 01111111b    ; clear the cursor bit (D7)
+        LD (HL), A
         RET
 ENDP
 
@@ -47,13 +57,24 @@ PROC
 ; result in HL
 ; errors reported in A
 vga_validAddr:
-        LD A, 39
+        LD A, MAX_X
         CP B
         RET C ; if X position is more than 39, return non zero code in A
-        LD A, 29
+        LD A, MAX_Y
         CP C
         RET C ; if Y position is more than 29, return non zero code in A
         LD A, 0
+        RET
+ENDP
+
+PROC
+; returns the VRAM address for current cursor position
+vga_getAddr:
+        LD A, (VgaCurX)
+        LD B, A         ; read in the X position
+        LD A, (VgaCurY)
+        LD C, A         ; read in the Y position
+        CALL vga_getAddrXY
         RET
 ENDP
 
@@ -64,7 +85,7 @@ PROC
 ; result in HL
 ; errors reported in A
 defb "vga_getAddr"
-vga_getAddr:
+vga_getAddrXY:
         ; error checking
         CALL vga_validAddr
         CP 0
@@ -99,6 +120,62 @@ _end:
         ADD HL, DE ; add base VRAM address to the calculated offset
         POP DE    ; restore registers
         LD A, 0   ; report no errors
+        RET
+ENDP
+
+PROC
+vga_advanceCur:
+        CALL vga_curOff
+        ; the following 4 lines are redundant, as vga_curOff already does this
+        ;LD A, (VgaCurX)
+        ;LD B, A         ; read in the X position
+        ;LD A, (VgaCurY)
+        ;LD C, A         ; read in the Y position
+        INC B           ; move the cursor to the next charatcter
+        LD A, MAX_X     ; if we are over the line end
+        CP B             ; then wrap line
+        JR C, _wrapLine
+        JR _end
+_wrapLine:
+        LD B, 0       ; move cursor to beginning of line
+        INC C         ; move cursor to next line
+        LD A, MAX_Y   ; if we are over the end of screen
+        CP C          ; then wrap back to 0,0
+        JR C, _wrapScreen
+        JR _end
+_wrapScreen:
+        LD B, 0       ; wrapping back to 0,0
+        LD C, 0
+_end:
+        LD A, B        ; store new cursor location
+        LD (VgaCurX), A
+        LD A, C
+        LD (VgaCurY), A
+        CALL cga_curOn
+        RET
+ENDP
+
+PROC
+; puts a single character on the screen
+; and moves the cursor over by one
+; A - character to be written
+vga_putChar:
+        PUSH AF
+        CALL vga_getAddr
+        POP AF
+        CALL vga_advanceCur
+        LD (HL), A
+        RET
+ENDP
+
+PROC
+; gets a single character from the screen at current cursor position
+; and moves the cursor over by one
+; result in A
+vga_getChar:
+        CALL vga_getAddr
+        CALL vga_advanceCur
+        LD A, (HL)
         RET
 ENDP
 
