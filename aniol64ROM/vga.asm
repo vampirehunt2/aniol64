@@ -12,6 +12,10 @@ MAX_X equ 39
 MAX_Y equ 29
 
 PROC
+; clears the screen by filling the entire VRAM area with zeroes
+; this includes the blanking regions, which may be somewhat redundant
+; and impact performance slightly, but at least it ensures no data is sent
+; to the display during blanking period
 vga_clrscr:
         ; store register values
         PUSH HL
@@ -33,6 +37,7 @@ vga_clrscr:
 ENDP
 
 PROC
+; turns on the cursor for the character at the current cursor position
 vga_curOn:
         CALL vga_getAddr
         LD A, (HL)      ; get character at current cursor position
@@ -42,6 +47,7 @@ vga_curOn:
 ENDP
 
 PROC
+; turns off the cursor for the character at the current cursor position
 vga_curOff:
         CALL vga_getAddr
         LD A, (HL)      ; get character at current cursor position
@@ -84,7 +90,6 @@ PROC
 ; C - Y position
 ; result in HL
 ; errors reported in A
-defb "vga_getAddr"
 vga_getAddrXY:
         ; error checking
         CALL vga_validAddr
@@ -162,8 +167,9 @@ PROC
 vga_putChar:
         PUSH AF
         CALL vga_getAddr
-        POP AF
         CALL vga_advanceCur
+        POP AF
+        AND 01111111b   ; make sure cursor data is not stored
         LD (HL), A
         RET
 ENDP
@@ -176,6 +182,7 @@ vga_getChar:
         CALL vga_getAddr
         CALL vga_advanceCur
         LD A, (HL)
+        AND 01111111b   ; make sure cursor data is not returned
         RET
 ENDP
 

@@ -1,0 +1,205 @@
+
+*******************************************************************************
+                                   template
+*******************************************************************************
+
+CUPL(WM)        5.0a Serial# MW-10400000
+Device          g16v8ms  Library DLIB-h-40-11
+Created         Tue Apr 05 12:24:16 2022
+Name            template 
+Partno          00 
+Revision        01 
+Date            05/03/2022 
+Designer        Engineer 
+Company         None 
+Assembly        None 
+Location        
+
+===============================================================================
+                            Expanded Product Terms
+===============================================================================
+
+BZR.d  =>
+    D7
+
+BZRCLK =>
+    A4 & IORQ & WR
+
+CLKOUT =>
+    CLKIN
+
+KBDRD =>
+    A4 & IORQ & RD
+
+LCDE =>
+    A5 & IORQ
+
+RAMSEL =>
+    A15 & MEMRQ
+
+ROMSEL =>
+    !A15 & MEMRQ
+
+BZRCLK.oe  =>
+    1 
+
+CLKOUT.oe  =>
+    1 
+
+D7.oe  =>
+    0 
+
+KBDRD.oe  =>
+    1 
+
+LCDE.oe  =>
+    1 
+
+RAMSEL.oe  =>
+    1 
+
+ROMSEL.oe  =>
+    1 
+
+
+===============================================================================
+                                 Symbol Table
+===============================================================================
+
+Pin Variable                                    Pterms   Max     Min    
+Pol   Name              Ext     Pin     Type     Used   Pterms  Level   
+--- --------            ---     ---     ----    ------  ------  -----   
+
+ !  A4                          2        V        -       -       -     
+ !  A5                          3        V        -       -       -     
+    A15                         4        V        -       -       -     
+    BZR                         13       V        -       -       -     
+    BZR                 d       13       X        1       8       2     
+    BZRCLK                      16       V        1       7       2     
+    CLKIN                       9        V        -       -       -     
+    CLKOUT                      19       V        1       7       2     
+    D7                          12       V        -       -       -     
+ !  IORQ                        5        V        -       -       -     
+ !  KBDRD                       14       V        1       7       2     
+    LCDE                        15       V        1       7       2     
+ !  MEMRQ                       6        V        -       -       -     
+ !  RAMSEL                      18       V        1       7       2     
+ !  RD                          7        V        -       -       -     
+ !  ROMSEL                      17       V        1       7       2     
+ !  WR                          8        V        -       -       -     
+    BZRCLK              oe      16       D        1       1       0     
+    CLKOUT              oe      19       D        1       1       0     
+    D7                  oe      12       D        1       1       0     
+    KBDRD               oe      14       D        1       1       0     
+    LCDE                oe      15       D        1       1       0     
+    RAMSEL              oe      18       D        1       1       0     
+    ROMSEL              oe      17       D        1       1       0     
+
+
+LEGEND    D : default variable         F : field      G : group
+          I : intermediate variable    N : node       M : extended node
+          U : undefined                V : variable   X : extended variable
+          T : function
+
+
+===============================================================================
+                                   Fuse Plot
+===============================================================================
+
+Syn   02192 x Ac0   02193 - 
+
+Pin #19  02048  Pol -  02120  Ac1 - 
+ 00000 -------------------------------- 
+ 00032 ----------------------------x--- 
+ 00064 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00096 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00128 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00160 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00192 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00224 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+Pin #18  02049  Pol x  02121  Ac1 - 
+ 00256 -------------------------------- 
+ 00288 --------x--------x-------------- 
+ 00320 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00352 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00384 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00416 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00448 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00480 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+Pin #17  02050  Pol x  02122  Ac1 - 
+ 00512 -------------------------------- 
+ 00544 ---------x-------x-------------- 
+ 00576 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00608 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00640 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00672 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00704 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00736 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+Pin #16  02051  Pol -  02123  Ac1 - 
+ 00768 -------------------------------- 
+ 00800 -x-----------x-----------x------ 
+ 00832 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00864 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00896 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00928 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00960 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00992 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+Pin #15  02052  Pol -  02124  Ac1 - 
+ 01024 -------------------------------- 
+ 01056 -----x-------x------------------ 
+ 01088 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01120 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01152 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01184 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01216 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01248 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+Pin #14  02053  Pol x  02125  Ac1 - 
+ 01280 -------------------------------- 
+ 01312 -x-----------x-------x---------- 
+ 01344 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01376 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01408 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01440 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01472 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01504 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+Pin #13  02054  Pol -  02126  Ac1 x 
+ 01536 ------------------------------x- 
+ 01568 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01600 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01632 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01664 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01696 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01728 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01760 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+Pin #12  02055  Pol x  02127  Ac1 - 
+ 01792 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01824 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01856 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01888 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01920 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01952 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01984 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 02016 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+
+
+LEGEND    X : fuse not blown 
+          - : fuse blown 
+
+===============================================================================
+                                 Chip Diagram
+===============================================================================
+
+                               ______________
+                              |   template   |
+                          x---|1           20|---x Vcc                      
+                      !A4 x---|2           19|---x CLKOUT                   
+                      !A5 x---|3           18|---x !RAMSEL                  
+                      A15 x---|4           17|---x !ROMSEL                  
+                    !IORQ x---|5           16|---x BZRCLK                   
+                   !MEMRQ x---|6           15|---x LCDE                     
+                      !RD x---|7           14|---x !KBDRD                   
+                      !WR x---|8           13|---x BZR                      
+                    CLKIN x---|9           12|---x D7                       
+                      GND x---|10          11|---x                          
+                              |______________|
+

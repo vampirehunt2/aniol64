@@ -7,6 +7,9 @@
 ;
 ;----------------------------------------------------
 
+FALSE equ 00h
+TRUE equ 0FFh
+
 
 ; converts a two-digit hex number to a printable string
 ; BC - representation of one byte as two hex digits in ASCII

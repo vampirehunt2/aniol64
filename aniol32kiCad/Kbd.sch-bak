@@ -1033,9 +1033,22 @@ F 3 "" H 1850 7550 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	1850 7550 1850 7250
-Text GLabel 2750 6700 2    50   Input ~ 0
+Text GLabel 3200 6700 2    50   Input ~ 0
 NMI
-Wire Wire Line
-	2750 6700 2450 6700
 Connection ~ 2450 6700
+$Comp
+L Connector:Conn_01x02_Male NMI
+U 1 1 6223A9B8
+P 3000 6500
+F 0 "NMI" V 3062 6544 50  0000 L CNN
+F 1 "Conn_01x02_Male" V 3153 6544 50  0000 L CNN
+F 2 "" H 3000 6500 50  0001 C CNN
+F 3 "~" H 3000 6500 50  0001 C CNN
+	1    3000 6500
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	3200 6700 3000 6700
+Wire Wire Line
+	2450 6700 2900 6700
 $EndSCHEMATC

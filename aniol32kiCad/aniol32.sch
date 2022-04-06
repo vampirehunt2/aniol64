@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 3
+Sheet 1 4
 Title ""
 Date ""
 Rev ""
@@ -823,17 +823,6 @@ Wire Wire Line
 	2150 2200 2150 2800
 Text GLabel 2900 2300 0    50   Input ~ 0
 INT
-$Comp
-L Connector:Conn_01x24_Male EXP_PORT1
-U 1 1 61D74C8B
-P 8800 5100
-F 0 "EXP_PORT1" H 8908 6381 50  0000 C CNN
-F 1 "Conn_01x24_Male" H 8908 6290 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x24_P2.54mm_Horizontal" H 8800 5100 50  0001 C CNN
-F 3 "~" H 8800 5100 50  0001 C CNN
-	1    8800 5100
-	0    -1   -1   0   
-$EndComp
 Text GLabel 7700 4900 1    50   Input ~ 0
 NMI
 Text GLabel 7800 4900 1    50   Input ~ 0
@@ -937,7 +926,6 @@ F 3 "" H 11050 1350 50  0001 C CNN
 $EndComp
 Text GLabel 10000 2750 2    50   Input ~ 0
 CLK
-NoConn ~ 9900 4900
 NoConn ~ 9650 2200
 NoConn ~ 9650 2300
 NoConn ~ 9650 2400
@@ -1128,4 +1116,23 @@ Wire Wire Line
 Connection ~ 2550 7550
 Wire Wire Line
 	2550 7550 3000 7550
+$Comp
+L Connector:Conn_01x24_Male EXP_PORT1
+U 1 1 61D74C8B
+P 8800 5100
+F 0 "EXP_PORT1" H 8908 6381 50  0000 C CNN
+F 1 "Conn_01x24_Male" H 8908 6290 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x24_P2.54mm_Horizontal" H 8800 5100 50  0001 C CNN
+F 3 "~" H 8800 5100 50  0001 C CNN
+	1    8800 5100
+	0    -1   -1   0   
+$EndComp
+Text GLabel 9900 4900 1    50   Input ~ 0
+WAIT
+$Sheet
+S 1200 1500 500  150 
+U 624CEC4A
+F0 "simpleKbd" 50
+F1 "simpleKbd.sch" 50
+$EndSheet
 $EndSCHEMATC

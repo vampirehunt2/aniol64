@@ -1,0 +1,39 @@
+Name     template ; 
+PartNo   00 ; 
+Date     10/10/10 ;
+Revision 01 ;
+Designer Engineer ;
+Company  None ;
+Assembly None ; 
+Location  ;
+Device   g16v8 ;
+
+/* Inputs */
+PIN 2 = !A4;
+PIN 3 = !A5;
+PIN 4 = A15;
+PIN 5 = !IORQ;
+PIN 6 = !MEMRQ;
+PIN 7 = !RD;
+PIN 8 = !WR;
+PIN 9 = CLKIN;
+PIN 12 = D7;
+
+/* Outputs */
+PIN 13 = BZR;
+PIN 14 = !KBDRD;
+PIN 15 = LCDE;
+PIN 16 = BZRCLK;
+PIN 17 = !ROMSEL;
+PIN 18 = !RAMSEL;
+PIN 19 = CLKOUT;
+
+/* Formulas */
+BZR.D = D7;
+KBDRD = A4 & IORQ & RD;
+LCDE = A5 & IORQ;
+BZRCLK = A4 & IORQ & WR;
+ROMSEL = !A15 & MEMRQ;
+RAMSEL = A15 & MEMRQ;
+CLKIN = CLKOUT;
+

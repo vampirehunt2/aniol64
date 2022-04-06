@@ -40,12 +40,12 @@ org 0100h
                                         ; note, low order byte goes first
 
 boot:
-;IF version=640
-;        LD A, 1
-;        CALL setRomBank
-;        LD A, 1
-;        CALL setRamBank
-;ENDIF
+IF version=640
+        LD A, 1
+        CALL setRomBank
+        LD A, 1
+        CALL setRamBank
+ENDIF
         ; init LCD
         CALL lcd_init
         CALL lcd_clrScr
@@ -69,12 +69,10 @@ memTestOk:
         JP printMemTest
 printMemTest:
         CALL lcd_wriStr
-
         CALL lcd_gotoLn3
         LD IX, Ready
         CALL lcd_wriStr
         CALL lcd_gotoLn4
-
         CALL bzr_beep
         LD A, 50
         CALL delay
@@ -83,6 +81,7 @@ printMemTest:
         CALL delay
         CALL bzr_beep
         ;CALL snd_init
+        CALL lcd_scroll
 
         ; wait for user input from here on in
         CALL cmd_main
@@ -110,7 +109,8 @@ include io.asm
 include clk.asm
 include cmd.asm
 include cal.asm
-include vga.asm
+;include vga.asm
+include skbd.asm
 include kbd.asm ; this goes last becasue of the org 2000h inside
 
 PROC
