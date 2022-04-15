@@ -41,10 +41,10 @@ org 0100h
 
 boot:
 IF version=640
-        LD A, 1
-        CALL setRomBank
-        LD A, 1
-        CALL setRamBank
+;        LD A, 1
+;        CALL setRomBank
+;        LD A, 1
+;        CALL setRamBank
 ENDIF
         ; init LCD
         CALL lcd_init
@@ -81,7 +81,6 @@ printMemTest:
         CALL delay
         CALL bzr_beep
         ;CALL snd_init
-        CALL lcd_scroll
 
         ; wait for user input from here on in
         CALL cmd_main
@@ -98,17 +97,16 @@ NvRamNok: defb  "NVRAM Error", 0
 include var.asm
 include util.asm
 include bzr.asm
-include dos.asm
 include mon.asm
 include lcd.asm
 include str.asm
-include dart.asm
-include snd.asm
 include mem.asm
-include io.asm
-include clk.asm
 include cmd.asm
-include cal.asm
+include clk.asm
+;include snd.asm
+;include dos.asm
+;include dart.asm
+;include cal.asm
 ;include vga.asm
 include skbd.asm
 include kbd.asm ; this goes last becasue of the org 2000h inside
@@ -137,6 +135,7 @@ ENDP
 
 PROC
 handleNmi:
+        CALL skbd_poll
         LD A, (NmiCount)
         INC A
         LD (NmiCount), A

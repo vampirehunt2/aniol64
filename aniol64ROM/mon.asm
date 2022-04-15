@@ -479,4 +479,30 @@ _valError:
         RET
 ENDP
 
+PROC
+mon_put:
+        CALL str_tok        ; port number now in a string pointe to by IX, value in a string pointed to by HL
+        PUSH HL             ; copying the value string
+        POP IY              ; to IY for safekeeping
+        CALL parseByte      ; assuming parsing is OK, port number is now in B
+        CP 0
+        JR NZ, _addrError
+        LD C, B             ; save port number in C
+        PUSH IY             ; transferring the value string
+        POP IX              ; to IX
+        CALL parseByte      ; assuming parsing is OK, value is now in B
+        CP 0
+        JR NZ, _valError
+        LD A, B             ; load the value to A
+        OUT (C), A          ; output the value to the port with the given number
+        RET
+_addrError:
+        LD IX, InvAddr
+        CALL lcd_wriStr
+        RET
+_valError:
+        LD IX, InvVal
+        CALL lcd_wriStr
+        RET
+ENDP
 

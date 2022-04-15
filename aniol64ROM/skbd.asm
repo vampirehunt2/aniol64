@@ -15,19 +15,26 @@ SKBD_PORT3 equ 10111000b
 SKbdEnabled equ 8013h
 
 PROC
-defb "handleSKbdNmi"
-handleSKbdNmi:
+defb "skbd_poll"
+skbd_poll:
         PUSH BC            ; save register state
         PUSH AF
         CALL skbd_scan     ; read all the pressed keys from the matrix
         CP 0               ; check if any key is pressed
-        JR Z, _notPressed  ; if not, jump down
+        JP Z, _notPressed  ; if not, jump down
         LD A, (SKbdEnabled); check if the keyboard is currently enabled...
         CP FALSE           ;... meaning if there was a notPressed condition since the last key press
-        JR Z, _end         ; if not, i.e the same key as before is still pressed, exit to avoid double reads
-        LD A, B            ; load the scancode from B
-        CALL skbd_2asc     ; convert the scancode to ASCII code
-        LD (KbdBuff), A    ; save the scancode in the keyboard buffer, to be read by getChar
+        JP Z, _end         ; if not, i.e the same key as before is still pressed, exit to avoid double reads
+        LD A, (KbdBuff)    ; software debouncing
+        CP 0
+        JP NZ, _end
+        LD C, B            ; load the scancode from B to C
+        CALL kbd_keycode2ascii ; convert the scancode to ASCII code
+        LD (KbdBuff), A    ; save the character in the keyboard buffer, to be read by getChar
+        CP 20h             ; checks if the key corresponds to a control character
+        JP C, _noEcho      ; skip echo if less
+        CALL lcd_putChar   ; echo character to screen
+_noEcho:
         LD A, FALSE
         LD (SKbdEnabled), A ; disable the keyboard to avoid double reads
         JR _end
@@ -44,7 +51,7 @@ ENDP
 PROC
 ; scans for keys pressed and returns the scancode
 ; resulting scancode in B
-; non-zero value in A if a key waw pressed, other than just the modifier keys
+; non-zero value in A if a key was pressed, other than just the modifier keys
 defb "skbd_scan"
 skbd_scan:
         PUSH DE          ; save register state
@@ -52,11 +59,15 @@ skbd_scan:
         LD C, SKBD_PORT2 ; starting in row 2, where the modifier keys are
         IN A, (C)        ; read from row 2
         LD B, A          ; save the scancode in B for later
-        AND 11000000b   ; check if SHIFT or ALT are pressed
-        SRL A           ; move SHIFT and ALT to D5 and D5, respectively
+        AND 00000011b   ; check if SHIFT or ALT are pressed
+        SLA A           ; move SHIFT and ALT to D5 and D5, respectively
+        SLA A
+        SLA A
+        SLA A
+        SLA A
         LD D, A         ; save the SHIFT and ALT in D
         LD A, B         ; restore scancode from B
-        AND 00111111b   ; remove SHIFT and ALT information
+        AND 11111100b   ; remove SHIFT and ALT information
         CP 0
         JP NZ, _process  ; if there's anything pressed, other than a modifier, process it
         LD C, SKBD_PORT0

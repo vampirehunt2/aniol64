@@ -260,30 +260,30 @@ Wire Wire Line
 $Comp
 L 74xx:74LS32 U?
 U 4 1 624C56CC
-P 1650 4550
-F 0 "U?" H 1650 4875 50  0000 C CNN
-F 1 "74LS32" H 1650 4784 50  0000 C CNN
-F 2 "" H 1650 4550 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 1650 4550 50  0001 C CNN
-	4    1650 4550
+P 3550 5700
+F 0 "U?" H 3550 6025 50  0000 C CNN
+F 1 "74LS32" H 3550 5934 50  0000 C CNN
+F 2 "" H 3550 5700 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 3550 5700 50  0001 C CNN
+	4    3550 5700
 	1    0    0    -1  
 $EndComp
 $Comp
 L 74xx:74LS14 U?
 U 2 1 624C73AD
-P 2250 4550
-F 0 "U?" H 2250 4867 50  0000 C CNN
-F 1 "74LS14" H 2250 4776 50  0000 C CNN
-F 2 "" H 2250 4550 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS14" H 2250 4550 50  0001 C CNN
-	2    2250 4550
+P 4150 5700
+F 0 "U?" H 4150 6017 50  0000 C CNN
+F 1 "74LS14" H 4150 5926 50  0000 C CNN
+F 2 "" H 4150 5700 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS14" H 4150 5700 50  0001 C CNN
+	2    4150 5700
 	1    0    0    -1  
 $EndComp
-Text GLabel 1350 4450 0    50   Input ~ 0
+Text GLabel 3250 5600 0    50   Input ~ 0
 A5
-Text GLabel 1350 4650 0    50   Input ~ 0
+Text GLabel 3250 5800 0    50   Input ~ 0
 IORQ
-Text GLabel 2550 4550 2    50   Input ~ 0
+Text GLabel 4450 5700 2    50   Input ~ 0
 LCDE
 NoConn ~ 3700 3950
 $Comp
@@ -344,7 +344,7 @@ F 3 "http://www.vishay.com/docs/31509/csc.pdf" H 5100 2700 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 Wire Wire Line
-	5650 2350 4600 2350
+	5650 2350 5500 2350
 Wire Wire Line
 	4600 2250 5400 2250
 Wire Wire Line
@@ -392,13 +392,6 @@ Wire Wire Line
 Wire Wire Line
 	5400 2500 5400 2250
 Connection ~ 5400 2250
-Wire Wire Line
-	5400 2250 5500 2250
-Wire Wire Line
-	5500 2500 5500 2250
-Connection ~ 5500 2250
-Wire Wire Line
-	5500 2250 5650 2250
 Wire Wire Line
 	5500 2900 5500 2950
 Wire Wire Line
@@ -466,80 +459,87 @@ Wire Wire Line
 $Comp
 L Connector:Conn_01x12_Male J?
 U 1 1 624F6497
-P 4650 5000
-F 0 "J?" V 4485 4928 50  0000 C CNN
-F 1 "Conn_01x12_Male" V 4576 4928 50  0000 C CNN
-F 2 "" H 4650 5000 50  0001 C CNN
-F 3 "~" H 4650 5000 50  0001 C CNN
-	1    4650 5000
+P 1550 1350
+F 0 "J?" V 1385 1278 50  0000 C CNN
+F 1 "Conn_01x12_Male" V 1476 1278 50  0000 C CNN
+F 2 "" H 1550 1350 50  0001 C CNN
+F 3 "~" H 1550 1350 50  0001 C CNN
+	1    1550 1350
 	0    -1   1    0   
 $EndComp
-Text GLabel 4150 5200 3    50   Input ~ 0
+Text GLabel 1050 1550 3    50   Input ~ 0
 C0
-Text GLabel 4250 5200 3    50   Input ~ 0
+Text GLabel 1150 1550 3    50   Input ~ 0
 C1
-Text GLabel 4350 5200 3    50   Input ~ 0
+Text GLabel 1250 1550 3    50   Input ~ 0
 C2
-Text GLabel 4450 5200 3    50   Input ~ 0
+Text GLabel 1350 1550 3    50   Input ~ 0
 C3
-Text GLabel 4550 5200 3    50   Input ~ 0
+Text GLabel 1450 1550 3    50   Input ~ 0
 C4
-Text GLabel 4650 5200 3    50   Input ~ 0
+Text GLabel 1550 1550 3    50   Input ~ 0
 C5
-Text GLabel 4750 5200 3    50   Input ~ 0
+Text GLabel 1650 1550 3    50   Input ~ 0
 C6
-Text GLabel 4850 5200 3    50   Input ~ 0
+Text GLabel 1750 1550 3    50   Input ~ 0
 C7
 $Comp
 L Device:R_Small R?
 U 1 1 624FC3C2
-P 4950 5300
-F 0 "R?" H 4900 5800 50  0000 L CNN
-F 1 "4k7" V 4950 5250 50  0000 L CNN
-F 2 "" H 4950 5300 50  0001 C CNN
-F 3 "~" H 4950 5300 50  0001 C CNN
-	1    4950 5300
+P 1850 1650
+F 0 "R?" H 1800 2150 50  0000 L CNN
+F 1 "4k7" V 1850 1600 50  0000 L CNN
+F 2 "" H 1850 1650 50  0001 C CNN
+F 3 "~" H 1850 1650 50  0001 C CNN
+	1    1850 1650
 	1    0    0    -1  
 $EndComp
 $Comp
 L Device:R_Small R?
 U 1 1 624FEFA0
-P 5150 5300
-F 0 "R?" H 5100 5800 50  0000 L CNN
-F 1 "4k7" V 5150 5250 50  0000 L CNN
-F 2 "" H 5150 5300 50  0001 C CNN
-F 3 "~" H 5150 5300 50  0001 C CNN
-	1    5150 5300
+P 2050 1650
+F 0 "R?" H 2000 2150 50  0000 L CNN
+F 1 "4k7" V 2050 1600 50  0000 L CNN
+F 2 "" H 2050 1650 50  0001 C CNN
+F 3 "~" H 2050 1650 50  0001 C CNN
+	1    2050 1650
 	1    0    0    -1  
 $EndComp
 $Comp
 L Device:R_Small R?
 U 1 1 624FF512
-P 5250 5300
-F 0 "R?" H 5200 5800 50  0000 L CNN
-F 1 "4k7" V 5250 5250 50  0000 L CNN
-F 2 "" H 5250 5300 50  0001 C CNN
-F 3 "~" H 5250 5300 50  0001 C CNN
-	1    5250 5300
+P 2150 1650
+F 0 "R?" H 2100 2150 50  0000 L CNN
+F 1 "4k7" V 2150 1600 50  0000 L CNN
+F 2 "" H 2150 1650 50  0001 C CNN
+F 3 "~" H 2150 1650 50  0001 C CNN
+	1    2150 1650
 	1    0    0    -1  
 $EndComp
-Text GLabel 4950 5400 3    50   Input ~ 0
+Text GLabel 1850 1750 3    50   Input ~ 0
 A0
 $Comp
 L Device:R_Small R?
 U 1 1 624FD724
-P 5050 5300
-F 0 "R?" H 5000 5800 50  0000 L CNN
-F 1 "4k7" V 5050 5250 50  0000 L CNN
-F 2 "" H 5050 5300 50  0001 C CNN
-F 3 "~" H 5050 5300 50  0001 C CNN
-	1    5050 5300
+P 1950 1650
+F 0 "R?" H 1900 2150 50  0000 L CNN
+F 1 "4k7" V 1950 1600 50  0000 L CNN
+F 2 "" H 1950 1650 50  0001 C CNN
+F 3 "~" H 1950 1650 50  0001 C CNN
+	1    1950 1650
 	1    0    0    -1  
 $EndComp
-Text GLabel 5050 5400 3    50   Input ~ 0
+Text GLabel 1950 1750 3    50   Input ~ 0
 A1
-Text GLabel 5150 5400 3    50   Input ~ 0
+Text GLabel 2050 1750 3    50   Input ~ 0
 A2
-Text GLabel 5250 5400 3    50   Input ~ 0
+Text GLabel 2150 1750 3    50   Input ~ 0
 A3
+Wire Wire Line
+	5400 2250 5650 2250
+Wire Wire Line
+	5500 2500 5500 2350
+Connection ~ 5500 2350
+Wire Wire Line
+	5500 2350 4600 2350
 $EndSCHEMATC

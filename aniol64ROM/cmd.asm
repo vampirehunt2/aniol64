@@ -15,6 +15,7 @@ Echo: defb "echo", 0
 Rnd: defb "rnd", 0
 Peek: defb "peek", 0
 Poke: defb "poke", 0
+Put: defb "put", 0
 UnknownCmd: defb "Unknown cmd", 0
 
 PROC
@@ -27,43 +28,49 @@ cmd_main:
         LD IY, Clr
         CALL str_cmp
         CP 0
-        JR Z, _clr
+        JP Z, _clr
         ; reset command
         LD IX, LineBuff
         LD IY, Reset
         CALL str_cmp
         CP 0
-        JR Z, _rst
+        JP Z, _rst
         ; echo command
         LD IX, LineBuff
         LD IY, Echo
         CALL str_cmp
         CP 0
-        JR Z, _echo
+        JP Z, _echo
         ; rnd command
         LD IX, LineBuff
         LD IY, Rnd
         CALL str_cmp
         CP 0
-        JR Z, _rnd
+        JP Z, _rnd
         ; monitor program
         LD IX, LineBuff
         LD IY, Mon
         CALL str_cmp
         CP 0
-        JR Z, _mon
+        JP Z, _mon
         ; peek command
         LD IX, LineBuff
         LD IY, Peek
         CALL str_cmp
         CP 0
-        JR Z, _peek
+        JP Z, _peek
         ; poke command
         LD IX, LineBuff
         LD IY, Poke
         CALL str_cmp
         CP 0
-        JR Z, _poke
+        JP Z, _poke
+        ; put command
+        LD IX, LineBuff
+        LD IY, Put
+        CALL str_cmp
+        CP 0
+        JP Z, mon_put
         ; unknown command
         LD IX, UnknownCmd
         CALL lcd_wriStr
@@ -92,6 +99,11 @@ _poke:
         PUSH HL
         POP IX
         CALL mon_poke
+        JP cmd_main
+_put:
+        PUSH HL
+        POP IX
+        CALL mon_put
         JP cmd_main
 _rnd:
         CALL rnd
