@@ -714,18 +714,12 @@ Wire Wire Line
 	6450 3400 6050 3400
 Wire Wire Line
 	6150 3850 6250 3850
-Wire Wire Line
-	6450 3850 6450 4750
-Wire Wire Line
-	6450 4750 6800 4750
-Connection ~ 6450 3850
 Connection ~ 6250 3850
 Wire Wire Line
 	6250 3850 6350 3850
 Connection ~ 6350 3850
 Wire Wire Line
 	6350 3850 6450 3850
-Connection ~ 6800 4750
 Text GLabel 7800 3200 2    50   Input ~ 0
 LOAD
 Text GLabel 5850 1950 0    50   Input ~ 0
@@ -1049,4 +1043,10 @@ Wire Wire Line
 	5300 1050 5850 1050
 Wire Wire Line
 	5400 1750 5850 1750
+Wire Wire Line
+	6450 3850 6700 3850
+Wire Wire Line
+	6700 3850 6700 3800
+Connection ~ 6450 3850
+Connection ~ 6700 3800
 $EndSCHEMATC

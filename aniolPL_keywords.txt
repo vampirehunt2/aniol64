@@ -1,9 +1,13 @@
+KEYWORDS:
+prg
 def
+dim
+var
 byte
 int
 ptr
 dim
-prc
+proc
 fun
 ret
 if
@@ -15,27 +19,54 @@ to
 next
 while
 loop
+stop
+
+OPERATORS
+<- assignment
+= comparison
++ addition
+- subtraction
+* multiplication
+/ division
+\ modulo
+@ address
+^ dereference
+~ negation
+| alternative
+& conjunction
+? exclusive or
+[] array index
+. also array index
+
+$ hex value
+% bin value
+
 
 
 def WIDTH 40
 def HEIGHT 30
 def SIZE 10
 
-var i, d
+int i d
+byte b
+ptr p
 
-dim tab SIZE
+dim byte tab SIZE
 
-fun findIdx x
+prg test
+stop
+
+fun byte findIdx x
 for i<-0 to SIZE
 	if tab[i]=x ret i
 end
 
-prc init
+proc init a b c 
 i<-0
 while i<=SIZE
 	if i%2=0 
-		tab[i]=i
+		tab[i]<-i
 	else
-		tab[i]=i-1
+		tab[i]<-i-1
 	endif
 end

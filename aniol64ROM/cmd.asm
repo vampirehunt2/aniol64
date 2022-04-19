@@ -16,7 +16,7 @@ Rnd: defb "rnd", 0
 Peek: defb "peek", 0
 Poke: defb "poke", 0
 Put: defb "put", 0
-UnknownCmd: defb "Unknown cmd", 0
+UnknownCmd: defb "Unknown cmd: ", 0
 
 PROC
 defb "cmd_main"
@@ -73,6 +73,8 @@ cmd_main:
         JP Z, mon_put
         ; unknown command
         LD IX, UnknownCmd
+        CALL lcd_wriStr
+        LD IX, LineBuff
         CALL lcd_wriStr
         CALL bzr_beep
 _wrap:

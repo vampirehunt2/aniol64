@@ -421,14 +421,13 @@ mon_prevAddrs:
 
 PROC
 mon_isWriteable:
-        ;LD BC, HL
-        ;LD A, B
-        ;CP FirstRamPage
-        ;JR C, _nonWriteable
-        ;LD A, 1
-        ;RET
+        LD A, H
+        CP 7Fh
+        JR C, _nonWriteable
+        LD A, TRUE
+        RET
 _nonWriteable:
-        ;LD A, 0
+        LD A, FALSE
         RET
 ENDP
 
@@ -455,7 +454,7 @@ ENDP
 
 PROC
 mon_poke:
-        CALL str_tok        ; address now in a string pointe to by IX, value in a string pointed to by HL
+        CALL str_tok        ; address now in a string pointed to by IX, value in a string pointed to by HL
         PUSH HL             ; copying the value string
         POP IY              ; to IY for safekeeping
         CALL parseDByte     ; assuming parsing is OK, address is now in HL
@@ -480,8 +479,9 @@ _valError:
 ENDP
 
 PROC
+defb "mon_put"
 mon_put:
-        CALL str_tok        ; port number now in a string pointe to by IX, value in a string pointed to by HL
+        CALL str_tok        ; port number now in a string pointed to by IX, value in a string pointed to by HL
         PUSH HL             ; copying the value string
         POP IY              ; to IY for safekeeping
         CALL parseByte      ; assuming parsing is OK, port number is now in B
