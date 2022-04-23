@@ -4,7 +4,7 @@ Path=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\
 ObjExt=.bin
 
 [File]
-Total=17
+Total=18
 0=aniol64.asm
 1=lcd.asm
 2=str.asm
@@ -22,6 +22,7 @@ Total=17
 14=cal.asm
 15=vga.asm
 16=skbd.asm
+17=math.asm
 
 [Directory]
 Total=2
@@ -47,7 +48,7 @@ Total=12
 Total=0
 
 [FileInUse]
-Total=17
+Total=18
 0=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\kbd.asm
 1=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\dart.asm
 2=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\dos.asm
@@ -65,3 +66,4 @@ Total=17
 14=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\vga.asm
 15=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\aniol64.asm
 16=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\skbd.asm
+17=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\math.asm

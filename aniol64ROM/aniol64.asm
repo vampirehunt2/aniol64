@@ -102,7 +102,8 @@ include lcd.asm
 include str.asm
 include mem.asm
 include cmd.asm
-include clk.asm
+include math.asm
+;include clk.asm
 ;include snd.asm
 ;include dos.asm
 ;include dart.asm
