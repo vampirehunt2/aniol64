@@ -342,7 +342,7 @@ _overflow:
         LD A, OVERFLOW
         JR _end
 _correct:
-        LD A, 0
+        LD A, OK
         JR _end
 _end:
         POP DE         ; restore register state
@@ -424,9 +424,14 @@ _loop:
         LD B, 0
         LD C, 10
         CALL u16_mul
+        CP OK
+        JR NZ, _overflow
         JR _loop
 _parseError:
         LD A, FORMATERR
+        JR _end
+_overflow:
+        LD A, OVERFLOW
 _end:
         RET
 ENDP
