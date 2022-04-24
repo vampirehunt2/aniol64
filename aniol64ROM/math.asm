@@ -14,6 +14,7 @@ SIGN equ 10000000b
 ABS equ 01111111b
 DIVBY0 equ 1
 OVERFLOW equ 2
+FORMATERR equ 3
 OK equ 0
 TRUE equ 0ffh
 FALSE equ 0
@@ -405,6 +406,36 @@ u16_parseBin:
 ENDP
 
 PROC
+defb "u16_parseDec"
+u16_parseDec:
+        LD BC, 0   ; will be accumulating the value in BC
+_loop:
+        LD A, (IX)
+        SUB '0'  ; converts '0'-'9' to 0-9
+        CP 10   ; check if we read a decimal digit
+        JR NC, _parseError
+        LD L, A
+        LD H, 0
+        ADD HL, BC
+        LD B, H
+        LD C, L
+        INC IX
+        LD A, (IX)
+        CP 0    ; check if we've reached end of string
+        JR Z, _end
+        LD H, 0
+        LD L, 10
+        CALL u16_mul
+        LD B, H
+        LD C, L
+        JR _loop
+_parseError:
+        LD A, FORMATERR
+_end:
+        RET
+ENDP
+
+PROC
 i16_formatDec:
         RET
 ENDP
@@ -414,12 +445,48 @@ u16_formatHex:
         RET
 ENDP
 
+; parses an 8-bit unsigned binary number from a null-terminated string
+; string format is !xxxxxxxx\0 where x is either '1' or '0'
+; leading zeroes are mandatory
+; in case of error a non-zero error code is in A
+; and the address of the first erroneous character is IX
+; in case of success a 0 is in A and result is in C
+; destroys B
+PROC
+u8_parseBin:
+        LD A, (IX)
+        CP '!'         ; check if the string starts with ! indicating it's a binary number
+        JR NZ, _parseError
+        INC IX
+        LD B, 8         ; initialise the loop
+        LD C, 0
+_loop:
+        SLA C
+        LD A, (IX)
+        SUB '0'         ; converting "0" and "1" to 0 and 1, respectively
+        CP 2            ; check if the character is a binary digit
+        JR NC, _parseError
+        OR C
+        LD C, A
+        INC IX
+        DJNZ _loop
+        LD A, (IX)
+        CP 0            ; check for end of string
+        JR NZ, _parseError
+        LD A, OK
+        JR _end
+_parseError:
+        LD A, FORMATERR
+_end:
+        RET
+ENDP
+
 PROC
 u8_formatBin:
         PUSH AF
         PUSH BC
         LD C, A
-        LD (IX), "!"
+        LD (IX), '!'
         INC IX
         LD B, 8
 _loop:
@@ -427,10 +494,10 @@ _loop:
         AND 10000000b
         CP 0
         JR Z, _zero
-        LD (IX), "1"
+        LD (IX), '1'
         JR _endLoop
 _zero:
-        LD (IX), "0"
+        LD (IX), '0'
 _endLoop:
         INC IX
         SLA C
@@ -448,6 +515,6 @@ u16_formatBin:
         CALL u8_formatBin
         LD A, L
         CALL u8_formatBin
-        LD (IX - 9), "-"
+        LD (IX - 9), '-'
         RET
 ENDP
