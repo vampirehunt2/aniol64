@@ -408,26 +408,22 @@ ENDP
 PROC
 defb "u16_parseDec"
 u16_parseDec:
-        LD BC, 0   ; will be accumulating the value in BC
+        LD HL, 0   ; will be accumulating the value in HL
 _loop:
         LD A, (IX)
         SUB '0'  ; converts '0'-'9' to 0-9
         CP 10   ; check if we read a decimal digit
         JR NC, _parseError
-        LD L, A
-        LD H, 0
+        LD C, A
+        LD B, 0
         ADD HL, BC
-        LD B, H
-        LD C, L
         INC IX
         LD A, (IX)
         CP 0    ; check if we've reached end of string
         JR Z, _end
-        LD H, 0
-        LD L, 10
+        LD B, 0
+        LD C, 10
         CALL u16_mul
-        LD B, H
-        LD C, L
         JR _loop
 _parseError:
         LD A, FORMATERR
