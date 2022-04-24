@@ -388,3 +388,66 @@ _loop:
 	DJNZ _loop
 	RET
 ENDP
+
+PROC
+i16_parseDec:
+        RET
+ENDP
+
+PROC
+u16_parseHex:
+        RET
+ENDP
+
+PROC
+u16_parseBin:
+        RET
+ENDP
+
+PROC
+i16_formatDec:
+        RET
+ENDP
+
+PROC
+u16_formatHex:
+        RET
+ENDP
+
+PROC
+u8_formatBin:
+        PUSH AF
+        PUSH BC
+        LD C, A
+        LD (IX), "!"
+        INC IX
+        LD B, 8
+_loop:
+        LD A, C
+        AND 10000000b
+        CP 0
+        JR Z, _zero
+        LD (IX), "1"
+        JR _endLoop
+_zero:
+        LD (IX), "0"
+_endLoop:
+        INC IX
+        SLA C
+        DJNZ _loop
+        LD (IX), 0
+        POP BC
+        POP AF
+        RET
+ENDP
+
+PROC
+defb "u16_formatBin"
+u16_formatBin:
+        LD A, H
+        CALL u8_formatBin
+        LD A, L
+        CALL u8_formatBin
+        LD (IX - 9), "-"
+        RET
+ENDP
