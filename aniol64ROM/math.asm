@@ -266,14 +266,12 @@ i16_operands2abs:
         RET
 ENDP
 
-
 ; divides two signed 16-bit integers
 ; arguments in HL and BC
 ; division result in DE
 ; mod result in HL
 ; errors reported in A
 PROC
-defb "i16_div"
 i16_div:
         PUSH BC
         CALL i16_mulSign
@@ -301,6 +299,9 @@ _divBy0:
         RET
 ENDP
 
+; checks if a 16-bit integer is zero
+; argument in DE
+; result in A
 PROC
 i16_is0:
         LD A, D
@@ -349,8 +350,11 @@ _end:
         RET
 ENDP
 
+; multiplies two signed 16-bit integers
+; operands in HL and BC
+; result in B
+; overflow reported in A (TODO: doesn't work)
 PROC
-defb "i16_mul"
 i16_mul:
         CALL i16_mulSign
         PUSH AF       ; storing the sign of the result on stack
@@ -405,9 +409,16 @@ u16_parseBin:
         RET
 ENDP
 
+; parses a 16-bit unsigned number
+; leading zeroes are not mandatory
+; string to parse is pointed to by IX
+; result in HL
+; errors reported in A
+; in case of errors, address of first erroneous character is in IX
+; destroys IX
 PROC
-defb "u16_parseDec"
 u16_parseDec:
+        PUSH BC
         LD HL, 0   ; will be accumulating the value in HL
 _loop:
         LD A, (IX)
@@ -421,8 +432,7 @@ _loop:
         LD A, (IX)
         CP 0    ; check if we've reached end of string
         JR Z, _end
-        LD B, 0
-        LD C, 10
+        LD BC, 10
         CALL u16_mul
         CP OK
         JR NZ, _overflow
@@ -433,11 +443,43 @@ _parseError:
 _overflow:
         LD A, OVERFLOW
 _end:
+        POP BC
         RET
 ENDP
 
+; formats a 16-bit unsigned number as string
+; result is a null-terminated string with leading zeroes
+; argument in HL
+; result in a string pointed to by IX
+; conserves both HL and IX
 PROC
-i16_formatDec:
+u16_formatDec:
+        PUSH BC
+        PUSH HL
+        PUSH IX
+        LD BC, 10000    ; divider stored in BC, numbers of up to 5 decimal digits are supported
+_loop:
+        CALL u16_div    ; divide the number by divider to get the current digit
+        LD A, E         ; load the division result to A
+        AND A           ; clear carry
+        ADD A, '0'      ; convert digit to its ASCII representation
+        LD (IX), A      ; store ASCII digit to the result string
+        INC IX          ; move to the next digit
+        PUSH HL
+        LD H, B
+        LD L, C
+        LD BC, 10
+        CALL u16_div   ; divide the divider by 10
+        LD B, D
+        LD C, E
+        POP HL
+        CALL i16_is0   ; check if divider is zero
+        CP FALSE       ; if not, perform another loop
+        JR Z, _loop
+        LD (IX), 0     ; store end of line
+        POP IX
+        POP HL
+        POP BC
         RET
 ENDP
 
@@ -482,6 +524,9 @@ _end:
         RET
 ENDP
 
+; converts an 8-bit unsigned number to its string representation
+; number passed in A
+; result in a null-terminated string pointed to by IX
 PROC
 u8_formatBin:
         PUSH AF
@@ -509,13 +554,35 @@ _endLoop:
         RET
 ENDP
 
+; trims leading zeroes from a formatted number
+; and replaces them with spaces for text adjustems
+; number in a string pointed to by IX
 PROC
-defb "u16_formatBin"
+trimLeading0s:
+        PUSH AF
+        PUSH IX
+_loop:
+        LD A, (IX)
+        CP '0'
+        JR NZ, _end
+        LD (IX), ' '
+        INC IX
+        JR _loop
+_end:
+        POP IX
+        POP AF
+        ENDP
+ENDP
+
+; converts a 16-bit unsigned number to its string representation
+; number passed in HL
+; result in a null-terminated string pointed to by IX
+PROC
 u16_formatBin:
         LD A, H
         CALL u8_formatBin
         LD A, L
         CALL u8_formatBin
-        LD (IX - 9), '-'
+        LD (IX - 9), '-'     ; put a divider between higher and lower byte to enhance readability
         RET
 ENDP
