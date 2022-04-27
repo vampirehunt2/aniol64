@@ -72,7 +72,6 @@ _parseOk:
 _parseError:
         LD A, 1
         RET
-        RET
 ENDP
 
 PROC

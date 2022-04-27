@@ -38,7 +38,7 @@ PROGRAM_DATA equ 4200h
 ENDIF
 
 IF version=640
-Aniol: defb   "     _ANIOL640_     ", 0
+Aniol: defb   "               _ANIOL640_               ", 0
 RAMTOP equ 0BFFFh
 TestAddr equ 8000h  ; points to the beginning of RAM
 ClkScratchpad equ 8008h

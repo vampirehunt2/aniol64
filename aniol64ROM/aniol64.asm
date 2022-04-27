@@ -1,7 +1,7 @@
 ;----------------------------------------------------
 ; Project: aniol64.zdsp
-; Main File: aniol64.asm
-; Date: 11/21/2019 12:50:17
+; File: aniolLcd
+; Date: 4/26/2022 18:42:17
 ;
 ; Created with zDevStudio - Z80 Development Studio.
 ;
@@ -41,14 +41,15 @@ org 0100h
 
 boot:
 IF version=640
-;        LD A, 1
-;        CALL setRomBank
-;        LD A, 1
-;        CALL setRamBank
+        LD A, 1
+        CALL setRomBank
+        LD A, 1
+        CALL setRamBank
 ENDIF
         ; init LCD
         CALL lcd_init
         CALL lcd_clrScr
+
         ; init the keyboard buffer to avoid a bogus character during the first read
         LD A, 0
         LD (KbdBuff), A
@@ -98,19 +99,15 @@ include var.asm
 include util.asm
 include bzr.asm
 include mon.asm
-include lcd.asm
 include str.asm
 include mem.asm
 include cmd.asm
-include math.asm
-;include clk.asm
-;include snd.asm
-;include dos.asm
-;include dart.asm
-;include cal.asm
-;include vga.asm
+include lcd.asm
+IF version=32
 include skbd.asm
+ENDIF
 include kbd.asm ; this goes last becasue of the org 2000h inside
+
 
 PROC
 handleInt:
@@ -136,20 +133,12 @@ ENDP
 
 PROC
 handleNmi:
+        IF version=32
         CALL skbd_poll
+        ENDIF
         LD A, (NmiCount)
         INC A
         LD (NmiCount), A
         RET
 ENDP
-
-
-
-
-
-
-
-
-
-
 

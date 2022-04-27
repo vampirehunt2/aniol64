@@ -11,6 +11,13 @@ VRAM equ 3800h
 MAX_X equ 39
 MAX_Y equ 29
 
+vga_init:
+        LD A, 0
+        LD (VgaCurX), A
+        LD (VgaCurY), A
+        CALL vga_curOn
+        RET
+
 PROC
 ; clears the screen by filling the entire VRAM area with zeroes
 ; this includes the blanking regions, which may be somewhat redundant
@@ -22,10 +29,10 @@ vga_clrscr:
         PUSH BC
         PUSH DE
 
-        XOR A   ; load 0 to A
+        LD A, 0
         LD HL, VRAM
-        LD DE, (VRAM + 1)
-        LD (HL), A  ; initialise the first byte of VRAM to 0
+        LD DE, VRAM + 1
+        LD (HL), A   ; initialise the first byte of VRAM to 0
         LD BC, 2048  ; set loop counter to the full size of VRAM
         LDIR         ; repeatedly copy previous byte to the current byte
 
@@ -35,6 +42,23 @@ vga_clrscr:
         POP HL
         RET
 ENDP
+
+vga_scroll:
+       ; store register values
+        PUSH HL
+        PUSH BC
+        PUSH DE
+
+        LD HL, VRAM + 64  ; 64 is the number of bytes for one display line
+        LD DE, VRAM
+        LD BC, 64 * 30  ; set loop counter to the size of visible memory (VRAM minus vertical blanking)
+        LDIR         ; repeatedly copy previous byte to the current byte
+
+        ; restore register values
+        POP DE
+        POP BC
+        POP HL
+        RET
 
 PROC
 ; turns on the cursor for the character at the current cursor position
@@ -73,8 +97,11 @@ vga_validAddr:
         RET
 ENDP
 
-PROC
 ; returns the VRAM address for current cursor position
+; VgaCurX - X position
+; VgaCurY - Y position
+; result in HL
+; errors reported in A
 vga_getAddr:
         LD A, (VgaCurX)
         LD B, A         ; read in the X position
@@ -82,7 +109,10 @@ vga_getAddr:
         LD C, A         ; read in the Y position
         CALL vga_getAddrXY
         RET
-ENDP
+
+vga_setAddr:
+        LD A, H
+        RET
 
 PROC
 ; returns the VRAM address for given XY position on screen
@@ -128,6 +158,19 @@ _end:
         RET
 ENDP
 
+; moves the cursor to a new X, Y position on screen
+; B - X position
+; C - Y position
+; TODO: do error checking
+vga_gotoXY:
+        CALL vga_curOff
+        LD A, B
+        LD (VgaCurX), A
+        LD A, C
+        LD (VgaCurY), A
+        CALL vga_curOn
+        RET
+
 PROC
 vga_advanceCur:
         CALL vga_curOff
@@ -156,7 +199,7 @@ _end:
         LD (VgaCurX), A
         LD A, C
         LD (VgaCurY), A
-        CALL cga_curOn
+        CALL vga_curOn
         RET
 ENDP
 
@@ -188,14 +231,14 @@ ENDP
 
 PROC
 vga_wriStr:
-        LD IY, VRAM ; for now, just write from the beginning of the screen
-                ; later on we will track the cursor position
+        CALL vga_getAddr
 _loop:
         LD A, (IX)
         CP 0
         RET Z
-        LD (IY), A
+        AND 01111111b ; make sure cursor data is not stored
+        LD (HL), A
         INC IX
-        INC IY
+        INC HL
         JP _loop
 ENDP
