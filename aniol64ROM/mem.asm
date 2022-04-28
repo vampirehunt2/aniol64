@@ -30,8 +30,6 @@ memTest:
 mem_cpy:
         RET
 
-IF version=640
-
 BANK_PORT equ 11011111b  ; bank switching is activated with A5
 
 ; sets the currently switched in ROM bank
@@ -82,5 +80,4 @@ getRamBank:
         SRA A
         RET
 
-ENDIF
 

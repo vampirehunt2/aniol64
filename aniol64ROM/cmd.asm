@@ -70,7 +70,7 @@ cmd_main:
         LD IY, Put
         CALL str_cmp
         CP 0
-        JP Z, mon_put
+        JP Z, _put
         ; unknown command
         LD IX, UnknownCmd
         CALL lcd_wriStr
