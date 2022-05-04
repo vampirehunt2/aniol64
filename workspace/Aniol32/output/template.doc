@@ -5,7 +5,7 @@
 
 CUPL(WM)        5.0a Serial# MW-10400000
 Device          g16v8ms  Library DLIB-h-40-11
-Created         Tue Apr 05 12:24:16 2022
+Created         Fri Apr 29 14:44:16 2022
 Name            template 
 Partno          00 
 Revision        01 
@@ -23,16 +23,16 @@ BZR.d  =>
     D7
 
 BZRCLK =>
-    A4 & IORQ & WR
+    !A4 & IORQ & WR
 
 CLKOUT =>
-    CLKIN
+    !CLKIN
 
 KBDRD =>
-    A4 & IORQ & RD
+    !A4 & IORQ & RD
 
 LCDE =>
-    A5 & IORQ
+    !A5 & IORQ
 
 RAMSEL =>
     A15 & MEMRQ
@@ -70,8 +70,8 @@ Pin Variable                                    Pterms   Max     Min
 Pol   Name              Ext     Pin     Type     Used   Pterms  Level   
 --- --------            ---     ---     ----    ------  ------  -----   
 
- !  A4                          2        V        -       -       -     
- !  A5                          3        V        -       -       -     
+    A4                          2        V        -       -       -     
+    A5                          3        V        -       -       -     
     A15                         4        V        -       -       -     
     BZR                         13       V        -       -       -     
     BZR                 d       13       X        1       8       2     
@@ -110,7 +110,7 @@ Syn   02192 x Ac0   02193 -
 
 Pin #19  02048  Pol -  02120  Ac1 - 
  00000 -------------------------------- 
- 00032 ----------------------------x--- 
+ 00032 -----------------------------x-- 
  00064 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00096 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00128 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
@@ -192,8 +192,8 @@ LEGEND    X : fuse not blown
                                ______________
                               |   template   |
                           x---|1           20|---x Vcc                      
-                      !A4 x---|2           19|---x CLKOUT                   
-                      !A5 x---|3           18|---x !RAMSEL                  
+                       A4 x---|2           19|---x CLKOUT                   
+                       A5 x---|3           18|---x !RAMSEL                  
                       A15 x---|4           17|---x !ROMSEL                  
                     !IORQ x---|5           16|---x BZRCLK                   
                    !MEMRQ x---|6           15|---x LCDE                     

@@ -7,6 +7,7 @@
 ;
 ;----------------------------------------------------
 
+
 org 0000h
         LD SP, RAMTOP   ; initialise stack pointer to the top of available RAM
         IM 2            ; set interupt mode to 2
@@ -17,11 +18,11 @@ org 0000h
 
 org 0038h
         ; respond to mode 1 interrupt
-        EX AF, AF'
+        EX AF, AF'       
         EXX
-        CALL handleInt
+        CALL handleInt 
         EXX
-        EX AF, AF'
+        EX AF, AF'		
         EI
         RETI
 
@@ -38,6 +39,29 @@ org 0100h
         KeyClickHandler: defb 38h, 00h ; we're pointing back at the mode 1 INT handler
                                         ; so that the routine works for both mode 1 and 2
                                         ; note, low order byte goes first
+
+
+Aniol: defb   "               _ANIOL640_               ", 0
+RAMTOP equ 0BFFFh
+TestAddr equ 8000h  		; points to the beginning of RAM
+ClkScratchpad equ 8008h
+ClkData equ 8009h
+KbdBuff equ 8012h         	; a 1-byte buffer
+LcdBuff equ 8020h          	; 20 byte long buffer + 1 byte for the trailing 0
+NmiCount equ 8035h
+MonCurrAddr equ 8036h
+Random equ 8038h
+Banks equ 8039h
+VgaCurX equ 8040h
+VgaCurY equ 8041h
+LineBuff equ 8100h
+PROGRAM_DATA equ 8200h
+
+Ready: defb     "Ready", 0
+Hello: defb     "Hello", 0
+Prompt: defb    ">", 0
+NvRamOk: defb   "NVRAM OK", 0
+NvRamNok: defb  "NVRAM Error", 0
 
 boot:
         LD A, 1
@@ -87,13 +111,6 @@ loop:
         HALT
         JP loop
 
-Ready: defb     "Ready", 0
-Hello: defb     "Hello", 0
-Prompt: defb    ">", 0
-NvRamOk: defb   "NVRAM OK", 0
-NvRamNok: defb  "NVRAM Error", 0
-
-include var.asm
 include util.asm
 include bzr.asm
 include mon.asm
@@ -101,7 +118,7 @@ include str.asm
 include mem.asm
 include cmd.asm
 include lcd.asm
-include vga.asm
+;include vga.asm
 include kbd.asm ; this goes last becasue of the org 2000h inside
 
 

@@ -7,8 +7,10 @@
 ;
 ;----------------------------------------------------
 
-MemTest: defb "MemTest", 0
-MemErr equ 1
+BANK_PORT equ 11011111b  ; bank switching is activated with A5
+MEM_ERR equ 1
+MEM_TEST: defb "MemTest", 0
+
 
 ; checks if NV RAM is installed
 ; returns 0 in C if non-volatile memory is found
@@ -16,21 +18,20 @@ MemErr equ 1
 ; this may happen if volatile RAM is installed
 ; or when it's the first run of the computer
 memTest:
-        LD IX, MemTest
+        LD IX, MEM_TEST
         LD IY, TestAddr
         CALL str_cmp    ; checks if RAM already contains the test string
         CP 0
         RET Z           ; if test string found, return 0 in C
-        LD IX, MemTest  ; otherwise copy it into the memory
+        LD IX, MEM_TEST ; otherwise copy it into the memory
         LD IY, TestAddr
         CALL str_copy
-        LD A, MemErr
+        LD A, MEM_ERR
         RET
 
 mem_cpy:
         RET
 
-BANK_PORT equ 11011111b  ; bank switching is activated with A5
 
 ; sets the currently switched in ROM bank
 ; A - ROM bank to switch in, 0-7

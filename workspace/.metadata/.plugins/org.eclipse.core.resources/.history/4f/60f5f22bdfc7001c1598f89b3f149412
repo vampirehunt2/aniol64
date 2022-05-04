@@ -1,0 +1,41 @@
+Name     PAL ; 
+PartNo   00 ; 
+Date     10/10/10 ;
+Revision 01 ;
+Designer Engineer ;
+Company  None ;
+Assembly None ; 
+Location  ;
+Device   g16v8 ;
+
+/* https://www.waveguide.se/?article=35&file=mc3-video-part1.png */
+/* INPUT */
+PIN 1 = N5;
+PIN 2 = N6;
+PIN 3 = N7;
+PIN 4 = N8;
+PIN 5 = N11;
+PIN 6 = N12;
+PIN 7 = N13;
+PIN 8 = N14;
+PIN 9 = N17;
+PIN 11 = N2;
+PIN 12 = N3;
+PIN 13 = VSYNCIN; /* connect externally with VSYNC */
+PIN 14 = HSYNCIN; /* connect externally with HSYNC */
+
+/* OUTPUT */
+
+PIN 16 = SYNC;
+PIN 17 = VSYNC;
+PIN 18 = HSYNC;
+PIN 19 = LOAD;
+
+/* PRODUCTIONS */
+HSYNC = N5 & N6 & N7 & N8;
+VSYNC = !N11 & !N12 & N13 & !N14 & N17;
+SYNC = !(HSYNCIN $ VSYNCIN); 
+LOAD = (N2 $ N3) & !N17;
+
+
+

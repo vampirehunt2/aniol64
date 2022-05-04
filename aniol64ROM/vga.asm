@@ -15,7 +15,7 @@ vga_init:
         XOR A           ;LD A, 0
         LD (VgaCurX), A
         LD (VgaCurY), A
-        CALL vga_clrscr
+        CALL vga_clrScr
         CALL vga_curOn
         RET
 
@@ -142,12 +142,13 @@ PROC
 ; - VgaCurX - X position
 ; - VgaCurY - Y position
 vga_addr2XY:
-        PUSH BC
+        PUSH BC			; store register state
+		PUSH HL
         AND A           ; clear carry
-        LD BC, VRAM
-        SBC HL, BC
+        LD BC, VRAM		; reading in the VRAM base address to BC
+        SBC HL, BC		; subtracting the base VRAM address from HL
         LD A, L
-        AND 00111111b
+        AND 00111111b	; extract column number (X position of the cursor)
         LD (VgaCurX), A ; store column number
         AND A           ; clear carry
         LD B, 6         ; init loop conter
@@ -157,6 +158,7 @@ _loop:
         DJNZ _loop
         LD A, L         ; line number now in L
         LD (VgaCurY), A ; store line number
+		POP HL			; restore re
         POP BC
         RET
 ENDP
@@ -260,6 +262,7 @@ PROC
 ; IX - null-terminated string to write
 vga_wriStr:
         PUSH HL           ; store register state
+		PUSH IX
         CALL vga_XY2addr  ; loads current VRAM address into HL
 _loop:
         LD A, (IX)    ; loads the current character in the string to A
@@ -272,17 +275,22 @@ _loop:
         LD A, L
         AND 00111111b ; get X position of the current character
         CP MAX_X      ; if we're at the end of the line, we should wrap around
-        JR Z, vga_nextLine
-        JR C, vga_nextLine    ; if we happen to be beyond the end of line, best we wrap as well
+        JR Z, _wrap
+        JR C, _wrap   ; if we happen to be beyond the end of line, best we wrap as well
         JP _loop
 _wrap:
         CALL vga_addr2XY      ; store the current X and Y position in memory
-        CALL Z, vga_nextLine  ; move to the next line, either down or by scrolling
+        CALL vga_nextLine  ; move to the next line, either down or by scrolling
         CALL vga_XY2addr      ; calculate the new VRAM address and load it to HL
-_endLoop:
         JP _loop
 _end:
         CALL vga_addr2XY      ; store the final X and Y position in memory
+		POP IX
         POP HL                ; restore register state
         RET
 ENDP
+
+vga_writeLn:
+		CALL vga_wriStr
+		CALL vga_nextLine
+		RET
