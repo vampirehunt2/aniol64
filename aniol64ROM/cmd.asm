@@ -16,11 +16,15 @@ Rnd: defb "rnd", 0
 Peek: defb "peek", 0
 Poke: defb "poke", 0
 Put: defb "put", 0
+Beep: defb "beep", 0
 UnknownCmd: defb "Unknown cmd: ", 0
+Prompt: defb ">", 0
 
 PROC
-defb "cmd_main"
 cmd_main:
+		LD IX, Prompt
+		CALL vga_wriStr
+		CALL vga_curOn
         CALL cmd_readLn
         CALL str_tok
         ; clear screen command
@@ -71,27 +75,30 @@ cmd_main:
         CALL str_cmp
         CP 0
         JP Z, _put
+        ; beep command
+        LD IX, LineBuff
+        LD IY, Beep
+        CALL str_cmp
+        CP 0
+        JP Z, _beep
         ; unknown command
         LD IX, UnknownCmd
-        CALL lcd_wriStr
-        LD IX, LineBuff
-        CALL lcd_wriStr
+        CALL vga_wriStr
         CALL bzr_beep
 _wrap:
-        CALL lcd_nextLine
-        JP cmd_main
+		CALL vga_nextLine
+		JP cmd_main
 _clr:
-        CALL lcd_clrScr
-        CALL lcd_home
+        CALL vga_clrScr
+        CALL vga_home
         JP cmd_main
 _rst:
         RST 00h
-        JP _wrap
 _echo:
         PUSH HL
         POP IX
-        CALL lcd_wriStr
-        JP _wrap
+        CALL vga_writeLn
+        JP cmd_main
 _peek:
         PUSH HL
         POP IX
@@ -107,14 +114,17 @@ _put:
         POP IX
         CALL mon_put
         JP cmd_main
+_beep:
+        CALL bzr_beep
+        JP _wrap
 _rnd:
         CALL rnd
         CALL byte2asc
         PUSH AF
         LD A, B
-        CALL lcd_putChar
+        CALL vga_putChar
         POP AF
-        CALL lcd_putChar
+        CALL vga_putChar
         JP _wrap
 _mon:
         CALL mon_main
@@ -124,6 +134,6 @@ ENDP
 
 cmd_readLn:
         CALL kbd_readLine
-        CALL lcd_nextLine
+        CALL vga_nextLine
         LD IX, LineBuff
         RET

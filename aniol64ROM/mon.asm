@@ -22,9 +22,13 @@ Exit: defb "Exiting...", 0
 ParseErr: defb "Parse error", 0
 InvAddr: defb "Invalid address", 0
 InvVal: defb "Invalid value", 0
+BlankLine: defb "                    ", 0
+
+MonCurrAddr equ PROGRAM_DATA
 
 PROC
 mon_main:
+		CALL vga_clrScr
         LD A, 0
         LD (MonCurrAddr), A
         LD (MonCurrAddr + 1), A
@@ -100,14 +104,14 @@ mon_main_loop:
         CALL str_cmp
         CP 0
         JR Z, _bye
-        ; unknown command
+        ; unknown command 
         LD IX, UnknownCmd
-        CALL lcd_gotoLn4
-        CALL lcd_wriStr
+        CALL vga_gotoLn4
+        CALL vga_wriStr
         JP mon_main_loop
 _bye:
         LD IX, Exit
-        CALL lcd_wriStr
+        CALL vga_wriStr
         RET
 ENDP
 
@@ -122,9 +126,9 @@ mon_setAddress:
         CALL mon_dsp
         JP mon_main_loop
 _parseError:
-        CALL lcd_gotoLn4
+        CALL vga_gotoLn4
         LD IX, InvAddr
-        CALL lcd_wriStr
+        CALL vga_wriStr
         CALL kbd_readKey
         CALL mon_blank
         JP mon_main_loop
@@ -140,9 +144,9 @@ mon_run:
         JP (HL)  ; we are assuming whatever program we call will
                 ;either continue running until system reset or jump back to a known location, such as mon_main
 _parseError:
-        CALL lcd_gotoLn4
+        CALL vga_gotoLn4
         LD IX, InvAddr
-        CALL lcd_wriStr
+        CALL vga_wriStr
         CALL kbd_readKey
         CALL mon_blank
         JP mon_main_loop
@@ -169,9 +173,9 @@ mon_setValue:
         POP HL
         JR mon_setValue
 _parseError:
-        CALL lcd_gotoLn4
+        CALL vga_gotoLn4
         LD IX, InvVal
-        CALL lcd_wriStr
+        CALL vga_wriStr
         CALL kbd_readKey
         CALL mon_blank
         JP mon_main_loop
@@ -206,9 +210,9 @@ _loop:
         CALL mon_dsp
         JP mon_main_loop
 _parseError:
-        CALL lcd_gotoLn4
+        CALL vga_gotoLn4
         LD IX, InvVal
-        CALL lcd_wriStr
+        CALL vga_wriStr
         CALL kbd_readKey
         CALL mon_blank
         JP mon_main_loop
@@ -243,16 +247,16 @@ _loop:
         CALL mon_dsp
         JP mon_main_loop
 _invalidValue:
-        CALL lcd_gotoLn4
+        CALL vga_gotoLn4
         LD IX, InvVal
-        CALL lcd_wriStr
+        CALL vga_wriStr
         CALL kbd_readKey
         CALL mon_blank
         JP mon_main_loop
 _invalidAddress:
-        CALL lcd_gotoLn4
+        CALL vga_gotoLn4
         LD IX, InvAddr
-        CALL lcd_wriStr
+        CALL vga_wriStr
         CALL kbd_readKey
         CALL mon_blank
         JP mon_main_loop
@@ -296,26 +300,26 @@ mon_prevLine:
 
 PROC
 mon_dsp:
-        CALL lcd_hideCursor
+        CALL vga_curOff
         LD BC, (MonCurrAddr)
         LD A, C
         AND 11111100b    ; make sure the address from which you star displaying is at a 4 byte alignement
         LD C, A
         PUSH BC
         POP HL          ; puts the current mon address in HL
-        CALL lcd_gotoLn1
+        CALL vga_gotoLn1
         CALL mon_printAddrs
         CALL mon_printVals
-        CALL lcd_gotoLn2
+        CALL vga_gotoLn2
         CALL mon_nextAddrs
         CALL mon_printAddrs
         CALL mon_printVals
-        CALL lcd_gotoLn3
+        CALL vga_gotoLn3
         CALL mon_nextAddrs
         CALL mon_printAddrs
         CALL mon_printVals
-        CALL lcd_gotoLn4
-        CALL lcd_showCursor
+        CALL vga_gotoLn4
+        CALL vga_curOn
         RET
 ENDP
 
@@ -326,15 +330,15 @@ mon_printAddrs:
         POP IX
         CALL mon_printDByte
         LD A, '-'
-        CALL lcd_putChar
+        CALL vga_putChar
         INC IX
         INC IX
         INC IX
         CALL mon_printLByte
         LD A, ":"
-        CALL lcd_putChar
+        CALL vga_putChar
         LD A, " "
-        CALL lcd_putChar
+        CALL vga_putChar
         RET
 
 ; prints the values for a single line of output of the dsp command
@@ -344,15 +348,15 @@ mon_printVals:
         POP IX
         CALL mon_printByte
         LD A, " "
-        CALL lcd_putChar
+        CALL vga_putChar
         INC IX
         CALL mon_printByte
         LD A, " "
-        CALL lcd_putChar
+        CALL vga_putChar
         INC IX
         CALL mon_printByte
         LD A, " "
-        CALL lcd_putChar
+        CALL vga_putChar
         INC IX
         CALL mon_printByte
         RET
@@ -363,9 +367,9 @@ mon_printByteA:
         CALL byte2asc
         PUSH AF
         LD A, B
-        CALL lcd_putChar
+        CALL vga_putChar
         POP AF
-        CALL lcd_putChar
+        CALL vga_putChar
         RET
 
 ; prints the value of a double byte stored in IX to the lcd screen
@@ -377,16 +381,16 @@ mon_printDByte:
         CALL byte2asc
         PUSH AF
         LD A, B
-        CALL lcd_putChar
+        CALL vga_putChar
         POP AF
-        CALL lcd_putChar
+        CALL vga_putChar
         LD A, E
         CALL byte2asc
         PUSH AF
         LD A, B
-        CALL lcd_putChar
+        CALL vga_putChar
         POP AF
-        CALL lcd_putChar
+        CALL vga_putChar
         RET
 
 ; prints the value the lower byte of IX to the lcd screen
@@ -398,9 +402,9 @@ mon_printLByte
         CALL byte2asc
         PUSH AF
         LD A, B
-        CALL lcd_putChar
+        CALL vga_putChar
         POP AF
-        CALL lcd_putChar
+        CALL vga_putChar
         RET
 
 ; moves the address in HL by one line (4 memory cells)
@@ -432,10 +436,10 @@ _nonWriteable:
 ENDP
 
 mon_blank:
-        CALL lcd_gotoLn4
+        CALL vga_gotoLn4
         LD IX, BlankLine
-        CALL lcd_wriStr
-        CALL lcd_gotoLn4
+        CALL vga_wriStr
+        CALL vga_gotoLn4
         RET
 
 PROC
@@ -448,7 +452,7 @@ mon_peek:
         RET
 _parseError:
         LD IX, InvAddr
-        CALL lcd_wriStr
+        CALL vga_wriStr
         RET
 ENDP
 
@@ -470,11 +474,11 @@ mon_poke:
         RET
 _addrError:
         LD IX, InvAddr
-        CALL lcd_wriStr
+        CALL vga_wriStr
         RET
 _valError:
         LD IX, InvVal
-        CALL lcd_wriStr
+        CALL vga_wriStr
         RET
 ENDP
 
@@ -498,11 +502,11 @@ mon_put:
         RET
 _addrError:
         LD IX, InvAddr
-        CALL lcd_wriStr
+        CALL vga_wriStr
         RET
 _valError:
         LD IX, InvVal
-        CALL lcd_wriStr
+        CALL vga_wriStr
         RET
 ENDP
 
