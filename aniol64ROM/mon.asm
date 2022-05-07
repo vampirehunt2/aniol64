@@ -7,34 +7,36 @@
 ;
 ;----------------------------------------------------
 
-SetValue: defb "s", 0
+SetValue: 	defb "s", 0
 SetAddress: defb "a", 0
 NextScreen: defb "n", 0
 PrevScreen: defb "p", 0
-NextLine: defb "d", 0
-PrevLine: defb "u", 0
-Fill: defb "f", 0
-Copy: defb "c", 0
-Run: defb "r", 0
+NextLine: 	defb "d", 0
+PrevLine: 	defb "u", 0
+Fill: 		defb "f", 0
+Copy: 		defb "c", 0
+Run: 		defb "r", 0
 
-Bye: defb "bye", 0
-Exit: defb "Exiting...", 0
-ParseErr: defb "Parse error", 0
-InvAddr: defb "Invalid address", 0
-InvVal: defb "Invalid value", 0
-BlankLine: defb "                    ", 0
+Bye: 		defb "bye", 			0
+Exit: 		defb "Exiting...", 		0
+ParseErr: 	defb "Parse error", 	0
+InvAddr: 	defb "Invalid address", 0
+InvVal: 	defb "Invalid value", 	0 
+Blank:		defb "                                      ", 0
 
-MonCurrAddr equ PROGRAM_DATA
+MonCurrAddr equ PROGRAM_DATA 
+LINE_NUM 	equ 26
 
 PROC
 mon_main:
 		CALL vga_clrScr
-        LD A, 0
+        LD A, 0  
         LD (MonCurrAddr), A
         LD (MonCurrAddr + 1), A
-        CALL mon_dsp
+		CALL mon_refresh
 mon_main_loop:
-        CALL mon_blank
+		CALL vga_curOn
+		CALL mon_gotoCmdLine
         CALL kbd_readLine
         LD IX, LineBuff
         CALL str_tok
@@ -106,14 +108,34 @@ mon_main_loop:
         JR Z, _bye
         ; unknown command 
         LD IX, UnknownCmd
-        CALL vga_gotoLn4
+        CALL mon_gotoStatusLine
         CALL vga_wriStr
         JP mon_main_loop
 _bye:
-        LD IX, Exit
-        CALL vga_wriStr
         RET
 ENDP
+
+mon_gotoCmdLine:
+		LD B, 0
+		LD C, LINE_NUM
+		CALL vga_gotoXY
+		LD IX, Blank
+		CALL vga_wriStr
+		LD B, 0
+		LD C, LINE_NUM
+		CALL vga_gotoXY
+		RET
+		
+mon_gotoStatusLine:
+		LD B, 0
+		LD C, LINE_NUM + 1
+		CALL vga_gotoXY
+		LD IX, Blank
+		CALL vga_wriStr
+		LD B, 0
+		LD C, LINE_NUM + 1
+		CALL vga_gotoXY
+		RET
 
 PROC
 mon_setAddress:
@@ -126,11 +148,11 @@ mon_setAddress:
         CALL mon_dsp
         JP mon_main_loop
 _parseError:
-        CALL vga_gotoLn4
+        CALL mon_gotoStatusLine
         LD IX, InvAddr
         CALL vga_wriStr
         CALL kbd_readKey
-        CALL mon_blank
+        CALL mon_refresh
         JP mon_main_loop
 ENDP
 
@@ -144,11 +166,11 @@ mon_run:
         JP (HL)  ; we are assuming whatever program we call will
                 ;either continue running until system reset or jump back to a known location, such as mon_main
 _parseError:
-        CALL vga_gotoLn4
+        CALL mon_gotoStatusLine
         LD IX, InvAddr
         CALL vga_wriStr
         CALL kbd_readKey
-        CALL mon_blank
+        CALL mon_refresh
         JP mon_main_loop
         RET
 ENDP
@@ -173,15 +195,14 @@ mon_setValue:
         POP HL
         JR mon_setValue
 _parseError:
-        CALL vga_gotoLn4
+        CALL mon_gotoStatusLine
         LD IX, InvVal
         CALL vga_wriStr
         CALL kbd_readKey
-        CALL mon_blank
         JP mon_main_loop
 _completed:
         CALL mon_dsp
-        JP Z, mon_main_loop
+        JP mon_main_loop
 ENDP
 
 PROC
@@ -210,11 +231,11 @@ _loop:
         CALL mon_dsp
         JP mon_main_loop
 _parseError:
-        CALL vga_gotoLn4
+        CALL mon_gotoStatusLine
         LD IX, InvVal
         CALL vga_wriStr
         CALL kbd_readKey
-        CALL mon_blank
+        CALL mon_refresh
         JP mon_main_loop
 ENDP
 
@@ -247,40 +268,48 @@ _loop:
         CALL mon_dsp
         JP mon_main_loop
 _invalidValue:
-        CALL vga_gotoLn4
+        CALL mon_gotoStatusLine
         LD IX, InvVal
         CALL vga_wriStr
         CALL kbd_readKey
-        CALL mon_blank
+        CALL mon_refresh
         JP mon_main_loop
 _invalidAddress:
-        CALL vga_gotoLn4
+        CALL mon_gotoStatusLine
         LD IX, InvAddr
         CALL vga_wriStr
         CALL kbd_readKey
-        CALL mon_blank
+        CALL mon_refresh
         JP mon_main_loop
 ENDP
 
-; displays the next 3 lines
+PROC
 mon_nextScreen:
+		PUSH BC
         LD HL, (MonCurrAddr)
+		LD B, LINE_NUM
+_loop:
         CALL mon_nextAddrs
-        CALL mon_nextAddrs
-        CALL mon_nextAddrs
+        DJNZ _loop
         LD (MonCurrAddr), HL
         CALL mon_dsp
+		POP BC
         JP mon_main_loop
+ENDP
 
-; displays the previous 3 lines
+PROC
 mon_prevScreen:
+		PUSH BC
         LD HL, (MonCurrAddr)
+		LD B, LINE_NUM
+_loop:
         CALL mon_prevAddrs
-        CALL mon_prevAddrs
-        CALL mon_prevAddrs
+		DJNZ _loop
         LD (MonCurrAddr), HL
         CALL mon_dsp
+		POP BC
         JP mon_main_loop
+ENDP
 
 ; scrolls one line down
 mon_nextLine:
@@ -300,26 +329,24 @@ mon_prevLine:
 
 PROC
 mon_dsp:
+		PUSH BC
         CALL vga_curOff
-        LD BC, (MonCurrAddr)
-        LD A, C
-        AND 11111100b    ; make sure the address from which you star displaying is at a 4 byte alignement
-        LD C, A
-        PUSH BC
-        POP HL          ; puts the current mon address in HL
-        CALL vga_gotoLn1
+        LD HL, (MonCurrAddr) 
+        LD A, L 
+        AND 11111000b    ; make sure the address from which you start displaying is at an 8 byte alignement   
+		LD L, A
+		CALL vga_gotoLn1
+		LD B, LINE_NUM
+_loop:
+		PUSH BC
         CALL mon_printAddrs
         CALL mon_printVals
-        CALL vga_gotoLn2
-        CALL mon_nextAddrs
-        CALL mon_printAddrs
-        CALL mon_printVals
-        CALL vga_gotoLn3
-        CALL mon_nextAddrs
-        CALL mon_printAddrs
-        CALL mon_printVals
-        CALL vga_gotoLn4
-        CALL vga_curOn
+        CALL vga_nextLine
+		CALL mon_nextAddrs
+		POP BC
+		DJNZ _loop
+		CALL vga_curOn
+		POP BC
         RET
 ENDP
 
@@ -329,37 +356,29 @@ mon_printAddrs:
         PUSH HL
         POP IX
         CALL mon_printDByte
-        LD A, '-'
-        CALL vga_putChar
-        INC IX
-        INC IX
-        INC IX
-        CALL mon_printLByte
         LD A, ":"
-        CALL vga_putChar
-        LD A, " "
         CALL vga_putChar
         RET
 
+PROC
 ; prints the values for a single line of output of the dsp command
 ; the first address in is HL
 mon_printVals:
+		PUSH BC
         PUSH HL
         POP IX
-        CALL mon_printByte
+		LD B, 8
+_loop:
+		PUSH BC
         LD A, " "
         CALL vga_putChar
-        INC IX
         CALL mon_printByte
-        LD A, " "
-        CALL vga_putChar
-        INC IX
-        CALL mon_printByte
-        LD A, " "
-        CALL vga_putChar
-        INC IX
-        CALL mon_printByte
+		INC IX
+		POP BC
+		DJNZ _loop
+		POP BC
         RET
+ENDP
 
 mon_printByte:
         LD A, (IX + 0)
@@ -407,17 +426,25 @@ mon_printLByte
         CALL vga_putChar
         RET
 
-; moves the address in HL by one line (4 memory cells)
+; moves the address in HL by one line (8 memory cells)
 mon_nextAddrs:
         INC HL
         INC HL
         INC HL
         INC HL
+		INC HL
+        INC HL
+        INC HL
+        INC HL
         RET
 
-; moves back the address in HL by one line (4 memory cells)
+; moves back the address in HL by one line (8 memory cells)
 mon_prevAddrs:
         DEC HL
+        DEC HL
+        DEC HL
+        DEC HL
+		DEC HL
         DEC HL
         DEC HL
         DEC HL
@@ -435,11 +462,9 @@ _nonWriteable:
         RET
 ENDP
 
-mon_blank:
-        CALL vga_gotoLn4
-        LD IX, BlankLine
-        CALL vga_wriStr
-        CALL vga_gotoLn4
+mon_refresh:
+        CALL vga_clrScr
+        CALL mon_dsp
         RET
 
 PROC
@@ -483,7 +508,6 @@ _valError:
 ENDP
 
 PROC
-defb "mon_put"
 mon_put:
         CALL str_tok        ; port number now in a string pointed to by IX, value in a string pointed to by HL
         PUSH HL             ; copying the value string

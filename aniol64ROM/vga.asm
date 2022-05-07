@@ -310,9 +310,11 @@ vga_writeLn:
 		RET
 		
 vga_gotoLn1:
+		PUSH BC
 		LD B, 0
 		LD C, 1
 		CALL vga_gotoXY
+		POP BC
 		RET
 		
 vga_gotoLn2:

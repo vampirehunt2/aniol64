@@ -9,7 +9,6 @@
 
 Clr: defb "clr", 0
 Mon: defb "mon", 0
-Clk: defb "clk", 0
 Reset: defb "rst", 0
 Echo: defb "echo", 0
 Rnd: defb "rnd", 0
@@ -17,7 +16,7 @@ Peek: defb "peek", 0
 Poke: defb "poke", 0
 Put: defb "put", 0
 Beep: defb "beep", 0
-UnknownCmd: defb "Unknown cmd: ", 0
+UnknownCmd: defb "Unknown cmd", 0
 Prompt: defb ">", 0
 
 PROC

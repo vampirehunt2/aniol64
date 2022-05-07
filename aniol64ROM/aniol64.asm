@@ -41,7 +41,7 @@ org 0100h
                                         ; note, low order byte goes first
 
 
-Aniol: defb   "               _ANIOL640_               ", 0
+Aniol: defb   "               _ANIOL640_", 0
 RAMTOP equ 0BFFFh
 TestAddr equ 8000h  		; points to the beginning of RAM
 ClkScratchpad equ 8008h
@@ -114,7 +114,7 @@ include mon.asm
 include str.asm
 include mem.asm
 include cmd.asm
-;include lcd.asm
+include lcd.asm
 include vga.asm
 include kbd.asm ; this goes last becasue of the org 2000h inside
 
