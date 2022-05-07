@@ -115,7 +115,7 @@ _put:
         JP cmd_main
 _beep:
         CALL bzr_beep
-        JP _wrap
+        JP cmd_main
 _rnd:
         CALL rnd
         CALL byte2asc
