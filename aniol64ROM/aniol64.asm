@@ -16,15 +16,14 @@ org 0000h
         EI              ; enable interrupts
         JP boot         ; jump over the interrupt handlers for NMI and mode 1 INT
 
+; interrupt handlers
 org 0038h
         ; respond to mode 1 interrupt
-        EX AF, AF'       
-        EXX
-        CALL handleInt 
-        EXX
-        EX AF, AF'		
-        EI
-        RETI
+        JP handleKeyClick
+        
+org 003Ch
+        JP handleDartRx
+
 
 org 0066h
         ; NMI handler
@@ -39,17 +38,17 @@ org 0100h
         KeyClickHandler: defb 38h, 00h ; we're pointing back at the mode 1 INT handler
                                         ; so that the routine works for both mode 1 and 2
                                         ; note, low order byte goes first
-
+        DartRxHandler: defb 3Ch, 00h                                                
 
 Aniol: defb   "               _ANIOL640_", 0
 RAMTOP equ 0BFFFh
-TestAddr equ 8000h  		; points to the beginning of RAM
+TestAddr equ 8000h          ; points to the beginning of RAM
 ClkScratchpad equ 8008h
 ClkData equ 8009h
-KbdBuff equ 8012h         	; a 1-byte buffer
-LcdBuff equ 8020h          	; 20 byte long buffer + 1 byte for the trailing 0
+KbdBuff equ 8012h           ; a 1-byte buffer
+LcdBuff equ 8020h           ; 20 byte long buffer + 1 byte for the trailing 0
 NmiCount equ 8035h
-Random equ 8038h
+Random equ 8036h            ; 2 bytes needed
 Banks equ 8039h
 VgaCurX equ 8040h
 VgaCurY equ 8041h
@@ -66,6 +65,10 @@ boot:
         CALL setRomBank
         LD A, 1
         CALL setRamBank
+		
+		LD A, 0
+		LD (Random), A
+		LD (Random + 1), A
 
         ; init LCD 
         CALL vga_init
@@ -75,7 +78,7 @@ boot:
         LD (KbdBuff), A
 
         ; greetings
-		CALL vga_nextLine
+        CALL vga_nextLine
         LD IX, Aniol
         CALL vga_writeLn
 
@@ -92,7 +95,7 @@ printMemTest:
         CALL vga_writeLn
         LD IX, Ready
         CALL vga_writeLn
-		
+        
         CALL bzr_beep
         LD A, 50
         CALL delay
@@ -100,7 +103,6 @@ printMemTest:
         LD A, 50
         CALL delay
         CALL bzr_beep
-        ;CALL snd_init
 
         ; wait for user input from here on in
         CALL cmd_main
@@ -108,22 +110,28 @@ loop:
         HALT
         JP loop
 
-include util.asm
-include bzr.asm
+
 include mon.asm
-include str.asm
-include mem.asm
 include cmd.asm
-include lcd.asm
-include vga.asm
-include kbd.asm ; this goes last becasue of the org 2000h inside
+include term.asm
+include lib/str.asm
+include lib/mem.asm
+include lib/util.asm
+include lib/math.asm
+include dev/bzr.asm
+include dev/lcd.asm
+include dev/vga.asm
+include dev/dart.asm
+include dev/kbd.asm ; this goes last becasue of the org 2000h inside
 
 
 PROC
-handleInt:
+handleKeyClick:
+        EX AF, AF'       
+        EXX
         LD A, (KbdBuff)
         CP 0                  ; checking if keyboard buffer is empty
-        RET NZ                ; this is essentially software debouncing
+        JP NZ, _end           ; this is essentially software debouncing
         CALL kbd_input
         CP 08                 ; check if BACKSPACE was pressed
         JR Z, _bkspc
@@ -132,7 +140,11 @@ handleInt:
         CALL vga_putChar      ; echo the character to screen, but don't remove it from the keyboard buffer
 _noEcho:
         CALL bzr_click
-        RET
+_end:
+        EXX
+        EX AF, AF'      
+        EI
+        RETI
 _bkspc:
         CALL vga_cursorLShift  ; TODO: check if you're already in the beginning of line
         LD A, ' '
@@ -142,10 +154,23 @@ _bkspc:
 ENDP
 
 PROC
-handleNmi:
+handleNmi: 
         LD A, (NmiCount)
-        INC A
+        INC A 
         LD (NmiCount), A
+        SRL A
+        SRL A
+        SRL A
+        SRL A
+        SRL A
+        CP 31
+        JR Z, _toggle
+        RET
+_toggle:
+        CALL vga_XY2addr
+        LD A, (HL)
+        XOR 10000000b
+        LD (HL), A
         RET
 ENDP
 

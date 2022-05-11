@@ -321,8 +321,8 @@ delay:
         CALL delay10ms
         JP delay
 
-; waits for 37us * 1,8432MHz = 69 clock cycles
-; which is just 11 NOPs, 4 cycles each
+; waits for 37us * 2.5MHz = 92 clock cycles
+; which is just 16 NOPs, 4 cycles each
 ; plus 10 cycles for the RET
 ; plus 17 cycles to CALL this routine
 delay37us:
@@ -337,10 +337,15 @@ delay37us:
         NOP
         NOP
         NOP
+		NOP
+		NOP
+		NOP
+		NOP
+		NOP
         RET
 
 ; waits for 1520us,
-; which is 22 calls to lcd_delay37us
+; which is 22 calls to delay37us
 delay1520us:
         CALL delay37us
         CALL delay37us

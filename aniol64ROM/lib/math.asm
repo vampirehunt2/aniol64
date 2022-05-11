@@ -6,7 +6,7 @@
 ; Created with zDevStudio - Z80 Development Studio.
 ;
 ;----------------------------------------------------
-
+ 
 EQUAL equ 0
 GREATER equ 1
 SMALLER equ 0FFh
@@ -16,8 +16,6 @@ DIVBY0 equ 1
 OVERFLOW equ 2
 FORMATERR equ 3
 OK equ 0
-TRUE equ 0ffh
-FALSE equ 0
 
 ; adds to 16 bit integers
 ; arguments in HL nd BC
@@ -571,7 +569,6 @@ _loop:
 _end:
         POP IX
         POP AF
-        ENDP
 ENDP
 
 ; converts a 16-bit unsigned number to its string representation

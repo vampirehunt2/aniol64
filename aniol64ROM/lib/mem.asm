@@ -43,7 +43,7 @@ setRomBank:
         AND 11111000b   ; clear the current ROM bank number, leave current RAM bank number intact
         OR B            ; set the new ROM bank number
         LD C, BANK_PORT
-        OUT (C), A        ; write the bank numbers to the bank switch register
+        OUT (C), A      ; write the bank numbers to the bank switch register
         LD (Banks), A   ; save the bank numbers to memory
         POP BC          ; restore original state of BC
         RET
@@ -54,7 +54,7 @@ setRamBank:
         PUSH BC         ; save current state of BC
         SLA A
         SLA A
-        SLA A            ; make sure the ROM bank is not switched by accident
+        SLA A           ; make sure the ROM bank is not switched by accident
         LD B, A         ; move the RAM bank number to B
         LD A, (Banks)   ; load the currently switched in banks for ROM and RAM
         AND 00000111b   ; clear the current RAM bank, leave the current ROM bank intact
@@ -76,9 +76,9 @@ getRomBank:
 ; result in A
 getRamBank:
         LD A, (Banks)
-        SRA A
-        SRA A
-        SRA A
+        SRL A
+        SRL A
+        SRL A
         RET
 
 

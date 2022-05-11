@@ -28,6 +28,7 @@ MonCurrAddr equ PROGRAM_DATA
 LINE_NUM 	equ 26
 
 PROC
+defb "mon_main"
 mon_main:
 		CALL vga_clrScr
         LD A, 0  
@@ -377,6 +378,25 @@ _loop:
 		POP BC
 		DJNZ _loop
 		POP BC
+		; print the actual characters
+		LD A, '|'
+		CALL vga_putChar
+		LD A, (IX - 8)
+		CALL vga_putChar
+		LD A, (IX - 7)
+		CALL vga_putChar
+		LD A, (IX - 6)
+		CALL vga_putChar
+		LD A, (IX - 5)
+		CALL vga_putChar
+		LD A, (IX - 4)
+		CALL vga_putChar
+		LD A, (IX - 3)
+		CALL vga_putChar
+		LD A, (IX - 2)
+		CALL vga_putChar
+		LD A, (IX - 1)
+		CALL vga_putChar
         RET
 ENDP
 
