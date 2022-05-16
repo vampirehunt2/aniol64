@@ -22,7 +22,6 @@ Exit: 		defb "Exiting...", 		0
 ParseErr: 	defb "Parse error", 	0
 InvAddr: 	defb "Invalid address", 0
 InvVal: 	defb "Invalid value", 	0 
-Blank:		defb "                                      ", 0
 
 MonCurrAddr equ PROGRAM_DATA 
 LINE_NUM 	equ 26

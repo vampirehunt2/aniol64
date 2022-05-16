@@ -381,15 +381,31 @@ ENDP
 PROC
 u8_mul:
         LD HL, 0
-	LD A, B
-	OR A
-	RET Z
-	LD D, 0
-	LD E, C
+		LD A, B
+		OR A
+		RET Z
+		LD D, 0
+		LD E, C
 _loop:
         ADD HL, DE
-	DJNZ _loop
-	RET
+		DJNZ _loop
+		RET
+ENDP
+
+PROC
+; divides A by B
+; result in C
+; rest in A
+u8_div:
+		LD C, 0
+_loop:
+		CP B
+		JR C, _end
+		SUB B
+		INC C
+		JP _loop
+_end:
+		RET
 ENDP
 
 PROC

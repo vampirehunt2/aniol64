@@ -1,6 +1,6 @@
 [Project]
 Name=test.zdsp
-Path=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\
+Path=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\test\
 ObjExt=.exe
 
 [File]
@@ -31,4 +31,4 @@ Total=0
 
 [FileInUse]
 Total=1
-0=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\test.asm
+0=C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\test\test.asm

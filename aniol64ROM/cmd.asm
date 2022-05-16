@@ -16,6 +16,7 @@ Peek: defb "peek", 0
 Poke: defb "poke", 0
 Put: defb "put", 0
 Beep: defb "beep", 0
+Term: defb "term", 0
 UnknownCmd: defb "Unknown cmd", 0
 Prompt: defb ">", 0
 
@@ -80,6 +81,12 @@ cmd_main:
         CALL str_cmp
         CP 0
         JP Z, _beep
+		; term program
+		LD IX, LineBuff
+		LD IY, Term
+		CALL str_cmp
+		CP 0
+		JP Z, term_main
         ; unknown command
         LD IX, UnknownCmd
         CALL vga_wriStr

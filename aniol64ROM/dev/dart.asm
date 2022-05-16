@@ -12,49 +12,42 @@ DART_A_CMD equ 11101110b
 DART_B_CMD equ 11101111b 
 DART_A_DAT equ 11101100b
 DART_B_DAT equ 11101101b
-
-X_ON equ 13h
+ 
+X_ON equ 13h 
 X_OFF equ 11h
 
-; Connection parameters are
-; 	- 2 stop bits
-;	- even parity
-; 	- 8bits per character
-;	- x64 data clock, i.e. 38400kbaud for a 2.5MHz system clock
+init_seq:
+		defb 0, 00011000b	; channel reset
+		defb 4, 11000100b	; x64 clock, no parity, 1 stop bit
+		defb 3, 11000001b	; Rx 8 bits enable Rx
+		defb 5, 01101000b	; Tx 8 bits, Tx enabled
+		defb 1, 10000000b	; disable interrupts, enable WAIT
+
 dart_init:
-		LD A, 00110000b ;write into WR0: error reset, select WR0
-		OUT(DART_B_CMD), A
-		LD A, 00011000b ;write into WR0: channel reset
-		OUT (DART_B_CMD), A
-		LD A, 1 		; select WR1
-		OUT(DART_B_CMD), A
-		LD A, 10011000b ; WAIT enabled, INT on all characters
-		OUT (DART_B_CMD), A
-		LD A, 2 		; select WR2 
-		OUT (DART_B_CMD), A 
-		;LD A, 02h		  interrupt vector 2 
-		OUT (DART_B_CMD), A 
-		LD A, 3			; select WR3
-		OUT (DART_B_CMD), A
-		LD A, 11000001b	; 8 bits per character, Rx enabled
-		OUT (DART_B_CMD), A
-		LD A, 4
-		OUT (DART_B_CMD), A
-		LD A, 11001101b	; x64 clock, 2 stop bit, even parity
-		OUT (DART_B_CMD), A
-		LD A, 5			; select WR5
-		OUT (DART_B_CMD), A
-		LD A, 01101000b	; DTS disabled, 8 bits per character, Tx enabled
+		LD HL, init_seq
+		LD B, 10
+		LD C, DART_B_CMD
+		OTIR
         RET
-		
+
+; writes a character out through the serial port	
+; A - character to write out
 dart_putChar:
 		OUT (DART_B_DAT), A
-		CALL dart_TxWait
+		; waiting for the character to be sent is done automatically
+		; since WAIT function is enabled.
 		RET
-		
+	 
+PROC 
+; synchronously reads a character from the serial port
+; when a character is available, it's ASCII code is in A
 dart_getChar:
+		IN A, (DART_B_CMD)
+		BIT 0, A
+		JR Z, dart_getChar
 		IN A, (DART_B_DAT)
 		RET
+ENDP
 		
 dart_xoff:
 		PUSH AF
@@ -74,7 +67,7 @@ dart_xon:
 dart_TxWait:
 		LD A, 1				; select RR1
 		OUT (DART_B_CMD), A
-		IN A,(DART_B_CMD) 	;read RRx
+		IN A,(DART_B_CMD) 	; read RR1
 		BIT 0, A			; check if ALL SENT bit is set
 		JR Z, dart_TxWait	; wait if not
 		RET

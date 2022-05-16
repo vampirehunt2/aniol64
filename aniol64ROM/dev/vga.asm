@@ -11,6 +11,8 @@ VRAM equ 3800h
 MAX_X equ 39
 MAX_Y equ 29
 
+Blank:		defb "                                      ", 0
+
 vga_init:
         CALL vga_clrScr
         CALL vga_home
@@ -242,6 +244,23 @@ _scroll:
 _end:
         CALL vga_curOn
         RET
+ENDP
+
+PROC
+vga_wrapLine:
+		CALL vga_curOff
+        XOR A           ; LD A, 0
+        LD (VgaCurX), A ; move the cursor to the beginning of line
+        LD A, (VgaCurY) ; load current cursor Y position (line number)
+        CP MAX_Y        ; if already at the bottom of the screen
+		JR Z, _wrapScreen   
+        INC A           ; else move to the next line down
+		JR _end
+_wrapScreen:
+		LD A, 0
+_end:
+        LD (VgaCurY), A
+		RET
 ENDP
 
 ; puts a single character on the screen

@@ -13,24 +13,75 @@
 ; computer on the other side is able to handle keyclicks in time.
 ; There is no terdown procedure implemented at this point,
 ; to exit the terminal program you have to reset the machine.
-
+ 
 Program defb "A-Term", 0
-Separator defb "========================================", 0
+Separator defb "=======================================", 0
 
-IntVector equ PROGRAM_DATA
-INT_TABLE_INDEX equ 02h
+IntTable equ 0A000h
+IntTableSize equ 8   ; just a guess
 
+
+PROC
 term_main: 
 		CALL dart_init
-		CALL setupInterrupts
+		CALL term_resetScreen
+		CALL term_setupInterrupts
+		CALL term_greet
+_loop:
+		CALL dart_getChar	; using polling for now
+		AND 01111111b		; make sure cursor is not stored
+		CP 13				; check if it's a carriage return
+		JR Z, _wrapLine
+		CALL vga_putChar	; put the received character on screen
+		LD A, (VgaCurY)		; check if we're at the end of the screen
+		CP MAX_Y
+		CALL Z, term_wrapScreen	; if yes, wrap around to the top
+		JR _loop
+_wrapLine:
+		CALL term_wrapLine
+		JR _loop
+		RET 
+ENDP
+
+term_wrapScreen:
+		LD B, 0
+		LD A, 3
+		CALL vga_gotoXY
+		RET
+		
+term_wrapLine:
+		CALL vga_curOff
+        XOR A           ; LD A, 0
+        LD (VgaCurX), A ; move the cursor to the beginning of line
+        LD A, (VgaCurY) ; load current cursor Y position (line number)
+        INC A           
+		LD (VgaCurY), A
+		CALL vga_curOn
+		RET
+
+term_resetScreen:
 		CALL vga_clrScr
+		CALL vga_home
+		LD IX, Blank
+		CALL vga_writeLn
 		LD IX, Program
 		CALL vga_writeLn
 		LD IX, Separator
 		CALL vga_writeLn
-		RET 
+		RET
 		
-		
+PROC	
+term_handleKeyClick:
+		EX AF, AF'       
+        EXX 
+        CALL kbd_input		  ; read a character from the keyboard
+        CALL dart_putChar     ; send the character to the serial port    
+        EXX
+        EX AF, AF'		
+        EI
+        RETI
+ENDP
+				
 PROC
 handleDartRx:
 		EX AF, AF'       
@@ -46,14 +97,32 @@ handleDartRx:
 ENDP
 
 PROC
-setupInterrupts:
-		LD H, 01h			; interrupt handler table address
-		LD L, 02h   		; interrupt handler table index
-		LD (IntVector), HL	; save original interrupt vector 
+term_setupInterrupts:
+		DI
+		LD HL, 0100h			; original interrupt handler table address
+        LD DE, IntTable 		; new interrupt handler table address
+        LD BC, IntTableSize  	; set loop counter to the size of the interrupt table
+        LDIR         			; copy the interrupt handler table to the new location
+		LD A, 0A0h				; load the top byte of the new interrupt handler table to A
+		LD I, A					; replace the original table address with the new one
+		LD HL, term_handleKeyClick	; load the new keyClick interrupt handler address to HL
+		LD (IntTable + 0), HL	; switch the keyClick interrupt handler to the new one
+		EI
 		RET
 ENDP
 
-PROC 
-restoreInterrupts:
+PROC
+term_greet:
+		LD IX, Program
+_loop:
+		LD A, (IX)
+		CP 0
+		JR Z, _end
+		CALL dart_putChar
+		INC IX
+		JR _loop
+_end:
+		RET
 ENDP
+
 		

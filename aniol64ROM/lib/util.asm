@@ -436,5 +436,5 @@ randomize:
         LD A, (NmiCount)
         CP 0
         JR Z, randomize
-        LD (Random), A
+        LD (Random +1), A
         RET

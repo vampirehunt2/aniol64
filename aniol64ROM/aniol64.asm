@@ -13,22 +13,24 @@ org 0000h
         IM 2            ; set interupt mode to 2
         LD A, 01h       ; higher byte of the interrupt vector table
         LD I, A         ; set the vector table address
-        EI              ; enable interrupts
+		EI				; enable interrupts
         JP boot         ; jump over the interrupt handlers for NMI and mode 1 INT
 
-; interrupt handlers
 org 0038h
         ; respond to mode 1 interrupt
-        JP handleKeyClick
-        
-org 003Ch
-        JP handleDartRx
-
+        EX AF, AF'       
+        EXX
+        CALL handleInt 
+        EXX
+        EX AF, AF'		
+        EI
+        RETI
 
 org 0066h
         ; NMI handler
         PUSH AF
         CALL handleNmi
+		CALL customNmiHandler
         POP AF
         EI
         RETN
@@ -38,20 +40,22 @@ org 0100h
         KeyClickHandler: defb 38h, 00h ; we're pointing back at the mode 1 INT handler
                                         ; so that the routine works for both mode 1 and 2
                                         ; note, low order byte goes first
-        DartRxHandler: defb 3Ch, 00h                                                
+		; DartRxHandler: 
+
 
 Aniol: defb   "               _ANIOL640_", 0
 RAMTOP equ 0BFFFh
-TestAddr equ 8000h          ; points to the beginning of RAM
+TestAddr equ 8000h  		; points to the beginning of RAM
 ClkScratchpad equ 8008h
 ClkData equ 8009h
-KbdBuff equ 8012h           ; a 1-byte buffer
-LcdBuff equ 8020h           ; 20 byte long buffer + 1 byte for the trailing 0
+KbdBuff equ 8012h         	; a 1-byte buffer
+LcdBuff equ 8020h          	; 20 byte long buffer + 1 byte for the trailing 0
 NmiCount equ 8035h
-Random equ 8036h            ; 2 bytes needed
+Random equ 8038h
 Banks equ 8039h
 VgaCurX equ 8040h
 VgaCurY equ 8041h
+customNmiHandler equ 8042h	; 3 byte procedure, either RET or JP **
 LineBuff equ 8100h
 PROGRAM_DATA equ 8200h
 
@@ -65,23 +69,20 @@ boot:
         CALL setRomBank
         LD A, 1
         CALL setRamBank
-		
-		LD A, 0
-		LD (Random), A
-		LD (Random + 1), A
-
-        ; init LCD 
+        ; init devices 
         CALL vga_init
-
         ; init the keyboard buffer to avoid a bogus character during the first read
         LD A, 0
         LD (KbdBuff), A
+		LD (Random), A
+		LD (Random + 1), A
+		
+		CALL resetNmiHandler
 
         ; greetings
-        CALL vga_nextLine
+		CALL vga_nextLine
         LD IX, Aniol
         CALL vga_writeLn
-
         ; check for NVRAM
         CALL memTest ; returns result in A
         CP 0
@@ -95,7 +96,7 @@ printMemTest:
         CALL vga_writeLn
         LD IX, Ready
         CALL vga_writeLn
-        
+		
         CALL bzr_beep
         LD A, 50
         CALL delay
@@ -103,6 +104,7 @@ printMemTest:
         LD A, 50
         CALL delay
         CALL bzr_beep
+        ;CALL snd_init
 
         ; wait for user input from here on in
         CALL cmd_main
@@ -110,28 +112,23 @@ loop:
         HALT
         JP loop
 
-
-include mon.asm
 include cmd.asm
+include mon.asm
 include term.asm
+include lib/util.asm
 include lib/str.asm
 include lib/mem.asm
-include lib/util.asm
-include lib/math.asm
 include dev/bzr.asm
-include dev/lcd.asm
 include dev/vga.asm
 include dev/dart.asm
 include dev/kbd.asm ; this goes last becasue of the org 2000h inside
 
 
 PROC
-handleKeyClick:
-        EX AF, AF'       
-        EXX
+handleInt:
         LD A, (KbdBuff)
         CP 0                  ; checking if keyboard buffer is empty
-        JP NZ, _end           ; this is essentially software debouncing
+        RET NZ                ; this is essentially software debouncing
         CALL kbd_input
         CP 08                 ; check if BACKSPACE was pressed
         JR Z, _bkspc
@@ -140,11 +137,7 @@ handleKeyClick:
         CALL vga_putChar      ; echo the character to screen, but don't remove it from the keyboard buffer
 _noEcho:
         CALL bzr_click
-_end:
-        EXX
-        EX AF, AF'      
-        EI
-        RETI
+        RET
 _bkspc:
         CALL vga_cursorLShift  ; TODO: check if you're already in the beginning of line
         LD A, ' '
@@ -154,23 +147,23 @@ _bkspc:
 ENDP
 
 PROC
-handleNmi: 
+handleNmi:
         LD A, (NmiCount)
-        INC A 
+        INC A
         LD (NmiCount), A
-        SRL A
-        SRL A
-        SRL A
-        SRL A
-        SRL A
-        CP 31
-        JR Z, _toggle
-        RET
-_toggle:
-        CALL vga_XY2addr
-        LD A, (HL)
-        XOR 10000000b
-        LD (HL), A
+		CALL (customNmiHandler)
         RET
 ENDP
+
+registerNmiHandler:
+		LD A, $C3					; JP ** instruction code
+		LD (customNmiHandler), A
+		LD (customNmiHandler + 1), HL
+		RET
+		
+resetNmiHandler:
+		LD A, 0C9h					; RET instruction
+		LD (customNmiHandler), A	; by default we just return from the custom NMI handler
+		RET
+
 
