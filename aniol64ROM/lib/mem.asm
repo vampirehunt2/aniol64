@@ -9,11 +9,11 @@
 
 BANK_PORT equ 11011111b  ; bank switching is activated with A5
 MEM_ERR equ 1
-MEM_TEST: defb "MemTest", 0
+MEM_TEST: defb "MemTst", 0
 
 
 ; checks if NV RAM is installed
-; returns 0 in C if non-volatile memory is found
+; returns 0 in A if non-volatile memory is found
 ; returns non-zero in A if data from previous run is not found
 ; this may happen if volatile RAM is installed
 ; or when it's the first run of the computer
@@ -22,10 +22,10 @@ memTest:
         LD IY, TestAddr
         CALL str_cmp    ; checks if RAM already contains the test string
         CP 0
-        RET Z           ; if test string found, return 0 in C
+        RET Z           ; if test string found, return 0 in A
         LD IX, MEM_TEST ; otherwise copy it into the memory
         LD IY, TestAddr
-        CALL str_copy
+        ;CALL str_copy
         LD A, MEM_ERR
         RET
 

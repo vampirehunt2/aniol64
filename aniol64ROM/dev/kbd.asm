@@ -77,7 +77,7 @@ _return:
 ENDP
 
 org KEYCODE_BASE_ADDR
-       	defb 71h	; 00-00-000b	q
+    defb 71h	; 00-00-000b	q
 	defb 77h	; 00-00-001b	w
 	defb 65h	; 00-00-010b	e
 	defb 72h	; 00-00-011b	r

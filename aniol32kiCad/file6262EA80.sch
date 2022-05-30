@@ -231,4 +231,6 @@ Wire Wire Line
 	4150 2700 4250 2700
 Wire Wire Line
 	4250 2700 4250 1400
+Text GLabel 1650 4350 2    50   Input ~ 0
+IO_IEO
 $EndSCHEMATC

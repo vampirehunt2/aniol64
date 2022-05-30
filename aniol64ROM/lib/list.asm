@@ -2,6 +2,7 @@
 
 LIST_SIZE equ 0
 
+; fills the entire list with zeroes without changing the list length
 PROC
 list_clear:
 		PUSH BC					; save register state
@@ -17,10 +18,6 @@ _loop:
 		INC IX
 		LD (IX), A
 		INC IX
-		LD (IX), A
-		INC IX
-		LD (IX), A
-		INC IX
 		DJNZ _loop
 _end:
 		POP IX					; restore register state
@@ -28,10 +25,15 @@ _end:
 		RET
 ENDP
 
+; creates a list with a given length
+; IX - address of the list
+; B - number of elements in the list
 list_create:
 		LD (IX + LIST_SIZE), B
 		RET
 
+; checks if the list has zero elements
+; result in A
 PROC
 list_empty:
 		LD A, (IX + LIST_SIZE)
@@ -43,6 +45,11 @@ _notEmpty:
 		LD A, FALSE
 		RET
 ENDP
+
+; returns the number of elements in the list in A
+list_len:
+		LD A, (IX + LIST_SIZE)
+		RET
 
 PROC
 list_append:

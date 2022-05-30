@@ -7,18 +7,21 @@
 ;
 ;----------------------------------------------------
  
-Clr: defb "clr", 0
-Mon: defb "mon", 0
-Reset: defb "rst", 0
-Echo: defb "echo", 0
-Rnd: defb "rnd", 0
-Peek: defb "peek", 0
-Poke: defb "poke", 0
-Put: defb "put", 0
-Beep: defb "beep", 0
-Term: defb "term", 0
+Clr: 		defb "clr", 0
+Mon: 		defb "mon", 0
+Reset: 		defb "rst", 0
+Echo: 		defb "echo", 0
+Rnd: 		defb "rnd", 0
+Peek: 		defb "peek", 0
+Poke: 		defb "poke", 0
+Put: 		defb "put", 0
+Get:		defb "get", 0
+Beep: 		defb "beep", 0
+Term: 		defb "term", 0
+DiskInfo: 	defb "di", 0
+DiskDiag:	defb "dd", 0
 UnknownCmd: defb "Unknown cmd", 0
-Prompt: defb ">", 0
+Prompt: 	defb ">", 0
 
 PROC
 cmd_main:
@@ -75,6 +78,12 @@ cmd_main:
         CALL str_cmp
         CP 0
         JP Z, _put
+		; get command
+		LD IX, LineBuff
+		LD IY, Get
+		CALL str_cmp
+		CP 0
+		JP Z, _get
         ; beep command
         LD IX, LineBuff
         LD IY, Beep
@@ -87,6 +96,18 @@ cmd_main:
 		CALL str_cmp
 		CP 0
 		JP Z, term_main
+		; disk info
+		LD IX, LineBuff
+		LD IY, DiskInfo
+		CALL str_cmp
+		CP 0
+		JP Z, _di
+		; disk info
+		LD IX, LineBuff
+		LD IY, DiskDiag
+		CALL str_cmp
+		CP 0
+		JP Z, _dd
         ; unknown command
         LD IX, UnknownCmd
         CALL vga_wriStr
@@ -120,6 +141,11 @@ _put:
         POP IX
         CALL mon_put
         JP cmd_main
+_get:
+		PUSH HL
+		POP IX
+		CALL mon_get
+		JP _wrap
 _beep:
         CALL bzr_beep
         JP cmd_main
@@ -132,6 +158,14 @@ _rnd:
         POP AF
         CALL vga_putChar
         JP _wrap
+_di:
+		LD HL, 9000h
+		CALL cf_di
+		JP cmd_main
+_dd:	
+		CALL cf_diag
+		CALL mon_printByteA
+		JP _wrap
 _mon:
         CALL mon_main
         JP _wrap

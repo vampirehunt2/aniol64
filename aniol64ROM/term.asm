@@ -45,7 +45,7 @@ ENDP
 
 term_wrapScreen:
 		LD B, 0
-		LD A, 3
+		LD C, 3
 		CALL vga_gotoXY
 		RET
 		
@@ -93,20 +93,20 @@ handleDartRx:
 		EXX
         EX AF, AF'		
 		EI
-		RET
+		RETI
 ENDP
 
 PROC
 term_setupInterrupts:
 		DI
-		LD HL, 0100h			; original interrupt handler table address
-        LD DE, IntTable 		; new interrupt handler table address
-        LD BC, IntTableSize  	; set loop counter to the size of the interrupt table
-        LDIR         			; copy the interrupt handler table to the new location
-		LD A, 0A0h				; load the top byte of the new interrupt handler table to A
-		LD I, A					; replace the original table address with the new one
+		LD HL, 0100h				; original interrupt handler table address
+        LD DE, IntTable 			; new interrupt handler table address
+        LD BC, IntTableSize  		; set loop counter to the size of the interrupt table
+        LDIR         				; copy the interrupt handler table to the new location
+		LD A, 0A0h					; load the top byte of the new interrupt handler table to A
+		LD I, A						; replace the original table address with the new one
 		LD HL, term_handleKeyClick	; load the new keyClick interrupt handler address to HL
-		LD (IntTable + 0), HL	; switch the keyClick interrupt handler to the new one
+		LD (IntTable + 0), HL		; switch the keyClick interrupt handler to the new one
 		EI
 		RET
 ENDP

@@ -14,6 +14,7 @@ org 0000h
         LD A, 01h       ; higher byte of the interrupt vector table
         LD I, A         ; set the vector table address
 		EI				; enable interrupts
+		CALL resetNmiHandler
         JP boot         ; jump over the interrupt handlers for NMI and mode 1 INT
 
 org 0038h
@@ -44,20 +45,19 @@ org 0100h
 
 
 Aniol: defb   "               _ANIOL640_", 0
-RAMTOP equ 0BFFFh
-TestAddr equ 8000h  		; points to the beginning of RAM
-ClkScratchpad equ 8008h
-ClkData equ 8009h
-KbdBuff equ 8012h         	; a 1-byte buffer
-LcdBuff equ 8020h          	; 20 byte long buffer + 1 byte for the trailing 0
-NmiCount equ 8035h
-Random equ 8038h
-Banks equ 8039h
-VgaCurX equ 8040h
-VgaCurY equ 8041h
-customNmiHandler equ 8042h	; 3 byte procedure, either RET or JP **
-LineBuff equ 8100h
-PROGRAM_DATA equ 8200h
+RAMTOP 				equ 0BFFFh
+TestAddr 			equ 8001h  		; points to the beginning of RAM
+KbdBuff 			equ 8012h       ; 1 byte buffer
+Echo 				equ 8013h
+Cursor				equ 8014h
+NmiCount 			equ 8035h		; 2 byte number
+Random 				equ 8037h		; 2 byte number
+Banks 				equ 8039h
+VgaCurX 			equ 8040h
+VgaCurY 			equ 8041h
+customNmiHandler 	equ 8042h		; 3 byte procedure, either RET or JP **
+LineBuff 			equ 8100h		; 256 byte buffer
+PROGRAM_DATA 		equ 8200h
 
 Ready: defb     "Ready", 0
 Hello: defb     "Hello", 0
@@ -71,13 +71,16 @@ boot:
         CALL setRamBank
         ; init devices 
         CALL vga_init
+		CALL cf_init
         ; init the keyboard buffer to avoid a bogus character during the first read
         LD A, 0
         LD (KbdBuff), A
 		LD (Random), A
 		LD (Random + 1), A
 		
-		CALL resetNmiHandler
+		LD A, TRUE
+		LD (Cursor), A
+		LD (Echo), A
 
         ; greetings
 		CALL vga_nextLine
@@ -121,20 +124,26 @@ include lib/mem.asm
 include dev/bzr.asm
 include dev/vga.asm
 include dev/dart.asm
+include dev/cf.asm
 include dev/kbd.asm ; this goes last becasue of the org 2000h inside
 
 
 PROC
 handleInt:
         LD A, (KbdBuff)
-        CP 0                  ; checking if keyboard buffer is empty
-        RET NZ                ; this is essentially software debouncing
+        CP 0            	; checking if keyboard buffer is empty
+        RET NZ         		; this is essentially software debouncing
         CALL kbd_input
-        CP 08                 ; check if BACKSPACE was pressed
+		LD A, B
+        CP 08            	; check if BACKSPACE was pressed
         JR Z, _bkspc
-        CP 20h                ; checks if the key corresponds to a control character
-        JR C, _noEcho         ; skip echo if less
-        CALL vga_putChar      ; echo the character to screen, but don't remove it from the keyboard buffer
+        CP 20h              ; checks if the key corresponds to a control character
+        JR C, _noEcho   	; skip echo if less
+		LD B, A				; test for echo
+		LD A, (Echo)		  
+		CP FALSE
+		JR Z, _noEcho
+        CALL vga_putChar	; echo the character to screen, but don't remove it from the keyboard buffer
 _noEcho:
         CALL bzr_click
         RET
@@ -151,16 +160,30 @@ handleNmi:
         LD A, (NmiCount)
         INC A
         LD (NmiCount), A
-		CALL (customNmiHandler)
+		CP 0
+		JR Z, _inc2
+		JR _end
+_inc2:
+		LD A, (NmiCount + 1)
+		INC A
+		LD (NmiCount + 1), A
+_end:
         RET
 ENDP
 
+; allows to register a routine that will be executed each time NMI is fired
+; the routine needs to end with a RET instruction
+; address of the routine in HL
+; destroys A
 registerNmiHandler:
 		LD A, $C3					; JP ** instruction code
 		LD (customNmiHandler), A
 		LD (customNmiHandler + 1), HL
 		RET
-		
+
+; restores the default NMI handler that is called each time NMI is fired		
+; the default hadler consists of an empty routine, i.e. just the RET instruction
+; destroys A
 resetNmiHandler:
 		LD A, 0C9h					; RET instruction
 		LD (customNmiHandler), A	; by default we just return from the custom NMI handler

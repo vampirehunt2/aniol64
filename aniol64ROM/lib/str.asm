@@ -11,8 +11,8 @@
 ; IX, IY: addresses of the strings to compare
 ; result in C: 0 if equal, 1 if different
 str_cmp:
-        LD A, (IX+0)
-        LD B, (IY+0)
+        LD A, (IX)
+        LD B, (IY)
         CP B
         JR NZ, strCmpNeq
         CP 0
@@ -31,8 +31,8 @@ strCmpNeq:
 ; IX: source string address
 ; IY: target address
 str_copy:
-        LD A, (IX+0)
-        LD (IY+0), A
+        LD A, (IX)
+        LD (IY), A
         CP 0
         RET Z
         INC IX

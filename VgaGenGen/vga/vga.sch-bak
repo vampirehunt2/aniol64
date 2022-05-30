@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 1
+Sheet 1 2
 Title ""
 Date ""
 Rev ""
@@ -730,8 +730,6 @@ Entry Wire Line
 Entry Wire Line
 	7950 3250 8050 3350
 Wire Wire Line
-	8300 3350 8050 3350
-Wire Wire Line
 	8300 3250 8050 3250
 Wire Wire Line
 	8300 3150 8050 3150
@@ -1185,6 +1183,111 @@ Wire Wire Line
 	4300 3250 4700 3250
 Wire Wire Line
 	8150 5650 8150 5400
+Wire Wire Line
+	8150 5400 8550 5400
+$Comp
+L Device:R_Small R?
+U 1 1 627DE5FC
+P 8200 3650
+F 0 "R?" V 8300 3650 50  0000 C CNN
+F 1 "1k" V 8095 3650 50  0000 C CNN
+F 2 "" H 8200 3650 50  0001 C CNN
+F 3 "~" H 8200 3650 50  0001 C CNN
+	1    8200 3650
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	8300 3650 8300 3350
+Wire Wire Line
+	8100 3650 8100 3350
+Wire Wire Line
+	8100 3350 8050 3350
+$Comp
+L 74xx:74LS14 U?
+U 6 1 627F2FB8
+P 7250 3650
+F 0 "U?" H 7250 3967 50  0000 C CNN
+F 1 "74LS14" H 7250 3876 50  0000 C CNN
+F 2 "" H 7250 3650 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS14" H 7250 3650 50  0001 C CNN
+	6    7250 3650
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Schottky D?
+U 1 1 627F48A8
+P 7800 3650
+F 0 "D?" H 7800 3867 50  0000 C CNN
+F 1 "D_Schottky" H 7800 3776 50  0000 C CNN
+F 2 "" H 7800 3650 50  0001 C CNN
+F 3 "~" H 7800 3650 50  0001 C CNN
+	1    7800 3650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7650 3650 7600 3650
+Wire Wire Line
+	7950 3650 8100 3650
+Connection ~ 8100 3650
+$Comp
+L Device:R_Small R?
+U 1 1 62808D1B
+P 7200 3150
+F 0 "R?" V 7004 3150 50  0000 C CNN
+F 1 "330k" V 7095 3150 50  0000 C CNN
+F 2 "" H 7200 3150 50  0001 C CNN
+F 3 "~" H 7200 3150 50  0001 C CNN
+	1    7200 3150
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	7600 3650 7600 3150
+Wire Wire Line
+	7600 3150 7300 3150
+Connection ~ 7600 3650
+Wire Wire Line
+	7600 3650 7550 3650
+Wire Wire Line
+	7100 3150 6950 3150
+Wire Wire Line
+	6950 3150 6950 3650
+$Comp
+L Device:C_Small C?
+U 1 1 6281E9AB
+P 6950 4000
+F 0 "C?" H 7042 4046 50  0000 L CNN
+F 1 "1u" H 7042 3955 50  0000 L CNN
+F 2 "" H 6950 4000 50  0001 C CNN
+F 3 "~" H 6950 4000 50  0001 C CNN
+	1    6950 4000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6950 3900 6950 3650
+Connection ~ 6950 3650
+$Comp
+L power:GND #PWR?
+U 1 1 62829BE7
+P 6950 4100
+F 0 "#PWR?" H 6950 3850 50  0001 C CNN
+F 1 "GND" H 6955 3927 50  0000 C CNN
+F 2 "" H 6950 4100 50  0001 C CNN
+F 3 "" H 6950 4100 50  0001 C CNN
+	1    6950 4100
+	1    0    0    -1  
+$EndComp
+$Sheet
+S 3100 7200 800  200 
+U 62C4CC9E
+F0 "colourRam" 50
+F1 "file62C4CC9D.sch" 50
+$EndSheet
+Text GLabel 10800 1450 2    50   Input ~ 0
+BUSY
+Wire Wire Line
+	10800 1450 10300 1450
+Wire Wire Line
+	10300 1450 10300 1150
 Wire Bus Line
 	6100 1650 6100 4250
 Wire Bus Line
@@ -1195,6 +1298,5 @@ Wire Bus Line
 	7950 700  7950 3250
 Wire Bus Line
 	950  700  950  6700
-Wire Wire Line
-	8150 5400 8550 5400
+Connection ~ 10300 1150
 $EndSCHEMATC

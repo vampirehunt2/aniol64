@@ -114,6 +114,7 @@ PROC
 ; VgaCurX - X position
 ; VgaCurY - Y position
 ; result in HL
+; destroys A
 vga_XY2addr:
         PUSH BC         ; store register values
         PUSH DE
@@ -144,6 +145,7 @@ PROC
 ; result:
 ; - VgaCurX - X position
 ; - VgaCurY - Y position
+; destroys A
 vga_addr2XY:
         PUSH BC			; store register state
 		PUSH HL
@@ -169,6 +171,7 @@ ENDP
 ; moves the cursor to a new X, Y position on screen
 ; B - X position
 ; C - Y position
+; destroys A
 ; TODO: do error checking
 vga_gotoXY:
         CALL vga_curOff
@@ -180,6 +183,7 @@ vga_gotoXY:
         RET
 
 PROC
+; destroys A
 vga_advanceCur:
         PUSH BC
         CALL vga_curOff
@@ -334,22 +338,4 @@ vga_gotoLn1:
 		LD C, 1
 		CALL vga_gotoXY
 		POP BC
-		RET
-		
-vga_gotoLn2:
-		LD B, 0
-		LD C, 2
-		CALL vga_gotoXY
-		RET
-		
-vga_gotoLn3:
-		LD B, 0
-		LD C, 3
-		CALL vga_gotoXY
-		RET
-		
-vga_gotoLn4:
-		LD B, 0
-		LD C, 4
-		CALL vga_gotoXY
 		RET

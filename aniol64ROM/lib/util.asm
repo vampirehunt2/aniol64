@@ -433,8 +433,13 @@ ENDP
 
 
 randomize:
+		PUSH HL
+		PUSH AF
         LD A, (NmiCount)
         CP 0
         JR Z, randomize
-        LD (Random +1), A
+        LD HL, (NmiCount)
+		LD (Random), HL
+		POP AF
+		POP HL
         RET

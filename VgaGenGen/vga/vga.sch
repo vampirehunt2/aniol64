@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 1
+Sheet 1 2
 Title ""
 Date ""
 Rev ""
@@ -1264,16 +1264,6 @@ F 3 "~" H 6950 4000 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	6950 3900 6950 3650
-Wire Bus Line
-	6100 1650 6100 4250
-Wire Bus Line
-	4650 4250 4650 5800
-Wire Bus Line
-	4300 700  4300 2450
-Wire Bus Line
-	7950 700  7950 3250
-Wire Bus Line
-	950  700  950  6700
 Connection ~ 6950 3650
 $Comp
 L power:GND #PWR?
@@ -1286,4 +1276,27 @@ F 3 "" H 6950 4100 50  0001 C CNN
 	1    6950 4100
 	1    0    0    -1  
 $EndComp
+$Sheet
+S 3100 7200 800  200 
+U 62C4CC9E
+F0 "colourRam" 50
+F1 "file62C4CC9D.sch" 50
+$EndSheet
+Text GLabel 10800 1450 2    50   Input ~ 0
+BUSY
+Wire Wire Line
+	10800 1450 10300 1450
+Wire Wire Line
+	10300 1450 10300 1150
+Wire Bus Line
+	6100 1650 6100 4250
+Wire Bus Line
+	4650 4250 4650 5800
+Wire Bus Line
+	4300 700  4300 2450
+Wire Bus Line
+	7950 700  7950 3250
+Wire Bus Line
+	950  700  950  6700
+Connection ~ 10300 1150
 $EndSCHEMATC

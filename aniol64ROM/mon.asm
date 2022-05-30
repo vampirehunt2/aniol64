@@ -553,3 +553,17 @@ _valError:
         RET
 ENDP
 
+PROC
+mon_get:
+		CALL parseByte
+		CP 0
+		JR NZ, _addrError
+		LD C, B
+		IN A, (C)
+		CALL mon_printByteA
+		RET
+_addrError:
+		LD IX, InvAddr
+        CALL vga_wriStr
+        RET
+ENDP
