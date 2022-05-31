@@ -66,16 +66,17 @@ snake_init:
 		CALL vga_clrScr
 		LD A, 0
 		LD (Echo), A			; turn echo off
+		LD (Cursor), A			; turn cursor off
 		LD (Head), A			; set the first item in the Coeffs table to be the current one
 		LD (Tail), A
 		LD IX, Coeffs
 		CALL rnd
-		LD B, 40				; randomly select the X position
-		CALL u8_div
+		AND 32				; randomly select the X position
+		ADD A, 4
 		LD (IX), A
 		CALL rnd
-		LD B, 30				; randomplu select the Y position
-		CALL u8_div
+		AND 16				; randomly select the Y position
+		ADD A, 7
 		LD (IX + 1), A
 		CALL rnd
 		AND 00000011b			; randomly select the direction
@@ -86,9 +87,10 @@ snake_init:
 		
 PROC
 snake_move:
-		LD HL, Coeffs
+		LD HL, Coeffs			
 		LD B, 0
 		LD A, (Head)
+		
 		LD C, A
 		ADD HL, BC				; current hed coefficient now in HL and HL + 1
 		LD A, (Dir)
@@ -145,7 +147,7 @@ snake_moveHead:
 		LD A, (HL)
 		LD B, A
 		INC HL
-		LD A, (HL
+		LD A, (HL)
 		LD C, A
 		CALL vga_gotoXY
 		LD A, '*'
@@ -161,7 +163,7 @@ snake_moveTail:
 		LD A, (HL)
 		LD B, A
 		INC HL
-		LD A, (HL
+		LD A, (HL)
 		LD C, A
 		CALL vga_gotoXY
 		LD A, ' '

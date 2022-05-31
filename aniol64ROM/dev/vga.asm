@@ -98,6 +98,16 @@ vga_curOff:
         RET
 ENDP
 
+vga_curEnable:
+		LD A, TRUE
+		LD (Cursor), A
+		RET
+		
+vga_curDisable:
+		LD A, FALSE
+		LD (Cursor), A
+		RET
+
 PROC
 ; checks whether screen coordinates are within the visible area [0..39, 0..29]
 ; D - X position
