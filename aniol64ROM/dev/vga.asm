@@ -67,10 +67,13 @@ vga_scroll:
         POP BC
         POP HL
         RET
-
-PROC
+ 
+PROC 
 ; turns on the cursor for the character at the current cursor position
 vga_curOn:
+		LD A, (Cursor)
+		CP FALSE
+		JR Z, _noCursor
 		PUSH HL
         CALL vga_XY2addr
         LD A, (HL)      ; get character at current cursor position
@@ -78,6 +81,9 @@ vga_curOn:
         LD (HL), A
 		POP HL
         RET
+_noCursor:
+		CALL vga_curOff
+		RET
 ENDP
 
 PROC

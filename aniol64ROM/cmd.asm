@@ -142,7 +142,7 @@ _poke:
         PUSH HL
         POP IX
         CALL mon_poke
-        JP cmd_main
+        JP _cmd_main
 _put:
         PUSH HL
         POP IX
