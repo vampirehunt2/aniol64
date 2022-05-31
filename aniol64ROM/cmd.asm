@@ -10,7 +10,7 @@
 Clr: 		defb "clr", 0
 Mon: 		defb "mon", 0
 Reset: 		defb "rst", 0
-Echo: 		defb "echo", 0
+EchoCmd:	defb "echo", 0
 Rnd: 		defb "rnd", 0
 Peek: 		defb "peek", 0
 Poke: 		defb "poke", 0
@@ -20,6 +20,7 @@ Beep: 		defb "beep", 0
 Term: 		defb "term", 0
 DiskInfo: 	defb "di", 0
 DiskDiag:	defb "dd", 0
+Test:		defb "test", 0
 UnknownCmd: defb "Unknown cmd", 0
 Prompt: 	defb ">", 0
 
@@ -44,7 +45,7 @@ cmd_main:
         JP Z, _rst
         ; echo command
         LD IX, LineBuff
-        LD IY, Echo
+        LD IY, EchoCmd
         CALL str_cmp
         CP 0
         JP Z, _echo
@@ -108,6 +109,12 @@ cmd_main:
 		CALL str_cmp
 		CP 0
 		JP Z, _dd
+		; test command
+		LD IX, LineBuff
+		LD IY, Test
+		CALL str_cmp
+		CP 0
+		JP Z, _test
         ; unknown command
         LD IX, UnknownCmd
         CALL vga_wriStr
@@ -166,6 +173,9 @@ _dd:
 		CALL cf_diag
 		CALL mon_printByteA
 		JP _wrap
+_test:
+		CALL test_main
+		JP cmd_main
 _mon:
         CALL mon_main
         JP _wrap

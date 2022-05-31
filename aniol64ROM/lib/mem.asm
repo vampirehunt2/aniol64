@@ -25,7 +25,7 @@ memTest:
         RET Z           ; if test string found, return 0 in A
         LD IX, MEM_TEST ; otherwise copy it into the memory
         LD IY, TestAddr
-        ;CALL str_copy
+        CALL str_copy
         LD A, MEM_ERR
         RET
 

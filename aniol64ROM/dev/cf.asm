@@ -21,6 +21,28 @@ CF_DIAG			equ 90h
 CF_ID			equ 0ECh
 CF_OK			equ 00h
 
+PROC
+; checks if a cf drive is present in the system
+; result in A
+cf_exists:
+		IN A, (CF_STATUS)
+		CP 0
+		JR NZ, _true
+		CALL delay10ms
+		IN A, (CF_STATUS)
+		CP 0
+		JR NZ, _true
+		CALL delay10ms
+		IN A, (CF_STATUS)
+		CP 0
+		JR NZ, _true
+		RET				; return FALSE, ie. zero that we already have in the A register
+_true:
+		LD A, TRUE
+		RET
+ENDP
+		
+
 ; waits until the cf card is ready
 ; the READY pin on the card is optional as per the CF spec
 ; some cards may not implement it

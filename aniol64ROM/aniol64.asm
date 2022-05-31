@@ -61,8 +61,6 @@ PROGRAM_DATA 		equ 8200h
 
 Ready: defb     "Ready", 0
 Hello: defb     "Hello", 0
-NvRamOk: defb   "NVRAM OK", 0
-NvRamNok: defb  "NVRAM Error", 0
 
 boot:
         LD A, 1
@@ -71,7 +69,7 @@ boot:
         CALL setRamBank
         ; init devices 
         CALL vga_init
-		CALL cf_init
+
         ; init the keyboard buffer to avoid a bogus character during the first read
         LD A, 0
         LD (KbdBuff), A
@@ -86,17 +84,10 @@ boot:
 		CALL vga_nextLine
         LD IX, Aniol
         CALL vga_writeLn
-        ; check for NVRAM
-        CALL memTest ; returns result in A
-        CP 0
-        JR Z, memTestOk
-        LD IX, NvRamNok
-        JP printMemTest
-memTestOk:
-        LD IX, NvRamOk
-        JP printMemTest
-printMemTest:
-        CALL vga_writeLn
+		; set up permanent storage
+		CALL dos_setUpCf
+		CALL dos_checkNvram
+		
         LD IX, Ready
         CALL vga_writeLn
 		
@@ -107,7 +98,6 @@ printMemTest:
         LD A, 50
         CALL delay
         CALL bzr_beep
-        ;CALL snd_init
 
         ; wait for user input from here on in
         CALL cmd_main
@@ -118,6 +108,8 @@ loop:
 include cmd.asm
 include mon.asm
 include term.asm
+include dos.asm
+include test/test.asm
 include lib/util.asm
 include lib/str.asm
 include lib/mem.asm
@@ -134,15 +126,15 @@ handleInt:
         CP 0            	; checking if keyboard buffer is empty
         RET NZ         		; this is essentially software debouncing
         CALL kbd_input
-		LD A, B
         CP 08            	; check if BACKSPACE was pressed
         JR Z, _bkspc
         CP 20h              ; checks if the key corresponds to a control character
-        JR C, _noEcho   	; skip echo if less
-		LD B, A				; test for echo
-		LD A, (Echo)		  
+        JR C, _noEcho   	; skip echo if less	
+		LD B, A
+		LD A, (Echo)
 		CP FALSE
 		JR Z, _noEcho
+		LD A, B
         CALL vga_putChar	; echo the character to screen, but don't remove it from the keyboard buffer
 _noEcho:
         CALL bzr_click
