@@ -173,8 +173,7 @@ _rnd:
         CALL vga_putChar
         JP _wrap
 _di:
-		LD HL, 9000h
-		CALL cf_di
+		CALL dos_cfDiskInfo
 		JP cmd_main
 _dd:	
 		CALL cf_diag

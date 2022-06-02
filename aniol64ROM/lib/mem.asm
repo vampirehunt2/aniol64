@@ -7,7 +7,7 @@
 ;
 ;----------------------------------------------------
 
-BANK_PORT equ 11011111b  ; bank switching is activated with A5
+BANK_PORT equ 11011111b  ; DFh bank switching is activated with A5
 MEM_ERR equ 1
 MEM_TEST: defb "MemTst", 0
 

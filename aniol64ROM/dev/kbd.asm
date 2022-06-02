@@ -7,10 +7,10 @@
 ;
 ;----------------------------------------------------
 
-; keyboard is selected with A6
 
-KEYCODE_BASE_ADDR equ 1000h
-KBD_PORT equ 10111111b
+
+KEYCODE_BASE_ADDR equ 3700h
+KBD_PORT equ 10111111b  ; BFh keyboard is selected with A6
 
 ; Converts keyboard code to ASCII code
 ; C - keycode to convert

@@ -114,12 +114,12 @@ include test/test.asm
 include lib/util.asm
 include lib/str.asm
 include lib/mem.asm
-include lib/list.asm
+;include lib/list.asm
 include dev/bzr.asm
 include dev/vga.asm
 include dev/dart.asm
 include dev/cf.asm
-include dev/kbd.asm ; this goes last becasue of the org 2000h inside
+include dev/kbd.asm ; this goes last becasue of the org 3700h inside
 
 
 PROC

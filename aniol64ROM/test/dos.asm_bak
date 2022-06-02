@@ -7,8 +7,7 @@
 ;
 ;----------------------------------------------------
 
-DiskFound1 defb "Disk...", 0
-DiskFound2 defb "found", 0
+DiskFound defb "Disk found", 0
 DiskNotFound defb "Disk not found", 0
 NvRamOk: defb   "NVRAM OK", 0
 NvRamNok: defb  "NVRAM Error", 0
@@ -17,17 +16,15 @@ Model: defb "Model: ", 0
 FirmwareRev: defb "Firmware Rev: ", 0
 LbaSectors: defb "LBA Sectors: ", 0
 
-SECTOR_BUFFER equ 08400h
- 
+SECTOR_BUFFER equ 0C000h
+
 PROC
 dos_setUpCf:
 		CALL cf_exists
 		CP FALSE
 		JR Z, _noDisk
-		LD IX, DiskFound1
-		CALL vga_wriStr
 		CALL cf_init
-		LD IX, DiskFound2
+		LD IX, DiskFound
 		CALL vga_writeLn
 		RET
 _noDisk:

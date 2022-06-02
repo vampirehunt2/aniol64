@@ -7,7 +7,7 @@
 ;
 ;----------------------------------------------------
 
-BZR_PORT equ 10111111b  ; buzzer is activated by A6
+BZR_PORT equ 10111111b  ; BFh buzzer is activated by A6
 
 bzr_beep:
         LD C, BZR_PORT
