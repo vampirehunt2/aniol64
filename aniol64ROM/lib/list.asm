@@ -7,6 +7,9 @@ MAX_LIST_SIZE equ 127
 TRUE equ 0FFh
 FALSE equ 00h
 
+OK equ 00h
+ERR equ 01h
+
 
 ; fills the entire list with zeroes without changing the list length
 ; IX - address of the list
@@ -36,16 +39,26 @@ ENDP
 ; creates a list with a given length
 ; IX - address of the list
 ; B - number of elements in the list
+; errors reported in A
+PROC
 defb "list_create"
 list_create:
+		LD A, B
+		CP MAX_LIST_SIZE
+		JR C, _error
 		LD (IX + LIST_SIZE), B
+		LD A, OK
 		RET
+_error:
+		LD A, ERR
+		RET
+ENDP
 
 ; checks if the list has as many elements as it can hold
 ; IX - address of the list
 ; result in A
 PROC
-defb "list_full"
+defb "list_isFull"
 list_isFull:
 		LD A, (IX + LIST_SIZE)
 		CP MAX_LIST_SIZE
@@ -68,12 +81,22 @@ list_len:
 ; increases the list size by 1
 ; by adding an unitialised element at the end		
 ; IX - address of the list
+; errors reported in A
+PROC
 defb "list_expand"
 list_expand:
+		CALL list_isFull
+		CP TRUE
+		JR Z, _err
 		LD A, (IX + LIST_SIZE)	; increase list size by 1
 		INC A						
 		LD (IX + LIST_SIZE), A
+		LD A, 0
 		RET
+_err:
+		LD A, ERR
+		RET
+ENDP
 
 ; appends a new element at the end of the list
 ; IX - address of the list
@@ -81,11 +104,18 @@ list_expand:
 PROC
 defb "list_append"
 list_append:
+		CALL list_isFull
+		CP TRUE
+		JR Z, _err
 		PUSH IX
 		CALL list_endAddr
 		CALL list_copyElem
 		POP IX					; restore register state
 		CALL list_expand
+		LD A, 0
+		RET
+_err:
+		LD A, ERR
 		RET
 ENDP
 
@@ -95,6 +125,9 @@ ENDP
 PROC
 defb "list_insert"
 list_insert:
+		CALL list_isFull
+		CP TRUE
+		JR Z, _err
 		PUSH IX
 		LD A, (IX + LIST_SIZE)
 		LD B, A
@@ -112,6 +145,10 @@ _loop:
 		LD A, (IX + LIST_SIZE)
 		INC A
 		LD (IX + LIST_SIZE), A
+		LD A, 0
+		RET
+_err:
+		LD A, ERR
 		RET
 ENDP
 
@@ -145,11 +182,12 @@ ENDP
 ; removes the last element from the list 
 ; and returns it in HL
 ; IX - address of the list
+PROC
 defb "list_pull"
 list_pull:
 		CALL list_isEmpty
 		CP TRUE
-		RET Z
+		JP Z, _err
 		PUSH IX
 		CALL list_endAddr
 		LD A, (IX - 1)
@@ -158,7 +196,12 @@ list_pull:
 		LD L, A
 		POP IX
 		CALL list_trim
+		LD A, 0
 		RET
+_err:
+		LD A, ERR
+		RET
+ENDP
 		
 ; sets the size of the list to zero
 ; IX - address of the list
@@ -244,14 +287,23 @@ ENDP
 ; returns the last item from the list
 ; list address in IX
 ; result in HL	
+PROC
 defb "list_last"
 list_last:
+		CALL list_isEmpty
+		CP TRUE
+		JP Z, _err
 		CALL list_endAddr
 		DEC IX
 		DEC IX
 		LD L, (IX)
 		LD H, (IX + 1)
+		LD A, 0
 		RET
+_err:
+		LD A, ERR
+		RET
+ENDP
 		
 defb "list_copyElem"
 list_copyElem:
@@ -295,6 +347,20 @@ list_getAt:
 		LD L, A
 		LD A, (IX + 1)
 		LD H, A
+		POP IX
+		RET
+	
+; puts an element on the B-th place the list
+; IX - list address
+; HL - element to add
+defb "list_putAt"	
+list_putAt:
+		PUSH IX
+		CALL list_getAddrAt
+		LD A, L
+		LD (IX + 0), A
+		LD A, H
+		LD (IX + 1), A
 		POP IX
 		RET
 

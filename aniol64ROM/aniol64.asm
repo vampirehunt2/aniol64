@@ -17,6 +17,10 @@ org 0000h
 		CALL resetNmiHandler
         JP boot         ; jump over the interrupt handlers for NMI and mode 1 INT
 
+org 0020h
+		Version: defb 0, 0, 0, 0
+		Build: defw 0000h
+
 org 0038h
         ; respond to mode 1 interrupt
         EX AF, AF'       
@@ -58,6 +62,7 @@ VgaCurY 			equ 8041h
 customNmiHandler 	equ 8042h		; 3 byte procedure, either RET or JP **
 LineBuff 			equ 8100h		; 256 byte buffer
 PROGRAM_DATA 		equ 8200h
+
 
 Ready: defb     "Ready", 0
 Hello: defb     "Hello", 0
