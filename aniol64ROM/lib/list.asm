@@ -3,13 +3,6 @@
 LIST_SIZE equ 0
 MAX_LIST_SIZE equ 127
 
-;
-TRUE equ 0FFh
-FALSE equ 00h
-
-OK equ 00h
-ERR equ 01h
-
 
 ; fills the entire list with zeroes without changing the list length
 ; IX - address of the list
@@ -45,7 +38,7 @@ defb "list_create"
 list_create:
 		LD A, B
 		CP MAX_LIST_SIZE
-		JR C, _error
+		JR NC, _error
 		LD (IX + LIST_SIZE), B
 		LD A, OK
 		RET

@@ -22,6 +22,7 @@ OK equ 0
 ; result in HL
 u16_add:
 i16_add:
+		AND A		; clear carry
         ADD HL, BC
         RET
 

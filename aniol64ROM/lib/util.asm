@@ -9,6 +9,7 @@
 
 FALSE equ 00h
 TRUE equ 0FFh
+ERR equ 01h
 
 
 ; converts a two-digit hex number to a printable string

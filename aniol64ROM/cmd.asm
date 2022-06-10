@@ -22,6 +22,7 @@ DiskInfo: 	defb "di", 0
 DiskDiag:	defb "dd", 0
 Test:		defb "test", 0
 Snake:		defb "snake", 0
+Onp:		defb "onp", 0
 UnknownCmd: defb "Unknown cmd", 0
 Prompt: 	defb ">", 0
 
@@ -122,6 +123,12 @@ cmd_main:
 		CALL str_cmp
 		CP 0
 		JP Z, snake_main
+		; onp 
+		LD IX, LineBuff
+		LD IY, Onp
+		CALL str_cmp
+		CP 0
+		JP Z, _onp
         ; unknown command
         LD IX, UnknownCmd
         CALL vga_wriStr
@@ -186,6 +193,11 @@ _mon:
         CALL mon_main
         JP _wrap
         RET
+_onp:
+		PUSH HL
+		POP IX
+		CALL onp_main
+		JP cmd_main
 ENDP
 
 cmd_readLn:

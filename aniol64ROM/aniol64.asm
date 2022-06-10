@@ -115,11 +115,13 @@ include mon.asm
 include term.asm
 include dos.asm
 include snake.asm
+include onp.asm
 include test/test.asm
 include lib/util.asm
 include lib/str.asm
 include lib/mem.asm
-;include lib/list.asm
+include lib/list.asm
+include lib/math.asm
 include dev/bzr.asm
 include dev/vga.asm
 include dev/dart.asm
