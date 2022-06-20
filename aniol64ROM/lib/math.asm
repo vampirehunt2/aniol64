@@ -416,11 +416,22 @@ ENDP
 
 PROC
 u16_parseHex:
+		LD A, (IX)
+        CP '$'         ; check if the string starts with $ indicating it's a hex number
+        JR NZ, _parseError
+        INC IX
+		CALL parseDByte
+		RET
+_parseError:
+		LD A, FORMATERR
         RET
 ENDP
 
 PROC
 u16_parseBin:
+		CALL u8_parseBin
+		LD L, C
+		LD H, 0  
         RET
 ENDP
 

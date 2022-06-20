@@ -181,7 +181,7 @@ _rnd:
         JP _wrap
 _di:
 		CALL dos_cfDiskInfo
-		JP cmd_main
+		JP _wrap
 _dd:	
 		CALL cf_diag
 		CALL mon_printByteA

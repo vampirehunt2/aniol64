@@ -139,29 +139,6 @@ _loop:
 		RET
 ENDP
 
-;cf_di:
-		;CALL cf_wait_cmd		; wait until the cf is ready to accept commands
-		;LD A, CF_ID			
-		;OUT (CF_CMD), A		; send the ID command
-		;CALL cf_wait			
-		;IN A, (CF_STATUS)		; load the status word
-		;BIT 3, A				; check if there is data to be read
-		;RET Z					; if no more data left, exit
-		;CALL cf_wait			
-		;IN A, (CF_DAT)			; read next byte of data
-		;LD (HL), A				; store it in memory
-		;INC HL					; increment HL
-		;JR cf_di				; rinse and repeat
-		;RET
-
-
-
-
-
-
-
-
-
 ; reads sector 0 into a buffer
 ; buffer address in HL
 cf_readSect0:

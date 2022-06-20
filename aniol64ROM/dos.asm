@@ -48,7 +48,7 @@ dos_cfDiskInfo:
 		LD IX, Model				; model
 		CALL vga_wriStr
 		LD IX, SECTOR_BUFFER + 54
-		LD B, 40
+		LD B, 30					; truncated to the width of the display
 		CALL dos_printRecord
 		CALL vga_nextLine
 		LD IX, FirmwareRev			; firmware
@@ -91,4 +91,9 @@ _printMemTest:
         CALL vga_writeLn
 		RET
 ENDP
+
+dos_loadDirs:
+		
+		RET
+		
 		

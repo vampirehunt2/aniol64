@@ -13,7 +13,7 @@ MULTIPLY equ '*'
 MODULO equ '\'
 NEGATE equ '~'
 
-BIN equ '%'
+BIN equ '!'
 HEX equ '$'
 
 ARITHMETIC_ERROR equ 1
