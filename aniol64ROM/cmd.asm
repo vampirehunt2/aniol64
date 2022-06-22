@@ -16,6 +16,8 @@ Peek: 		defb "peek", 0
 Poke: 		defb "poke", 0
 Put: 		defb "put", 0
 Get:		defb "get", 0
+Load: 		defb "load", 0
+Save:		defb "save", 0
 Beep: 		defb "beep", 0
 Term: 		defb "term", 0
 DiskInfo: 	defb "di", 0
@@ -87,6 +89,18 @@ cmd_main:
 		CALL str_cmp
 		CP 0
 		JP Z, _get
+		; load command
+		LD IX, LineBuff
+		LD IY, Load
+		CALL str_cmp
+		CP 0
+		JP Z, _load
+		; save command
+		LD IX, LineBuff
+		LD IY, Save
+		CALL str_cmp
+		CP 0
+		JP Z, _save
         ; beep command
         LD IX, LineBuff
         LD IY, Beep
@@ -167,6 +181,16 @@ _get:
 		POP IX
 		CALL mon_get
 		JP _wrap
+_load:
+		PUSH HL
+		POP IX
+		CALL dos_load
+		JP cmd_main
+_save:
+		PUSH HL
+		POP IX
+		CALL dos_save
+		JP cmd_main
 _beep:
         CALL bzr_beep
         JP cmd_main

@@ -71,9 +71,6 @@ cf_waitDat:
 ; inits the cf card to 8 bit mode
 cf_init:
 		CALL cf_wait
-		LD A, 1
-		OUT (CF_SECT_COUNT), A	; we want to only read or write one sector at a time
-		CALL cf_wait
 		LD A, CF_8BIT_MODE	; set the 8 bit mode
 		OUT	(CF_FEAT), A
 		CALL cf_waitCmd
@@ -89,39 +86,15 @@ cf_error:
 		IN A,(CF_STATUS)					;Read status
 		AND 00000001b
 		RET
- 
-PROC
-; reads a sector from a cf card
-; buffer address in HL
-cf_readSector:
-		CALL cf_waitCmd			; wait till the cf card is ready for command
-		LD A, CF_READ			; prepare read command
-		OUT	(CF_CMD), A			; send read command
-		CALL cf_waitDat			; wait until data is ready to be read 
-		LD B, 0					; read 512 bytes, 2 bytes per loop iteration
-_loop:
-		CALL cf_waitDat	
-		IN A, (CF_DAT)			; get a byte of data	
-		LD (HL),A
-		INC HL
-		CALL cf_waitDat
-		IN A, (CF_DAT)			;get a byte of data	
-		LD (HL), A
-		INC HL
-		DJNZ _loop
-		RET
-ENDP	
-
-cf_diag:
-		CALL cf_waitCmd
-		LD A, CF_DIAG
-		OUT (CF_CMD), A
-		CALL cf_wait
-		LD A, (CF_ERR)
-		RET
-
+		
 PROC
 cf_di: 
+		CALL cf_wait
+		LD A, 1
+		OUT (CF_SECT_COUNT), A	; we want to only read or write one sector at a time
+		CALL cf_wait
+		LD A, 1
+		OUT (CF_SECT_COUNT), A	; we want to only read or write one sector at a time
 		CALL cf_waitCmd			; wait until the cf is ready to accept commands 
 		LD A, CF_ID			
 		OUT (CF_CMD), A			; send the ID command
@@ -139,21 +112,78 @@ _loop:
 		RET
 ENDP
 
-; reads sector 0 into a buffer
+PROC
+; reads a sector from a cf card
 ; buffer address in HL
-cf_readSect0:
+cf_readSector:
+		CALL cf_waitCmd			; wait till the cf card is ready for command
+		LD A, CF_READ			; prepare read command
+		OUT	(CF_CMD), A			; send read command
+		CALL cf_waitDat			; wait until data is ready to be read 
+		LD B, 0					; read 512 bytes, 2 bytes per loop iteration
+_loop:
+		CALL cf_wait	
+		IN A, (CF_DAT)			; get a byte of data	
+		LD (HL),A
+		INC HL
 		CALL cf_wait
-		LD A, 0
+		IN A, (CF_DAT)			;get a byte of data	
+		LD (HL), A
+		INC HL
+		DJNZ _loop
+		RET
+ENDP	
+
+PROC
+; writes a sector from a cf card
+; buffer address in HL
+cf_writeSector:
+		CALL cf_waitCmd			; wait till the cf card is ready for command
+		LD A, CF_WRITE			; prepare the write command
+		OUT	(CF_CMD), A			; send the write command
+		CALL cf_waitDat			; wait until data is ready to be written 
+		LD B, 0					; write 512 bytes, 2 bytes per loop iteration
+_loop:
+		CALL cf_wait	
+		LD A, (HL)
+		OUT (CF_DAT), A			; write a byte of data	
+		INC HL
+		CALL cf_wait
+		LD A, (HL)
+		OUT (CF_DAT), A			; write a byte of data	
+		INC HL
+		DJNZ _loop
+		RET
+ENDP
+
+cf_diag:
+		CALL cf_waitCmd
+		LD A, CF_DIAG
+		OUT (CF_CMD), A
+		CALL cf_wait
+		LD A, (CF_ERR)
+		RET
+
+
+; sets the sector number for the next IO operation
+; supports up to 2^24 = 16M sectors		
+; sector number in ABC
+cf_setSector:
+		PUSH AF
+		CALL cf_wait
+		LD A, 1
+		OUT (CF_SECT_COUNT), A	; we want to only read or write one sector at a time
+		POP AF
+		CALL cf_wait
 		OUT	(CF_LBA0), A		;LBA 0:7
 		CALL cf_wait
-		LD A, 0
+		LD A, B
 		OUT	(CF_LBA1), A		;LBA 8:15
 		CALL cf_wait 
-		LD A, 0
+		LD A, C
 		OUT (CF_LBA2), A		;LBA 16:23
 		CALL cf_wait
 		LD A, CF_LBA_MODE		;Selects CF as master
 		OUT (CF_LBA3), A		;LBA 24:27 + DRV 0 selected + bits 5:7=111
-		CALL cf_readSector
 		RET
 	

@@ -3,3 +3,8 @@
 *.tree
 workspace/.metadata/version.ini
 workspace/.metadata/.plugins/org.eclipse.e4.workbench/workbench.xmi
+workspace/.metadata/.log
+workspace/.metadata/.plugins/org.eclipse.core.resources/.root/8.tree
+workspace/.metadata/.plugins/org.eclipse.core.resources/.safetable/org.eclipse.core.resources
+workspace/.metadata/.plugins/org.eclipse.e4.workbench/workbench.xmi
+workspace/.metadata/version.ini

@@ -303,7 +303,7 @@ vga_putChar:
 vga_getChar:
         PUSH HL
         CALL vga_XY2addr
-        CALL vga_advanceCur
+        CALL vga_advanceCur ; TODO vga_advanceCur should go at the end?
         LD A, (HL)
         AND 01111111b   ; make sure cursor data is not returned
         POP HL

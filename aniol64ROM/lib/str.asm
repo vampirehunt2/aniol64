@@ -87,6 +87,28 @@ _end:
         RET
 ENDP
 
+
+; converts an area of memory to a null-terminated string
+; IX - memory area address
+; IY - string address
+; B - number of bytes (length of the string)
+PROC
+str_2str:
+		PUSH IX
+		PUSH IY
+_loop:
+		LD A, (IX)
+		LD (IY), A
+		INC IX
+		INC IY
+		DJNZ _loop
+		LD A, 0
+		LD (IY), A
+		POP IY
+		POP IX
+		RET
+ENDP
+
 ; skips leading spaces in a string
 ; IX - string to trim
 ; result in IX
@@ -100,6 +122,37 @@ _loop:
         INC IX
         JR str_ltrim
 ENDP
+
+PROC
+str_rtrim:
+		PUSH IX
+_loop:
+		LD A, (IX)
+		INC IX
+		CP 0
+		JR NZ, _loop
+_loop1:
+		LD A, (IX)
+		CP ' '
+		DEC IX
+		JR Z, _loop1
+		LD A, 0
+		LD (IX + 1), A
+		POP IX
+		RET
+ENDP
+
+str_cat:
+		RET
+		
+str_contains:
+		RET
+		
+str_indexOf:
+		RET
+
+str_sub:
+		RET
 
 
 

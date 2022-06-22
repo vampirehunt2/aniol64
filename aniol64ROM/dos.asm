@@ -16,6 +16,8 @@ SerialNum: defb "Serial: ", 0
 Model: defb "Model: ", 0
 FirmwareRev: defb "Firmware Rev: ", 0
 LbaSectors: defb "LBA Sectors: ", 0
+InvalidSector: defb "Invalid sector", 0
+Saving:	defb "Saving", 0
 
 SECTOR_BUFFER equ 08400h
  
@@ -48,7 +50,7 @@ dos_cfDiskInfo:
 		LD IX, Model				; model
 		CALL vga_wriStr
 		LD IX, SECTOR_BUFFER + 54
-		LD B, 30					; truncated to the width of the display
+		LD B, 30
 		CALL dos_printRecord
 		CALL vga_nextLine
 		LD IX, FirmwareRev			; firmware
@@ -91,6 +93,65 @@ _printMemTest:
         CALL vga_writeLn
 		RET
 ENDP
+
+PROC
+dos_load:
+		CALL str_tok
+		PUSH HL				; push address of the rest of the string
+		CALL parseDByte		; address of buffer to save now in HL
+		CP OK
+		JR NZ, _invalidAddress
+		POP IX				; address of the rest of the string now in IX
+		PUSH HL				; push buffer address
+		CALL parseDByte		; sector number now in HL
+		CP OK
+		JR NZ, _invalidSector
+		LD A, L				
+		LD B, H
+		LD C, 0				; sector number now in ABC
+		POP HL				; buffer address now in HL
+		CALL cf_setSector
+		CALL cf_readSector
+		RET
+_invalidAddress:
+		LD IX, InvAddr
+		CALL vga_writeLn
+		RET
+_invalidSector:
+		LD IX, InvalidSector
+		CALL vga_writeLn
+		RET
+ENDP
+	
+PROC
+dos_save:
+		CALL str_tok
+		PUSH HL				; push address of the rest of the string
+		CALL parseDByte		; address of buffer to save now in HL
+		CP OK
+		JR NZ, _invalidAddress
+		POP IX				; address of the rest of the string now in IX
+		PUSH HL				; push buffer address
+		CALL parseDByte		; sector number now in HL
+		CP OK
+		JR NZ, _invalidSector
+		LD A, L				
+		LD B, H
+		LD C, 0				; sector number now in ABC
+		POP HL				; buffer address now in HL
+		CALL cf_setSector
+		CALL cf_writeSector
+		RET
+_invalidAddress:
+		LD IX, InvAddr
+		CALL vga_writeLn
+		RET
+_invalidSector:
+		LD IX, InvalidSector
+		CALL vga_writeLn
+		RET
+_
+ENDP	
 
 dos_loadDirs:
 		
