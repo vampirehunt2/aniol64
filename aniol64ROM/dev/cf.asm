@@ -153,6 +153,7 @@ _loop:
 		OUT (CF_DAT), A			; write a byte of data	
 		INC HL
 		DJNZ _loop
+_error:
 		RET
 ENDP
 

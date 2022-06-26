@@ -60,6 +60,7 @@ Banks 				equ 8039h
 VgaCurX 			equ 8040h
 VgaCurY 			equ 8041h
 customNmiHandler 	equ 8042h		; 3 byte procedure, either RET or JP **
+DOS_AREA			equ 8045h
 LineBuff 			equ 8100h		; 256 byte buffer
 PROGRAM_DATA 		equ 8200h
 

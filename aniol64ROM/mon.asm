@@ -488,6 +488,7 @@ mon_refresh:
 
 PROC
 mon_peek:
+		CALL str_shift
         CALL parseDByte
         CP 0
         JR NZ, _parseError
@@ -502,6 +503,7 @@ ENDP
 
 PROC
 mon_poke:
+		CALL str_shift
         CALL str_tok        ; address now in a string pointed to by IX, value in a string pointed to by HL
         PUSH HL             ; copying the value string
         POP IY              ; to IY for safekeeping
@@ -528,6 +530,7 @@ ENDP
 
 PROC
 mon_put:
+		CALL str_shift
         CALL str_tok        ; port number now in a string pointed to by IX, value in a string pointed to by HL
         PUSH HL             ; copying the value string
         POP IY              ; to IY for safekeeping
@@ -555,6 +558,7 @@ ENDP
 
 PROC
 mon_get:
+        CALL str_shift
 		CALL parseByte
 		CP 0
 		JR NZ, _addrError

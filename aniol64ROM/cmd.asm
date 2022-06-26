@@ -42,103 +42,86 @@ cmd_main:
         CP 0
         JP Z, _clr
         ; reset command
-        LD IX, LineBuff
         LD IY, Reset
         CALL str_cmp
         CP 0
         JP Z, _rst
         ; echo command
-        LD IX, LineBuff
         LD IY, EchoCmd
         CALL str_cmp
         CP 0
         JP Z, _echo
         ; rnd command
-        LD IX, LineBuff
         LD IY, Rnd
         CALL str_cmp
         CP 0
         JP Z, _rnd
         ; monitor program
-        LD IX, LineBuff
         LD IY, Mon
         CALL str_cmp
         CP 0
         JP Z, _mon
         ; peek command
-        LD IX, LineBuff
         LD IY, Peek
         CALL str_cmp
         CP 0
         JP Z, _peek
         ; poke command
-        LD IX, LineBuff
         LD IY, Poke
         CALL str_cmp
         CP 0
         JP Z, _poke
         ; put command
-        LD IX, LineBuff
         LD IY, Put
         CALL str_cmp
         CP 0
         JP Z, _put
 		; get command
-		LD IX, LineBuff
 		LD IY, Get
 		CALL str_cmp
 		CP 0
 		JP Z, _get
 		; load command
-		LD IX, LineBuff
 		LD IY, Load
 		CALL str_cmp
 		CP 0
 		JP Z, _load
 		; save command
-		LD IX, LineBuff
 		LD IY, Save
 		CALL str_cmp
 		CP 0
 		JP Z, _save
         ; beep command
-        LD IX, LineBuff
         LD IY, Beep
         CALL str_cmp
         CP 0
         JP Z, _beep
 		; term program
-		LD IX, LineBuff
 		LD IY, Term
 		CALL str_cmp
 		CP 0
 		JP Z, term_main
 		; disk info
-		LD IX, LineBuff
 		LD IY, DiskInfo
 		CALL str_cmp
 		CP 0
 		JP Z, _di
 		; disk info
-		LD IX, LineBuff
 		LD IY, DiskDiag
 		CALL str_cmp
 		CP 0
 		JP Z, _dd
 		; test command
-		LD IX, LineBuff
 		LD IY, Test
 		CALL str_cmp
 		CP 0
 		JP Z, _test
 		; snake 
-		LD IX, LineBuff
 		LD IY, Snake
 		CALL str_cmp
 		CP 0
 		JP Z, snake_main
 		; onp 
-		LD IX, LineBuff
 		LD IY, Onp
 		CALL str_cmp
 		CP 0
@@ -157,38 +140,25 @@ _clr:
 _rst:
         RST 00h
 _echo:
-        PUSH HL
-        POP IX
+        CALL str_shift
         CALL vga_writeLn
         JP cmd_main
 _peek:
-        PUSH HL
-        POP IX
         CALL mon_peek
         JP _wrap
 _poke:
-        PUSH HL
-        POP IX
         CALL mon_poke
         JP cmd_main
 _put:
-        PUSH HL
-        POP IX
         CALL mon_put
         JP cmd_main
 _get:
-		PUSH HL
-		POP IX
 		CALL mon_get
 		JP _wrap
 _load:
-		PUSH HL
-		POP IX
 		CALL dos_load
 		JP cmd_main
 _save:
-		PUSH HL
-		POP IX
 		CALL dos_save
 		JP cmd_main
 _beep:
@@ -218,8 +188,6 @@ _mon:
         JP _wrap
         RET
 _onp:
-		PUSH HL
-		POP IX
 		CALL onp_main
 		JP cmd_main
 ENDP

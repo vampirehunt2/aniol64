@@ -9,35 +9,81 @@
 
 ; compares two null-terminated strings
 ; IX, IY: addresses of the strings to compare
-; result in C: 0 if equal, 1 if different
+; result in A: 0 if equal, 1 if different
+PROC
 str_cmp:
+		PUSH IX
+		PUSH IY
+_loop:
         LD A, (IX)
         LD B, (IY)
         CP B
-        JR NZ, strCmpNeq
+        JR NZ, _neq
         CP 0
-        JR Z, strCmpEq
+        JR Z, _eq
         INC IX
         INC IY
-        JP str_cmp
-strCmpEq:
+        JP _loop
+_eq:
         LD A, 0
-        RET
-strCmpNeq:
+        JR _end
+_neq:
         LD A, 1
-        RET
+        JR _end
+_end:
+		POP IY
+		POP IX
+		RET
+ENDP
+
+; compares a null-terminated string with a memory area, 
+; ignoring the terminating zero
+; IX: address of the string to compare
+; IY: address of the memory buffer to compare to
+; result in A: 0 if equal, 1 if different
+PROC
+str_cmpMem:
+_loop:
+		LD A, (IX)
+		CP 0
+		JR Z, _eq
+		CP (IY)
+		JR NZ, _neq
+		INC IX
+		INC IY
+		JR _loop
+_eq:
+        LD A, 0
+        JR _end
+_neq:
+        LD A, 1
+        JR _end
+_end:
+		POP IY
+		POP IX
+		RET
+ENDP
 
 ; copies a null-terminated string
 ; IX: source string address
 ; IY: target address
+PROC
 str_copy:
+		PUSH IX
+		PUSH IY
+_loop:
         LD A, (IX)
         LD (IY), A
         CP 0
-        RET Z
+        JR Z, _end
         INC IX
         INC IY
-        JR str_copy
+        JR _loop
+_end:
+		POP IY
+		POP IX
+		RET
+ENDP
 
 ; finds the length of a null-terminated string
 ; only supports strings up to 255 characters
@@ -87,6 +133,12 @@ _end:
         RET
 ENDP
 
+; shifts to the beginning of next token after calling str_tok
+str_shift:
+		PUSH HL
+		POP IX
+		RET
+
 
 ; converts an area of memory to a null-terminated string
 ; IX - memory area address
@@ -107,6 +159,23 @@ _loop:
 		POP IY
 		POP IX
 		RET
+ENDP
+
+PROC
+str_2mem:
+		PUSH IX
+		PUSH IY
+_loop:
+		LD A, (IX)
+		CP 0
+		JR Z, _end
+		LD (IY), A
+		INC IX
+		INC IY
+		JR _loop
+_end:
+		POP IY
+		POP IX
 ENDP
 
 ; skips leading spaces in a string

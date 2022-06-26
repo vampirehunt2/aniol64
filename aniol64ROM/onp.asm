@@ -25,6 +25,7 @@ ArithmeticError: defb "Arithmetic error", 0
 PROC
 defb "onp_main"
 onp_main:
+        CALL str_shift
 		LD B, 0
 		PUSH IX
 		LD IX, Stack		
