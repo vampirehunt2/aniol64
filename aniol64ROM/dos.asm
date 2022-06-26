@@ -27,7 +27,8 @@ CurrentDir equ	DOS_AREA + 09h	; index of the current directory in the directory 
 TempDirname equ DOS_AREA + 0Ah	; 9 bytes: 8 for the folder name and 1 for the terminating zero
 
 MAX_DIRNAME_LEN equ 8
-MAX_DIRS equ 64
+FS_INFO_LEN equ 8
+MAX_DIRS equ 63
  
 PROC
 dos_setUpCf:
@@ -39,6 +40,7 @@ dos_setUpCf:
 		CALL cf_init
 		LD IX, DiskFound2
 		CALL vga_writeLn
+		CALL dos_cdRoot
 		RET
 _noDisk:
 		LD IX, DiskNotFound
@@ -202,7 +204,7 @@ dos_listDirs:
 		PUSH DE
 		LD E, MAX_DIRS
 		CALL dos_loadDirs
-		LD IX, SectorBuffer
+		LD IX, SectorBuffer + FS_INFO_LEN
 _checkDir:
 		PUSH IX
 		LD A, (IX)
@@ -308,8 +310,8 @@ dos_pwd:
 		RET
 		
 dos_cdRoot:
-		LD IX, CurrentPath
-		LD IY, RootFolder
+		LD IX, RootFolder
+		LD IY, CurrentPath
 		CALL str_copy
 		LD A, 0
 		LD (CurrentDir), A
@@ -334,6 +336,10 @@ _root:
 _end:
 		RET
 ENDP
+
+dos_ls:
+		CALL dos_listDirs
+		RET
 		
 
 
