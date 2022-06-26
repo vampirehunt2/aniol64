@@ -82,13 +82,9 @@ snake_init:
 		INC A
 		LD (Level), A			; set level to 1
 		LD IX, Coeffs
-		CALL rnd
-		AND 32					; randomly select the X position
-		ADD A, 4
+		ADD A, 20
 		LD (IX), A
-		CALL rnd
-		AND 16					; randomly select the Y position
-		ADD A, 7
+		ADD A, 15
 		LD (IX + 1), A
 		CALL rnd
 		AND 00000011b			; randomly select the direction
