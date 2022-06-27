@@ -82,9 +82,9 @@ snake_init:
 		INC A
 		LD (Level), A			; set level to 1
 		LD IX, Coeffs
-		ADD A, 20
+		LD A, 20
 		LD (IX), A
-		ADD A, 15
+		LD A, 15
 		LD (IX + 1), A
 		CALL rnd
 		AND 00000011b			; randomly select the direction

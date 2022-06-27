@@ -197,6 +197,7 @@ dos_saveDirs:
 		POP HL
 		POP DE
 		POP BC
+		RET
 
 PROC
 dos_listDirs:
@@ -212,15 +213,14 @@ _checkDir:
 		JR Z, _nextDir
 		LD B, MAX_DIRNAME_LEN
 		LD IY, LineBuff
-		CALL str_2str	
-		PUSH IY
-		POP IX			; transfer IY to IX
+		CALL str_2str
 		CALL vga_writeLn
-		POP IX
 _nextDir:
+		POP IX
 		CALL dos_nextDir
 		DEC E			; decrement directory record counter
 		JP NZ, _checkDir; if haven't reached the end of the directory sector, fetch the next directory
+_end:
 		POP DE			; restore register state	
 		POP BC
 		RET

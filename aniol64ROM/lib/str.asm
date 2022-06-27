@@ -10,6 +10,7 @@
 ; compares two null-terminated strings
 ; IX, IY: addresses of the strings to compare
 ; result in A: 0 if equal, 1 if different
+; Z flag set if equal, reset if different
 PROC
 str_cmp:
 		PUSH IX
@@ -31,6 +32,7 @@ _neq:
         LD A, 1
         JR _end
 _end:
+		CP 0
 		POP IY
 		POP IX
 		RET
@@ -41,6 +43,7 @@ ENDP
 ; IX: address of the string to compare
 ; IY: address of the memory buffer to compare to
 ; result in A: 0 if equal, 1 if different
+; Z flag set if equal, reset if different
 PROC
 str_cmpMem:
 _loop:
@@ -59,6 +62,7 @@ _neq:
         LD A, 1
         JR _end
 _end:
+		CP 0
 		POP IY
 		POP IX
 		RET
@@ -144,9 +148,10 @@ str_shift:
 ; IX - memory area address
 ; IY - string address
 ; B - number of bytes (length of the string)
+; result in IX
+; destroys IY
 PROC
 str_2str:
-		PUSH IX
 		PUSH IY
 _loop:
 		LD A, (IX)
@@ -156,7 +161,6 @@ _loop:
 		DJNZ _loop
 		LD A, 0
 		LD (IY), A
-		POP IY
 		POP IX
 		RET
 ENDP
