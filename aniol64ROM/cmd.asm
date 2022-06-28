@@ -28,6 +28,7 @@ Onp:		defb "onp", 0
 ; DOS commands
 Pwd:		defb "pwd", 0
 Ls:			defb "ls", 0
+MkDir:		defb "mkdir", 0
 
 UnknownCmd: defb "Unknown cmd", 0
 Prompt: 	defb ">", 0
@@ -140,6 +141,11 @@ cmd_main:
 		CALL str_cmp
 		CP 0
 		JP Z, _ls
+		; mkdir command
+		LD IY, MkDir
+		CALL str_cmp
+		CP 0
+		JP Z, _mkdir
         ; unknown command
         LD IX, UnknownCmd
         CALL vga_wriStr
@@ -209,6 +215,9 @@ _pwd:
 		JP cmd_main
 _ls:
 		CALL dos_ls
+		JP cmd_main
+_mkdir:
+		CALL dos_mkDir
 		JP cmd_main
 ENDP
 

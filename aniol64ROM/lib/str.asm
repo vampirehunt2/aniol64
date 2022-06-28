@@ -40,17 +40,19 @@ ENDP
 
 ; compares a null-terminated string with a memory area, 
 ; ignoring the terminating zero
-; IX: address of the string to compare
-; IY: address of the memory buffer to compare to
+; IX: address of the memory buffer to compare to
+; IY: address of the string to compare
 ; result in A: 0 if equal, 1 if different
 ; Z flag set if equal, reset if different
 PROC
 str_cmpMem:
+		PUSH IX
+		PUSH IY
 _loop:
-		LD A, (IX)
+		LD A, (IY)
 		CP 0
 		JR Z, _eq
-		CP (IY)
+		CP (IX)
 		JR NZ, _neq
 		INC IX
 		INC IY

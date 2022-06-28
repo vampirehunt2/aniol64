@@ -7,19 +7,22 @@
 ;
 ;----------------------------------------------------
 
-DiskFound1 defb "Disk ", 0
-DiskFound2 defb "found", 0
-DiskNotFound defb "Disk not found", 0
-NvRamOk: defb   "NVRAM found", 0
-NvRamNok: defb  "NVRAM not found", 0
-SerialNum: defb "Serial: ", 0
-Model: defb "Model: ", 0
-FirmwareRev: defb "Firmware Rev: ", 0
-LbaSectors: defb "LBA Sectors: ", 0
-InvalidSector: defb "Invalid sector", 0
-Saving:	defb "Saving", 0
-RootFolder: defb "/", 0
-ParentFolder: defb "..", 0
+DiskFound1 		defb "Disk ", 0
+DiskFound2 		defb "found", 0
+DiskNotFound 	defb "Disk not found", 0
+NvRamOk: 		defb   "NVRAM found", 0
+NvRamNok: 		defb  "NVRAM not found", 0
+SerialNum: 		defb "Serial: ", 0
+Model: 			defb "Model: ", 0
+FirmwareRev: 	defb "Firmware Rev: ", 0
+LbaSectors: 	defb "LBA Sectors: ", 0
+InvalidSector: 	defb "Invalid sector", 0
+ErrInvDirName:	defb "Invalid directory name", 0
+ErrDirExists:	defb "Directory already exists", 0
+ErrTooManyDirs:	defb "Too many directories", 0
+
+RootFolder: 	defb "/", 0
+ParentFolder: 	defb "..", 0
  
 SectorBuffer equ 08400h
 CurrentPath equ DOS_AREA + 00h	; 9 bytes: 8 for the folder name and 1 for the terminating zero
@@ -203,6 +206,7 @@ PROC
 dos_listDirs:
 		PUSH BC			; save register state
 		PUSH DE
+		PUSH IX
 		LD E, MAX_DIRS
 		CALL dos_loadDirs
 		LD IX, SectorBuffer + FS_INFO_LEN
@@ -221,6 +225,7 @@ _nextDir:
 		DEC E			; decrement directory record counter
 		JP NZ, _checkDir; if haven't reached the end of the directory sector, fetch the next directory
 _end:
+		POP IX
 		POP DE			; restore register state	
 		POP BC
 		RET
@@ -231,24 +236,24 @@ dos_mkDir:
 		PUSH BC			; save register state
 		PUSH DE
 		; check if dir name is valid
+		CALL str_shift
 		CALL dos_validateDirname
-		CP FALSE
-		JP Z, _error
+		CP TRUE
+		JP NZ, _invName
+		CALL dos_dirExists
+		CP 0
+		JR NZ, _exists
 		; if valid, proceed
 		LD E, MAX_DIRS
-		CALL dos_loadDirs
-		LD IX, SectorBuffer
+		LD IX, SectorBuffer + FS_INFO_LEN
 _checkDir:
-		PUSH IX
 		LD A, (IX)
 		CP 0			; check if a directory entry is present
 		JR Z, _makeDir
-		LD B, 8			; length of directory entry
-		POP IX
 		CALL dos_nextDir
 		DEC E			; decrement directory record counter
 		JP NZ, _checkDir; if haven't reached the end of the directory sector, fetch the next directory
-		JP _error		; maximum number of directories on the disk has been reached
+		JP _tooMany		; maximum number of directories on the disk has been reached
 _makeDir:
 		PUSH IX
 		POP IY			; transfer buffer address from IX to IY
@@ -257,8 +262,18 @@ _makeDir:
 		CALL str_2mem
 		CALL dos_saveDirs
 		JP _end
-_error:
-		; TODO write some error messages
+_invName:
+		LD IX, ErrInvDirName
+		CALL vga_writeLn
+		JR _end
+_exists:
+		LD IX, ErrDirExists
+		CALL vga_writeLn
+		JR _end
+_tooMany:
+		LD IX, ErrTooManyDirs
+		CALL vga_writeLn
+		JR _end
 _end:
 		POP DE			; restore register state	
 		POP BC
@@ -271,7 +286,7 @@ PROC
 dos_validateDirname:
 		CALL str_len
 		CP MAX_DIRNAME_LEN			
-		JR C, _false
+		JR NC, _false
 		LD A, TRUE
 		RET
 _false:
@@ -279,16 +294,33 @@ _false:
 		RET		
 ENDP
 
+; checks if a directory with a given name exists
+; IX - directory name
+; result in A:
+; - 0 if the directory doesn't exist
+; - directory index if it exists
+; destroys IY, DE
 PROC
+defb "dos_dirExists"
 dos_dirExists:
 		CALL dos_loadDirs
-		LD IX, SectorBuffer
+		LD D, 1
+		LD E, MAX_DIRS
+		PUSH IX
+		POP IY
+		LD IX, SectorBuffer + FS_INFO_LEN
 _loop:
 		LD B, MAX_DIRNAME_LEN
-		LD IY, TempDirname
-		CALL str_2str
+		CALL str_cmpMem
+		JR Z, _yes
+		CALL dos_nextDir
+		INC D
+		DEC E
+		JR NZ, _loop
+		LD A, 0
+		RET
 _yes:
-		
+		LD A, D
 		RET
 ENDP
 
@@ -319,8 +351,7 @@ dos_cdRoot:
 		
 PROC
 dos_cd:
-		PUSH HL		; transfer folder name from HL to IX
-		POP IX
+		CALL str_shift		; transfer folder name from HL to IX
 		; check if user wants to go to the root folder
 		LD IY, RootFolder
 		CALL str_cmp
