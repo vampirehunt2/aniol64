@@ -44,107 +44,86 @@ cmd_main:
         LD IX, LineBuff
         LD IY, Clr
         CALL str_cmp
-        CP 0
         JP Z, _clr
         ; reset command
         LD IY, Reset
         CALL str_cmp
-        CP 0
         JP Z, _rst
         ; echo command
         LD IY, EchoCmd
         CALL str_cmp
-        CP 0
         JP Z, _echo
         ; rnd command
         LD IY, Rnd
         CALL str_cmp
-        CP 0
         JP Z, _rnd
         ; monitor program
         LD IY, Mon
         CALL str_cmp
-        CP 0
         JP Z, _mon
         ; peek command
         LD IY, Peek
         CALL str_cmp
-        CP 0
         JP Z, _peek
         ; poke command
         LD IY, Poke
         CALL str_cmp
-        CP 0
         JP Z, _poke
         ; put command
         LD IY, Put
         CALL str_cmp
-        CP 0
         JP Z, _put
 		; get command
 		LD IY, Get
 		CALL str_cmp
-		CP 0
 		JP Z, _get
 		; load command
 		LD IY, Load
 		CALL str_cmp
-		CP 0
 		JP Z, _load
 		; save command
 		LD IY, Save
 		CALL str_cmp
-		CP 0
 		JP Z, _save
         ; beep command
         LD IY, Beep
         CALL str_cmp
-        CP 0
         JP Z, _beep
 		; term program
 		LD IY, Term
 		CALL str_cmp
-		CP 0
 		JP Z, term_main
 		; disk info
 		LD IY, DiskInfo
 		CALL str_cmp
-		CP 0
 		JP Z, _di
 		; disk info
 		LD IY, DiskDiag
 		CALL str_cmp
-		CP 0
 		JP Z, _dd
 		; test command
 		LD IY, Test
 		CALL str_cmp
-		CP 0
 		JP Z, _test
 		; snake 
 		LD IY, Snake
 		CALL str_cmp
-		CP 0
 		JP Z, snake_main
 		; onp 
 		LD IY, Onp
 		CALL str_cmp
-		CP 0
 		JP Z, _onp
 		; pwd command
 		LD IY, Pwd
 		CALL str_cmp
-		CP 0
 		JP Z, _pwd     
 		; ls command
 		LD IY, Ls
 		CALL str_cmp
-		CP 0
 		JP Z, _ls
 		; mkdir command
 		LD IY, MkDir
 		CALL str_cmp
-		CP 0
 		JP Z, _mkdir
         ; unknown command
         LD IX, UnknownCmd
