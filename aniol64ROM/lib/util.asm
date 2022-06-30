@@ -164,12 +164,73 @@ isDecDigit:
         CP 3Ah
         JR C, _yes ; if less than ':' (which is the next ascii code after '9' then it's a hex digit
         JR _no
-_yes
+_yes:
         LD A, 1
         RET
-_no
+_no:
         LD A, 0
         RET
+ENDP
+
+PROC
+isUppercaseLetter:
+		CP 'A'
+		JR C, _no
+		CP 'Z' + 1
+		JR C, _yes
+		JR _no
+_yes:
+        LD A, 1
+        RET
+_no:
+        LD A, 0
+        RET
+ENDP
+
+PROC
+isLowercaseLetter:
+		CP 'a'
+		JR C, _no
+		CP 'z' + 1
+		JR C, _yes
+		JR _no
+_yes:
+        LD A, 1
+        RET
+_no:
+        LD A, 0
+        RET
+ENDP
+
+PROC
+isAlphanumeric:
+		PUSH AF
+		CALL isDecDigit
+		CP 1
+		JR Z, _true
+		POP AF
+		PUSH AF
+		CALL isUppercaseLetter
+		CP 1
+		JR Z, _true
+		POP AF
+		PUSH AF
+		CALL isLowercaseLetter
+		CP 1
+		JR Z, _true
+		POP AF
+		PUSH AF
+		CP '_'
+		JR Z, _true
+		JR _false
+_true:
+		POP AF
+		LD A, TRUE
+		RET
+_false:
+		POP AF
+		LD A, FALSE
+		RET
 ENDP
 
 ; checks if a string represents a two-byte hex value

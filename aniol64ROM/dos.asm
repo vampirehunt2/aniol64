@@ -20,6 +20,7 @@ InvalidSector: 	defb "Invalid sector", 0
 ErrInvDirName:	defb "Invalid directory name", 0
 ErrDirExists:	defb "Directory already exists", 0
 ErrTooManyDirs:	defb "Too many directories", 0
+ErrNoSuchDir:	defb "No such directory", 0
 
 RootFolder: 	defb "/", 0
 ParentFolder: 	defb "..", 0
@@ -232,6 +233,34 @@ _end:
 ENDP
 
 PROC
+dos_rmDir:
+		CALL str_shift
+		CALL dos_loadDirs
+		LD E, MAX_DIRS
+		PUSH IX
+		POP IY
+		LD IX, SectorBuffer + FS_INFO_LEN
+_loop:
+		LD B, MAX_DIRNAME_LEN
+		CALL str_cmpMem
+		JR Z, _rm
+		CALL dos_nextDir
+		DEC E
+		JR NZ, _loop
+		LD A, 0
+		LD IX, ErrNoSuchDir
+		CALL vga_writeLn
+		JR _end
+_rm:
+		LD A, 0
+		LD (IX), A
+		CALL dos_saveDirs
+_end:
+		RET
+
+ENDP
+
+PROC
 dos_mkDir:
 		PUSH BC			; save register state
 		PUSH DE
@@ -284,13 +313,29 @@ ENDP
 ; TODO: check if the name consists of alphanumeric characters only
 PROC
 dos_validateDirname:
+		PUSH IX
 		CALL str_len
+		CP 0
+		JR Z, _false
 		CP MAX_DIRNAME_LEN			
 		JR NC, _false
+_loop:
+		LD A, (IX)
+		CP 0
+		JR Z, _true
+		CALL isAlphanumeric
+		CP FALSE
+		JR Z, _false
+		INC IX
+		JR _loop
+_true:
 		LD A, TRUE
-		RET
+		JR _end
 _false:
 		LD A, FALSE
+		JR _end
+_end:
+		POP IX
 		RET		
 ENDP
 
