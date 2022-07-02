@@ -30,6 +30,7 @@ Pwd:		defb "pwd", 0
 Ls:			defb "ls", 0
 MkDir:		defb "mkdir", 0
 RmDir:		defb "rmdir", 0
+Cd:			defb "cd", 0
 
 UnknownCmd: defb "Unknown cmd", 0
 Prompt: 	defb ">", 0
@@ -130,6 +131,10 @@ cmd_main:
 		LD IY, RmDir
 		CALL str_cmp
 		JP Z, _rmdir
+		; cd command
+		LD IY, Cd
+		CALL str_cmp
+		JP Z, _cd
         ; unknown command
         LD IX, UnknownCmd
         CALL vga_wriStr
@@ -205,6 +210,9 @@ _mkdir:
 		JP cmd_main
 _rmdir:
 		CALL dos_rmDir
+		JP cmd_main
+_cd:
+		CALL dos_cd
 		JP cmd_main
 ENDP
 

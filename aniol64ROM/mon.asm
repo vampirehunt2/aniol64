@@ -181,7 +181,10 @@ mon_setValue:
         POP IX                  ; put the arguments of the set command in IX
         CALL str_len
         CP 0                    ; if we've reached the end of argument list
-        JP Z, _completed         ; return from this routine
+        JP Z, _completed        ; return from this routine
+		LD A, (IX)
+		CP '='
+		JP Z, _setDirect
         CALL str_tok            ; extract the first of the remaining arguments
         PUSH HL                 ; save the rest of the arguments on stack
         CALL parseByte
@@ -194,6 +197,22 @@ mon_setValue:
         LD (MonCurrAddr), HL
         POP HL
         JR mon_setValue
+_setDirect:
+		CALL str_tok            ; extract the first of the remaining arguments
+		PUSH HL
+		LD HL, (MonCurrAddr)
+_loop:
+		INC IX
+		LD A, (IX)
+		CP 0
+		JP Z, _endSetDirect
+		LD (HL), A
+		INC HL
+		JR _loop
+_endSetDirect:
+		LD (MonCurrAddr), HL
+		POP HL
+		JR mon_setValue
 _parseError:
         CALL mon_gotoStatusLine
         LD IX, InvVal

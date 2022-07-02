@@ -310,7 +310,6 @@ _end:
 ENDP
 
 ; checks if the string at IX represents a valid directory name
-; TODO: check if the name consists of alphanumeric characters only
 PROC
 dos_validateDirname:
 		PUSH IX
@@ -406,6 +405,16 @@ dos_cd:
 		CALL str_cmp
 		CP 0
 		JR Z, _root
+		CALL dos_dirExists
+		CP 0
+		JR Z, _noDir
+		LD (CurrentDir), A
+		LD IY, CurrentPath
+		CALL str_copy
+		JR _end
+_noDir:
+		LD IX, ErrNoSuchDir
+		CALL vga_writeLn
 		JR _end
 _root:
 		CALL dos_cdRoot
