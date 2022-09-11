@@ -1,6 +1,8 @@
 ; compact flah driver
- 
-CF_BASE 		equ 01111000b			; 78h CF card is on the expansion port, activated by A7, with A0:A2 free
+
+;CF_BASE 		equ 01111000b			; 78h CF card is on the expansion port, activated by A7, with A0:A2 free
+
+CF_BASE 		equ 11110000b			; 78h CF card is activated by A3, with A0:A2 free
 CF_DAT 			equ	CF_BASE + 00h		; 78h Data (R/W)
 CF_ERR 			equ CF_BASE + 01h		; 79h Error register (R)
 CF_FEAT 		equ CF_BASE + 01h		; 79h Features (W)
@@ -46,27 +48,42 @@ ENDP
 ; waits until the cf card is ready
 ; the READY pin on the card is optional as per the CF spec
 ; some cards may not implement it
+PROC
 cf_wait:
+		PUSH AF
+_loop:
 		IN A, (CF_STATUS)	; read the cf status word
 		BIT 7, A			; test busy bit
-		JR NZ, cf_wait		; loop until the busy bit (D7) is clear
+		JR NZ, _loop		; loop until the busy bit (D7) is clear
+		POP AF
 		RET
+ENDP
 	
+PROC
 cf_waitCmd:
+		PUSH AF
+_loop:
 		IN A, (CF_STATUS)	; read the cf status word
 		BIT 7, A
-		JR NZ, cf_waitCmd	; busy bit (D7) should be 0
+		JR NZ, _loop		; busy bit (D7) should be 0
 		BIT	6, A
-		JR Z, cf_waitCmd	; drvrdy (D6) should be 1 
+		JR Z, _loop			; drvrdy (D6) should be 1 
+		POP AF
 		RET
+ENDP
 
+PROC
 cf_waitDat:
+		PUSH AF
+_loop:
 		IN A, (CF_STATUS)	; read the cf status word
 		BIT 7, A
-		JR NZ, cf_waitDat	; busy bit (D7) should be 0
+		JR NZ, _loop		; busy bit (D7) should be 0
 		BIT 3, A
-		JR Z, cf_waitDat	; drq bit (D3) should be 1
+		JR Z, _loop			; drq bit (D3) should be 1
+		POP AF
 		RET
+ENDP
 	
 ; inits the cf card to 8 bit mode
 cf_init:
@@ -168,7 +185,7 @@ cf_diag:
 
 ; sets the sector number for the next IO operation
 ; supports up to 2^24 = 16M sectors		
-; sector number in ABC
+; sector number in ABC, LSB to MSB
 cf_setSector:
 		PUSH AF
 		CALL cf_wait
