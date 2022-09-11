@@ -2,6 +2,8 @@
 
 KEY_UP equ 0F0h
 EXT_KEY equ 0E0h
+LSHIFT equ 12h
+RSHIFT equ 59h
 
 
 ps2_initSeq:
@@ -28,18 +30,26 @@ ps2_readScancode:
 		RET
 		
 ; converts a scancode to the corresponding ascii character
-defb "ps2_scancode2asc"
+PROC
 ps2_scancode2asc:
 		PUSH BC
 		PUSH HL
 		LD C, A
 		LD B, 0
+		LD A, (Ps2Shift)
+		CP TRUE
+		JR Z, _shift
 		LD HL, ps2Scancodes
+		JR _continue
+_shift:
+		LD HL, ps2ShiftScancodes
+_continue:
 		ADD HL, BC
 		LD A, (HL)
 		POP HL
 		POP BC
 		RET
+ENDP
 
 PROC
 ps2_readKey:
@@ -48,11 +58,28 @@ ps2_readKey:
 		JR Z, _keyUp
 		CP EXT_KEY
 		JR Z, _extKey
+		CP LSHIFT
+		JR Z, _shiftDn
+		CP RSHIFT
+		JR Z, _shiftDn
 		CALL ps2_scancode2asc
 		RET
+_shiftDn:
+		LD A, TRUE
+		LD (Ps2Shift), A
+		JR ps2_readKey
+_shiftUp:
+		LD A, FALSE
+		LD (Ps2Shift), A
+		JR ps2_readKey 
 _keyUp:
 _extKey:
 		CALL ps2_readScancode	; ignore the next scancode, it's the code of the key that's going up
+		JR Z, _extKey
+		CP LSHIFT
+		JR Z, _shiftUp
+		CP RSHIFT
+		JR Z, _shiftUp
 		JR ps2_readKey
 		RET
 ENDP
