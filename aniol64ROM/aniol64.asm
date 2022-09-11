@@ -127,6 +127,7 @@ include dev/bzr.asm
 include dev/vga.asm
 include dev/dart.asm
 include dev/cf.asm
+include dev/ps2.asm
 include dev/kbd.asm ; this goes last becasue of the org 3700h inside
 
 

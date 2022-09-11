@@ -131,39 +131,39 @@ Text GLabel 8400 3350 0    50   Input ~ 0
 NMI
 Text GLabel 8400 3250 0    50   Input ~ 0
 INT
-Text GLabel 5700 3500 0    50   Input ~ 0
+Text GLabel 6700 3500 0    50   Input ~ 0
 D0
-Text GLabel 5700 3400 0    50   Input ~ 0
+Text GLabel 6700 3400 0    50   Input ~ 0
 D1
-Text GLabel 5700 3300 0    50   Input ~ 0
+Text GLabel 6700 3300 0    50   Input ~ 0
 D2
-Text GLabel 5700 3200 0    50   Input ~ 0
+Text GLabel 6700 3200 0    50   Input ~ 0
 D3
-Text GLabel 5700 3100 0    50   Input ~ 0
+Text GLabel 6700 3100 0    50   Input ~ 0
 D4
-Text GLabel 5700 3000 0    50   Input ~ 0
+Text GLabel 6700 3000 0    50   Input ~ 0
 D5
-Text GLabel 5700 2900 0    50   Input ~ 0
+Text GLabel 6700 2900 0    50   Input ~ 0
 D6
-Text GLabel 5700 2800 0    50   Input ~ 0
+Text GLabel 6700 2800 0    50   Input ~ 0
 D7
-Text GLabel 5700 1700 0    50   Input ~ 0
+Text GLabel 6700 1700 0    50   Input ~ 0
 WR
-Text GLabel 5700 1600 0    50   Input ~ 0
+Text GLabel 6700 1600 0    50   Input ~ 0
 RD
 Text GLabel 5350 1500 0    50   Input ~ 0
 IORQ
 Text GLabel 8400 1850 0    50   Input ~ 0
 CLK
-Text GLabel 5700 1400 0    50   Input ~ 0
+Text GLabel 6700 1400 0    50   Input ~ 0
 A7
-Text GLabel 5700 1300 0    50   Input ~ 0
+Text GLabel 6700 1300 0    50   Input ~ 0
 A2
-Text GLabel 5700 1200 0    50   Input ~ 0
+Text GLabel 6700 1200 0    50   Input ~ 0
 A1
-Text GLabel 5700 1100 0    50   Input ~ 0
+Text GLabel 6700 1100 0    50   Input ~ 0
 A0
-Text GLabel 5700 1000 0    50   Input ~ 0
+Text GLabel 6700 1000 0    50   Input ~ 0
 M1
 Text GLabel 8400 1250 0    50   Input ~ 0
 RST
@@ -320,17 +320,6 @@ Wire Wire Line
 	4700 2500 4700 1200
 Wire Wire Line
 	2050 3050 2300 3050
-$Comp
-L 74xx:74LS245 U?
-U 1 1 622D7911
-P 6200 3300
-F 0 "U?" H 6200 4281 50  0000 C CNN
-F 1 "74LS245" H 6200 4190 50  0000 C CNN
-F 2 "" H 6200 3300 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS245" H 6200 3300 50  0001 C CNN
-	1    6200 3300
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	8000 3050 8400 3050
 Wire Wire Line
@@ -353,30 +342,19 @@ Wire Wire Line
 	8450 2850 8400 2850
 Wire Wire Line
 	8450 2950 8400 2950
-Text GLabel 5700 3700 0    50   Input ~ 0
+Text GLabel 6700 3700 0    50   Input ~ 0
 WR
-Text GLabel 5700 3800 0    50   Input ~ 0
+Text GLabel 6700 3800 0    50   Input ~ 0
 IORQ
-$Comp
-L 74xx:74LS245 U?
-U 1 1 6230E5FB
-P 6200 1500
-F 0 "U?" H 6200 2481 50  0000 C CNN
-F 1 "74LS245" H 6200 2390 50  0000 C CNN
-F 2 "" H 6200 1500 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS245" H 6200 1500 50  0001 C CNN
-	1    6200 1500
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
-	5700 1500 5450 1500
+	6700 1500 6450 1500
 Wire Wire Line
-	5450 1500 5450 2000
+	6450 1500 6450 2000
 Wire Wire Line
 	5450 2000 5700 2000
-Connection ~ 5450 1500
+Connection ~ 6450 1500
 Wire Wire Line
-	5450 1500 5350 1500
+	6450 1500 6350 1500
 Wire Wire Line
 	6700 1000 8050 1000
 Wire Wire Line

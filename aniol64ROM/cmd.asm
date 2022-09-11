@@ -31,6 +31,8 @@ Ls:			defb "ls", 0
 MkDir:		defb "mkdir", 0
 RmDir:		defb "rmdir", 0
 Cd:			defb "cd", 0
+Touch:		defb "touch", 0
+Format:		defb "format", 0
 
 UnknownCmd: defb "Unknown cmd", 0
 Prompt: 	defb ">", 0
@@ -135,6 +137,14 @@ cmd_main:
 		LD IY, Cd
 		CALL str_cmp
 		JP Z, _cd
+		; touch command
+		LD IY, Touch
+		CALL str_cmp
+		JP Z, _touch
+		; format command
+		LD IY, Format
+		CALL str_cmp
+		JP Z, _format
         ; unknown command
         LD IX, UnknownCmd
         CALL vga_wriStr
@@ -213,6 +223,12 @@ _rmdir:
 		JP cmd_main
 _cd:
 		CALL dos_cd
+		JP cmd_main
+_touch:
+		CALL dos_touch
+		JP cmd_main
+_format:
+		CALL dos_format
 		JP cmd_main
 ENDP
 

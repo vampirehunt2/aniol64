@@ -181,7 +181,7 @@ org KEYCODE_BASE_ADDR
 	defb 5Eh	; 11-00-101b	^
 	defb 26h	; 11-00-110b	&
 	defb 2Ah	; 11-00-111b	*
-	defb 00h	;
+	defb 7Ch	; 11-01-000b	|
 	defb 00h	;
 	defb 00h	;
 	defb 00h	;

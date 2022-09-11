@@ -141,7 +141,7 @@ RD
 Text GLabel 2900 3400 0    50   Input ~ 0
 WR
 Text GLabel 6100 3650 0    50   Input ~ 0
-RD
+MEMRQ
 Text GLabel 2900 1600 0    50   Input ~ 0
 RST
 Text GLabel 2900 1900 0    50   Input ~ 0
@@ -895,40 +895,22 @@ F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 8900 4850 50  0001 C CNN
 	1    8900 4850
 	1    0    0    -1  
 $EndComp
-$Comp
-L 74xx:74LS32 U?
-U 2 1 62492E17
-P 8900 5550
-F 0 "U?" H 8900 5875 50  0000 C CNN
-F 1 "74LS32" H 8900 5784 50  0000 C CNN
-F 2 "" H 8900 5550 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 8900 5550 50  0001 C CNN
-	2    8900 5550
-	1    0    0    -1  
-$EndComp
 Text GLabel 7500 4750 0    50   Input ~ 0
 A15
 Wire Wire Line
 	7500 4750 7750 4750
-Wire Wire Line
-	8600 5650 7750 5650
-Wire Wire Line
-	7750 5650 7750 4750
 Connection ~ 7750 4750
 Wire Wire Line
 	7750 4750 7950 4750
 Wire Wire Line
-	8600 4950 8600 5450
-Wire Wire Line
 	8600 4750 8550 4750
 Wire Wire Line
 	8600 4950 7500 4950
-Connection ~ 8600 4950
 Text GLabel 7500 4950 0    50   Input ~ 0
 MEMRQ
 Text GLabel 9200 4850 2    50   Input ~ 0
 RAMSEL
-Text GLabel 9800 5650 2    50   Input ~ 0
+Text GLabel 9200 5650 2    50   Input ~ 0
 ROMSEL
 $Comp
 L Memory_RAM:AS6C4008-55PCN RAM
@@ -971,16 +953,14 @@ Wire Wire Line
 $Comp
 L 74xx:74LS32 U?
 U 4 1 6249C96C
-P 9500 5650
-F 0 "U?" H 9500 5975 50  0000 C CNN
-F 1 "74LS32" H 9500 5884 50  0000 C CNN
-F 2 "" H 9500 5650 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 9500 5650 50  0001 C CNN
-	4    9500 5650
+P 8900 5650
+F 0 "U?" H 8900 5975 50  0000 C CNN
+F 1 "74LS32" H 8900 5884 50  0000 C CNN
+F 2 "" H 8900 5650 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS32" H 8900 5650 50  0001 C CNN
+	4    8900 5650
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	9200 5750 8300 5750
 Text GLabel 7500 5750 0    50   Input ~ 0
 VRAMSEL'
 $Comp
@@ -994,7 +974,6 @@ F 3 "~" H 8300 5850 50  0001 C CNN
 	1    8300 5850
 	1    0    0    -1  
 $EndComp
-Connection ~ 8300 5750
 Wire Wire Line
 	8300 5750 7500 5750
 $Comp
@@ -1290,4 +1269,11 @@ F 3 "" H 10150 1750 50  0001 C CNN
 	1    10150 1750
 	1    0    0    -1  
 $EndComp
+Wire Wire Line
+	8600 5750 8300 5750
+Connection ~ 8300 5750
+Wire Wire Line
+	8600 5550 7750 5550
+Wire Wire Line
+	7750 4750 7750 5550
 $EndSCHEMATC
