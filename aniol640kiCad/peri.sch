@@ -131,39 +131,23 @@ Text GLabel 8400 3350 0    50   Input ~ 0
 NMI
 Text GLabel 8400 3250 0    50   Input ~ 0
 INT
-Text GLabel 6700 3500 0    50   Input ~ 0
-D0
-Text GLabel 6700 3400 0    50   Input ~ 0
-D1
-Text GLabel 6700 3300 0    50   Input ~ 0
-D2
-Text GLabel 6700 3200 0    50   Input ~ 0
-D3
-Text GLabel 6700 3100 0    50   Input ~ 0
-D4
-Text GLabel 6700 3000 0    50   Input ~ 0
-D5
-Text GLabel 6700 2900 0    50   Input ~ 0
-D6
-Text GLabel 6700 2800 0    50   Input ~ 0
-D7
-Text GLabel 6700 1700 0    50   Input ~ 0
+Text GLabel 8400 2050 0    50   Input ~ 0
 WR
-Text GLabel 6700 1600 0    50   Input ~ 0
+Text GLabel 8400 1950 0    50   Input ~ 0
 RD
-Text GLabel 5350 1500 0    50   Input ~ 0
+Text GLabel 8400 2150 0    50   Input ~ 0
 IORQ
 Text GLabel 8400 1850 0    50   Input ~ 0
 CLK
-Text GLabel 6700 1400 0    50   Input ~ 0
+Text GLabel 8400 1750 0    50   Input ~ 0
 A7
-Text GLabel 6700 1300 0    50   Input ~ 0
+Text GLabel 8400 1650 0    50   Input ~ 0
 A2
-Text GLabel 6700 1200 0    50   Input ~ 0
+Text GLabel 8400 1550 0    50   Input ~ 0
 A1
-Text GLabel 6700 1100 0    50   Input ~ 0
+Text GLabel 8400 1450 0    50   Input ~ 0
 A0
-Text GLabel 6700 1000 0    50   Input ~ 0
+Text GLabel 8400 1350 0    50   Input ~ 0
 M1
 Text GLabel 8400 1250 0    50   Input ~ 0
 RST
@@ -211,14 +195,14 @@ $EndComp
 $Comp
 L power:+5V #PWR?
 U 1 1 62294225
-P 4700 1200
+P 5650 1200
 AR Path="/62294225" Ref="#PWR?"  Part="1" 
 AR Path="/6228D96B/62294225" Ref="#PWR?"  Part="1" 
-F 0 "#PWR?" H 4700 1050 50  0001 C CNN
-F 1 "+5V" H 4715 1373 50  0000 C CNN
-F 2 "" H 4700 1200 50  0001 C CNN
-F 3 "" H 4700 1200 50  0001 C CNN
-	1    4700 1200
+F 0 "#PWR?" H 5650 1050 50  0001 C CNN
+F 1 "+5V" H 5665 1373 50  0000 C CNN
+F 2 "" H 5650 1200 50  0001 C CNN
+F 3 "" H 5650 1200 50  0001 C CNN
+	1    5650 1200
 	1    0    0    -1  
 $EndComp
 Text GLabel 3650 2600 2    50   Input ~ 0
@@ -302,7 +286,6 @@ Wire Wire Line
 	3600 2600 3650 2600
 Wire Wire Line
 	3300 2600 3600 2600
-NoConn ~ 4600 2000
 Wire Wire Line
 	3300 2700 4000 2700
 Wire Wire Line
@@ -315,9 +298,7 @@ Wire Wire Line
 Wire Wire Line
 	3900 1100 3900 2000
 Wire Wire Line
-	4600 2500 4700 2500
-Wire Wire Line
-	4700 2500 4700 1200
+	5650 2500 5650 1200
 Wire Wire Line
 	2050 3050 2300 3050
 Wire Wire Line
@@ -342,99 +323,51 @@ Wire Wire Line
 	8450 2850 8400 2850
 Wire Wire Line
 	8450 2950 8400 2950
-Text GLabel 6700 3700 0    50   Input ~ 0
-WR
-Text GLabel 6700 3800 0    50   Input ~ 0
-IORQ
+$Comp
+L 74xx:74LS14 U?
+U 6 1 6320FDDD
+P 4900 2000
+F 0 "U?" H 4900 2317 50  0000 C CNN
+F 1 "74LS14" H 4900 2226 50  0000 C CNN
+F 2 "" H 4900 2000 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS14" H 4900 2000 50  0001 C CNN
+	6    4900 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R_Small R?
+U 1 1 6321FB1E
+P 5200 1750
+F 0 "R?" H 5259 1796 50  0000 L CNN
+F 1 "R_Small" H 5259 1705 50  0000 L CNN
+F 2 "" H 5200 1750 50  0001 C CNN
+F 3 "~" H 5200 1750 50  0001 C CNN
+	1    5200 1750
+	1    0    0    -1  
+$EndComp
 Wire Wire Line
-	6700 1500 6450 1500
+	5200 1650 5200 1500
 Wire Wire Line
-	6450 1500 6450 2000
+	5200 2000 5200 1850
 Wire Wire Line
-	5450 2000 5700 2000
-Connection ~ 6450 1500
+	5200 1500 4400 1500
+Connection ~ 4400 1500
 Wire Wire Line
-	6450 1500 6350 1500
-Wire Wire Line
-	6700 1000 8050 1000
-Wire Wire Line
-	8050 1000 8050 1350
-Wire Wire Line
-	8050 1350 8400 1350
-Wire Wire Line
-	6700 1100 7950 1100
-Wire Wire Line
-	7950 1100 7950 1450
-Wire Wire Line
-	7950 1450 8400 1450
-Wire Wire Line
-	6700 1200 7850 1200
-Wire Wire Line
-	7850 1200 7850 1550
-Wire Wire Line
-	7850 1550 8400 1550
-Wire Wire Line
-	6700 1300 7750 1300
-Wire Wire Line
-	7750 1300 7750 1650
-Wire Wire Line
-	7750 1650 8400 1650
-Wire Wire Line
-	6700 1400 7650 1400
-Wire Wire Line
-	7650 1400 7650 1750
-Wire Wire Line
-	7650 1750 8400 1750
-Connection ~ 8400 2450
-Connection ~ 8400 2550
-Connection ~ 8400 2650
-Connection ~ 8400 2750
-Connection ~ 8400 2850
-Connection ~ 8400 2950
-Wire Wire Line
-	6700 2800 6700 2250
-Wire Wire Line
-	6700 2250 8400 2250
-Wire Wire Line
-	6700 2900 6800 2900
-Wire Wire Line
-	6800 2900 6800 2350
-Wire Wire Line
-	6800 2350 8400 2350
-Wire Wire Line
-	6700 3000 6900 3000
-Wire Wire Line
-	6900 3000 6900 2450
-Wire Wire Line
-	6900 2450 8400 2450
-Wire Wire Line
-	6700 3100 7000 3100
-Wire Wire Line
-	7000 3100 7000 2550
-Wire Wire Line
-	7000 2550 8400 2550
-Wire Wire Line
-	6700 3200 7100 3200
-Wire Wire Line
-	7100 3200 7100 2650
-Wire Wire Line
-	7100 2650 8400 2650
-Wire Wire Line
-	6700 3300 7200 3300
-Wire Wire Line
-	7200 3300 7200 2750
-Wire Wire Line
-	7200 2750 8400 2750
-Wire Wire Line
-	6700 3400 7300 3400
-Wire Wire Line
-	7300 3400 7300 2850
-Wire Wire Line
-	7300 2850 8400 2850
-Wire Wire Line
-	6700 3500 7400 3500
-Wire Wire Line
-	7400 3500 7400 2950
-Wire Wire Line
-	7400 2950 8400 2950
+	4600 2500 5650 2500
+Text GLabel 8400 2250 0    50   Input ~ 0
+D7
+Text GLabel 8400 2350 0    50   Input ~ 0
+D6
+Text GLabel 8400 2450 0    50   Input ~ 0
+D5
+Text GLabel 8400 2550 0    50   Input ~ 0
+D4
+Text GLabel 8400 2650 0    50   Input ~ 0
+D3
+Text GLabel 8400 2750 0    50   Input ~ 0
+D2
+Text GLabel 8400 2850 0    50   Input ~ 0
+D1
+Text GLabel 8400 2950 0    50   Input ~ 0
+D0
 $EndSCHEMATC

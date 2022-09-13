@@ -806,7 +806,7 @@ Text GLabel 4300 3100 2    50   Input ~ 0
 A15
 Text GLabel 6100 3550 0    50   Input ~ 0
 ROMSEL
-Text GLabel 9600 2950 2    50   Input ~ 0
+Text GLabel 8950 2950 2    50   Input ~ 0
 RAMSEL
 Text GLabel 7950 1950 0    50   Input ~ 0
 A0
@@ -1193,82 +1193,6 @@ Wire Wire Line
 	3100 6050 3700 6050
 Wire Wire Line
 	4300 6050 4650 6050
-$Comp
-L Device:D_Schottky D?
-U 1 1 625B1E53
-P 8450 1250
-F 0 "D?" V 8496 1170 50  0000 R CNN
-F 1 "D_Schottky" V 8405 1170 50  0000 R CNN
-F 2 "" H 8450 1250 50  0001 C CNN
-F 3 "~" H 8450 1250 50  0001 C CNN
-	1    8450 1250
-	0    -1   -1   0   
-$EndComp
-$Comp
-L Device:D_Schottky D?
-U 1 1 625B23EB
-P 9550 1400
-F 0 "D?" H 9550 1617 50  0000 C CNN
-F 1 "D_Schottky" H 9550 1526 50  0000 C CNN
-F 2 "" H 9550 1400 50  0001 C CNN
-F 3 "~" H 9550 1400 50  0001 C CNN
-	1    9550 1400
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	8450 1400 8450 1750
-Connection ~ 8450 1400
-Wire Wire Line
-	8450 1400 9350 1400
-$Comp
-L Device:R_Small R?
-U 1 1 625D62BC
-P 9350 2200
-F 0 "R?" H 9409 2246 50  0000 L CNN
-F 1 "4k7" H 9409 2155 50  0000 L CNN
-F 2 "" H 9350 2200 50  0001 C CNN
-F 3 "~" H 9350 2200 50  0001 C CNN
-	1    9350 2200
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	9350 1400 9350 2100
-Connection ~ 9350 1400
-Wire Wire Line
-	9350 1400 9400 1400
-Wire Wire Line
-	9350 2300 9350 2950
-Wire Wire Line
-	9350 2950 8950 2950
-Wire Wire Line
-	9350 2950 9600 2950
-Connection ~ 9350 2950
-$Comp
-L Device:Battery_Cell CR2032
-U 1 1 625E844B
-P 10150 1650
-F 0 "CR2032" H 10268 1746 50  0000 L CNN
-F 1 "3V" H 10268 1655 50  0000 L CNN
-F 2 "" V 10150 1710 50  0001 C CNN
-F 3 "~" V 10150 1710 50  0001 C CNN
-	1    10150 1650
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	10150 1450 10150 1400
-Wire Wire Line
-	10150 1400 9700 1400
-$Comp
-L power:GND #PWR?
-U 1 1 625F0565
-P 10150 1750
-F 0 "#PWR?" H 10150 1500 50  0001 C CNN
-F 1 "GND" H 10155 1577 50  0000 C CNN
-F 2 "" H 10150 1750 50  0001 C CNN
-F 3 "" H 10150 1750 50  0001 C CNN
-	1    10150 1750
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	8600 5750 8300 5750
 Connection ~ 8300 5750
@@ -1276,4 +1200,6 @@ Wire Wire Line
 	8600 5550 7750 5550
 Wire Wire Line
 	7750 4750 7750 5550
+Wire Wire Line
+	8450 1100 8450 1750
 $EndSCHEMATC
