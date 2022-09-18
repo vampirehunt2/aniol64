@@ -574,12 +574,12 @@ PROC
 defb "dos_touch"
 dos_touch:
 		CALL str_shift
-		;CALL dos_validateFilename	; first, check if the given file name is valid...
-		;CP FALSE					; ...as this doesn't require reding any data from disk 
-		;JR Z, _invName
-		;CALL dos_fileExists			; check if file already exists in the current directory
-		;CP TRUE
-		;JR Z, _fileExists
+		CALL dos_validateFilename	; first, check if the given file name is valid...
+		CP FALSE					; ...as this doesn't require reding any data from disk 
+		JR Z, _invName
+		CALL dos_fileExists			; check if file already exists in the current directory
+		CP TRUE
+		JR Z, _fileExists
 		CALL dos_findFreeFileSlot
 		CP FALSE					; check if a free slot exists
 		JR Z, _diskFull
@@ -639,7 +639,6 @@ ENDP
 ; if A is true, IY points to the beginning of the file record
 PROC
 dos_findFreeFileSlotInSector:
-		PUSH IY
 		PUSH BC
 		LD IY, SectorBuffer
 		LD B, FILE_RECORDS_PER_SECTOR
@@ -655,7 +654,6 @@ _found:
 		LD A, TRUE
 _end:
 		POP BC
-		POP IY
 		RET
 ENDP
 
