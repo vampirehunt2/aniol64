@@ -32,6 +32,7 @@ MkDir:		defb "mkdir", 0
 RmDir:		defb "rmdir", 0
 Cd:			defb "cd", 0
 Touch:		defb "touch", 0
+Rm:			defb "rm", 0
 Format:		defb "format", 0
 
 UnknownCmd: defb "Unknown cmd", 0
@@ -141,6 +142,10 @@ cmd_main:
 		LD IY, Touch
 		CALL str_cmp
 		JP Z, _touch
+		; rm command
+		LD IY, Rm
+		CALL str_cmp
+		JP Z, _rm
 		; format command
 		LD IY, Format
 		CALL str_cmp
@@ -226,6 +231,9 @@ _cd:
 		JP cmd_main
 _touch:
 		CALL dos_touch
+		JP cmd_main
+_rm:
+		CALL dos_rm
 		JP cmd_main
 _format:
 		CALL dos_format

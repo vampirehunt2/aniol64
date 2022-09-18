@@ -24,6 +24,7 @@ ErrInvDirName:	defb "Invalid directory name", 0
 ErrInvFileName:	defb "Invalid file name", 0
 ErrDirExists:	defb "Directory already exists", 0
 ErrFileExists:	defb "File already exists", 0
+ErrFileNotFound:defb "File not found", 0
 ErrTooManyDirs:	defb "Too many directories", 0
 ErrNoSuchDir:	defb "No such directory", 0
 ErrDiskFull:	defb "Disk full", 0
@@ -332,6 +333,25 @@ _continue:
 		RET
 ENDP
 
+
+PROC
+dos_rm:
+		CALL str_shift
+		CALL dos_fileExists
+		CP 0
+		JR Z, _notFound
+		PUSH AF
+		LD A, FALSE
+		LD (IY + FileExists), A
+		POP AF
+		CALL dos_saveFileTabSector
+		RET
+_notFound:
+		LD IX, ErrFileNotFound
+		CALL vga_writeLn
+		RET
+ENDP
+
 PROC
 dos_rmDir:
 		CALL str_shift
@@ -571,15 +591,14 @@ ENDP
 ; creates an empty file
 ; IX: file name
 PROC
-defb "dos_touch"
 dos_touch:
 		CALL str_shift
 		CALL dos_validateFilename	; first, check if the given file name is valid...
 		CP FALSE					; ...as this doesn't require reding any data from disk 
 		JR Z, _invName
 		CALL dos_fileExists			; check if file already exists in the current directory
-		CP TRUE
-		JR Z, _fileExists
+		CP FALSE
+		JR NZ, _fileExists
 		CALL dos_findFreeFileSlot
 		CP FALSE					; check if a free slot exists
 		JR Z, _diskFull
@@ -659,32 +678,53 @@ ENDP
 
 ; checks whether a file with a given name exists in the current directory
 ; IX: file name
-; result in A
+; result: 
+; - 0 in A if file not found
+; - if file found, then
+; -- file table sector number in A
+; -- file record address in memory in IY
 PROC
 dos_fileExists:
 		LD A, 01h				; the first sector of the file table
-		LD B, FILE_TABLE_SECTORS
-_sectorLoop:
+_loop:
+		PUSH AF
 		CALL dos_loadFileTabSector
-		PUSH BC					; store the sector loop counter
+		CALL dos_fileExistsInSector
+		CP TRUE
+		JR Z, _found
+		POP AF
+		INC A
+		CP FILE_TABLE_SECTORS
+		JR NZ, _loop
+		LD A, FALSE
+		RET
+_found:
+		POP AF
+		RET
+ENDP
+
+PROC
+dos_fileExistsInSector:
+		PUSH BC
+		LD IY, SectorBuffer
 		LD B, FILE_RECORDS_PER_SECTOR
-		LD IY, 0
-_recordLoop:
-		LD A, (IY + FileExists)	; check if file record represents an existing file
-		CP FALSE
-		JR Z, _endRecordLoop 	; if not, skip the rest of the current sector
+_loop:
 		LD A, (IY + FileDir)	; read directory index of the file
 		LD C, A					; store directory index of the file in C
-		LD A, CurrentDir		; load the current directory into A
+		LD A, (CurrentDir)		; load the current directory into A
 		CP C					; check if directory index of the file record equals the current directory
-		JR NZ, _endRecordLoop 	; if not, skip the rest of the current sector
-		; TODO check for filename
-		CALL str_cmp
-_endRecordLoop:
+		JR NZ, _continue	 	; if not, skip the current file record
+		CALL str_cmp			; check if file has the same name
+		CP 0					
+		JR NZ, _continue		; if not, skip the current file record
+		LD A, TRUE
+		JR _end
+_continue:
 		CALL dos_nextFileRecord
-		DJNZ _recordLoop
-		POP BC			; restore the sector loop counter
-		DJNZ _sectorLoop
+		DJNZ _loop
+		LD A, FALSE
+_end:
+		POP BC
 		RET
 ENDP
 
