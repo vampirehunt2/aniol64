@@ -17,6 +17,7 @@ SerialNum: 		defb "Serial: ", 0
 Model: 			defb "Model: ", 0
 FirmwareRev: 	defb "Firmware Rev: ", 0
 LbaSectors: 	defb "LBA Sectors: ", 0
+Bytes			defb " bytes", 0
 
 ; error messages
 InvalidSector: 	defb "Invalid sector", 0
@@ -324,12 +325,40 @@ _loop:
 		JR NZ, _continue
 		PUSH IY
 		POP IX
+		CALL vga_wriStr
+		CALL dos_tabFileName
+		LD A, (IY + FileLen)
+		LD L, A
+		LD A, (IY + FileLen + 1)
+		LD H, A
+		CALL u16_formatDec
+		CALL vga_wriStr
+		LD IX, Bytes
 		CALL vga_writeLn
 _continue:
 		CALL dos_nextFileRecord
 		DJNZ _loop
 		POP BC
 		POP IY
+		RET
+ENDP
+
+PROC
+dos_tabFileName:
+		PUSH AF
+		PUSH BC
+		CALL str_len
+		LD B, A
+		LD A, MAX_FILENAME_LEN
+		SUB B
+		INC A
+		LD B, A
+		LD A, ' '
+_loop:
+		CALL vga_putChar
+		DJNZ _loop
+		POP BC
+		POP AF
 		RET
 ENDP
 
