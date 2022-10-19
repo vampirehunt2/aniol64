@@ -70,10 +70,6 @@ Ready: defb     "Ready", 0
 Hello: defb     "Hello", 0
 
 boot:
-        LD A, 1
-        CALL setRomBank
-        LD A, 1
-        CALL setRamBank
         ; init devices 
         CALL vga_init
 
@@ -112,24 +108,33 @@ loop:
         HALT
         JP loop
 
+
+; device drivers
+include dev/bzr.asm
+include dev/vga.asm
+include dev/dart.asm
+include dev/cf.asm
+include dev/ps2.asm
+include dev/kbd.asm
+
+; libraries
+include lib/util.asm
+include lib/str.asm
+include lib/mem.asm
+include lib/list.asm
+include lib/math.asm
+
+; test routines
+include test/test.asm
+
+; programs
 include cmd.asm
 include mon.asm
 include term.asm
 include dos.asm
 include snake.asm
 include onp.asm
-include test/test.asm
-include lib/util.asm
-include lib/str.asm
-include lib/mem.asm
-include lib/list.asm
-include lib/math.asm
-include dev/bzr.asm
-include dev/vga.asm
-include dev/dart.asm
-include dev/cf.asm
-include dev/ps2.asm
-include dev/kbd.asm ; this goes last becasue of the org 3700h inside
+
 
 
 PROC

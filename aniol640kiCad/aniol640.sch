@@ -431,34 +431,34 @@ Connection ~ 3900 7550
 $Comp
 L Oscillator:ACO-xxxMHz X1
 U 1 1 61D3D043
-P 1600 5000
-F 0 "X1" H 1257 5046 50  0000 R CNN
-F 1 "ACO-1.8432MHz" H 1257 4955 50  0000 R CNN
-F 2 "Oscillator:Oscillator_DIP-14" H 2050 4650 50  0001 C CNN
-F 3 "http://www.conwin.com/datasheets/cx/cx030.pdf" H 1500 5000 50  0001 C CNN
-	1    1600 5000
+P 900 4450
+F 0 "X1" H 557 4496 50  0000 R CNN
+F 1 "ACO-2.5MHz" H 1400 4950 50  0000 R CNN
+F 2 "Oscillator:Oscillator_DIP-14" H 1350 4100 50  0001 C CNN
+F 3 "http://www.conwin.com/datasheets/cx/cx030.pdf" H 800 4450 50  0001 C CNN
+	1    900  4450
 	1    0    0    -1  
 $EndComp
 $Comp
 L power:+5V #PWR014
 U 1 1 61D3E347
-P 1600 4700
-F 0 "#PWR014" H 1600 4550 50  0001 C CNN
-F 1 "+5V" H 1615 4873 50  0000 C CNN
-F 2 "" H 1600 4700 50  0001 C CNN
-F 3 "" H 1600 4700 50  0001 C CNN
-	1    1600 4700
+P 900 4150
+F 0 "#PWR014" H 900 4000 50  0001 C CNN
+F 1 "+5V" H 750 4200 50  0000 C CNN
+F 2 "" H 900 4150 50  0001 C CNN
+F 3 "" H 900 4150 50  0001 C CNN
+	1    900  4150
 	1    0    0    -1  
 $EndComp
 $Comp
 L power:GND #PWR015
 U 1 1 61D3EB67
-P 1600 5300
-F 0 "#PWR015" H 1600 5050 50  0001 C CNN
-F 1 "GND" H 1605 5127 50  0000 C CNN
-F 2 "" H 1600 5300 50  0001 C CNN
-F 3 "" H 1600 5300 50  0001 C CNN
-	1    1600 5300
+P 900 4750
+F 0 "#PWR015" H 900 4500 50  0001 C CNN
+F 1 "GND" H 905 4577 50  0000 C CNN
+F 2 "" H 900 4750 50  0001 C CNN
+F 3 "" H 900 4750 50  0001 C CNN
+	1    900  4750
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -861,15 +861,15 @@ WR
 $Comp
 L 74xx:74LS14 U?
 U 1 1 62490009
-P 2200 5000
-F 0 "U?" H 2200 5317 50  0000 C CNN
-F 1 "74LS14" H 2200 5226 50  0000 C CNN
-F 2 "" H 2200 5000 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS14" H 2200 5000 50  0001 C CNN
-	1    2200 5000
+P 1500 4450
+F 0 "U?" H 1500 4767 50  0000 C CNN
+F 1 "74LS14" H 1500 4676 50  0000 C CNN
+F 2 "" H 1500 4450 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS14" H 1500 4450 50  0001 C CNN
+	1    1500 4450
 	1    0    0    -1  
 $EndComp
-Text GLabel 2500 5000 2    50   Input ~ 0
+Text GLabel 1800 4450 2    50   Input ~ 0
 CLK
 $Comp
 L 74xx:74LS14 U?
@@ -1170,7 +1170,7 @@ Wire Wire Line
 	4650 5550 4300 5550
 Text GLabel 3100 5650 0    50   Input ~ 0
 A5
-Text GLabel 3100 5450 0    50   Input ~ 0
+Text GLabel 2450 5450 0    50   Input ~ 0
 IORQ
 $Comp
 L 74xx:74LS14 U?
@@ -1225,4 +1225,50 @@ Wire Wire Line
 Connection ~ 10200 4600
 Wire Wire Line
 	10200 4600 10200 4700
+$Comp
+L Device:R_Small R?
+U 1 1 63343F4D
+P 2650 5450
+F 0 "R?" V 2454 5450 50  0000 C CNN
+F 1 "R_Small" V 2545 5450 50  0000 C CNN
+F 2 "" H 2650 5450 50  0001 C CNN
+F 3 "~" H 2650 5450 50  0001 C CNN
+	1    2650 5450
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	2550 5450 2450 5450
+Wire Wire Line
+	3100 5450 2950 5450
+$Comp
+L Device:D_Schottky D?
+U 1 1 6335B52C
+P 2650 5100
+F 0 "D?" H 2650 4883 50  0000 C CNN
+F 1 "D_Schottky" H 2650 4974 50  0000 C CNN
+F 2 "" H 2650 5100 50  0001 C CNN
+F 3 "~" H 2650 5100 50  0001 C CNN
+	1    2650 5100
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	2800 5100 2950 5100
+Wire Wire Line
+	2950 5100 2950 5450
+Connection ~ 2950 5450
+Wire Wire Line
+	2950 5450 2750 5450
+$Comp
+L 74xx:74LS14 U?
+U 3 1 63362105
+P 2200 5100
+F 0 "U?" H 2200 5417 50  0000 C CNN
+F 1 "74LS14" H 2200 5326 50  0000 C CNN
+F 2 "" H 2200 5100 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS14" H 2200 5100 50  0001 C CNN
+	3    2200 5100
+	1    0    0    -1  
+$EndComp
+Text GLabel 1900 5100 0    50   Input ~ 0
+M1
 $EndSCHEMATC

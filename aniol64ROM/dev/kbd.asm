@@ -8,8 +8,6 @@
 ;----------------------------------------------------
 
 
-
-KEYCODE_BASE_ADDR equ 3700h
 KBD_PORT equ 10111111b  ; BFh keyboard is selected with A6
 
 ; Converts keyboard code to ASCII code
@@ -17,7 +15,7 @@ KBD_PORT equ 10111111b  ; BFh keyboard is selected with A6
 ; zeroes B
 ; result in A
 kbd_keycode2ascii:
-        LD HL, KEYCODE_BASE_ADDR
+        LD HL, KeyCodes
         LD B, 00h
         ADD HL, BC
         LD A, (HL)
@@ -76,7 +74,7 @@ _return:
         RET
 ENDP
 
-org KEYCODE_BASE_ADDR
+KeyCodes:
     defb 71h	; 00-00-000b	q
 	defb 77h	; 00-00-001b	w
 	defb 65h	; 00-00-010b	e

@@ -44,22 +44,6 @@ C000-7FFF: bank-switchable NVRAM (AS6C4008) - 32x16KB<br/>
 <h4>Bank switching schematic</h4>
 <img src="Design/bankSwitching.png"/>
 <br/>
-
-<h3>Peripheral decoding</h3>
-<table>
-<tr><th colspan="3"/><th colspan="2">Bank Switching</th><th/></tr>
-<tr><th/>			<th>ROM'</th>	<th>RAM'</th>	<th>IN</th>	<th>OUT'</th>	<th>DART'</th>	<th>keybd</th>	<th>buzzer</th></tr>
-<tr><th>A15</th>	<td>0</td>		<td>1</td>		<td>x</td>	<td>1</td>		<td>x</td>		<td>x</td>		<td>x</td></tr>
-<tr><th>A14</th>	<td>x</td>		<td>x</td>		<td>x</td>	<td>1</td>		<td>x</td>		<td>x</td>		<td>x</td></tr>
-<tr><th>A5</th>		<td>x</td>		<td>x</td>		<td>0</td>	<td>x</td>		<td>x</td>		<td>x</td>		<td>x</td></tr>
-<tr><th>A4</th>		<td>x</td>		<td>x</td>		<td>x</td>	<td>x</td>		<td>0</td>		<td>x</td>		<td>x</td></tr>
-<tr><th>A2</th>		<td>x</td>		<td>x</td>		<td>x</td>	<td>x</td>		<td>x</td>		<td>0</td>		<td>0</td></tr>
-<tr><th>MEMRQ</th>	<td>0</td>		<td>0</td>		<td>x</td>	<td>x</td>		<td>x</td>		<td>x</td>		<td>x</td></tr>
-<tr><th>IORQ</th>	<td>x</td>		<td>x</td>		<td>0</td>	<td>x</td>		<td>0</td>		<td>0</td>		<td>0</td></tr>
-<tr><th>WR</th>		<td>x</td>		<td>x</td>		<td>0</td>	<td>x</td>		<td>x</td>		<td>x</td>		<td>0</td></tr>
-<tr><th>RD</th>		<td>x</td>		<td>x</td>		<td>x</td>	<td>x</td>		<td>x</td>		<td>0</td>		<td>x</td></tr>
-</table>
-<br/>
  
 <h2>Bus organization</h2>
 <table>
@@ -114,7 +98,7 @@ C000-7FFF: bank-switchable NVRAM (AS6C4008) - 32x16KB<br/>
 <tr><td>A0</td><td colspan=3>internal register select</td></tr>
 <tr><td>A1</td><td colspan=3>internal register select</td></tr>
 <tr><td>A2</td><td colspan=3>internal register select</td></tr>	
-<tr><td>A3</td><td>11110xxx</td><td>LCD display</td><td>empty</td></tr>
+<tr><td>A3</td><td>11110xxx</td><td>LCD display</td><td>Disk</td></tr>
 <tr><td>A4</td><td>11101xxx</td><td colspan=2>DART</td></tr>
 <tr><td>A5</td><td>11011xxx</td><td>empty</td><td>NVRAM bank switching</td></tr>
 <tr><td>A6</td><td>10111xxx</td><td colspan=2>	keyboard/buzzer</td></tr>
