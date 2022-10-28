@@ -26,12 +26,12 @@ Special keys: <font color="yellow">Yellow</font><br/>
 
 <h2>Memory map</h2>
 <h3>Aniol 32</h3>
-0000-7FFF: NVRAM (1244Y)<br/>
-8000-FFFF: NVRAM (mirrored)<br/>
+0000-7FFF: ROM (28C256)<br/>
+8000-87FF: ROM 5264<br/>
 
 <h3>Aniol 64</h3>
 0000-7FFF: ROM (28C256)<br/>
-8000-FFFF: RAM (62C256 or 1244Y)<br/>
+8000-FFFF: RAM (62256 or 1244Y)<br/>
 
 <h3>Aniol 640</h3>
 0000-3800: ROM (28F010)<br/>
@@ -94,15 +94,15 @@ C000-7FFF: bank-switchable NVRAM (AS6C4008) - 32x16KB<br/>
 <h2>I/O</h2>
 <h3>Device address decoding</h3>
 <table>
-<tr><th>Address line</th><th>Address</th><th>Aniol 32/64</th><th>Aniola 640</th></tr>
-<tr><td>A0</td><td colspan=3>internal register select</td></tr>
-<tr><td>A1</td><td colspan=3>internal register select</td></tr>
-<tr><td>A2</td><td colspan=3>internal register select</td></tr>	
-<tr><td>A3</td><td>11110xxx</td><td>LCD display</td><td>Disk</td></tr>
-<tr><td>A4</td><td>11101xxx</td><td colspan=2>DART</td></tr>
-<tr><td>A5</td><td>11011xxx</td><td>empty</td><td>NVRAM bank switching</td></tr>
-<tr><td>A6</td><td>10111xxx</td><td colspan=2>	keyboard/buzzer</td></tr>
-<tr><td>A7</td><td>01111xxx</td><td colspan=2>	expansion</td></tr>
+<tr><th>Address line</th><th>Address</th><th>Aniol 32</th><th>Aniol 64</th><th>Aniola 640</th></tr>
+<tr><td>A0</td><td colspan=4>internal register select</td></tr>
+<tr><td>A1</td><td colspan=4>internal register select</td></tr>
+<tr><td>A2</td><td colspan=4>internal register select</td></tr>	
+<tr><td>A3</td><td>11110xxx</td><td>LCD display</td><td colspan=2>Disk</td></tr>
+<tr><td>A4</td><td>11101xxx</td><td colspan=3>DART</td></tr>
+<tr><td>A5</td><td>11011xxx</td><td colspan=2>empty</td><td>NVRAM bank switching</td></tr>
+<tr><td>A6</td><td>10111xxx</td><td colspan=3>	keyboard/buzzer</td></tr>
+<tr><td>A7</td><td>01111xxx</td><td colspan=3>	expansion</td></tr>
 </table>
 <br/>
 

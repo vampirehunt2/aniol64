@@ -26,7 +26,7 @@ PROC
 snake_main:
 		CALL snake_init
 _loop:
-		CALL kbd_readKey
+		CALL readKey
 		CP 'k'
 		JP Z, _n
 		CP 'n'

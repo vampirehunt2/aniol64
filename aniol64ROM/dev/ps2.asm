@@ -13,7 +13,7 @@ ps2_initSeq:
 		defb 5, 00000000b	; Tx disabled
 		defb 1, 10000000b	; disable interrupts, enable WAIT
 
-ps2_dartInit:
+keyInit:
 		LD HL, ps2_initSeq
 		LD B, 10
 		LD C, DART_A_CMD
@@ -52,7 +52,7 @@ _continue:
 ENDP
 
 PROC
-ps2_readKey:
+readKey:
 		CALL ps2_readScancode
 		CP KEY_UP
 		JR Z, _keyUp
@@ -67,11 +67,11 @@ ps2_readKey:
 _shiftDn:
 		LD A, TRUE
 		LD (Ps2Shift), A
-		JR ps2_readKey
+		JR readKey
 _shiftUp:
 		LD A, FALSE
 		LD (Ps2Shift), A
-		JR ps2_readKey 
+		JR readKey 
 _keyUp:
 _extKey:
 		CALL ps2_readScancode	; ignore the next scancode, it's the code of the key that's going up
@@ -80,7 +80,7 @@ _extKey:
 		JR Z, _shiftUp
 		CP RSHIFT
 		JR Z, _shiftUp
-		JR ps2_readKey
+		JR readKey
 		RET
 ENDP
 		

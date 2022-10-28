@@ -1,9 +1,9 @@
 
 PROC
 test_main:
-		CALL ps2_dartInit
+		CALL keyInit
 _loop:
-		CALL ps2_readKey
+		CALL readKey
 		CALL vga_putChar
 		JR _loop
 ENDP

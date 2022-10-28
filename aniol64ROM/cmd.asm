@@ -241,7 +241,7 @@ _format:
 ENDP
 
 cmd_readLn:
-        CALL kbd_readLine
+        CALL readLine
         CALL vga_nextLine
         LD IX, LineBuff
         RET

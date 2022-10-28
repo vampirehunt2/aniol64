@@ -11,7 +11,7 @@
 ; It uses software handshaking with Xon/Xoff on the receiving side.
 ; It uses no handshaking on the transmitting side, assuming the 
 ; computer on the other side is able to handle keyclicks in time.
-; There is no terdown procedure implemented at this point,
+; There is no teardown procedure implemented at this point,
 ; to exit the terminal program you have to reset the machine.
  
 Program defb "A-Term", 0

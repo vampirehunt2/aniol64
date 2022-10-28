@@ -72,6 +72,7 @@ Hello: defb     "Hello", 0
 boot:
         ; init devices 
         CALL vga_init
+		CALL keyInit
 
         ; init the keyboard buffer to avoid a bogus character during the first read
         LD A, 0
@@ -114,7 +115,6 @@ include dev/bzr.asm
 include dev/vga.asm
 include dev/dart.asm
 include dev/cf.asm
-include dev/ps2.asm
 include dev/kbd.asm
 
 ; libraries
@@ -123,6 +123,7 @@ include lib/str.asm
 include lib/mem.asm
 include lib/list.asm
 include lib/math.asm
+include lib/conio.asm
 
 ; test routines
 include test/test.asm
@@ -134,8 +135,6 @@ include term.asm
 include dos.asm
 include snake.asm
 include onp.asm
-
-
 
 PROC
 handleInt:

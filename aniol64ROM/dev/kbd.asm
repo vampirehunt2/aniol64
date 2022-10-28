@@ -31,28 +31,31 @@ kbd_input:
         CALL kbd_keycode2ascii
         LD (KbdBuff), A
         RET
+		
+keyInit:
+		RET
 
 ; reads a single key from the buffer
-kbd_readKey:
+readKey:
         LD A, (KbdBuff)
         CP 0
-        JR Z, kbd_readKey
+        JR Z, readKey
         PUSH AF
         LD A, 0
         LD (KbdBuff), A
         POP AF
         RET
-
+		
 ; reads a line from keyboard
 ; result in LineBuff
-; result is only valid until next call of kbd_readLine
+; result is only valid until next call of readLine
 ; if the result needs to persist, it needs to be copied to elswhere in memory
 ; TODO: check for max line length (buffer overflow)
 PROC
-kbd_readLine:
+readLine:
         LD BC, LineBuff       ; point BC to the beginning of the keyboard buffer
 _loop:
-        CALL kbd_readKey     ; wait for a key to be pressed
+        CALL readKey     	 ; wait for a key to be pressed
         CP 13                ; check if RETURN key was pressed
         JR Z, _return
         CP 08                 ; check if BACKSPACE was pressed

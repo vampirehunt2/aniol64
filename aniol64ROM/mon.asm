@@ -37,7 +37,7 @@ mon_main:
 mon_main_loop:
 		CALL vga_curOn
 		CALL mon_gotoCmdLine
-        CALL kbd_readLine
+        CALL readLine
         LD IX, LineBuff
         CALL str_tok
         ; set value command
@@ -151,7 +151,7 @@ _parseError:
         CALL mon_gotoStatusLine
         LD IX, InvAddr
         CALL vga_wriStr
-        CALL kbd_readKey
+        CALL readKey
         CALL mon_refresh
         JP mon_main_loop
 ENDP
@@ -169,7 +169,7 @@ _parseError:
         CALL mon_gotoStatusLine
         LD IX, InvAddr
         CALL vga_wriStr
-        CALL kbd_readKey
+        CALL readKey
         CALL mon_refresh
         JP mon_main_loop
         RET
@@ -217,7 +217,7 @@ _parseError:
         CALL mon_gotoStatusLine
         LD IX, InvVal
         CALL vga_wriStr
-        CALL kbd_readKey
+        CALL readKey
         JP mon_main_loop
 _completed:
         CALL mon_dsp
@@ -253,7 +253,7 @@ _parseError:
         CALL mon_gotoStatusLine
         LD IX, InvVal
         CALL vga_wriStr
-        CALL kbd_readKey
+        CALL readKey
         CALL mon_refresh
         JP mon_main_loop
 ENDP
@@ -290,14 +290,14 @@ _invalidValue:
         CALL mon_gotoStatusLine
         LD IX, InvVal
         CALL vga_wriStr
-        CALL kbd_readKey
+        CALL readKey
         CALL mon_refresh
         JP mon_main_loop
 _invalidAddress:
         CALL mon_gotoStatusLine
         LD IX, InvAddr
         CALL vga_wriStr
-        CALL kbd_readKey
+        CALL readKey
         CALL mon_refresh
         JP mon_main_loop
 ENDP
