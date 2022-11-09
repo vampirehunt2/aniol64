@@ -69,17 +69,6 @@ F 3 "http://www.ti.com/lit/gpn/sn74LS109" H 7050 1350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L 74xx:74LS373 U6
-U 1 1 628CBCB8
-P 6450 4200
-F 0 "U6" H 6650 4900 50  0000 C CNN
-F 1 "74LS373" V 6450 4250 50  0000 C CNN
-F 2 "" H 6450 4200 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS373" H 6450 4200 50  0001 C CNN
-	1    6450 4200
-	1    0    0    -1  
-$EndComp
-$Comp
 L 74xx:74LS138 U8
 U 1 1 628CE61F
 P 1700 4150
@@ -474,7 +463,6 @@ Wire Wire Line
 	6450 5000 5950 5000
 Wire Wire Line
 	5950 5000 5950 4700
-Connection ~ 6450 5000
 Text GLabel 3650 2950 0    50   Input ~ 0
 D0
 Text GLabel 3650 3050 0    50   Input ~ 0
@@ -493,17 +481,6 @@ Text GLabel 3650 3650 0    50   Input ~ 0
 D7
 Text GLabel 5950 3900 0    50   Input ~ 0
 D2
-Wire Wire Line
-	1700 3450 1700 3500
-Wire Wire Line
-	1700 3500 1050 3500
-Wire Wire Line
-	1050 3500 1050 4350
-Wire Wire Line
-	1050 4350 1200 4350
-Connection ~ 1700 3500
-Wire Wire Line
-	1700 3500 1700 3550
 Text GLabel 750  4450 0    50   Input ~ 0
 Ax
 Text GLabel 850  4550 0    50   Input ~ 0
@@ -524,32 +501,6 @@ Wire Wire Line
 	1200 4450 750  4450
 Wire Wire Line
 	1200 4550 850  4550
-$Comp
-L Device:R_Small R?
-U 1 1 629251BB
-P 2400 3650
-F 0 "R?" H 2200 3750 50  0000 L CNN
-F 1 "1k" V 2300 3600 50  0000 L CNN
-F 2 "" H 2400 3650 50  0001 C CNN
-F 3 "~" H 2400 3650 50  0001 C CNN
-	1    2400 3650
-	1    0    0    -1  
-$EndComp
-$Comp
-L Device:R_Small R?
-U 1 1 629259F8
-P 2300 3650
-F 0 "R?" H 2400 3750 50  0000 L CNN
-F 1 "1k" V 2400 3600 50  0000 L CNN
-F 2 "" H 2300 3650 50  0001 C CNN
-F 3 "~" H 2300 3650 50  0001 C CNN
-	1    2300 3650
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	2400 3500 2400 3550
-Wire Wire Line
-	2300 3550 2300 3500
 Wire Wire Line
 	5450 3550 5450 3500
 Wire Wire Line
@@ -583,22 +534,8 @@ Wire Wire Line
 NoConn ~ 7350 1450
 Wire Wire Line
 	2200 3950 2400 3950
-Connection ~ 2300 3500
-Wire Wire Line
-	1700 3500 2300 3500
-Wire Wire Line
-	2300 3500 2400 3500
-Wire Wire Line
-	2400 3750 2400 3950
-Wire Wire Line
-	2300 3750 2300 3850
-Connection ~ 2300 3850
-Wire Wire Line
-	2300 3850 2200 3850
 Wire Wire Line
 	2500 1650 3300 1650
-Wire Wire Line
-	6950 3900 7050 3900
 $Comp
 L Device:R_Small R?
 U 1 1 6299125B
@@ -736,8 +673,6 @@ $EndComp
 Wire Wire Line
 	9400 1250 9150 1250
 Wire Wire Line
-	7050 1650 7050 3900
-Wire Wire Line
 	7500 3700 7500 2450
 Wire Wire Line
 	8300 3800 8300 2450
@@ -745,12 +680,9 @@ Wire Wire Line
 	7050 1050 7050 1000
 Connection ~ 7050 1000
 Wire Wire Line
-	2300 3850 2850 3850
-Wire Wire Line
 	2400 3950 2400 4600
 Wire Wire Line
 	2400 4600 5150 4600
-Connection ~ 2400 3950
 $Comp
 L 74xx:74HC164 U10
 U 1 1 62A081F4
@@ -959,21 +891,8 @@ NoConn ~ 2200 4250
 NoConn ~ 2200 4350
 NoConn ~ 2200 4450
 NoConn ~ 2200 4550
-$Comp
-L 74xx:74LS14 U9
-U 4 1 62B1065C
-P 5200 5550
-F 0 "U9" H 5200 5233 50  0000 C CNN
-F 1 "74LS14" H 5200 5324 50  0000 C CNN
-F 2 "" H 5200 5550 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS14" H 5200 5550 50  0001 C CNN
-	4    5200 5550
-	-1   0    0    1   
-$EndComp
 Wire Wire Line
 	6950 4400 6950 5550
-Wire Wire Line
-	6950 5550 5500 5550
 $Comp
 L Device:D_Schottky D?
 U 1 1 62B17E99
@@ -983,7 +902,7 @@ F 1 "D_Schottky" H 4750 5676 50  0000 C CNN
 F 2 "" H 4750 5550 50  0001 C CNN
 F 3 "~" H 4750 5550 50  0001 C CNN
 	1    4750 5550
-	1    0    0    -1  
+	-1   0    0    1   
 $EndComp
 Wire Wire Line
 	4600 5550 4150 5550
@@ -1196,13 +1115,45 @@ Wire Wire Line
 	5700 6650 9750 6650
 Wire Wire Line
 	9750 6650 9750 1250
-Wire Bus Line
-	4250 900  4250 2150
-Wire Bus Line
-	4800 900  4800 1950
-Wire Bus Line
-	4800 2150 4800 3750
 Connection ~ 9750 1250
 Wire Wire Line
 	9750 1250 10050 1250
+Wire Wire Line
+	2200 3850 2850 3850
+Wire Wire Line
+	1700 3450 1700 3550
+Text GLabel 750  4350 0    50   Input ~ 0
+M1
+Wire Wire Line
+	750  4350 1200 4350
+Wire Wire Line
+	7050 1650 7050 2000
+Wire Wire Line
+	7050 2000 6500 2000
+Wire Wire Line
+	6500 2000 6500 1000
+Wire Wire Line
+	6500 1000 6750 1000
+Connection ~ 6750 1000
+Connection ~ 6450 5000
+$Comp
+L 74xx:74LS373 U6
+U 1 1 628CBCB8
+P 6450 4200
+F 0 "U6" H 6650 4900 50  0000 C CNN
+F 1 "74LS373" V 6450 4250 50  0000 C CNN
+F 2 "" H 6450 4200 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS373" H 6450 4200 50  0001 C CNN
+	1    6450 4200
+	1    0    0    -1  
+$EndComp
+NoConn ~ 6950 3900
+Wire Wire Line
+	4900 5550 6950 5550
+Wire Bus Line
+	4800 900  4800 1950
+Wire Bus Line
+	4250 900  4250 2150
+Wire Bus Line
+	4800 2150 4800 3750
 $EndSCHEMATC

@@ -13,7 +13,7 @@ ps2_initSeq:
 		defb 5, 00000000b	; Tx disabled
 		defb 1, 10000000b	; disable interrupts, enable WAIT
 
-keyInit:
+ps2_keyInit:
 		LD HL, ps2_initSeq
 		LD B, 10
 		LD C, DART_A_CMD
@@ -52,7 +52,7 @@ _continue:
 ENDP
 
 PROC
-readKey:
+ps2_readKey:
 		CALL ps2_readScancode
 		CP KEY_UP
 		JR Z, _keyUp
@@ -67,11 +67,11 @@ readKey:
 _shiftDn:
 		LD A, TRUE
 		LD (Ps2Shift), A
-		JR readKey
+		JR ps2_readKey
 _shiftUp:
 		LD A, FALSE
 		LD (Ps2Shift), A
-		JR readKey 
+		JR ps2_readKey 
 _keyUp:
 _extKey:
 		CALL ps2_readScancode	; ignore the next scancode, it's the code of the key that's going up
@@ -80,10 +80,40 @@ _extKey:
 		JR Z, _shiftUp
 		CP RSHIFT
 		JR Z, _shiftUp
-		JR readKey
+		JR ps2_readKey
 		RET
 ENDP
-		
+	
+; reads a line from keyboard
+; result in LineBuff
+; result is only valid until next call of readLine
+; if the result needs to persist, it needs to be copied to elswhere in memory
+; TODO: check for max line length (buffer overflow)
+PROC
+ps2_readLine:
+        LD BC, LineBuff       ; point BC to the beginning of the keyboard buffer
+_loop:
+        CALL ps2_readKey     	 ; wait for a key to be pressed
+        CP 13                ; check if RETURN key was pressed
+        JR Z, _return
+        CP 08                 ; check if BACKSPACE was pressed
+        JR Z, _bkspc
+        CP 20h                ; checks if the key corresponds to a control character
+        JR C, _loop           ; skip if less
+        LD (BC), A            ; store the character in the keyboard buffer
+        INC C                 ; point BC to the new position of keyboard buffer
+        JR _loop
+_bkspc:
+        LD A, C                ; check if line buffer not empty
+        CP 0
+        JR Z, _loop             ; TODO: beep if buffer is empty
+        DEC C                   ; go back one character
+        JR _loop
+_return:
+        LD A, 0                ; store end of line
+        LD (BC), A
+        RET
+ENDP	
 		
 ps2Scancodes:
 		defb 00		; scancode 00

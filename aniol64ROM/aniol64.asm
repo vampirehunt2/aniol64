@@ -116,6 +116,7 @@ include dev/vga.asm
 include dev/dart.asm
 include dev/cf.asm
 include dev/kbd.asm
+include dev/ps2.asm
 
 ; libraries
 include lib/util.asm
@@ -123,7 +124,6 @@ include lib/str.asm
 include lib/mem.asm
 include lib/list.asm
 include lib/math.asm
-include lib/conio.asm
 
 ; test routines
 include test/test.asm
