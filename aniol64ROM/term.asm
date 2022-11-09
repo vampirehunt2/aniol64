@@ -74,7 +74,7 @@ PROC
 term_handleKeyClick:
 		EX AF, AF'       
         EXX 
-        CALL readKeyAsync	  ; read a character from the keyboard
+        CALL keyInput		  ; read a character from the keyboard
         CALL dart_putChar     ; send the character to the serial port    
         EXX
         EX AF, AF'		
