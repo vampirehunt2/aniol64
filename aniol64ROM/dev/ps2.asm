@@ -6,18 +6,27 @@ LSHIFT equ 12h
 RSHIFT equ 59h
 
 
-ps2_initSeq:
+ps2_initSeqA:
 		defb 0, 00011000b	; channel reset
 		defb 4, 00000111b	; x1 clock, 1 stop bit, odd parity 
 		defb 3, 11000001b	; Rx 8 bits enable Rx
 		defb 5, 00000000b	; Tx disabled
-		defb 1, 10000000b	; disable interrupts, enable WAIT
+		defb 1, 10011000b	; enable interrupts, enable WAIT
+		
+ps2_initSeqB
+		defb 2, 00h			; set interrupt vector to 0
 
-ps2_keyInit:
-		LD HL, ps2_initSeq
+keyInit:
+		LD HL, ps2_initSeqA
 		LD B, 10
 		LD C, DART_A_CMD
 		OTIR
+		LD HL, ps2_initSeqB
+		LD B, 2
+		LD C, DART_B_CMD
+		OTIR
+		LD A, 0
+		LD (Ps2Shift), A
         RET
 		
 ; synchronously reads a scancode from the serial port
@@ -51,8 +60,14 @@ _continue:
 		RET
 ENDP
 
+
 PROC
-ps2_readKey:
+readKeyAsync:
+		RET
+ENDP
+
+PROC
+keyInput:
 		CALL ps2_readScancode
 		CP KEY_UP
 		JR Z, _keyUp
@@ -63,26 +78,42 @@ ps2_readKey:
 		CP RSHIFT
 		JR Z, _shiftDn
 		CALL ps2_scancode2asc
+		LD (KbdBuff), A
 		RET
 _shiftDn:
 		LD A, TRUE
 		LD (Ps2Shift), A
-		JR ps2_readKey
+		JR _zero
+		RET
 _shiftUp:
 		LD A, FALSE
 		LD (Ps2Shift), A
-		JR ps2_readKey 
+		JR _zero
+		RET
 _keyUp:
 _extKey:
-		CALL ps2_readScancode	; ignore the next scancode, it's the code of the key that's going up
+		CALL ps2_readScancode ; ignore the next scancode, it's the code of the key that's going up
 		JR Z, _extKey
 		CP LSHIFT
 		JR Z, _shiftUp
 		CP RSHIFT
 		JR Z, _shiftUp
-		JR ps2_readKey
+_zero:
+		LD A, 0
+		LD (KbdBuff), A
 		RET
 ENDP
+
+; reads a single key from the buffer
+readKey:
+        LD A, (KbdBuff)
+        CP 0
+        JR Z, readKey
+        PUSH AF
+        LD A, 0
+        LD (KbdBuff), A
+        POP AF
+        RET
 	
 ; reads a line from keyboard
 ; result in LineBuff
@@ -90,10 +121,10 @@ ENDP
 ; if the result needs to persist, it needs to be copied to elswhere in memory
 ; TODO: check for max line length (buffer overflow)
 PROC
-ps2_readLine:
+readLine:
         LD BC, LineBuff       ; point BC to the beginning of the keyboard buffer
 _loop:
-        CALL ps2_readKey     	 ; wait for a key to be pressed
+        CALL readKey     	 ; wait for a key to be pressed
         CP 13                ; check if RETURN key was pressed
         JR Z, _return
         CP 08                 ; check if BACKSPACE was pressed

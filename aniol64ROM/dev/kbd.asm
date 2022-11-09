@@ -24,7 +24,7 @@ kbd_keycode2ascii:
 ; reads a keycode from the keyboard and converts to an ascii character
 ; then stores it in the keyboard buffer.
 ; To be called from interrupt routine
-kbd_input:
+keyInput:
         LD C, KBD_PORT
         IN A, (C)
         LD C, A

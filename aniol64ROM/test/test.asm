@@ -1,11 +1,11 @@
- 
+
 PROC
 test_main:
-		CALL ps2_keyInit
+		CALL keyInit
 _loop:
 		;CALL ps2_readScancode
 		;CALL mon_printByte
-		CALL ps2_readKey
+		CALL readKey
 		CALL vga_putChar
 		JR _loop
 ENDP

@@ -45,10 +45,9 @@ org 0100h
         KeyClickHandler: defb 38h, 00h ; we're pointing back at the mode 1 INT handler
                                         ; so that the routine works for both mode 1 and 2
                                         ; note, low order byte goes first
-		; DartRxHandler: 
 
 
-Aniol: defb   "               _ANIOL640_", 0
+Aniol: defb   "               _ANIOL64_", 0
 RAMTOP 				equ 0BFFFh
 TestAddr 			equ 8001h  		; points to the beginning of RAM
 KbdBuff 			equ 8012h       ; 1 byte buffer
@@ -115,7 +114,7 @@ include dev/bzr.asm
 include dev/vga.asm
 include dev/dart.asm
 include dev/cf.asm
-include dev/kbd.asm
+;include dev/kbd.asm
 include dev/ps2.asm
 
 ; libraries
@@ -141,7 +140,7 @@ handleInt:
         LD A, (KbdBuff)
         CP 0            	; checking if keyboard buffer is empty
         RET NZ         		; this is essentially software debouncing
-        CALL kbd_input
+        CALL keyInput
         CP 08            	; check if BACKSPACE was pressed
         JR Z, _bkspc
         CP 20h              ; checks if the key corresponds to a control character
@@ -152,8 +151,8 @@ handleInt:
 		JR Z, _noEcho
 		LD A, B
         CALL vga_putChar	; echo the character to screen, but don't remove it from the keyboard buffer
+		CALL bzr_click
 _noEcho:
-        CALL bzr_click
         RET
 _bkspc:
         CALL vga_cursorLShift  ; TODO: check if you're already in the beginning of line

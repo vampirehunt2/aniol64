@@ -74,7 +74,7 @@ PROC
 term_handleKeyClick:
 		EX AF, AF'       
         EXX 
-        CALL kbd_input		  ; read a character from the keyboard
+        CALL readKeyAsync	  ; read a character from the keyboard
         CALL dart_putChar     ; send the character to the serial port    
         EXX
         EX AF, AF'		

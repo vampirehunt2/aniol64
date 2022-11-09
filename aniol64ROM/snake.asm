@@ -27,7 +27,7 @@ snake_main:
 		CALL snake_init
 _loop:
 		CALL readKey
-		CP 'k'
+		CP 'h'
 		JP Z, _n
 		CP 'n'
 		JP Z, _s
