@@ -1,0 +1,37 @@
+Name     AniolZ180 ; 
+PartNo   00 ; 
+Date     10/10/10 ;
+Revision 01 ;
+Designer Engineer ;
+Company  None ;
+Assembly None ; 
+Location  ;
+Device   g16v8 ;
+
+/* Start Here */
+PIN 1 = MEM;
+PIN 2 = A20;
+PIN 3 = A3; 	/* disk */
+PIN 4 = A5; 	/* memory switching */
+PIN 5 = A6; 	/* buzzer */
+PIN 6 = IORQ;
+PIN 7 = MEMRQ; 
+PIN 8 = M1;
+
+PIN 12 = RAMCS;
+PIN 13 = ROMCS;
+PIN 14 = DISK;
+PIN 15 = MEM_SW;
+PIN 16 = BUZZ_SW;
+
+IOSEL = IORQ & !M1;
+RAMCS = MEMRQ # (MEM $ !A20);
+ROMCS = MEMRQ # (MEM $ A20);
+DISK = IOSEL # A3;
+MEM_SW = !(IOSEL # A5);
+BUZZ_SW = !(IOSEL # A6);
+
+
+
+
+

@@ -16,44 +16,44 @@ $EndDescr
 $Comp
 L z180:Z8-L180-S180-180-PLCC-68 IC1
 U 1 1 636BD5D9
-P 1850 3750
-F 0 "IC1" H 3894 2771 50  0000 L CNN
-F 1 "Z8-L180-S180-180-PLCC-68" H 3894 2680 50  0000 L CNN
-F 2 "Package_LCC:PLCC-68" H 1850 4750 50  0001 L CNN
-F 3 "" H 3200 3650 50  0001 L CNN
-F 4 "Zilog Z8S180 & Z8L180, Z80 Microprocessor Z180 8bit CISC 68-Pin PLCC" H 1850 5175 50  0001 L CNN "Description"
-F 5 "4.57" H 3200 4750 50  0001 L CNN "Height"
-F 6 "Zilog" H 3150 4650 50  0001 L CNN "Manufacturer_Name"
-F 7 "Z8S18033VSG" H 1850 4650 50  0001 L CNN "Manufacturer_Part_Number"
-F 8 "692-Z8S18033VSG" H 1850 4550 50  0001 L CNN "Mouser Part Number"
-F 9 "https://www.mouser.com/Search/Refine.aspx?Keyword=692-Z8S18033VSG" H 1850 5075 50  0001 L CNN "Mouser Price/Stock"
-F 10 "6259270" H 3200 4550 50  0001 L CNN "RS Part Number"
-F 11 "http://uk.rs-online.com/web/p/products/6259270" H 1850 4975 50  0001 L CNN "RS Price/Stock"
-F 12 "R1000023" H 3150 4450 50  0001 L CNN "Allied_Number"
-F 13 "https://www.alliedelec.com/zilog-z8s18033vsg/R1000023/" H 1850 4875 50  0001 L CNN "Allied Price/Stock"
-	1    1850 3750
+P 2600 4950
+F 0 "IC1" H 3450 4000 50  0000 L CNN
+F 1 "Z8-L180-S180-180-PLCC-68" H 2950 3400 50  0000 L CNN
+F 2 "Package_LCC:PLCC-68" H 2600 5950 50  0001 L CNN
+F 3 "" H 3950 4850 50  0001 L CNN
+F 4 "Zilog Z8S180 & Z8L180, Z80 Microprocessor Z180 8bit CISC 68-Pin PLCC" H 2600 6375 50  0001 L CNN "Description"
+F 5 "4.57" H 3950 5950 50  0001 L CNN "Height"
+F 6 "Zilog" H 3900 5850 50  0001 L CNN "Manufacturer_Name"
+F 7 "Z8S18033VSG" H 2600 5850 50  0001 L CNN "Manufacturer_Part_Number"
+F 8 "692-Z8S18033VSG" H 2600 5750 50  0001 L CNN "Mouser Part Number"
+F 9 "https://www.mouser.com/Search/Refine.aspx?Keyword=692-Z8S18033VSG" H 2600 6275 50  0001 L CNN "Mouser Price/Stock"
+F 10 "6259270" H 3950 5750 50  0001 L CNN "RS Part Number"
+F 11 "http://uk.rs-online.com/web/p/products/6259270" H 2600 6175 50  0001 L CNN "RS Price/Stock"
+F 12 "R1000023" H 3900 5650 50  0001 L CNN "Allied_Number"
+F 13 "https://www.alliedelec.com/zilog-z8s18033vsg/R1000023/" H 2600 6075 50  0001 L CNN "Allied Price/Stock"
+	1    2600 4950
 	1    0    0    -1  
 $EndComp
 $Comp
 L Memory_RAM:AS6C4008-55PCN U3
 U 1 1 636BF444
-P 6300 4800
-F 0 "U3" H 6300 6081 50  0000 C CNN
-F 1 "AS6C4008-55PCN" H 6300 5990 50  0000 C CNN
-F 2 "Package_DIP:DIP-32_W15.24mm" H 6300 4900 50  0001 C CNN
-F 3 "https://www.alliancememory.com/wp-content/uploads/pdf/AS6C4008.pdf" H 6300 4900 50  0001 C CNN
-	1    6300 4800
+P 6450 5200
+F 0 "U3" H 6450 6481 50  0000 C CNN
+F 1 "AS6C4008-55PCN" H 6450 6390 50  0000 C CNN
+F 2 "Package_DIP:DIP-32_W15.24mm" H 6450 5300 50  0001 C CNN
+F 3 "https://www.alliancememory.com/wp-content/uploads/pdf/AS6C4008.pdf" H 6450 5300 50  0001 C CNN
+	1    6450 5200
 	1    0    0    -1  
 $EndComp
 $Comp
 L memory:27C010 U4
 U 1 1 636BFF94
-P 8650 4600
-F 0 "U4" H 8650 5821 70  0000 C CNN
-F 1 "27C010" H 8650 5700 70  0000 C CNN
-F 2 "Package_DIP:DIP-32_W15.24mm" H 8650 4600 50  0001 C CNN
-F 3 "" H 8650 4600 50  0001 C CNN
-	1    8650 4600
+P 8700 4950
+F 0 "U4" H 8700 6171 70  0000 C CNN
+F 1 "27C010" H 8700 6050 70  0000 C CNN
+F 2 "Package_DIP:DIP-32_W15.24mm" H 8700 4950 50  0001 C CNN
+F 3 "" H 8700 4950 50  0001 C CNN
+	1    8700 4950
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -101,28 +101,6 @@ F 3 "~" H 1150 960 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Connector:Mini-DIN-6 J4
-U 1 1 636C6199
-P 3350 1000
-F 0 "J4" H 3350 1367 50  0000 C CNN
-F 1 "Mini-DIN-6" H 3350 1276 50  0000 C CNN
-F 2 "" H 3350 1000 50  0001 C CNN
-F 3 "http://service.powerdynamics.com/ec/Catalog17/Section%2011.pdf" H 3350 1000 50  0001 C CNN
-	1    3350 1000
-	1    0    0    -1  
-$EndComp
-$Comp
-L Connector:Mini-DIN-6 J3
-U 1 1 636C73EE
-P 2450 1000
-F 0 "J3" H 2450 1367 50  0000 C CNN
-F 1 "Mini-DIN-6" H 2450 1276 50  0000 C CNN
-F 2 "" H 2450 1000 50  0001 C CNN
-F 3 "http://service.powerdynamics.com/ec/Catalog17/Section%2011.pdf" H 2450 1000 50  0001 C CNN
-	1    2450 1000
-	1    0    0    -1  
-$EndComp
-$Comp
 L Connector_Generic:Conn_02x20_Odd_Even J5
 U 1 1 636CAAC0
 P 5150 1550
@@ -166,4 +144,210 @@ F 3 "~" H 5250 800 50  0001 C CNN
 	1    5250 800 
 	0    1    1    0   
 $EndComp
+$Comp
+L Switch:SW_Push_SPDT SW1
+U 1 1 63703856
+P 900 4900
+F 0 "SW1" H 900 5185 50  0000 C CNN
+F 1 "SW_Push_SPDT" H 900 5094 50  0000 C CNN
+F 2 "Button_Switch_THT:SW_Tactile_SKHH_Angled" H 900 4900 50  0001 C CNN
+F 3 "~" H 900 4900 50  0001 C CNN
+	1    900  4900
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_01x04_Female J3
+U 1 1 637181C8
+P 2800 950
+F 0 "J3" V 2646 1098 50  0000 L CNN
+F 1 "Conn_01x04_Female" V 2737 1098 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Horizontal" H 2800 950 50  0001 C CNN
+F 3 "~" H 2800 950 50  0001 C CNN
+	1    2800 950 
+	0    1    1    0   
+$EndComp
+Text GLabel 2400 6500 0    50   Input ~ 0
+A0
+Text GLabel 2400 6600 0    50   Input ~ 0
+A1
+Text GLabel 2400 6700 0    50   Input ~ 0
+A2
+Text GLabel 2400 6800 0    50   Input ~ 0
+A3
+Text GLabel 2800 7200 3    50   Input ~ 0
+A4
+Text GLabel 2900 7200 3    50   Input ~ 0
+A5
+Text GLabel 3000 7200 3    50   Input ~ 0
+A6
+Text GLabel 3100 7200 3    50   Input ~ 0
+A7
+Text GLabel 3200 7200 3    50   Input ~ 0
+A8
+Text GLabel 3300 7200 3    50   Input ~ 0
+A9
+Text GLabel 3400 7200 3    50   Input ~ 0
+A10
+Text GLabel 3500 7200 3    50   Input ~ 0
+A11
+Text GLabel 3600 7200 3    50   Input ~ 0
+A12
+Text GLabel 3700 7200 3    50   Input ~ 0
+A13
+Text GLabel 3800 7200 3    50   Input ~ 0
+A14
+Text GLabel 3900 7200 3    50   Input ~ 0
+A15
+Text GLabel 4000 7200 3    50   Input ~ 0
+A16
+Text GLabel 4100 7200 3    50   Input ~ 0
+A17
+Text GLabel 4200 7200 3    50   Input ~ 0
+A18
+Text GLabel 4600 6800 2    50   Input ~ 0
+A19
+Text GLabel 5950 4700 0    50   Input ~ 0
+A4
+Text GLabel 5950 4800 0    50   Input ~ 0
+A5
+Text GLabel 5950 4900 0    50   Input ~ 0
+A6
+Text GLabel 5950 5000 0    50   Input ~ 0
+A7
+Text GLabel 5950 5100 0    50   Input ~ 0
+A8
+Text GLabel 5950 5200 0    50   Input ~ 0
+A9
+Text GLabel 5950 5300 0    50   Input ~ 0
+A10
+Text GLabel 5950 5400 0    50   Input ~ 0
+A11
+Text GLabel 5950 5500 0    50   Input ~ 0
+A12
+Text GLabel 5950 5600 0    50   Input ~ 0
+A13
+Text GLabel 5950 5700 0    50   Input ~ 0
+A14
+Text GLabel 5950 5800 0    50   Input ~ 0
+A15
+Text GLabel 5950 5900 0    50   Input ~ 0
+A16
+Text GLabel 5950 6000 0    50   Input ~ 0
+A17
+Text GLabel 5950 6100 0    50   Input ~ 0
+A18
+Text GLabel 5950 4300 0    50   Input ~ 0
+A0
+Text GLabel 5950 4400 0    50   Input ~ 0
+A1
+Text GLabel 5950 4500 0    50   Input ~ 0
+A2
+Text GLabel 5950 4600 0    50   Input ~ 0
+A3
+Text GLabel 8000 4450 0    50   Input ~ 0
+A4
+Text GLabel 8000 4550 0    50   Input ~ 0
+A5
+Text GLabel 8000 4650 0    50   Input ~ 0
+A6
+Text GLabel 8000 4750 0    50   Input ~ 0
+A7
+Text GLabel 8000 4850 0    50   Input ~ 0
+A8
+Text GLabel 8000 4950 0    50   Input ~ 0
+A9
+Text GLabel 8000 5050 0    50   Input ~ 0
+A10
+Text GLabel 8000 5150 0    50   Input ~ 0
+A11
+Text GLabel 8000 5250 0    50   Input ~ 0
+A12
+Text GLabel 8000 5350 0    50   Input ~ 0
+A13
+Text GLabel 8000 5450 0    50   Input ~ 0
+A14
+Text GLabel 8000 5550 0    50   Input ~ 0
+A15
+Text GLabel 8000 5650 0    50   Input ~ 0
+A16
+Text GLabel 8000 4050 0    50   Input ~ 0
+A0
+Text GLabel 8000 4150 0    50   Input ~ 0
+A1
+Text GLabel 8000 4250 0    50   Input ~ 0
+A2
+Text GLabel 8000 4350 0    50   Input ~ 0
+A3
+Text GLabel 4600 6600 2    50   Input ~ 0
+D0
+Text GLabel 4600 6500 2    50   Input ~ 0
+D1
+Text GLabel 4600 6600 2    50   Input ~ 0
+D2
+Text GLabel 4600 6400 2    50   Input ~ 0
+D2
+Text GLabel 4600 6300 2    50   Input ~ 0
+D3
+Text GLabel 4600 6200 2    50   Input ~ 0
+D4
+Text GLabel 4600 6100 2    50   Input ~ 0
+D5
+Text GLabel 4600 6000 2    50   Input ~ 0
+D6
+Text GLabel 4600 5900 2    50   Input ~ 0
+D7
+Text GLabel 6950 4300 2    50   Input ~ 0
+D0
+Text GLabel 6950 4400 2    50   Input ~ 0
+D1
+Text GLabel 6950 4300 2    50   Input ~ 0
+D2
+Text GLabel 6950 4500 2    50   Input ~ 0
+D2
+Text GLabel 6950 4600 2    50   Input ~ 0
+D3
+Text GLabel 6950 4700 2    50   Input ~ 0
+D4
+Text GLabel 6950 4800 2    50   Input ~ 0
+D5
+Text GLabel 6950 4900 2    50   Input ~ 0
+D6
+Text GLabel 6950 5000 2    50   Input ~ 0
+D7
+Text GLabel 9400 4050 2    50   Input ~ 0
+D0
+Text GLabel 9400 4150 2    50   Input ~ 0
+D1
+Text GLabel 9400 4050 2    50   Input ~ 0
+D2
+Text GLabel 9400 4250 2    50   Input ~ 0
+D2
+Text GLabel 9400 4350 2    50   Input ~ 0
+D3
+Text GLabel 9400 4450 2    50   Input ~ 0
+D4
+Text GLabel 9400 4550 2    50   Input ~ 0
+D5
+Text GLabel 9400 4650 2    50   Input ~ 0
+D6
+Text GLabel 9400 4750 2    50   Input ~ 0
+D7
+Text GLabel 4350 1000 3    50   Input ~ 0
+D0
+Text GLabel 4450 1000 3    50   Input ~ 0
+D1
+Text GLabel 4350 1000 3    50   Input ~ 0
+D2
+Text GLabel 4550 1000 3    50   Input ~ 0
+D2
+Text GLabel 4650 1000 3    50   Input ~ 0
+D3
+Text GLabel 4750 1000 3    50   Input ~ 0
+D4
+Text GLabel 4850 1000 3    50   Input ~ 0
+D5
+Text GLabel 4950 1000 3    50   Input ~ 0
+D6
+Text GLabel 5050 1000 3    50   Input ~ 0
+D7
 $EndSCHEMATC
