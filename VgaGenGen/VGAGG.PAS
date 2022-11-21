@@ -133,7 +133,7 @@ end;
 function vReset: byte;
 var d: byte;
 begin
-if yAddress = 525 then
+if (yAddress = 524) and (xAddress = 199) then
    d := 16
 else
     d := 0;
