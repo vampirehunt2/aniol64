@@ -5,7 +5,7 @@
 
 CUPL(WM)        5.0a Serial# MW-10400000
 Device          g16v8ma  Library DLIB-h-40-8
-Created         Sat Nov 19 20:50:33 2022
+Created         Sun Nov 20 09:33:46 2022
 Name            AniolZ180 
 Partno          00 
 Revision        01 
@@ -21,26 +21,36 @@ Location
 
 BUZZ_SW =>
     A6
-  # IORQ & !M1
+  # IORQ
+  # !M1
 
 DISK =>
     A3
-  # IORQ & !M1
+  # IORQ
+  # !M1
+
+HIGH_MEM_CS =>
+    !A20
+  # MEMRQ
 
 IOSEL =>
-    IORQ & !M1
+    IORQ
+  # !M1
 
 MEM_SW =>
     A5
-  # IORQ & !M1
+  # IORQ
+  # !M1
 
-RAMCS =>
-    MEMRQ
-  # !ROMCS
+RAM_CS =>
+    !HIGH_MEM_CS
+  # MEMRQ
+  # !ROM_CS
 
-ROMCS =>
+ROM_CS =>
     A18
   # A19
+  # A20
   # MEM
   # MEMRQ
   # RD
@@ -51,13 +61,19 @@ BUZZ_SW.oe  =>
 DISK.oe  =>
     1 
 
+HIGH_MEM_CS.oe  =>
+    1 
+
+MEM.oe  =>
+    0 
+
 MEM_SW.oe  =>
     1 
 
-RAMCS.oe  =>
+RAM_CS.oe  =>
     1 
 
-ROMCS.oe  =>
+ROM_CS.oe  =>
     1 
 
 
@@ -74,22 +90,26 @@ Pol   Name              Ext     Pin     Type     Used   Pterms  Level
     A6                          4        V        -       -       -     
     A18                         3        V        -       -       -     
     A19                         2        V        -       -       -     
-    BUZZ_SW                     17       V        2       7       2     
-    DISK                        15       V        2       7       2     
+    A20                         1        V        -       -       -     
+    BUZZ_SW                     19       V        3       7       2     
+    DISK                        16       V        3       7       2     
+    HIGH_MEM_CS                 15       V        2       7       2     
     IORQ                        7        V        -       -       -     
-    IOSEL                       0        I        1       -       -     
+    IOSEL                       0        I        2       -       -     
     M1                          9        V        -       -       -     
-    MEM                         1        V        -       -       -     
+    MEM                         18       V        -       -       -     
     MEMRQ                       8        V        -       -       -     
-    MEM_SW                      16       V        2       7       2     
-    RAMCS                       13       V        2       7       2     
+    MEM_SW                      17       V        3       7       2     
+    RAM_CS                      13       V        3       7       2     
     RD                          11       V        -       -       -     
-    ROMCS                       14       V        5       7       2     
-    BUZZ_SW             oe      17       D        1       1       0     
-    DISK                oe      15       D        1       1       0     
-    MEM_SW              oe      16       D        1       1       0     
-    RAMCS               oe      13       D        1       1       0     
-    ROMCS               oe      14       D        1       1       0     
+    ROM_CS                      14       V        6       7       2     
+    BUZZ_SW             oe      19       D        1       1       0     
+    DISK                oe      16       D        1       1       0     
+    HIGH_MEM_CS         oe      15       D        1       1       0     
+    MEM                 oe      18       D        1       1       0     
+    MEM_SW              oe      17       D        1       1       0     
+    RAM_CS              oe      13       D        1       1       0     
+    ROM_CS              oe      14       D        1       1       0     
 
 
 LEGEND    D : default variable         F : field      G : group
@@ -105,10 +125,10 @@ LEGEND    D : default variable         F : field      G : group
 Syn   02192 - Ac0   02193 - 
 
 Pin #19  02048  Pol x  02120  Ac1 - 
- 00000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
- 00032 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
- 00064 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
- 00096 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00000 -------------------------------- 
+ 00032 --------x----------------------- 
+ 00064 --------------------x----------- 
+ 00096 -----------------------------x-- 
  00128 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00160 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00192 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
@@ -124,26 +144,26 @@ Pin #18  02049  Pol x  02121  Ac1 -
  00480 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
 Pin #17  02050  Pol x  02122  Ac1 - 
  00512 -------------------------------- 
- 00544 --------x----------------------- 
- 00576 --------------------x--------x-- 
- 00608 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00544 ------------x------------------- 
+ 00576 --------------------x----------- 
+ 00608 -----------------------------x-- 
  00640 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00672 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00704 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00736 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
-Pin #16  02051  Pol x  02123  Ac1 - 
+Pin #16  02051  Pol -  02123  Ac1 - 
  00768 -------------------------------- 
- 00800 ------------x------------------- 
- 00832 --------------------x--------x-- 
- 00864 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00800 ----------------x--------------- 
+ 00832 --------------------x----------- 
+ 00864 -----------------------------x-- 
  00896 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00928 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00960 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00992 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
 Pin #15  02052  Pol -  02124  Ac1 - 
  01024 -------------------------------- 
- 01056 ----------------x--------------- 
- 01088 --------------------x--------x-- 
+ 01056 ---x---------------------------- 
+ 01088 ------------------------x------- 
  01120 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  01152 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  01184 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
@@ -154,15 +174,15 @@ Pin #14  02053  Pol -  02125  Ac1 -
  01312 ----x--------------------------- 
  01344 x------------------------------- 
  01376 --x----------------------------- 
- 01408 ------------------------x------- 
- 01440 ------------------------------x- 
- 01472 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01408 ------x------------------------- 
+ 01440 ------------------------x------- 
+ 01472 ------------------------------x- 
  01504 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
 Pin #13  02054  Pol -  02126  Ac1 - 
  01536 -------------------------------- 
- 01568 ------------------------x------- 
- 01600 -----------------------x-------- 
- 01632 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01568 -------------------x------------ 
+ 01600 ------------------------x------- 
+ 01632 -----------------------x-------- 
  01664 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  01696 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  01728 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
@@ -187,14 +207,14 @@ LEGEND    X : fuse not blown
 
                                ______________
                               |  AniolZ180   |
-                      MEM x---|1           20|---x Vcc                      
-                      A19 x---|2           19|---x                          
-                      A18 x---|3           18|---x                          
-                       A6 x---|4           17|---x BUZZ_SW                  
-                       A5 x---|5           16|---x MEM_SW                   
-                       A3 x---|6           15|---x DISK                     
-                     IORQ x---|7           14|---x ROMCS                    
-                    MEMRQ x---|8           13|---x RAMCS                    
+                      A20 x---|1           20|---x Vcc                      
+                      A19 x---|2           19|---x BUZZ_SW                  
+                      A18 x---|3           18|---x MEM                      
+                       A6 x---|4           17|---x MEM_SW                   
+                       A5 x---|5           16|---x DISK                     
+                       A3 x---|6           15|---x HIGH_MEM_CS              
+                     IORQ x---|7           14|---x ROM_CS                   
+                    MEMRQ x---|8           13|---x RAM_CS                   
                        M1 x---|9           12|---x                          
                       GND x---|10          11|---x RD                       
                               |______________|

@@ -9,7 +9,7 @@ Location  ;
 Device   g16v8 ;
 
 /* inputs */
-PIN 1 = MEM;
+PIN 1 = A20;
 PIN 2 = A19;
 PIN 3 = A18;
 PIN 4 = A6; 	/* buzzer */
@@ -19,17 +19,20 @@ PIN 7 = IORQ;
 PIN 8 = MEMRQ; 
 PIN 9 = M1;
 PIN 11 = RD;
+PIN 18 = MEM;
 
 /* outputs */
 PIN 13 = RAM_CS;
 PIN 14 = ROM_CS;
-PIN 15 = DISK;
-PIN 16 = MEM_SW;
-PIN 17 = BUZZ_SW;
+PIN 15 = HIGH_MEM_CS;
+PIN 16 = DISK;
+PIN 17 = MEM_SW;
+PIN 19 = BUZZ_SW;
 
 /* memory mapping */
-ROM_CS = MEMRQ # A19 # A18 # RD # MEM;
-RAM_CS = MEMRQ # !ROM_CS;
+ROM_CS = MEMRQ # A20 # A19 # A18 # RD # MEM;
+RAM_CS = MEMRQ # !ROM_CS # !HIGH_MEM_CS;
+HIGH_MEM_CS = MEMRQ # !A20;
 
 /* I/O selection */
 IOSEL = IORQ # !M1;
