@@ -117,7 +117,7 @@ end;
 function hReset: byte;
 var d: byte;
 begin
-if xAddress = 200 then
+if (xAddress = 200) or (yAddress = 525) then
    d := 8
 else
     d := 0;
@@ -133,7 +133,7 @@ end;
 function vReset: byte;
 var d: byte;
 begin
-if (yAddress = 524) and (xAddress = 199) then
+if yAddress = 525 then
    d := 16
 else
     d := 0;
