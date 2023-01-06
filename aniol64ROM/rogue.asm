@@ -23,6 +23,8 @@ ROOMMIN		equ 4
 ROOMMAXW	equ CELLW - 2
 ROOMMAXH	equ CELLH - 2
 
+
+
 PROC
 defb "rog_main"
 rog_main:
@@ -70,6 +72,8 @@ rog_initCell:
 	LD (IY + CellX), A
 	LD A, C
 	LD (IY + CellY), A
+	LD A, FALSE
+	LD (IY + RoomConn), A
 	RET
 ENDP
 
@@ -85,11 +89,11 @@ _loop:
 ENDP
 
 PROC
-defb "rog_generateRoom"
 rog_generateRoom:
+	PUSH BC
 	; randomize X position
-	LD C, CELLW - ROOMMIN - 2
-	CALL rndMod
+	LD A, CELLW - ROOMMIN - 2
+	CALL rndMod8
 	LD C, A
 	LD A, (IY + CellX)
 	ADD A, C
@@ -101,17 +105,16 @@ rog_generateRoom:
 	LD A, (IY + RoomX)
 	SUB C
 	LD C, A
-	LD A, CELLW 
+	LD A, CELLW
 	SUB C
 	LD C, ROOMMIN
 	SUB C
-	LD C, A
-	CALL rndMod
+	CALL rndMod8
 	ADD A, ROOMMIN
 	LD (IY + RoomW), A
 	; randomize Y position
-	LD C, CELLH - ROOMMIN - 2
-	CALL rndMod
+	LD A, CELLH - ROOMMIN - 2
+	CALL rndMod8
 	LD C, A
 	LD A, (IY + CellY)
 	ADD A, C
@@ -127,10 +130,10 @@ rog_generateRoom:
 	SUB C
 	LD C, ROOMMIN
 	SUB C
-	LD C, A
-	CALL rndMod
+	CALL rndMod8
 	ADD A, ROOMMIN
 	LD (IY + RoomH), A
+	POP BC
 	RET
 ENDP
 
@@ -230,3 +233,36 @@ _loop:
 	RET
 ENDP
 
+PROC
+; returns the number of connected rooms in A
+rog_countConnectedRooms:
+	LD C, 0
+	LD B, MAXROOMS
+	LD IY, Rooms
+_loop:
+	LD A,(IY + RoomConn)
+	CP TRUE
+	JR NZ, _cont
+	INC C
+_cont:
+	DJNZ _loop
+	LD A, C
+	RET
+ENDP
+
+PROC
+; returns the number of unconnected rooms in A
+rog_countUnconnectedRooms:
+	LD C, 0
+	LD B, MAXROOMS
+	LD IY, Rooms
+_loop:
+	LD A,(IY + RoomConn)
+	CP TRUE
+	JR Z, _cont
+	INC C
+_cont:
+	DJNZ _loop
+	LD A, C
+	RET
+ENDP
