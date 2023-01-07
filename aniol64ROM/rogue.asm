@@ -164,70 +164,62 @@ PROC
 ; draws a room on screen
 ; room record pointed to by IY
 ; destroys A
+defb "rog_drawRoom"
 rog_drawRoom:
 	PUSH BC
 	PUSH DE
-	; check if room exists
-	LD A, (IY + RoomW) 	
-	CP 0				
-	JR Z, _end
-	; draw horizontal lines
-	LD A, (IY + RoomX)
-	LD B, A				; room x0 now in B
-	LD A, (IY + RoomW)
-	;DEC A
-	ADD A, B
-	LD D, A				; room x1 now in D
 	LD A, (IY + RoomH)
-	DEC A
 	LD E, A
 	LD A, (IY + RoomY)
-	ADD A, E
-	LD E, A				; room y1 now in E
-_loop1:
-	LD A, (IY + RoomY)
 	LD C, A
-	CALL vga_gotoXY
-	LD A, '#'
-	CALL vga_putChar
-	LD C, E
-	CALL vga_gotoXY
-	LD A, '#'
-	CALL vga_putChar
-	INC B
-	LD A, B
-	CP D
-	JR NZ, _loop1
-	; draw vertical lines
-	LD A, (IY + RoomY)
-	LD C, A				; room y0 now in C
-	LD A, (IY + RoomH)
-	;DEC A
-	ADD A, C
-	LD E, A				; room y1 now in E
+_vLoop:
 	LD A, (IY + RoomW)
-	DEC A
 	LD D, A
-	LD A, (IY + RoomX)
-	ADD A, D
-	LD D, A				; room x1 now in D
-_loop2:
 	LD A, (IY + RoomX)
 	LD B, A
 	CALL vga_gotoXY
-	LD A, '#'
+_hLoop:
+	CALL rog_selectRoomChar
 	CALL vga_putChar
-	LD B, D
-	CALL vga_gotoXY
-	LD A, '#'
-	CALL vga_putChar
+	INC B
+	DEC D
+	JR NZ, _hLoop
 	INC C
-	LD A, C
-	CP E
-	JR NZ, _loop2
-_end:
+	DEC E
+	JR NZ, _vLoop
 	POP DE
 	POP BC
+	RET
+ENDP
+
+PROC
+rog_selectRoomChar:
+	PUSH DE
+	LD A, (IY + RoomX)
+	CP B
+	JR Z, _wall
+	LD D, A
+	LD A, (IY + RoomW)
+	ADD A, D
+	DEC A
+	CP B
+	JR Z, _wall
+	LD A, (IY + RoomY)
+	CP C
+	JR Z, _wall
+	LD E, A
+	LD A, (IY + RoomH)
+	ADD A, E
+	DEC A
+	CP C
+	JR Z, _wall
+	LD A, '.'
+	JR _end
+_wall:
+	LD A, '#'
+	JR _end
+_end:
+	POP DE
 	RET
 ENDP
 
@@ -313,7 +305,6 @@ rog_makeConnections:
 	CALL rog_connectRooms
 	RET
 
-defb "rog_connectRooms"
 rog_connectRooms:
 	CALL rog_countUnconnectedRooms
 	CP 0
