@@ -15,6 +15,15 @@ RoomH 		equ 5
 RoomConn 	equ 6
 RoomFlg		equ 7
 
+Crossover	equ PROGRAM_DATA + 48
+xStep		equ PROGRAM_DATA + 49
+yStep		equ PROGRAM_DATA + 50
+X0			equ PROGRAM_DATA + 51
+Y0			equ PROGRAM_DATA + 52
+X1			equ PROGRAM_DATA + 53
+Y1			equ PROGRAM_DATA + 54
+
+
 MAPW		equ 40
 MAPH		equ 30
 CELLW		equ MAPW / 3
@@ -32,6 +41,7 @@ rog_main:
 	CALL vga_clrScr
 	CALL rog_generateRooms
 	CALL rog_drawRooms
+	CALL rog_makeConnections
 	RET
 ENDP 
 
@@ -133,6 +143,8 @@ rog_generateRoom:
 	CALL rndMod8
 	ADD A, ROOMMIN
 	LD (IY + RoomH), A
+	LD A, FALSE
+	LD (IY + RoomConn), A
 	POP BC
 	RET
 ENDP
@@ -152,7 +164,6 @@ PROC
 ; draws a room on screen
 ; room record pointed to by IY
 ; destroys A
-defb "rog_drawRoom"
 rog_drawRoom:
 	PUSH BC
 	PUSH DE
@@ -253,16 +264,167 @@ ENDP
 PROC
 ; returns the number of unconnected rooms in A
 rog_countUnconnectedRooms:
+	PUSH IY
 	LD C, 0
 	LD B, MAXROOMS
 	LD IY, Rooms
 _loop:
 	LD A,(IY + RoomConn)
 	CP TRUE
+	CALL rog_nextRoom
 	JR Z, _cont
 	INC C
 _cont:
 	DJNZ _loop
 	LD A, C
+	POP IY
 	RET
 ENDP
+
+PROC
+; returns a random unconnected room
+; total number of unconnected rooms must be passed in A
+; returns room record pointer in IY
+rog_randomUnconnectedRoom:
+	PUSH BC
+	CALL rndMod8
+	LD B, A
+	INC B
+	LD IY, Rooms
+_loop:
+	LD A, (IY + RoomConn)
+	CP TRUE
+	JR Z, _skip
+	DEC B
+	JR Z, _end
+_skip:
+	CALL rog_nextRoom
+	JR _loop
+_end:
+	POP BC
+	RET
+ENDP
+
+rog_makeConnections:
+	LD A, MAXROOMS
+	CALL rog_randomUnconnectedRoom
+	LD A, TRUE
+	LD (IY + RoomConn), A
+	CALL rog_connectRooms
+	RET
+
+defb "rog_connectRooms"
+rog_connectRooms:
+	CALL rog_countUnconnectedRooms
+	CP 0
+	RET Z
+	PUSH IY
+	POP IX
+	CALL rog_randomUnconnectedRoom
+	CALL rog_connectRoom
+	JR rog_connectRooms
+	
+PROC
+; connects a room pointed to by IX 
+; to a previously unconnected room
+; pointed to by IY
+rog_connectRoom:
+	PUSH IX
+	PUSH IY
+	CALL rog_randomPtInRoom
+	LD A, B
+	LD (X0), A
+	LD A, C
+	LD (Y0), A
+	PUSH IX
+	POP IY
+	CALL rog_randomPtInRoom
+	LD A, B
+	LD (X1), A
+	LD A, C
+	LD (Y1), A
+	; compute the incrementation step for the X coeff
+	LD A, (X1)
+	LD B, A
+	LD A, (X0)
+	CP B
+	JR C, _xStep
+	LD A, -1
+	JR _xCont
+_xStep:
+	LD A, 1
+_xCont:
+	LD (xStep), A
+	; compute the incrementation step for the Y coeff
+	LD A, (Y1)
+	LD B, A
+	LD A, (Y0)
+	CP B
+	JR C, _yStep
+	LD A, -1
+	JR _yCont
+_yStep:
+	LD A, 1
+_yCont:
+	LD (yStep), A
+	;
+	LD A, (X0)
+	LD B, A
+	LD A, (Y0)
+	LD C, A
+_xLoop:
+	CALL vga_gotoXY
+	LD A, '.'
+	CALL vga_putChar
+	LD A, (X1)
+	CP B
+	JR Z, _yLoop
+	LD A, (xStep)
+	ADD A, B
+	LD B, A
+	JR _xLoop
+_yLoop:
+	CALL vga_gotoXY
+	LD A, '.'
+	CALL vga_putChar
+	LD A, (Y1)
+	CP C
+	JR Z, _end
+	LD A, (yStep)
+	ADD A, C
+	LD C, A
+	JR _yLoop
+_end:
+	POP IY
+	POP IX
+	LD A, TRUE
+	LD (IY + RoomConn), A
+	RET
+ENDP
+	
+; returns a random point within a room
+; room pointed to by IY
+; result:
+; - X coefficient in B
+; - Y coefficient in C
+rog_randomPtInRoom:
+	LD A, (IY + RoomW)
+	DEC A
+	DEC A
+	CALL rndMod8
+	INC A
+	LD B, A
+	LD A, (IY + RoomX)
+	ADD A, B
+	LD B, A
+	LD A, (IY + RoomH)
+	DEC A
+	DEC A
+	CALL rndMod8
+	INC A
+	LD C, A
+	LD A, (IY + RoomY)
+	ADD A, C
+	LD C, A
+	RET
+

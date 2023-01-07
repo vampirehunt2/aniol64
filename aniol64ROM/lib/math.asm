@@ -121,6 +121,13 @@ i16_abs:
         RET Z
         CALL i16_neg
         RET
+		
+i8_abs:
+		AND SIGN
+		CP 0
+		RET Z
+		NEG
+		RET
 
 ; returns the negative value of a signed 16-bit integer
 ; argument in HL
@@ -579,6 +586,18 @@ _endLoop:
         POP AF
         RET
 ENDP
+
+u8_min:
+		CP B
+		RET C
+		LD A, B
+		RET
+
+u8_max:
+		CP B
+		RET NC
+		LD A, B
+		RET
 
 ; trims leading zeroes from a formatted number
 ; and replaces them with spaces for text adjustems
