@@ -2,26 +2,31 @@
 
 Rooms equ PROGRAM_DATA + 0 	;
 
-ROOMRECSIZE	equ 8
+ROOMRECSIZE	equ 10h
 MAXROOMS 	equ 6
 ; room record format
 ; 8 bytes per room
-RoomX 		equ 0
-RoomY 		equ 1
-CellX		equ 2
-CellY		equ 3
-RoomW 		equ 4
-RoomH 		equ 5
-RoomConn 	equ 6
-RoomFlg		equ 7
+RoomX0 		equ 00h
+RoomY0 		equ 01h
+RoomX1		equ 02h
+RoomY1		equ 03h
+RoomW 		equ 04h
+RoomH 		equ 05h
+CellX		equ 06h
+CellY		equ 07h
+;CellW 		equ 08h
+;CELLH		equ 09h
+RoomConn 	equ 0Ah
+RoomFlg		equ 0Bh
 
-Crossover	equ PROGRAM_DATA + 48
-xStep		equ PROGRAM_DATA + 49
-yStep		equ PROGRAM_DATA + 50
-X0			equ PROGRAM_DATA + 51
-Y0			equ PROGRAM_DATA + 52
-X1			equ PROGRAM_DATA + 53
-Y1			equ PROGRAM_DATA + 54
+DATA 		equ PROGRAM_DATA + ROOMRECSIZE * MAXROOMS
+Crossover	equ DATA + 00h
+xStep		equ DATA + 01h
+yStep		equ DATA + 02h
+X0			equ DATA + 03h
+Y0			equ DATA + 04h
+X1			equ DATA + 05h
+Y1			equ DATA + 06h
 
 
 MAPW		equ 40
@@ -99,6 +104,7 @@ _loop:
 ENDP
 
 PROC
+defb "rog_generateRoom"
 rog_generateRoom:
 	PUSH BC
 	; randomize X position
@@ -108,11 +114,11 @@ rog_generateRoom:
 	LD A, (IY + CellX)
 	ADD A, C
 	INC A
-	LD (IY + RoomX), A
+	LD (IY + RoomX0), A
 	; randomize width
 	LD A, (IY + CellX)
 	LD C, A
-	LD A, (IY + RoomX)
+	LD A, (IY + RoomX0)
 	SUB C
 	LD C, A
 	LD A, CELLW
@@ -122,6 +128,11 @@ rog_generateRoom:
 	CALL rndMod8
 	ADD A, ROOMMIN
 	LD (IY + RoomW), A
+	LD B, A
+	LD A, (IY + RoomX0)
+	ADD A, B
+	DEC A
+	LD (IY + RoomX1), A
 	; randomize Y position
 	LD A, CELLH - ROOMMIN - 2
 	CALL rndMod8
@@ -129,11 +140,11 @@ rog_generateRoom:
 	LD A, (IY + CellY)
 	ADD A, C
 	INC A
-	LD (IY + RoomY), A
+	LD (IY + RoomY0), A
 	; randomize height
 	LD A, (IY + CellY)
 	LD C, A
-	LD A, (IY + RoomY)
+	LD A, (IY + RoomY0)
 	SUB C
 	LD C, A
 	LD A, CELLH
@@ -143,6 +154,11 @@ rog_generateRoom:
 	CALL rndMod8
 	ADD A, ROOMMIN
 	LD (IY + RoomH), A
+	LD B, A
+	LD A, (IY + RoomY0)
+	ADD A, B
+	DEC A
+	LD (IY + RoomY1), A
 	LD A, FALSE
 	LD (IY + RoomConn), A
 	POP BC
@@ -164,18 +180,17 @@ PROC
 ; draws a room on screen
 ; room record pointed to by IY
 ; destroys A
-defb "rog_drawRoom"
 rog_drawRoom:
 	PUSH BC
 	PUSH DE
 	LD A, (IY + RoomH)
 	LD E, A
-	LD A, (IY + RoomY)
+	LD A, (IY + RoomY0)
 	LD C, A
 _vLoop:
 	LD A, (IY + RoomW)
 	LD D, A
-	LD A, (IY + RoomX)
+	LD A, (IY + RoomX0)
 	LD B, A
 	CALL vga_gotoXY
 _hLoop:
@@ -194,32 +209,118 @@ ENDP
 
 PROC
 rog_selectRoomChar:
-	PUSH DE
-	LD A, (IY + RoomX)
+	LD A, (IY + RoomX0)
 	CP B
 	JR Z, _wall
-	LD D, A
-	LD A, (IY + RoomW)
-	ADD A, D
-	DEC A
+	LD A, (IY + RoomX1)
 	CP B
 	JR Z, _wall
-	LD A, (IY + RoomY)
+	LD A, (IY + RoomY0)
 	CP C
 	JR Z, _wall
-	LD E, A
-	LD A, (IY + RoomH)
-	ADD A, E
-	DEC A
+	LD A, (IY + RoomY1)
 	CP C
 	JR Z, _wall
 	LD A, '.'
-	JR _end
+	RET
 _wall:
 	LD A, '#'
-	JR _end
+	RET
+ENDP
+
+PROC
+; checks if two rooms interiors (excluding walls) have any horizontal overlap 
+; 	- room records pointed to by IX and IY
+; 	- result in A: overlap size or 0 if no overlap
+rog_hOverlap:
+	PUSH BC
+	; compute maximum of the two rooms' X1 coeffs
+	LD A, (IX + RoomX0)
+	LD B, A
+	LD A, (IY + RoomX0)
+	CALL u8_max
+	INC A				; exclude the wall
+	LD C, A	; maximum X0 of the two rooms now in C
+	; compute minimum of the two rooms' X1 coeffs
+	LD A, (IX + RoomX1)
+	DEC A				; exclude the wall
+	LD B, A
+	LD A, (IY + RoomX1)
+	DEC A				; exclude the wall
+	CALL u8_min ; minimum X1 of the two rooms now in A
+	DEC A		; exclude the wall
+	SUB C
+	BIT 7, A
+	JR Z, _end
+	LD A, 0		; no overlap
 _end:
-	POP DE
+	POP BC
+	RET
+ENDP
+
+PROC
+; checks if two rooms interiors (excluding walls) have any vertical overlap 
+; 	- room records pointed to by IX and IY
+; 	- result in A: overlap size or 0 if no overlap
+rog_vOverlap:
+	PUSH BC
+	; compute maximum of the two rooms' X1 coeffs
+	LD A, (IX + RoomY0)
+	LD B, A
+	LD A, (IY + RoomY0)
+	CALL u8_max
+	INC A				; exclude the wall
+	LD C, A	; maximum X0 of the two rooms now in C
+	; compute minimum of the two rooms' X1 coeffs
+	LD A, (IX + RoomY1)
+	DEC A				; exclude the wall
+	LD B, A
+	LD A, (IY + RoomY1)
+	DEC A				; exclude the wall
+	CALL u8_min ; minimum X1 of the two rooms now in A
+	DEC A		; exclude the wall
+	SUB C
+	BIT 7, A
+	JR Z, _end
+	LD A, 0		; no overlap
+_end:
+	POP BC
+	RET
+ENDP
+
+PROC
+defb "rog_selectCorridorChar"
+rog_selectCorridorChar:
+	PUSH BC
+	CALL vga_getChar
+	CP '#'
+	JR Z, _wall
+_floor
+	LD A, '.'
+	JR _end
+_wall:
+	PUSH IX	; store room record pointers
+	PUSH IY
+	CALL rog_isPointInRoom
+	CP TRUE
+	JR _door
+	PUSH IX ; move IX room record pointer to IY
+	POP IY 
+	CALL rog_isPointInRoom
+	CP TRUE
+	JR _door
+	LD A, '%'
+	JR _endWall
+_door:
+	LD A, '+'
+_endWall:
+	POP IY ; restore room record pointers
+	POP IX
+_end:
+	POP BC
+	PUSH AF
+	CALL vga_gotoXY
+	POP AF
 	RET
 ENDP
 
@@ -320,16 +421,18 @@ PROC
 ; to a previously unconnected room
 ; pointed to by IY
 rog_connectRoom:
-	PUSH IX
+	PUSH IX		; store room record pointers
 	PUSH IY
 	CALL rog_randomPtInRoom
 	LD A, B
 	LD (X0), A
 	LD A, C
 	LD (Y0), A
-	PUSH IX
+	PUSH IX		; move room record from IX to IY
 	POP IY
 	CALL rog_randomPtInRoom
+	POP IY		; restore room record pointers
+	POP IX
 	LD A, B
 	LD (X1), A
 	LD A, C
@@ -358,14 +461,14 @@ _yStep:
 	LD A, 1
 _yCont:
 	LD (yStep), A
-	;
+	; loop through the horizontal and the vertical parts of the corridor
 	LD A, (X0)
 	LD B, A
 	LD A, (Y0)
 	LD C, A
 _xLoop:
 	CALL vga_gotoXY
-	LD A, '.'
+	CALL rog_selectCorridorChar
 	CALL vga_putChar
 	LD A, (X1)
 	CP B
@@ -376,7 +479,7 @@ _xLoop:
 	JR _xLoop
 _yLoop:
 	CALL vga_gotoXY
-	LD A, '.'
+	CALL rog_selectCorridorChar
 	CALL vga_putChar
 	LD A, (Y1)
 	CP C
@@ -386,8 +489,6 @@ _yLoop:
 	LD C, A
 	JR _yLoop
 _end:
-	POP IY
-	POP IX
 	LD A, TRUE
 	LD (IY + RoomConn), A
 	RET
@@ -405,7 +506,7 @@ rog_randomPtInRoom:
 	CALL rndMod8
 	INC A
 	LD B, A
-	LD A, (IY + RoomX)
+	LD A, (IY + RoomX0)
 	ADD A, B
 	LD B, A
 	LD A, (IY + RoomH)
@@ -414,8 +515,44 @@ rog_randomPtInRoom:
 	CALL rndMod8
 	INC A
 	LD C, A
-	LD A, (IY + RoomY)
+	LD A, (IY + RoomY0)
 	ADD A, C
 	LD C, A
 	RET
+
+PROC
+; checks whether a point is within a room, including the walls
+; 	BC - XY coordinates of the point
+; 	IY - points to room record
+; 	result in A	
+rog_isPointInRoom:
+	PUSH AF
+	PUSH DE
+	LD A, (IY + RoomX0)
+	DEC A
+	CP B	; check if B is less or equal to RoomX0 - 1
+	JR NC, _false
+	LD D, A
+	LD A, (IY + RoomW)
+	ADD A, D
+	CP B
+	JR C, _false	; check if B is greater than RoomX0 + RoomW - 1
+	LD A, (IY + RoomY0)
+	DEC A
+	CP C	; check if C is less or equal to RoomY0 - 1
+	JR NC, _false
+	LD E, A
+	LD A, (IY + RoomH)
+	ADD A, E
+	CP C
+	JR C, _false	; check if C is greater than RoomY0 + RoomH - 1
+	LD A, TRUE
+	JR _end
+_false:
+	LD A, FALSE
+_end:
+	POP DE
+	POP AF
+	RET
+ENDP
 

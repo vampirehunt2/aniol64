@@ -493,6 +493,34 @@ _doRnd:
         RET
 ENDP
 
+; gets a random number from zero to C - 1
+; result in A
+rndMod:
+		PUSH HL
+		PUSH BC
+		CALL rnd
+		LD H, A
+		CALL rnd
+		LD L, A
+		LD B, 0
+		CALL u16_div
+		LD A, L
+		POP BC
+		POP HL
+		RET
+		
+; gets a random number from zero to A - 1
+; result in A
+rndMod8:
+		CP 0
+		RET Z
+		PUSH BC
+		LD B, A
+		CALL rnd
+		CALL u8_div
+		POP BC
+		RET
+
 
 randomize:
 		PUSH HL
