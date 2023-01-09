@@ -7,6 +7,15 @@
 ;
 ;----------------------------------------------------
 
+; dos supports the following:
+; - 16kB files
+; - maximum of 64 directories per logical drive, 32MB each
+; - maximum of 256 logical drives per physical disk
+; - maximum of 63 * 32 = 2016 files per logical drive
+; - up to 8 characters for a directory name
+; - file names following the 8+3 convention
+; - single level directory structure. 
+
 ; dos messages:
 DiskFound1 		defb "Disk ", 0
 DiskFound2 		defb "found", 0
@@ -38,6 +47,7 @@ ParentFolder: 	defb "..", 0
  
 ; dos variables:
 SectorBuffer 	equ 08400h
+FileBuffer		equ 0C000h
 CurrentPath 	equ DOS_AREA + 00h	; 9 bytes: 8 for the folder name and 1 for the terminating zero
 CurrentDir 		equ	DOS_AREA + 09h	; index of the current directory in the directory table
 TempDirname 	equ DOS_AREA + 0Ah	; 9 bytes: 8 for the folder name and 1 for the terminating zero
@@ -50,7 +60,7 @@ MAX_DIRS 				equ 63
 MAX_FILES 				equ 4087	; 4096 -8 for the file table and -1 for the directory table
 FILE_RECORDS_PER_SECTOR equ 32
 FILE_RECORD_SIZE		equ 16
-FILE_TABLE_SECTORS 		equ 128
+FILE_TABLE_SECTORS 		equ 63
 
 ; file record structure:
 Filename 	equ 00h		; null-terminated string, 
@@ -149,7 +159,7 @@ dos_load:
 		JR NZ, _invalidSector
 		LD A, L				
 		LD B, H
-		LD C, 0				; sector number now in ABC
+		LD C, 0				; sector number now in ABC, in the future, the logical drive number will go in C
 		POP HL				; buffer address now in HL
 		CALL cf_setSector
 		CALL cf_readSector
@@ -192,7 +202,6 @@ _invalidSector:
 		LD IX, InvalidSector
 		CALL vga_writeLn
 		RET
-_
 ENDP
 
 PROC
@@ -254,7 +263,7 @@ dos_saveDirs:
 		PUSH HL
 		LD A, 0
 		LD B, 0
-		LD C, 0
+		LD C, 0		; in the future, the logical drive number will go in C
 		CALL cf_setSector
 		LD HL, SectorBuffer
 		CALL cf_writeSector
@@ -763,7 +772,7 @@ dos_loadFileTabSector:
 		PUSH AF
 		PUSH BC
 		LD B, 0
-		LD C, 0
+		LD C, 0				; in the future, the logical drive number will go in C
 		CALL cf_setSector	; set sector to A:0:0, LSB to MSB
 		LD HL, SectorBuffer
 		CALL cf_readSector	; read a sector of the file table
@@ -777,7 +786,7 @@ dos_saveFileTabSector:
 		PUSH AF
 		PUSH BC
 		LD B, 0
-		LD C, 0
+		LD C, 0				; in the future, the logical drive number will go in C
 		CALL cf_setSector	; set sector to A:0:0, LSB to MSB
 		LD HL, SectorBuffer
 		CALL cf_writeSector	; read a sector of the file table
@@ -804,6 +813,13 @@ dos_nextFileRecord:
 		RET
 		
 
+PROC
+dos_saveFile:
+		RET
+		
+ENDP
+		
+		
 
 
 		
