@@ -43,7 +43,7 @@ PROC
 defb "rog_main"
 rog_main:
 	CALL rog_init
-	CALL vga_clrScr
+	CALL clrScr
 	CALL rog_generateRooms
 	CALL rog_drawRooms
 	CALL rog_makeConnections
@@ -192,10 +192,10 @@ _vLoop:
 	LD D, A
 	LD A, (IY + RoomX0)
 	LD B, A
-	CALL vga_gotoXY
+	CALL gotoXY
 _hLoop:
 	CALL rog_selectRoomChar
-	CALL vga_putChar
+	CALL putChar
 	INC B
 	DEC D
 	JR NZ, _hLoop
@@ -292,7 +292,7 @@ PROC
 defb "rog_selectCorridorChar"
 rog_selectCorridorChar:
 	PUSH BC
-	CALL vga_getChar
+	CALL getChar
 	CP '#'
 	JR Z, _wall
 _floor
@@ -319,7 +319,7 @@ _endWall:
 _end:
 	POP BC
 	PUSH AF
-	CALL vga_gotoXY
+	CALL gotoXY
 	POP AF
 	RET
 ENDP
@@ -467,9 +467,9 @@ _yCont:
 	LD A, (Y0)
 	LD C, A
 _xLoop:
-	CALL vga_gotoXY
+	CALL gotoXY
 	CALL rog_selectCorridorChar
-	CALL vga_putChar
+	CALL putChar
 	LD A, (X1)
 	CP B
 	JR Z, _yLoop
@@ -478,9 +478,9 @@ _xLoop:
 	LD B, A
 	JR _xLoop
 _yLoop:
-	CALL vga_gotoXY
+	CALL gotoXY
 	CALL rog_selectCorridorChar
-	CALL vga_putChar
+	CALL putChar
 	LD A, (Y1)
 	CP C
 	JR Z, _end

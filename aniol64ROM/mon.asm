@@ -29,13 +29,13 @@ LINE_NUM 	equ 26
 PROC
 defb "mon_main"
 mon_main:
-		CALL vga_clrScr
+		CALL clrScr
         LD A, 0  
         LD (MonCurrAddr), A
         LD (MonCurrAddr + 1), A
 		CALL mon_refresh
 mon_main_loop:
-		CALL vga_curOn
+		CALL cursorOn
 		CALL mon_gotoCmdLine
         CALL readLine
         LD IX, LineBuff
@@ -109,7 +109,7 @@ mon_main_loop:
         ; unknown command 
         LD IX, UnknownCmd
         CALL mon_gotoStatusLine
-        CALL vga_wriStr
+        CALL writeStr
         JP mon_main_loop
 _bye:
         RET
@@ -118,23 +118,23 @@ ENDP
 mon_gotoCmdLine:
 		LD B, 0
 		LD C, LINE_NUM
-		CALL vga_gotoXY
+		CALL gotoXY
 		LD IX, Blank
-		CALL vga_wriStr
+		CALL writeStr
 		LD B, 0
 		LD C, LINE_NUM
-		CALL vga_gotoXY
+		CALL gotoXY
 		RET
 		
 mon_gotoStatusLine:
 		LD B, 0
 		LD C, LINE_NUM + 1
-		CALL vga_gotoXY
+		CALL gotoXY
 		LD IX, Blank
-		CALL vga_wriStr
+		CALL writeStr
 		LD B, 0
 		LD C, LINE_NUM + 1
-		CALL vga_gotoXY
+		CALL gotoXY
 		RET
 
 PROC
@@ -150,7 +150,7 @@ mon_setAddress:
 _parseError:
         CALL mon_gotoStatusLine
         LD IX, InvAddr
-        CALL vga_wriStr
+        CALL writeStr
         CALL readKey
         CALL mon_refresh
         JP mon_main_loop
@@ -168,7 +168,7 @@ mon_run:
 _parseError:
         CALL mon_gotoStatusLine
         LD IX, InvAddr
-        CALL vga_wriStr
+        CALL writeStr
         CALL readKey
         CALL mon_refresh
         JP mon_main_loop
@@ -216,7 +216,7 @@ _endSetDirect:
 _parseError:
         CALL mon_gotoStatusLine
         LD IX, InvVal
-        CALL vga_wriStr
+        CALL writeStr
         CALL readKey
         JP mon_main_loop
 _completed:
@@ -252,7 +252,7 @@ _loop:
 _parseError:
         CALL mon_gotoStatusLine
         LD IX, InvVal
-        CALL vga_wriStr
+        CALL writeStr
         CALL readKey
         CALL mon_refresh
         JP mon_main_loop
@@ -289,14 +289,14 @@ _loop:
 _invalidValue:
         CALL mon_gotoStatusLine
         LD IX, InvVal
-        CALL vga_wriStr
+        CALL writeStr
         CALL readKey
         CALL mon_refresh
         JP mon_main_loop
 _invalidAddress:
         CALL mon_gotoStatusLine
         LD IX, InvAddr
-        CALL vga_wriStr
+        CALL writeStr
         CALL readKey
         CALL mon_refresh
         JP mon_main_loop
@@ -349,7 +349,7 @@ mon_prevLine:
 PROC
 mon_dsp:
 		PUSH BC
-        CALL vga_curOff
+        CALL cursorOff
         LD HL, (MonCurrAddr) 
         LD A, L 
         AND 11111000b    ; make sure the address from which you start displaying is at an 8 byte alignement   
@@ -360,11 +360,11 @@ _loop:
 		PUSH BC
         CALL mon_printAddrs
         CALL mon_printVals
-        CALL vga_nextLine
+        CALL nextLine
 		CALL mon_nextAddrs
 		POP BC
 		DJNZ _loop
-		CALL vga_curOn
+		CALL cursorOn
 		POP BC
         RET
 ENDP
@@ -376,7 +376,7 @@ mon_printAddrs:
         POP IX
         CALL mon_printDByte
         LD A, ":"
-        CALL vga_putChar
+        CALL putChar
         RET
 
 PROC
@@ -390,7 +390,7 @@ mon_printVals:
 _loop:
 		PUSH BC
         LD A, " "
-        CALL vga_putChar
+        CALL putChar
         CALL mon_printByte
 		INC IX
 		POP BC
@@ -398,23 +398,23 @@ _loop:
 		POP BC
 		; print the actual characters
 		LD A, '|'
-		CALL vga_putChar
+		CALL putChar
 		LD A, (IX - 8)
-		CALL vga_putChar
+		CALL putChar
 		LD A, (IX - 7)
-		CALL vga_putChar
+		CALL putChar
 		LD A, (IX - 6)
-		CALL vga_putChar
+		CALL putChar
 		LD A, (IX - 5)
-		CALL vga_putChar
+		CALL putChar
 		LD A, (IX - 4)
-		CALL vga_putChar
+		CALL putChar
 		LD A, (IX - 3)
-		CALL vga_putChar
+		CALL putChar
 		LD A, (IX - 2)
-		CALL vga_putChar
+		CALL putChar
 		LD A, (IX - 1)
-		CALL vga_putChar
+		CALL putChar
         RET
 ENDP
 
@@ -424,9 +424,9 @@ mon_printByteA:
         CALL byte2asc
         PUSH AF
         LD A, B
-        CALL vga_putChar
+        CALL putChar
         POP AF
-        CALL vga_putChar
+        CALL putChar
         RET
 
 ; prints the value of a double byte stored in IX to the lcd screen
@@ -438,16 +438,16 @@ mon_printDByte:
         CALL byte2asc
         PUSH AF
         LD A, B
-        CALL vga_putChar
+        CALL putChar
         POP AF
-        CALL vga_putChar
+        CALL putChar
         LD A, E
         CALL byte2asc
         PUSH AF
         LD A, B
-        CALL vga_putChar
+        CALL putChar
         POP AF
-        CALL vga_putChar
+        CALL putChar
         RET
 
 ; prints the value the lower byte of IX to the lcd screen
@@ -459,9 +459,9 @@ mon_printLByte
         CALL byte2asc
         PUSH AF
         LD A, B
-        CALL vga_putChar
+        CALL putChar
         POP AF
-        CALL vga_putChar
+        CALL putChar
         RET
 
 ; moves the address in HL by one line (8 memory cells)
@@ -501,7 +501,7 @@ _nonWriteable:
 ENDP
 
 mon_refresh:
-        CALL vga_clrScr
+        CALL clrScr
         CALL mon_dsp
         RET
 
@@ -516,7 +516,7 @@ mon_peek:
         RET
 _parseError:
         LD IX, InvAddr
-        CALL vga_wriStr
+        CALL writeStr
         RET
 ENDP
 
@@ -539,11 +539,11 @@ mon_poke:
         RET
 _addrError:
         LD IX, InvAddr
-        CALL vga_wriStr
+        CALL writeStr
         RET
 _valError:
         LD IX, InvVal
-        CALL vga_wriStr
+        CALL writeStr
         RET
 ENDP
 
@@ -567,11 +567,11 @@ mon_put:
         RET
 _addrError:
         LD IX, InvAddr
-        CALL vga_wriStr
+        CALL writeStr
         RET
 _valError:
         LD IX, InvVal
-        CALL vga_wriStr
+        CALL writeStr
         RET
 ENDP
 
@@ -587,6 +587,6 @@ mon_get:
 		RET
 _addrError:
 		LD IX, InvAddr
-        CALL vga_wriStr
+        CALL writeStr
         RET
 ENDP

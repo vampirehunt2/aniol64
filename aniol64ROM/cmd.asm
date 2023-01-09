@@ -41,8 +41,8 @@ Prompt: 	defb ">", 0
 PROC
 cmd_main:
 		LD IX, Prompt
-		CALL vga_wriStr
-		CALL vga_curOn
+		CALL writeStr
+		CALL cursorOn
         CALL cmd_readLn
         CALL str_tok
         ; clear screen command
@@ -152,20 +152,20 @@ cmd_main:
 		JP Z, _format
         ; unknown command
         LD IX, UnknownCmd
-        CALL vga_wriStr
+        CALL writeStr
         CALL bzr_beep
 _wrap:
-		CALL vga_nextLine
+		CALL nextLine
 		JP cmd_main
 _clr:
-        CALL vga_clrScr
-        CALL vga_home
+        CALL clrScr
+        CALL home
         JP cmd_main
 _rst:
         RST 00h
 _echo:
         CALL str_shift
-        CALL vga_writeLn
+        CALL writeLn
         JP cmd_main
 _peek:
         CALL mon_peek
@@ -193,9 +193,9 @@ _rnd:
         CALL byte2asc
         PUSH AF
         LD A, B
-        CALL vga_putChar
+        CALL putChar
         POP AF
-        CALL vga_putChar
+        CALL putChar
         JP _wrap
 _di:
 		CALL dos_cfDiskInfo
@@ -242,6 +242,6 @@ ENDP
 
 cmd_readLn:
         CALL readLine
-        CALL vga_nextLine
+        CALL nextLine
         LD IX, LineBuff
         RET

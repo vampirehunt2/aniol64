@@ -30,7 +30,7 @@ initDsp:
         RET
 
 wriStr:
-        CALL vga_wriStr
+        CALL writeStr
         RET
 
 scroll:

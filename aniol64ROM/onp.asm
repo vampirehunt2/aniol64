@@ -48,11 +48,11 @@ _end:
 		CALL list_pull
 		LD IX, Result
 		CALL u16_formatDec
-		CALL vga_writeLn
+		CALL writeLn
 		RET
 _syntaxErr:
 		LD IX, SyntaxError
-		CALL vga_writeLn
+		CALL writeLn
 		RET
 ENDP
 		

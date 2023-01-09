@@ -32,7 +32,7 @@ _loop:
 		AND 01111111b		; make sure cursor is not stored
 		CP 13				; check if it's a carriage return
 		JR Z, _wrapLine
-		CALL vga_putChar	; put the received character on screen
+		CALL putChar	; put the received character on screen
 		LD A, (VgaCurY)		; check if we're at the end of the screen
 		CP MAX_Y
 		CALL Z, term_wrapScreen	; if yes, wrap around to the top
@@ -46,28 +46,28 @@ ENDP
 term_wrapScreen:
 		LD B, 0
 		LD C, 3
-		CALL vga_gotoXY
+		CALL gotoXY
 		RET
 		
 term_wrapLine:
-		CALL vga_curOff
+		CALL cursorOff
         XOR A           ; LD A, 0
         LD (VgaCurX), A ; move the cursor to the beginning of line
         LD A, (VgaCurY) ; load current cursor Y position (line number)
         INC A           
 		LD (VgaCurY), A
-		CALL vga_curOn
+		CALL cursorOn
 		RET
 
 term_resetScreen:
-		CALL vga_clrScr
-		CALL vga_home
+		CALL clrScr
+		CALL home
 		LD IX, Blank
-		CALL vga_writeLn
+		CALL writeLn
 		LD IX, Program
-		CALL vga_writeLn
+		CALL writeLn
 		LD IX, Separator
-		CALL vga_writeLn
+		CALL writeLn
 		RET
 		
 PROC	
@@ -88,7 +88,7 @@ handleDartRx:
         EXX
 		CALL dart_xoff
 		CALL dart_getChar
-		CALL vga_putChar
+		CALL putChar
 		CALL dart_xon
 		EXX
         EX AF, AF'		

@@ -71,7 +71,7 @@ _set:
 ENDP
 
 snake_init:
-		CALL vga_clrScr
+		CALL clrScr
 		CALL snake_drawFrame
 		LD A, 0
 		LD (Echo), A			; turn echo off
@@ -159,12 +159,12 @@ _end:
 ENDP	
 
 snake_gameOver:
-		CALL vga_clrScr
+		CALL clrScr
 		LD B, 14
 		LD C, 10
-		CALL vga_gotoXY
+		CALL gotoXY
 		LD IX, GameOver
-		CALL vga_wriStr
+		CALL writeStr
 		RET
 
 ; returns previous char at new head location in D
@@ -173,12 +173,12 @@ snake_moveHead:
 		LD B, (HL)
 		INC HL
 		LD C, (HL)
-		CALL vga_gotoXY
-		CALL vga_getChar
+		CALL gotoXY
+		CALL getChar
 		LD D, A
-		CALL vga_gotoXY
+		CALL gotoXY
 		LD A, '*'
-		CALL vga_putChar
+		CALL putChar
 		RET 
 		
 snake_moveTail:
@@ -186,9 +186,9 @@ snake_moveTail:
 		LD B, (HL)
 		INC HL
 		LD C, (HL)
-		CALL vga_gotoXY
+		CALL gotoXY
 		LD A, ' '
-		CALL vga_putChar
+		CALL putChar
 		RET 
 		
 ; returns head coefficient in (HL) and (HL + 1)		
@@ -221,13 +221,13 @@ snake_placeDollar:
 		CALL u8_div
 		POP BC
 		LD C, A
-		CALL vga_gotoXY
-		CALL vga_getChar
+		CALL gotoXY
+		CALL getChar
 		CP ' '
 		JP NZ, snake_placeDollar ; only place the dollar in a free spot
-		CALL vga_gotoXY
+		CALL gotoXY
 		LD A, '$'
-		CALL vga_putChar
+		CALL putChar
 		RET
 ENDP
 
@@ -238,26 +238,26 @@ snake_drawFrame:
 		LD D, HEIGHT - 5
 		LD B, 0
 		LD C, 1
-	    CALL vga_gotoXY
+	    CALL gotoXY
 _loop:
 		LD B, 0
 		INC C
-		CALL vga_gotoXY
+		CALL gotoXY
 		LD IX, FRAME2
-		CALL vga_wriStr
+		CALL writeStr
 		DEC D
 		JR NZ, _loop
 		; horizontal bars
 		LD B, 0
 		LD C, 1
-		CALL vga_gotoXY
+		CALL gotoXY
 		LD IX, FRAME1
-		CALL vga_wriStr
+		CALL writeStr
 		LD B, 0
 		LD C, HEIGHT - 4
-		CALL vga_gotoXY
+		CALL gotoXY
 		LD IX, FRAME1
-		CALL vga_wriStr
+		CALL writeStr
 		RET
 ENDP
 

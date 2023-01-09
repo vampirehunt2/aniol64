@@ -76,15 +76,15 @@ dos_setUpCf:
 		CP FALSE
 		JR Z, _noDisk
 		LD IX, DiskFound1
-		CALL vga_wriStr
+		CALL writeStr
 		CALL cf_init
 		LD IX, DiskFound2
-		CALL vga_writeLn
+		CALL writeLn
 		CALL dos_cdRoot
 		RET
 _noDisk:
 		LD IX, DiskNotFound
-		CALL vga_writeLn
+		CALL writeLn
 		RET
 ENDP
 
@@ -92,25 +92,25 @@ dos_cfDiskInfo:
 		LD HL, SectorBuffer
 		CALL cf_di
 		LD IX, SerialNum			; serial
-		CALL vga_wriStr
+		CALL writeStr
 		LD IX, SectorBuffer + 20
 		LD B, 20
 		CALL dos_printRecord
-		CALL vga_nextLine
+		CALL nextLine
 		LD IX, Model				; model
-		CALL vga_wriStr
+		CALL writeStr
 		LD IX, SectorBuffer + 54
 		LD B, 30
 		CALL dos_printRecord
-		CALL vga_nextLine
+		CALL nextLine
 		LD IX, FirmwareRev			; firmware
-		CALL vga_wriStr
+		CALL writeStr
 		LD IX, SectorBuffer + 46
 		LD B, 8
 		CALL dos_printRecord
-		CALL vga_nextLine
+		CALL nextLine
 		LD IX, LbaSectors			; LBA sectors
-		CALL vga_wriStr
+		CALL writeStr
 	 	LD A, (SectorBuffer + 120)
 		CALL mon_printByteA
 		LD A, (SectorBuffer + 121)
@@ -124,7 +124,7 @@ dos_cfDiskInfo:
 ; prints B bytes from address IX
 dos_printRecord:
 		LD A, (IX)
-		CALL vga_putChar
+		CALL putChar
 		INC IX
 		DJNZ dos_printRecord
 		RET
@@ -140,7 +140,7 @@ _memTestOk:
         LD IX, NvRamOk
         JP _printMemTest
 _printMemTest:
-        CALL vga_writeLn
+        CALL writeLn
 		RET
 ENDP
 
@@ -166,11 +166,11 @@ dos_load:
 		RET
 _invalidAddress:
 		LD IX, InvAddr
-		CALL vga_writeLn
+		CALL writeLn
 		RET
 _invalidSector:
 		LD IX, InvalidSector
-		CALL vga_writeLn
+		CALL writeLn
 		RET
 ENDP
 	
@@ -196,11 +196,11 @@ dos_save:
 		RET
 _invalidAddress:
 		LD IX, InvAddr
-		CALL vga_writeLn
+		CALL writeLn
 		RET
 _invalidSector:
 		LD IX, InvalidSector
-		CALL vga_writeLn
+		CALL writeLn
 		RET
 ENDP
 
@@ -289,7 +289,7 @@ _checkDir:
 		LD B, MAX_DIRNAME_LEN
 		LD IY, LineBuff
 		CALL str_2str
-		CALL vga_writeLn
+		CALL writeLn
 _nextDir:
 		POP IX
 		CALL dos_nextDir
@@ -334,16 +334,16 @@ _loop:
 		JR NZ, _continue
 		PUSH IY
 		POP IX
-		CALL vga_wriStr
+		CALL writeStr
 		CALL dos_tabFileName
 		LD A, (IY + FileLen)
 		LD L, A
 		LD A, (IY + FileLen + 1)
 		LD H, A
 		CALL u16_formatDec
-		CALL vga_wriStr
+		CALL writeStr
 		LD IX, Bytes
-		CALL vga_writeLn
+		CALL writeLn
 _continue:
 		CALL dos_nextFileRecord
 		DJNZ _loop
@@ -364,7 +364,7 @@ dos_tabFileName:
 		LD B, A
 		LD A, ' '
 _loop:
-		CALL vga_putChar
+		CALL putChar
 		DJNZ _loop
 		POP BC
 		POP AF
@@ -386,7 +386,7 @@ dos_rm:
 		RET
 _notFound:
 		LD IX, ErrFileNotFound
-		CALL vga_writeLn
+		CALL writeLn
 		RET
 ENDP
 
@@ -407,7 +407,7 @@ _loop:
 		JR NZ, _loop
 		LD A, 0
 		LD IX, ErrNoSuchDir
-		CALL vga_writeLn
+		CALL writeLn
 		JR _end
 _rm:
 		LD A, 0
@@ -451,15 +451,15 @@ _makeDir:
 		JP _end
 _invName:
 		LD IX, ErrInvDirName
-		CALL vga_writeLn
+		CALL writeLn
 		JR _end
 _exists:
 		LD IX, ErrDirExists
-		CALL vga_writeLn
+		CALL writeLn
 		JR _end
 _tooMany:
 		LD IX, ErrTooManyDirs
-		CALL vga_writeLn
+		CALL writeLn
 		JR _end
 _end:
 		POP DE			; restore register state	
@@ -573,7 +573,7 @@ ENDP
 
 dos_pwd:
 		LD IX, CurrentPath
-		CALL vga_writeLn
+		CALL writeLn
 		RET
 	
 ; changes the current dir to be the root dir	
@@ -607,7 +607,7 @@ dos_cd:
 		JR _end
 _noDir:
 		LD IX, ErrNoSuchDir
-		CALL vga_writeLn
+		CALL writeLn
 		JR _end
 _root:
 		CALL dos_cdRoot
@@ -652,15 +652,15 @@ dos_touch:
 		JR _end
 _diskFull:	
 		LD IX, ErrDiskFull
-		CALL vga_writeLn
+		CALL writeLn
 		JR _end
 _fileExists:
 		LD IX, ErrFileExists
-		CALL vga_writeLn
+		CALL writeLn
 		JR _end
 _invName:
 		LD IX, ErrInvFileName
-		CALL vga_writeLn
+		CALL writeLn
 		JR _end
 _end:
 		RET

@@ -69,13 +69,13 @@ Ready: defb     "Ready", 0
 Hello: defb     "Hello", 0
 
 boot:
-        ; init devices 
-        CALL vga_init
+        ; init the display
+        CALL dspInit
 
         ; greetings
-		CALL vga_nextLine
+		CALL nextLine
         LD IX, Aniol
-        CALL vga_writeLn
+        CALL writeLn
 		
 		; initialise the keyboard
 		CALL keyInit
@@ -97,13 +97,13 @@ _keyMissing:
 		LD IX, KeyMissing
 		JR _endKeyInit
 _endKeyInit:
-		CALL vga_writeLn
+		CALL writeLn
 		; set up permanent storage
 		CALL dos_setUpCf
 		CALL dos_checkNvram
 		
         LD IX, Ready
-        CALL vga_writeLn
+        CALL writeLn
 		
         CALL bzr_beep
         LD A, 50
@@ -162,15 +162,15 @@ handleInt:
 		CP FALSE
 		JR Z, _noEcho
 		LD A, B
-        CALL vga_putChar	; echo the character to screen, but don't remove it from the keyboard buffer
+        CALL putChar	; echo the character to screen, but don't remove it from the keyboard buffer
 		CALL bzr_click
 _noEcho:
         RET
 _bkspc:
-        CALL vga_cursorLShift  ; TODO: check if you're already in the beginning of line
+        CALL cursorLShift  ; TODO: check if you're already in the beginning of line
         LD A, ' '
-        CALL vga_putChar
-        CALL vga_cursorLShift
+        CALL putChar
+        CALL cursorLShift
         JR _noEcho
 ENDP
 
