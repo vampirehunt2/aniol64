@@ -125,8 +125,8 @@ include dev/bzr.asm
 include dev/vga.asm
 include dev/dart.asm
 include dev/cf.asm
-include dev/kbd.asm
-;include dev/ps2.asm
+;include dev/kbd.asm
+include dev/ps2.asm
 
 ; libraries
 include lib/util.asm
