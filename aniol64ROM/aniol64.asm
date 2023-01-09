@@ -71,22 +71,33 @@ Hello: defb     "Hello", 0
 boot:
         ; init devices 
         CALL vga_init
-		CALL keyInit
-
-        ; init the keyboard buffer to avoid a bogus character during the first read
-        LD A, 0
-        LD (KbdBuff), A
-		LD (Random), A
-		LD (Random + 1), A
-		
-		LD A, TRUE
-		LD (Cursor), A
-		LD (Echo), A
 
         ; greetings
 		CALL vga_nextLine
         LD IX, Aniol
         CALL vga_writeLn
+		
+		; initialise the keyboard
+		CALL keyInit
+		CP BAT_SUCCESS
+		JR Z, _keyOk
+		CP BAT_ERROR
+		JR Z, _keyErr
+		CP BAT_MISSING
+		JR Z, _keyMissing
+		LD IX, KeyUnknown
+		JR _endKeyInit
+_keyOk:
+		LD IX, KeyOK
+		JR _endKeyInit
+_keyErr:
+		LD IX, KeyErr
+		JR _endKeyInit
+_keyMissing:
+		LD IX, KeyMissing
+		JR _endKeyInit
+_endKeyInit:
+		CALL vga_writeLn
 		; set up permanent storage
 		CALL dos_setUpCf
 		CALL dos_checkNvram
@@ -125,7 +136,7 @@ include lib/list.asm
 include lib/math.asm
 
 ; test routines
-include test/test.asm
+;include test/test.asm
 
 ; programs
 include cmd.asm
@@ -133,6 +144,7 @@ include mon.asm
 include term.asm
 include dos.asm
 include snake.asm
+include rogue.asm
 include onp.asm
 
 PROC
