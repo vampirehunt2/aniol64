@@ -9,6 +9,14 @@
 
 
 KBD_PORT equ 10111111b  ; BFh keyboard is selected with A6
+BAT_SUCCESS equ 0AAh
+BAT_ERROR 	equ 0FCh 
+BAT_MISSING equ 0
+
+KeyOK 		defb "Dumb keyboard configured", 0
+KeyErr 		defb "Keyboard error", 0
+KeyMissing 	defb "Keyboard not connected", 0
+KeyUnknown 	defb "Keyboard status unknown", 0
 
 ; Converts keyboard code to ASCII code
 ; C - keycode to convert
@@ -33,6 +41,15 @@ keyInput:
         RET
 		
 keyInit:
+		; init the keyboard buffer to avoid a bogus character during the first read
+        LD A, 0
+        LD (KbdBuff), A
+		LD (Random), A
+		LD (Random + 1), A
+		LD A, TRUE
+		LD (Cursor), A
+		LD (Echo), A
+		LD A, BAT_SUCCESS
 		RET
 
 ; reads a single key from the buffer
