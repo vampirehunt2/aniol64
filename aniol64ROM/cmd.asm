@@ -205,7 +205,7 @@ _dd:
 		CALL mon_printByteA
 		JP _wrap
 _test:
-		CALL test_main
+		;CALL test_main
 		JP cmd_main
 _mon:
         CALL mon_main
