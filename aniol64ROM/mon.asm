@@ -24,7 +24,7 @@ InvAddr: 	defb "Invalid address", 0
 InvVal: 	defb "Invalid value", 	0 
 
 MonCurrAddr equ PROGRAM_DATA 
-LINE_NUM 	equ 26
+LINE_NUM 	equ MAX_Y - 2
 
 PROC
 defb "mon_main"
@@ -388,9 +388,13 @@ mon_printVals:
         POP IX
 		LD B, 8
 _loop:
-		PUSH BC
+		LD A, 8
+		CP B
+		JR Z, _skipSpace
         LD A, " "
         CALL putChar
+_skipSpace:
+		PUSH BC
         CALL mon_printByte
 		INC IX
 		POP BC
@@ -400,22 +404,34 @@ _loop:
 		LD A, '|'
 		CALL putChar
 		LD A, (IX - 8)
-		CALL putChar
+		CALL mon_printChar
 		LD A, (IX - 7)
-		CALL putChar
+		CALL mon_printChar
 		LD A, (IX - 6)
-		CALL putChar
+		CALL mon_printChar
 		LD A, (IX - 5)
-		CALL putChar
+		CALL mon_printChar
 		LD A, (IX - 4)
-		CALL putChar
+		CALL mon_printChar
 		LD A, (IX - 3)
-		CALL putChar
+		CALL mon_printChar
 		LD A, (IX - 2)
-		CALL putChar
+		CALL mon_printChar
 		LD A, (IX - 1)
-		CALL putChar
+		CALL mon_printChar
         RET
+ENDP
+
+PROC
+mon_printChar:
+		CP 32
+		JR C, _special
+		JR _print
+_special:
+		LD A, ' '
+_print:
+		CALL putChar
+		RET
 ENDP
 
 mon_printByte:
