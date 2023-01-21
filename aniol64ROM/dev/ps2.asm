@@ -31,6 +31,7 @@ keyInit:
 		OTIR
 		LD A, 0
 		LD (Ps2Shift), A
+		CALL ps2_readScancode ; consume the BAT code
 		EI					; enable interrupts
         RET
 		
