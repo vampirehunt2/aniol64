@@ -15,7 +15,8 @@
 ; to exit the terminal program you have to reset the machine.
  
 Program defb "A-Term", 0
-Separator defb "=======================================", 0
+Separator ds MAX_X, "="
+defb 0
 
 IntTable equ 0A000h
 IntTableSize equ 8   ; just a guess
@@ -103,7 +104,7 @@ term_setupInterrupts:
         LD DE, IntTable 			; new interrupt handler table address
         LD BC, IntTableSize  		; set loop counter to the size of the interrupt table
         LDIR         				; copy the interrupt handler table to the new location
-		LD A, 0A0h					; load the top byte of the new interrupt handler table to A
+		LD A, D 					; load the top byte of the new interrupt handler table to A
 		LD I, A						; replace the original table address with the new one
 		LD HL, term_handleKeyClick	; load the new keyClick interrupt handler address to HL
 		LD (IntTable + 0), HL		; switch the keyClick interrupt handler to the new one

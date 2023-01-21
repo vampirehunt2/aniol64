@@ -21,12 +21,12 @@ PIN 8 = N14;
 PIN 9 = N17;
 PIN 11 = N2;
 PIN 12 = N3;
-PIN 13 = VSYNCIN; /* connect externally with VSYNCOUT */
-PIN 14 = HSYNCIN; /* connect externally with HSYNCOUT */
+PIN 14 = VSYNCIN; /* connect externally with VSYNCOUT */
+PIN 17 = HSYNCIN; /* connect externally with HSYNCOUT */
 
 /* OUTPUT */
-PIN 16 = VSYNCOUT; /* connect externally with VSYNCIN */
-PIN 17 = HSYNCOUT; /* connect externally with HSYNCIN */
+PIN 15 = VSYNCOUT; /* connect externally with VSYNCIN */
+PIN 16 = HSYNCOUT; /* connect externally with HSYNCIN */
 PIN 18 = SYNC;
 PIN 19 = LOAD;
 

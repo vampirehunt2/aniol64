@@ -86,3 +86,98 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64
 
 !ENTRY org.eclipse.equinox.p2.metadata.repository 4 1000 2022-05-23 10:18:23.276
 !MESSAGE No repository found at https://sourceforge.net/projects/cupl-ide/files/lastest/repository.
+!SESSION 2023-01-09 20:40:08.041 -----------------------------------------------
+eclipse.buildId=1.0.0.202006121150
+java.version=1.8.0_231
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.equinox.p2.metadata.repository 4 1000 2023-01-09 20:40:40.488
+!MESSAGE No repository found at https://sourceforge.net/projects/cupl-ide/files/lastest/repository.
+
+!ENTRY org.eclipse.equinox.p2.metadata.repository 4 1000 2023-01-09 20:40:40.504
+!MESSAGE No repository found at file:/C:/Users/PiotrAniola/Documents/8bit/z80_first_release/.
+!SESSION 2023-01-09 20:45:34.945 -----------------------------------------------
+eclipse.buildId=1.0.0.202006121150
+java.version=1.8.0_231
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.equinox.p2.metadata.repository 4 1000 2023-01-09 20:45:57.683
+!MESSAGE No repository found at https://sourceforge.net/projects/cupl-ide/files/lastest/repository.
+
+!ENTRY org.eclipse.equinox.p2.metadata.repository 4 1000 2023-01-09 20:45:57.701
+!MESSAGE No repository found at file:/C:/Users/PiotrAniola/Documents/8bit/z80_first_release/.
+
+!ENTRY org.eclipse.core.resources 4 568 2023-01-09 20:50:52.213
+!MESSAGE Could not write metadata for '/Aniol32'.
+!STACK 0
+java.io.FileNotFoundException: C:\8bit\GitHub\aniol64\workspace\.metadata\.plugins\org.eclipse.core.resources\.projects\Aniol32\.markers.snap (The system cannot find the path specified)
+	at java.io.FileOutputStream.open0(Native Method)
+	at java.io.FileOutputStream.open(Unknown Source)
+	at java.io.FileOutputStream.<init>(Unknown Source)
+	at java.io.FileOutputStream.<init>(Unknown Source)
+	at org.eclipse.core.internal.localstore.SafeChunkyOutputStream.<init>(SafeChunkyOutputStream.java:48)
+	at org.eclipse.core.internal.localstore.SafeChunkyOutputStream.<init>(SafeChunkyOutputStream.java:44)
+	at org.eclipse.core.internal.resources.SaveManager.visitAndSnap(SaveManager.java:1765)
+	at org.eclipse.core.internal.resources.SaveManager.visitAndSnap(SaveManager.java:1846)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1202)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1143)
+	at org.eclipse.core.internal.resources.DelayedSnapshotJob.run(DelayedSnapshotJob.java:55)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+
+!ENTRY org.eclipse.ui.ide 4 4 2023-01-09 21:08:59.453
+!MESSAGE Problems saving workspace
+
+!ENTRY org.eclipse.ui.ide 4 1 2023-01-09 21:08:59.454
+!MESSAGE Problems occurred while trying to save the state of the workbench.
+!SUBENTRY 1 org.eclipse.core.resources 4 568 2023-01-09 21:08:59.454
+!MESSAGE Could not write metadata for '/Aniol32'.
+!STACK 0
+java.io.FileNotFoundException: C:\8bit\GitHub\aniol64\workspace\.metadata\.plugins\org.eclipse.core.resources\.projects\Aniol32\.markers (The system cannot find the path specified)
+	at java.io.FileOutputStream.open0(Native Method)
+	at java.io.FileOutputStream.open(Unknown Source)
+	at java.io.FileOutputStream.<init>(Unknown Source)
+	at java.io.FileOutputStream.<init>(Unknown Source)
+	at org.eclipse.core.internal.localstore.SafeFileOutputStream.<init>(SafeFileOutputStream.java:55)
+	at org.eclipse.core.internal.resources.SaveManager.visitAndSave(SaveManager.java:1657)
+	at org.eclipse.core.internal.resources.SaveManager.visitAndSave(SaveManager.java:1736)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1177)
+	at org.eclipse.core.internal.resources.Workspace.save(Workspace.java:2333)
+	at org.eclipse.ui.internal.ide.application.IDEWorkbenchAdvisor.lambda$1(IDEWorkbenchAdvisor.java:509)
+	at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:122)
+!SESSION 2023-01-10 16:19:11.532 -----------------------------------------------
+eclipse.buildId=1.0.0.202006121150
+java.version=1.8.0_231
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.equinox.p2.metadata.repository 4 1000 2023-01-10 16:20:56.083
+!MESSAGE No repository found at https://sourceforge.net/projects/cupl-ide/files/lastest/repository.
+
+!ENTRY org.eclipse.equinox.p2.metadata.repository 4 1000 2023-01-10 16:20:56.181
+!MESSAGE No repository found at file:/C:/Users/PiotrAniola/Documents/8bit/z80_first_release/.
+
+!ENTRY org.eclipse.ui.ide 4 4 2023-01-10 16:21:58.173
+!MESSAGE Problems saving workspace
+
+!ENTRY org.eclipse.ui.ide 4 1 2023-01-10 16:21:58.183
+!MESSAGE Problems occurred while trying to save the state of the workbench.
+!SUBENTRY 1 org.eclipse.core.resources 4 568 2023-01-10 16:21:58.183
+!MESSAGE Could not write metadata for '/Aniol32'.
+!STACK 0
+java.io.FileNotFoundException: C:\8bit\GitHub\aniol64\workspace\.metadata\.plugins\org.eclipse.core.resources\.projects\Aniol32\.markers (The system cannot find the path specified)
+	at java.io.FileOutputStream.open0(Native Method)
+	at java.io.FileOutputStream.open(Unknown Source)
+	at java.io.FileOutputStream.<init>(Unknown Source)
+	at java.io.FileOutputStream.<init>(Unknown Source)
+	at org.eclipse.core.internal.localstore.SafeFileOutputStream.<init>(SafeFileOutputStream.java:55)
+	at org.eclipse.core.internal.resources.SaveManager.visitAndSave(SaveManager.java:1657)
+	at org.eclipse.core.internal.resources.SaveManager.visitAndSave(SaveManager.java:1736)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1177)
+	at org.eclipse.core.internal.resources.Workspace.save(Workspace.java:2333)
+	at org.eclipse.ui.internal.ide.application.IDEWorkbenchAdvisor.lambda$1(IDEWorkbenchAdvisor.java:509)
+	at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:122)

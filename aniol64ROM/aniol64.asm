@@ -69,6 +69,14 @@ Ready: defb     "Ready", 0
 Hello: defb     "Hello", 0
 
 boot:
+		LD A, 100
+		CALL delay	; make sure all  subsystems are initialised before we start booting
+		
+		; init the RNG:
+		LD A, 0
+		LD (Random), A
+		LD (Random + 1), A
+		
         ; init the display
         CALL dspInit
 
@@ -79,39 +87,22 @@ boot:
 		
 		; initialise the keyboard
 		CALL keyInit
-		CP BAT_SUCCESS
-		JR Z, _keyOk
-		CP BAT_ERROR
-		JR Z, _keyErr
-		CP BAT_MISSING
-		JR Z, _keyMissing
-		LD IX, KeyUnknown
-		JR _endKeyInit
-_keyOk:
-		LD IX, KeyOK
-		JR _endKeyInit
-_keyErr:
-		LD IX, KeyErr
-		JR _endKeyInit
-_keyMissing:
-		LD IX, KeyMissing
-		JR _endKeyInit
-_endKeyInit:
+		
 		CALL writeLn
 		; set up permanent storage
 		CALL dos_setUpCf
 		CALL dos_checkNvram
 		
+		CALL bzr_beep
+		LD A, 50
+		CALL delay
+		CALL bzr_beep
+		LD A, 50
+		CALL delay
+		CALL bzr_beep
+		
         LD IX, Ready
         CALL writeLn
-		
-        CALL bzr_beep
-        LD A, 50
-        CALL delay
-        CALL bzr_beep
-        LD A, 50
-        CALL delay
-        CALL bzr_beep
 
         ; wait for user input from here on in
         CALL cmd_main
@@ -122,7 +113,8 @@ loop:
 
 ; device drivers
 include dev/bzr.asm
-include dev/vga.asm
+;include dev/vga.asm
+include dev/tm.asm
 include dev/dart.asm
 include dev/cf.asm
 ;include dev/kbd.asm

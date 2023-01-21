@@ -5,7 +5,7 @@
 
 CUPL(WM)        5.0a Serial# MW-10400000
 Device          g16v8s  Library DLIB-h-40-9
-Created         Wed Dec 21 14:17:50 2022
+Created         Mon Jan 09 20:46:53 2023
 Name            PAL 
 Partno          00 
 Revision        01 
@@ -27,8 +27,8 @@ LOAD =>
   # N2 & !N3 & !N17
 
 SYNC =>
-    HSYNCIN & !VSYNCIN
-  # !HSYNCIN & VSYNCIN
+    !HSYNCIN & VSYNCIN
+  # HSYNCIN & !VSYNCIN
 
 VSYNCOUT =>
     !N11 & !N12 & N13 & !N14 & N17
@@ -42,9 +42,9 @@ Pin Variable                                    Pterms   Max     Min
 Pol   Name              Ext     Pin     Type     Used   Pterms  Level   
 --- --------            ---     ---     ----    ------  ------  -----   
 
-    HSYNCIN                     14       V        -       -       -     
-    HSYNCOUT                    17       V        1       8       0     
-    LOAD                        19       V        2       8       0     
+    HSYNCIN                     17       V        -       -       -     
+    HSYNCOUT                    16       V        1       8       2     
+    LOAD                        19       V        2       8       2     
     N2                          11       V        -       -       -     
     N3                          12       V        -       -       -     
     N5                          1        V        -       -       -     
@@ -56,9 +56,9 @@ Pol   Name              Ext     Pin     Type     Used   Pterms  Level
     N13                         7        V        -       -       -     
     N14                         8        V        -       -       -     
     N17                         9        V        -       -       -     
-    SYNC                        18       V        2       8       0     
-    VSYNCIN                     13       V        -       -       -     
-    VSYNCOUT                    16       V        1       8       0     
+    SYNC                        18       V        2       8       2     
+    VSYNCIN                     14       V        -       -       -     
+    VSYNCOUT                    15       V        1       8       2     
 
 
 LEGEND    D : default variable         F : field      G : group
@@ -83,16 +83,16 @@ Pin #19  02048  Pol -  02120  Ac1 x
  00192 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00224 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
 Pin #18  02049  Pol x  02121  Ac1 x 
- 00256 ------------------x----x-------- 
- 00288 -------------------x--x--------- 
+ 00256 ---------------x--x------------- 
+ 00288 --------------x----x------------ 
  00320 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00352 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00384 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00416 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00448 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00480 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
-Pin #17  02050  Pol -  02122  Ac1 x 
- 00512 x-x-x---x----------------------- 
+Pin #17  02050  Pol x  02122  Ac1 - 
+ 00512 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00544 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00576 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00608 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
@@ -101,7 +101,7 @@ Pin #17  02050  Pol -  02122  Ac1 x
  00704 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00736 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
 Pin #16  02051  Pol -  02123  Ac1 x 
- 00768 -------------x---x--x----x--x--- 
+ 00768 x-x-x---x----------------------- 
  00800 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00832 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00864 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
@@ -109,8 +109,8 @@ Pin #16  02051  Pol -  02123  Ac1 x
  00928 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00960 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00992 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
-Pin #15  02052  Pol x  02124  Ac1 - 
- 01024 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+Pin #15  02052  Pol -  02124  Ac1 x 
+ 01024 -------------x---x--x----x--x--- 
  01056 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  01088 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  01120 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
@@ -159,11 +159,11 @@ LEGEND    X : fuse not blown
                        N5 x---|1           20|---x Vcc                      
                        N6 x---|2           19|---x LOAD                     
                        N7 x---|3           18|---x SYNC                     
-                       N8 x---|4           17|---x HSYNCOUT                 
-                      N11 x---|5           16|---x VSYNCOUT                 
-                      N12 x---|6           15|---x                          
-                      N13 x---|7           14|---x HSYNCIN                  
-                      N14 x---|8           13|---x VSYNCIN                  
+                       N8 x---|4           17|---x HSYNCIN                  
+                      N11 x---|5           16|---x HSYNCOUT                 
+                      N12 x---|6           15|---x VSYNCOUT                 
+                      N13 x---|7           14|---x VSYNCIN                  
+                      N14 x---|8           13|---x                          
                       N17 x---|9           12|---x N3                       
                       GND x---|10          11|---x N2                       
                               |______________|

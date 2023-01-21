@@ -14,11 +14,11 @@ MAX_Y equ 29
 Blank:		defb "                                      ", 0
 
 dspInit:
-        CALL home
+        CALL clrScr
         CALL home
         RET
 
-clrScr:
+home:
         CALL cursorOff
         XOR A           ;LD A, 0
         LD (VgaCurX), A
@@ -31,7 +31,7 @@ PROC
 ; this includes the blanking regions, which may be somewhat redundant
 ; and impact performance slightly, but at least it ensures no data is sent
 ; to the display during blanking period
-home:
+clrScr:
         ; store register values
         PUSH HL
         PUSH BC
@@ -80,16 +80,6 @@ cursorOff:
 		POP HL
         RET
 ENDP
-
-cursorEnable:
-		LD A, TRUE
-		LD (Cursor), A
-		RET
-		
-cursorDisable:
-		LD A, FALSE
-		LD (Cursor), A
-		RET
 		
 writeLn:
 		CALL writeStr
@@ -334,14 +324,6 @@ _end:
         LD (VgaCurY), A
 		RET
 ENDP
-		
-vga_gotoLn1:
-		PUSH BC
-		LD B, 0
-		LD C, 1
-		CALL gotoXY
-		POP BC
-		RET
 		
 vga_scroll:
        ; store register values

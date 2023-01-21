@@ -354,7 +354,7 @@ mon_dsp:
         LD A, L 
         AND 11111000b    ; make sure the address from which you start displaying is at an 8 byte alignement   
 		LD L, A
-		CALL vga_gotoLn1
+		CALL home
 		LD B, LINE_NUM
 _loop:
 		PUSH BC

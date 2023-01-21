@@ -1,17 +1,9 @@
 ; 1 start bit, one stop bit, one parity bit
 
-KEY_UP 		equ 0F0h
-EXT_KEY 	equ 0E0h
-LSHIFT 		equ 12h
-RSHIFT 		equ 59h
-BAT_SUCCESS equ 0AAh
-BAT_ERROR 	equ 0FCh 
-BAT_MISSING equ 0
-
-KeyOK 		defb "Keyboard found", 0
-KeyErr 		defb "Keyboard error", 0
-KeyMissing 	defb "Keyboard not connected", 0
-KeyUnknown 	defb "Keyboard status unknown", 0
+KEY_UP equ 0F0h
+EXT_KEY equ 0E0h
+LSHIFT equ 12h
+RSHIFT equ 59h
 
 
 ps2_initSeqA:
@@ -24,45 +16,23 @@ ps2_initSeqA:
 ps2_initSeqB
 		defb 2, 00h			; set interrupt vector to 0
 
-; initialises the DART to work on the PS2 keyboard controller
-; returns the BAT code in A if the keyboard is present.
-PROC
 keyInit:
+		DI					; disable interrupts
 		; init the keyboard buffer to avoid a bogus character during the first read
         LD A, 0
         LD (KbdBuff), A
-		LD (Random), A
-		LD (Random + 1), A
-		LD A, TRUE
-		LD (Cursor), A
-		LD (Echo), A
-		; init the DART
-		LD HL, ps2_initSeqA
-		LD B, 10
-		LD C, DART_A_CMD
-		OTIR
 		LD HL, ps2_initSeqB
 		LD B, 2
 		LD C, DART_B_CMD
 		OTIR
+		LD HL, ps2_initSeqA
+		LD B, 10
+		LD C, DART_A_CMD
+		OTIR
 		LD A, 0
 		LD (Ps2Shift), A
-		; read the Basic Assurence Test (BAT) code from the keyboard
-		LD B, 75				; BAT code needs to be sent at the most 750ms after power on
-_loop:
-		IN A, (DART_A_CMD)		; read the DART status word
-		BIT 0, A				; check if the BAT code is available
-		JR NZ, _readBat			; if so, read it
-		CALL delay10ms			; otherwise wait for 10ms
-		DJNZ _loop				; and try again
-		JR _noBat				; skip to the end
-_readBat:		
-		IN A, (DART_A_DAT)		; read in the BAT code
+		EI					; enable interrupts
         RET
-_noBat:
-		LD A, 0					; return zero if no PS2 keyboard is present.
-		RET
-ENDP
 		
 ; synchronously reads a scancode from the serial port
 ; when the scancode is available, it's code is in A
@@ -440,5 +410,4 @@ ps2ShiftScancodes:
 		defb '9'	; scancode 7D
 		defb 00		; scancode 7E
 		defb 00		; scancode 7F		
-		
-		
+
