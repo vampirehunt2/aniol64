@@ -48,6 +48,7 @@ rog_main:
 	CALL rog_generateRooms
 	CALL rog_drawRooms
 	CALL rog_makeConnections
+	CALL rog_sanitiseDoors
 	RET
 ENDP 
 
@@ -490,6 +491,68 @@ _yLoop:
 _end:
 	LD A, TRUE
 	LD (IY + RoomConn), A
+	RET
+ENDP
+
+PROC
+rog_sanitiseDoors:
+	LD C, 1
+_yLoop:
+	LD B, 1
+	CALL gotoXY
+_xLoop:
+	CALL getChar
+	CP '+'
+	JR NZ, _notDoor
+	CALL rog_sanitiseDoor
+_notDoor:
+	INC B
+	LD A, MAX_X - 1
+	CP B
+	JR NZ, _xLoop
+	INC C
+	LD A, MAX_Y - 1
+	JR NZ, _yLoop
+	RET
+ENDP
+
+rog_sanitiseDoor:
+	PUSH BC
+	LD A, 0
+	LD (DoorSet), A
+	DEC B
+	CALL rog_checkWall
+	INC B
+	INC B
+	CALL rog_checkWall
+	DEC B
+	DEC C
+	CALL rog_checkWall
+	INC C
+	INC C
+	CALL rog_checkWall
+	POP BC
+	LD A, (DoorSet)
+	CP 2
+	RET Z
+	PUSH BC
+	CALL gotoXY
+	LD A, '.'
+	CALL putChar
+	POP BC
+	RET
+
+PROC
+rog_checkWall:
+	CALL gotoXY
+	CALL getChar
+	CP '#'
+	JR Z, _wall
+	RET
+_wall:
+	LD A, (DoorSet)
+	INC A
+	LD (DoorSet), A
 	RET
 ENDP
 	
