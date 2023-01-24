@@ -27,6 +27,7 @@ X0			equ DATA + 03h
 Y0			equ DATA + 04h
 X1			equ DATA + 05h
 Y1			equ DATA + 06h
+DoorSet		equ DATA + 07h
 
 
 MAPW		equ 40
@@ -289,7 +290,6 @@ _end:
 ENDP
 
 PROC
-defb "rog_selectCorridorChar"
 rog_selectCorridorChar:
 	PUSH BC
 	CALL getChar
@@ -299,23 +299,15 @@ _floor
 	LD A, '.'
 	JR _end
 _wall:
-	PUSH IX	; store room record pointers
-	PUSH IY
-	CALL rog_isPointInRoom
-	CP TRUE
-	JR _door
-	PUSH IX ; move IX room record pointer to IY
-	POP IY 
-	CALL rog_isPointInRoom
-	CP TRUE
-	JR _door
-	LD A, '%'
-	JR _endWall
+	LD A, (DoorSet)
+	CP FALSE
+	JR Z, _door
+	LD A, '.'
+	JR _end
 _door:
+	LD A, TRUE
+	LD (DoorSet), A
 	LD A, '+'
-_endWall:
-	POP IY ; restore room record pointers
-	POP IX
 _end:
 	POP BC
 	PUSH AF
@@ -455,10 +447,10 @@ _xCont:
 	LD A, (Y0)
 	CP B
 	JR C, _yStep
-	LD A, -1
+	LD A, 1
 	JR _yCont
 _yStep:
-	LD A, 1
+	LD A, -1
 _yCont:
 	LD (yStep), A
 	; loop through the horizontal and the vertical parts of the corridor
@@ -466,22 +458,29 @@ _yCont:
 	LD B, A
 	LD A, (Y0)
 	LD C, A
+	LD A, FALSE
+	LD (DoorSet), A
 _xLoop:
 	CALL gotoXY
 	CALL rog_selectCorridorChar
 	CALL putChar
 	LD A, (X1)
 	CP B
-	JR Z, _yLoop
+	JR Z, _yLoopSetup
 	LD A, (xStep)
 	ADD A, B
 	LD B, A
 	JR _xLoop
+_yLoopSetup:
+	LD A, (Y1)
+	LD C, A
+	LD A, FALSE
+	LD (DoorSet), A
 _yLoop:
 	CALL gotoXY
 	CALL rog_selectCorridorChar
 	CALL putChar
-	LD A, (Y1)
+	LD A, (Y0)
 	CP C
 	JR Z, _end
 	LD A, (yStep)
