@@ -7,7 +7,6 @@ MAX_LIST_SIZE equ 127
 ; fills the entire list with zeroes without changing the list length
 ; IX - address of the list
 PROC
-defb "list_clear"
 list_clear:
 		PUSH BC					; save register state
 		PUSH IX					
@@ -34,7 +33,6 @@ ENDP
 ; B - number of elements in the list
 ; errors reported in A
 PROC
-defb "list_create"
 list_create:
 		LD A, B
 		CP MAX_LIST_SIZE
@@ -51,7 +49,6 @@ ENDP
 ; IX - address of the list
 ; result in A
 PROC
-defb "list_isFull"
 list_isFull:
 		LD A, (IX + LIST_SIZE)
 		CP MAX_LIST_SIZE
@@ -66,7 +63,6 @@ ENDP
 
 ; returns the number of elements in the list in A
 ; IX - address of the list
-defb "list_len"
 list_len:
 		LD A, (IX + LIST_SIZE)
 		RET
@@ -76,7 +72,6 @@ list_len:
 ; IX - address of the list
 ; errors reported in A
 PROC
-defb "list_expand"
 list_expand:
 		CALL list_isFull
 		CP TRUE
@@ -95,7 +90,6 @@ ENDP
 ; IX - address of the list
 ; new element in HL
 PROC
-defb "list_append"
 list_append:
 		CALL list_isFull
 		CP TRUE
@@ -116,7 +110,6 @@ ENDP
 ; address of the list in IX
 ; new element in HL
 PROC
-defb "list_insert"
 list_insert:
 		CALL list_isFull
 		CP TRUE
@@ -147,7 +140,6 @@ ENDP
 
 ; removes last element from the list
 ; list address in IX	
-defb "list_trim"
 list_trim:
 		CALL list_isEmpty
 		CP TRUE
@@ -161,7 +153,6 @@ list_trim:
 ; leaving only first B elements in the list	
 ; list address in IX	
 PROC
-defb "list_trunc"
 list_trunc:
 		CALL list_len
 		SUB B
@@ -176,7 +167,6 @@ ENDP
 ; and returns it in HL
 ; IX - address of the list
 PROC
-defb "list_pull"
 list_pull:
 		CALL list_isEmpty
 		CP TRUE
@@ -198,7 +188,6 @@ ENDP
 		
 ; sets the size of the list to zero
 ; IX - address of the list
-defb "list_empty"
 list_empty:
 		LD A, 0
 		LD (IX + LIST_SIZE), A
@@ -208,7 +197,6 @@ list_empty:
 ; IX - address of the list
 ; result in A
 PROC
-defb "list_isEmpty"
 list_isEmpty:
 		LD A, (IX + LIST_SIZE)
 		CP 0
@@ -225,7 +213,6 @@ ENDP
 ; value in HL
 ; result in A
 PROC
-defb "list_contains"
 list_contains:
 		PUSH IX
 		LD A, (IX + LIST_SIZE)
@@ -257,7 +244,6 @@ ENDP
 ; IY - target list
 ; destroys A
 PROC
-defb "list_copy"
 list_copy:
 		PUSH IX
 		PUSH IY
@@ -281,7 +267,6 @@ ENDP
 ; list address in IX
 ; result in HL	
 PROC
-defb "list_last"
 list_last:
 		CALL list_isEmpty
 		CP TRUE
@@ -298,7 +283,6 @@ _err:
 		RET
 ENDP
 		
-defb "list_copyElem"
 list_copyElem:
 		LD A, L
 		LD (IX), A
@@ -309,7 +293,6 @@ list_copyElem:
 ; returns the address one past the last element of the list
 ; list address in IX
 ; result in IX
-defb "list_endAddr"
 list_endAddr:
 		PUSH HL
 		PUSH BC
@@ -332,7 +315,6 @@ list_endAddr:
 ; gets the B-th element from the list
 ; IX - list address
 ; result in HL
-defb "list_getAt"
 list_getAt:
 		PUSH IX
 		CALL list_getAddrAt
@@ -346,7 +328,6 @@ list_getAt:
 ; puts an element on the B-th place the list
 ; IX - list address
 ; HL - element to add
-defb "list_putAt"	
 list_putAt:
 		PUSH IX
 		CALL list_getAddrAt
@@ -357,8 +338,7 @@ list_putAt:
 		POP IX
 		RET
 
-PROC
-defb "list_removeAt"		
+PROC		
 list_removeAt:
 		PUSH IX
 		CALL list_len
@@ -381,7 +361,6 @@ _loop:
 ENDP
 
 PROC
-defb "list_insertAt"
 list_insertAt:
 		PUSH IX
 		CALL list_len
