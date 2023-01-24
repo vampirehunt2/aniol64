@@ -129,7 +129,7 @@ LOAD c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.2
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000     0x1426
+.text           0x00000000     0x1428
  *(.vectors)
  .vectors       0x00000000       0x26 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/../../../../avr/lib/avr4/crtm8a.o
                 0x00000000                __vector_default
@@ -208,31 +208,31 @@ LOAD c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.2
                 0x00000c96                __vector_10
                 0x00000c96                __vector_16
                 0x00000c96                __vector_18
- .text          0x00000c98      0x754 AVRVGA.o
+ .text          0x00000c98      0x756 AVRVGA.o
                 0x00000c98                SIG_OVERFLOW0
                 0x00000d7e                SIG_OUTPUT_COMPARE1A
                 0x00000e88                spi_init
                 0x00000e9a                pal_render
                 0x00001148                vga_render
                 0x00001390                main
- .text          0x000013ec        0x0 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/avr4\libgcc.a(_udivmodhi4.o)
- .text          0x000013ec        0x0 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/avr4\libgcc.a(_exit.o)
- .text          0x000013ec        0x0 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/avr4\libgcc.a(_clear_bss.o)
- .text          0x000013ec        0x0 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/../../../../avr/lib/avr4\libc.a(strcpy_P.o)
-                0x000013ec                . = ALIGN (0x2)
+ .text          0x000013ee        0x0 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/avr4\libgcc.a(_udivmodhi4.o)
+ .text          0x000013ee        0x0 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/avr4\libgcc.a(_exit.o)
+ .text          0x000013ee        0x0 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/avr4\libgcc.a(_clear_bss.o)
+ .text          0x000013ee        0x0 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/../../../../avr/lib/avr4\libc.a(strcpy_P.o)
+                0x000013ee                . = ALIGN (0x2)
  *(.text.*)
- .text.libgcc   0x000013ec       0x28 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/avr4\libgcc.a(_udivmodhi4.o)
-                0x000013ec                __udivmodhi4
- .text.libgcc   0x00001414        0x0 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/avr4\libgcc.a(_exit.o)
- .text.libgcc   0x00001414        0x0 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/avr4\libgcc.a(_clear_bss.o)
+ .text.libgcc   0x000013ee       0x28 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/avr4\libgcc.a(_udivmodhi4.o)
+                0x000013ee                __udivmodhi4
+ .text.libgcc   0x00001416        0x0 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/avr4\libgcc.a(_exit.o)
+ .text.libgcc   0x00001416        0x0 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/avr4\libgcc.a(_clear_bss.o)
  .text.avr-libc
-                0x00001414        0xe c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/../../../../avr/lib/avr4\libc.a(strcpy_P.o)
-                0x00001414                strcpy_P
-                0x00001422                . = ALIGN (0x2)
+                0x00001416        0xe c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/../../../../avr/lib/avr4\libc.a(strcpy_P.o)
+                0x00001416                strcpy_P
+                0x00001424                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00001422        0x0 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/avr4\libgcc.a(_exit.o)
-                0x00001422                _exit
-                0x00001422                exit
+ .fini9         0x00001424        0x0 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/avr4\libgcc.a(_exit.o)
+                0x00001424                _exit
+                0x00001424                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -251,11 +251,11 @@ LOAD c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.2
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00001422        0x4 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/avr4\libgcc.a(_exit.o)
+ .fini0         0x00001424        0x4 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/avr4\libgcc.a(_exit.o)
  *(.fini0)
-                0x00001426                _etext = .
+                0x00001428                _etext = .
 
-.data           0x00800060        0x0 load address 0x00001426
+.data           0x00800060        0x0 load address 0x00001428
                 0x00800060                PROVIDE (__data_start, .)
  *(.data)
  .data          0x00800060        0x0 c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.27/avrtoolchain/bin/../lib/gcc/avr/4.5.1/../../../../avr/lib/avr4/crtm8a.o
@@ -291,8 +291,8 @@ LOAD c:/program files (x86)/atmel/avr studio 5.1/extensions/atmel/avrgcc/3.3.1.2
                 0x00800362                raw_render
                 0x00800363                video_enable_flg
                 0x00800364                PROVIDE (__bss_end, .)
-                0x00001426                __data_load_start = LOADADDR (.data)
-                0x00001426                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x00001428                __data_load_start = LOADADDR (.data)
+                0x00001428                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x00800364        0x0
                 0x00800364                PROVIDE (__noinit_start, .)

@@ -34,6 +34,7 @@
 #define video_off  DDRB=0x90
 #define video_on  DDRB=0xB0
 //HSYNC
+#define _BV(n) (1 << n)
 #define sbi(port, pin) (port) |= _BV(pin)
 #define cbi(port, pin) (port) &= ~_BV(pin)
 #define tbi(port, pin) (port) ^= _BV(pin)
@@ -661,7 +662,8 @@ static void avr_init(void)
 	 TCCR0 = 0x00; //stop
 	 TCNT0 = 0xC3; //set count, One VGA line 31.77us
 	 TCCR0 = 1<<CS01; //start timer with prescaler select 1/8
-	 TIMSK = 1<<TOV0; //enable interrupt from Timer0 overflow
+	 TIMSK = 1<<TOIE0; //enable interrupt from Timer0 overflow
+	 TIFR = 1<<TOV0;
   }
 
   return;

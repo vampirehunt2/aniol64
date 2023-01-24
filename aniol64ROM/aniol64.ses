@@ -1,0 +1,10 @@
+<NotepadPlus>
+    <Session activeView="0">
+        <mainView activeIndex="2">
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="4725" startPos="180" endPos="180" selMode="0" offset="0" wrapCount="1" lang="Batch" encoding="-1" userReadOnly="no" filename="C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\build.bat" backupFilePath="" originalFileLastModifTimestamp="-1335284270" originalFileLastModifTimestampHigh="30956244" mapFirstVisibleDisplayLine="-1" mapFirstVisibleDocLine="-1" mapLastVisibleDocLine="-1" mapNbLine="-1" mapHigherPos="-1" mapWidth="-1" mapHeight="-1" mapKByteInDoc="0" mapWrapIndentMode="-1" mapIsWrap="no" />
+            <File firstVisibleLine="36" xOffset="122" scrollWidth="3924" startPos="3029" endPos="3029" selMode="0" offset="0" wrapCount="1" lang="Assembly Z80" encoding="-1" userReadOnly="no" filename="C:\Users\PiotrAniola\Documents\8bit\Assembly_z80.xml" backupFilePath="" originalFileLastModifTimestamp="-2136986600" originalFileLastModifTimestampHigh="30956287" mapFirstVisibleDisplayLine="-1" mapFirstVisibleDocLine="-1" mapLastVisibleDocLine="-1" mapNbLine="-1" mapHigherPos="-1" mapWidth="-1" mapHeight="-1" mapKByteInDoc="0" mapWrapIndentMode="-1" mapIsWrap="no" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1274" startPos="243" endPos="243" selMode="0" offset="0" wrapCount="1" lang="Assembly Z80" encoding="-1" userReadOnly="no" filename="C:\Users\PiotrAniola\Documents\8bit\git\aniol64ROM\aniol64.asm" backupFilePath="" originalFileLastModifTimestamp="-1478115167" originalFileLastModifTimestampHigh="30956288" mapFirstVisibleDisplayLine="-1" mapFirstVisibleDocLine="-1" mapLastVisibleDocLine="-1" mapNbLine="-1" mapHigherPos="-1" mapWidth="-1" mapHeight="-1" mapKByteInDoc="512" mapWrapIndentMode="-1" mapIsWrap="no" />
+        </mainView>
+        <subView activeIndex="0" />
+    </Session>
+</NotepadPlus>
