@@ -109,7 +109,7 @@ cmd_main:
 		; test command
 		LD IY, Test
 		CALL str_cmp
-		JP Z, _test
+		JP Z, rog_main
 		; snake 
 		LD IY, Snake
 		CALL str_cmp

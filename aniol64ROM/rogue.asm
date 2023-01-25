@@ -14,8 +14,8 @@ RoomW 		equ 04h
 RoomH 		equ 05h
 CellX		equ 06h
 CellY		equ 07h
-;CellW 		equ 08h
-;CELLH		equ 09h
+CellW 		equ 08h
+CellH		equ 09h
 RoomConn 	equ 0Ah
 RoomFlg		equ 0Bh
 
@@ -30,13 +30,13 @@ Y1			equ DATA + 06h
 DoorSet		equ DATA + 07h
 
 
-MAPW		equ 40
-MAPH		equ 30
-CELLW		equ MAPW / 3
-CELLH		equ MAPH / 2
+MAP_W		equ MAX_X + 1
+MAP_H		equ MAX_Y - 1	; saving two lines for status and messages
+CELL_W		equ MAP_W / 3
+CELL_H		equ MAP_H / 2
 ROOMMIN		equ 4
-ROOMMAXW	equ CELLW - 2
-ROOMMAXH	equ CELLH - 2
+ROOMMAXW	equ CELL_W - 2
+ROOMMAXH	equ CELL_H - 2
 
 
 
@@ -49,6 +49,8 @@ rog_main:
 	CALL rog_drawRooms
 	CALL rog_makeConnections
 	CALL rog_sanitiseDoors
+	CALL readKey
+	JR rog_main
 	RET
 ENDP 
 
@@ -65,20 +67,20 @@ rog_initCells:
 	LD C, 0
 	CALL rog_initCell
 	CALL rog_nextRoom
-	LD B, CELLW
+	LD B, CELL_W
 	CALL rog_initCell
 	CALL rog_nextRoom
-	LD B, CELLW * 2
+	LD B, CELL_W * 2
 	CALL rog_initCell
 	CALL rog_nextRoom
 	LD B, 0
-	LD C, CELLH
+	LD C, CELL_H
 	CALL rog_initCell
 	CALL rog_nextRoom
-	LD B, CELLW
+	LD B, CELL_W
 	CALL rog_initCell
 	CALL rog_nextRoom
-	LD B, CELLW * 2
+	LD B, CELL_W * 2
 	CALL rog_initCell
 	RET
 ENDP
@@ -110,7 +112,7 @@ defb "rog_generateRoom"
 rog_generateRoom:
 	PUSH BC
 	; randomize X position
-	LD A, CELLW - ROOMMIN - 2
+	LD A, CELL_W - ROOMMIN - 2
 	CALL rndMod8
 	LD C, A
 	LD A, (IY + CellX)
@@ -123,7 +125,7 @@ rog_generateRoom:
 	LD A, (IY + RoomX0)
 	SUB C
 	LD C, A
-	LD A, CELLW
+	LD A, CELL_W
 	SUB C
 	LD C, ROOMMIN
 	SUB C
@@ -136,7 +138,7 @@ rog_generateRoom:
 	DEC A
 	LD (IY + RoomX1), A
 	; randomize Y position
-	LD A, CELLH - ROOMMIN - 2
+	LD A, CELL_H - ROOMMIN - 2
 	CALL rndMod8
 	LD C, A
 	LD A, (IY + CellY)
@@ -149,7 +151,7 @@ rog_generateRoom:
 	LD A, (IY + RoomY0)
 	SUB C
 	LD C, A
-	LD A, CELLH
+	LD A, CELL_H
 	SUB C
 	LD C, ROOMMIN
 	SUB C
