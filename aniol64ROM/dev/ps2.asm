@@ -18,9 +18,11 @@ ps2_initSeqB
 
 keyInit:
 		DI					; disable interrupts
-		; init the keyboard buffer to avoid a bogus character during the first read
         LD A, 0
-        LD (KbdBuff), A
+        LD (KbdBuff), A		; init the keyboard buffer to avoid a bogus character during the first read
+		LD A, TRUE
+		LD (Cursor), A
+		LD (Echo), A
 		LD HL, ps2_initSeqB
 		LD B, 2
 		LD C, DART_B_CMD
