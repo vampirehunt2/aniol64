@@ -22,7 +22,7 @@ dspInit:
 	LD B, 10
 	LD C, DART_B_CMD
 	OTIR
-	;CALL tm_transmitEnable
+	CALL tm_transmitEnable
     RET
 
 ; clears the screen 
@@ -71,6 +71,7 @@ gotoXY:
 	LD A, ESC
 	OUT (DART_B_DAT), A
 	LD A, 'Y'
+	OUT (DART_B_DAT), A
 	LD A, C
 	ADD A, 32	; TellyMate magic number
 	OUT (DART_B_DAT), A
@@ -145,3 +146,9 @@ tm_transmitEnable:
 	OUT (DART_B_DAT), A
 	OUT (DART_B_DAT), A
 	RET
+	
+tm_diag:
+	LD A, ESC
+	OUT (DART_B_DAT), A
+	LD A, 'Q'
+	OUT (DART_B_DAT), A
