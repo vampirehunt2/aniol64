@@ -14,11 +14,15 @@ SOUTH equ 1
 EAST equ 2
 WEST equ 3
 
-WIDTH equ 40
-HEIGHT equ 30
+WIDTH equ MAX_X + 1
+HEIGHT equ MAX_Y
 
-FRAME1 defb "#######################################", 0
-FRAME2 defb "#                                     #", 0
+FRAME1: ds MAX_X, '#' 
+defb 0
+
+FRAME2: defb "#"
+ds MAX_X - 2, ' '
+defb "#", 0
 
 GameOver: defb "GAME OVER!!!", 0
 
@@ -34,6 +38,14 @@ _loop:
 		CP 'b'
 		JP Z, _w
 		CP 'm'
+		JP Z, _e
+		CP '8'
+		JP Z, _n
+		CP '2'
+		JP Z, _s
+		CP '4'
+		JP Z, _w
+		CP '6'
 		JP Z, _e
 		CP 'q'
 		JP Z, _end
@@ -81,6 +93,7 @@ snake_init:
 		LD (Points), A			; zero the points
 		INC A
 		LD (Level), A			; set level to 1
+		CALL cursorOff
 		LD IX, Coeffs
 		LD A, 20
 		LD (IX), A
@@ -96,7 +109,6 @@ snake_init:
 		
 		
 PROC
-defb "snake_move"
 snake_move:		
 		PUSH AF
 		CALL snake_getHeadCoeffs
@@ -165,7 +177,9 @@ snake_gameOver:
 		CALL gotoXY
 		LD IX, GameOver
 		CALL writeStr
-		RET
+		CALL resetNmiHandler
+		CALL readKey
+		JP snake_main
 
 ; returns previous char at new head location in D
 snake_moveHead:
@@ -232,10 +246,9 @@ snake_placeDollar:
 ENDP
 
 PROC
-defb "snake_drawFrame"
 snake_drawFrame:
 		; vertical bars
-		LD D, HEIGHT - 5
+		LD D, HEIGHT - 1
 		LD B, 0
 		LD C, 1
 	    CALL gotoXY
@@ -254,7 +267,7 @@ _loop:
 		LD IX, FRAME1
 		CALL writeStr
 		LD B, 0
-		LD C, HEIGHT - 4
+		LD C, HEIGHT
 		CALL gotoXY
 		LD IX, FRAME1
 		CALL writeStr
