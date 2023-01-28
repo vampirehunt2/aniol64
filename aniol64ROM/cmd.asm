@@ -45,8 +45,8 @@ cmd_main:
 		CALL cursorOn
         CALL cmd_readLn
         CALL str_tok
-        ; clear screen command
         LD IX, LineBuff
+		; clear screen command
         LD IY, Clr
         CALL str_cmp
         JP Z, _clr

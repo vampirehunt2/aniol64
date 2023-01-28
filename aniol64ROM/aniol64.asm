@@ -80,15 +80,14 @@ boot:
         ; init the display
         CALL dspInit
 
+		; initialise the keyboard
+		CALL keyInit
+
         ; greetings
 		CALL nextLine
         LD IX, Aniol
         CALL writeLn
 		
-		; initialise the keyboard
-		CALL keyInit
-		
-		CALL writeLn
 		; set up permanent storage
 		CALL dos_setUpCf
 		CALL dos_checkNvram
@@ -117,8 +116,8 @@ include dev/vga.asm
 ;include dev/tm.asm
 include dev/dart.asm
 include dev/cf.asm
-;include dev/kbd.asm
-include dev/ps2.asm
+include dev/kbd.asm
+;include dev/ps2.asm
 
 ; libraries
 include lib/util.asm
@@ -126,6 +125,7 @@ include lib/str.asm
 include lib/mem.asm
 include lib/list.asm
 include lib/math.asm
+include test/test.asm
 
 ; test routines
 ;include test/test.asm
@@ -138,33 +138,6 @@ include dos.asm
 include snake.asm
 include rogue.asm
 include onp.asm
-
-PROC
-handleInt:
-        LD A, (KbdBuff)
-        CP 0            	; checking if keyboard buffer is empty
-        RET NZ         		; this is essentially software debouncing
-        CALL keyInput
-        CP 08            	; check if BACKSPACE was pressed
-        JR Z, _bkspc
-        CP 20h              ; checks if the key corresponds to a control character
-        JR C, _noEcho   	; skip echo if less	
-		LD B, A
-		LD A, (Echo)
-		CP FALSE
-		JR Z, _noEcho
-		LD A, B
-        CALL putChar	; echo the character to screen, but don't remove it from the keyboard buffer
-		CALL bzr_click
-_noEcho:
-        RET
-_bkspc:
-        CALL cursorLShift  ; TODO: check if you're already in the beginning of line
-        LD A, ' '
-        CALL putChar
-        CALL cursorLShift
-        JR _noEcho
-ENDP
 
 PROC
 handleNmi:

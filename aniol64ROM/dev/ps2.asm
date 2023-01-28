@@ -6,15 +6,15 @@ LSHIFT equ 12h
 RSHIFT equ 59h
 
 
-ps2_initSeqA:
+ps2_initSeq:
 		defb 0, 00011000b	; channel reset
 		defb 4, 00000111b	; x1 clock, 1 stop bit, odd parity 
 		defb 3, 11000001b	; Rx 8 bits enable Rx
 		defb 5, 00000000b	; Tx disabled
-		defb 1, 10011000b	; enable interrupts, enable WAIT
+		defb 1, 10000000b	; disable interrupts, enable WAIT
 		
-ps2_initSeqB
-		defb 2, 00h			; set interrupt vector to 0
+handleInt:
+	RET
 
 keyInit:
 		DI					; disable interrupts
@@ -23,11 +23,7 @@ keyInit:
 		LD A, TRUE
 		LD (Cursor), A
 		LD (Echo), A
-		LD HL, ps2_initSeqB
-		LD B, 2
-		LD C, DART_B_CMD
-		OTIR
-		LD HL, ps2_initSeqA
+		LD HL, ps2_initSeq
 		LD B, 10
 		LD C, DART_A_CMD
 		OTIR
@@ -112,17 +108,33 @@ _zero:
 		RET
 ENDP
 
-; reads a single key from the buffer
+PROC
 readKey:
-        LD A, (KbdBuff)
-        CP 0
-        JR Z, readKey
-        PUSH AF
-        LD A, 0
-        LD (KbdBuff), A
-        POP AF
+		PUSH BC
+		CALL keyInput
+		LD B, A
+        CP 08            	; check if BACKSPACE was pressed
+        JR Z, _bkspc
+        CP 20h              ; checks if the key corresponds to a control character
+        JR C, _noEcho   	; skip echo if less	
+		LD A, (Echo)
+		CP FALSE
+		JR Z, _noEcho
+		LD A, B
+        CALL putChar	; echo the character to screen, but don't remove it from the keyboard buffer
+		CALL bzr_click
+_noEcho:
+		LD A, B
+		POP BC
         RET
-	
+_bkspc:
+        CALL cursorLShift  ; TODO: check if you're already in the beginning of line
+        LD A, ' '
+        CALL putChar
+        CALL cursorLShift
+        JR _noEcho
+ENDP
+
 ; reads a line from keyboard
 ; result in LineBuff
 ; result is only valid until next call of readLine
@@ -130,6 +142,7 @@ readKey:
 ; TODO: check for max line length (buffer overflow)
 PROC
 readLine:
+		PUSH BC
         LD BC, LineBuff       ; point BC to the beginning of the keyboard buffer
 _loop:
         CALL readKey     	 ; wait for a key to be pressed
@@ -151,8 +164,20 @@ _bkspc:
 _return:
         LD A, 0                ; store end of line
         LD (BC), A
+		POP BC
         RET
-ENDP	
+ENDP
+
+; reads a single key from the buffer
+;readKey:
+;        LD A, (KbdBuff)
+;        CP 0
+;        JR Z, readKey
+;        PUSH AF
+;        LD A, 0
+;        LD (KbdBuff), A
+;        POP AF
+;        RET	
 		
 ps2Scancodes:
 		defb 00		; scancode 00

@@ -10,6 +10,33 @@
 
 KBD_PORT equ 10111111b  ; BFh keyboard is selected with A6
 
+PROC
+handleInt:
+        LD A, (KbdBuff)
+        CP 0            	; checking if keyboard buffer is empty
+        RET NZ         		; this is essentially software debouncing
+        CALL keyInput
+        CP 08            	; check if BACKSPACE was pressed
+        JR Z, _bkspc
+        CP 20h              ; checks if the key corresponds to a control character
+        JR C, _noEcho   	; skip echo if less	
+		LD B, A
+		LD A, (Echo)
+		CP FALSE
+		JR Z, _noEcho
+		LD A, B
+        CALL putChar	; echo the character to screen, but don't remove it from the keyboard buffer
+		CALL bzr_click
+_noEcho:
+        RET
+_bkspc:
+        CALL cursorLShift  ; TODO: check if you're already in the beginning of line
+        LD A, ' '
+        CALL putChar
+        CALL cursorLShift
+        JR _noEcho
+ENDP
+
 
 ; Converts keyboard code to ASCII code
 ; C - keycode to convert
@@ -60,6 +87,7 @@ readKey:
 ; TODO: check for max line length (buffer overflow)
 PROC
 readLine:
+		PUSH BC
         LD BC, LineBuff       ; point BC to the beginning of the keyboard buffer
 _loop:
         CALL readKey     	 ; wait for a key to be pressed
@@ -81,6 +109,7 @@ _bkspc:
 _return:
         LD A, 0                ; store end of line
         LD (BC), A
+		POP BC
         RET
 ENDP
 

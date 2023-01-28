@@ -49,6 +49,7 @@ _loop:
 		JP Z, _e
 		CP 'q'
 		JP Z, _end
+		JP _loop
 _n:		LD A, NORTH
 		LD (Dir), A
 		JP _loop
@@ -201,7 +202,7 @@ snake_gameOver:
 		CALL writeStr
 		CALL resetNmiHandler
 		CALL bzr_beep
-		CALL keyInput
+		CALL readKey
 		JP snake_main
 
 ; returns previous char at new head location in D
@@ -249,15 +250,17 @@ snake_getTailCoeffs:
 PROC
 snake_placeDollar:
 		CALL rnd
-		LD B, WIDTH
+		LD B, WIDTH - 2
 		CALL u8_div
 		LD B, A
+		INC B
 		PUSH BC
 		CALL rnd
-		LD B, HEIGHT
+		LD B, HEIGHT - 2
 		CALL u8_div
 		POP BC
 		LD C, A
+		INC C
 		CALL gotoXY
 		CALL getChar
 		CP ' '
