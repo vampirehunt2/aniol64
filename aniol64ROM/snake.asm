@@ -17,11 +17,11 @@ WEST equ 3
 WIDTH equ MAX_X + 1
 HEIGHT equ MAX_Y
 
-FRAME1: ds MAX_X, '#' 
+FRAME1: ds WIDTH, '#' 
 defb 0
 
 FRAME2: defb "#"
-ds MAX_X - 2, ' '
+ds WIDTH - 2, ' '
 defb "#", 0
 
 GameOver: defb "GAME OVER!!!", 0
@@ -163,12 +163,34 @@ _dollar:
 		LD A, (Points)
 		INC A
 		LD (Points), A
-		; TODO print points
+		CALL bzr_click
+		CALL snake_printPoints
 		CALL snake_placeDollar
 _end:
 		POP AF
 		RET	
 ENDP	
+
+snake_printPoints:
+	PUSH BC
+	LD B, 0
+	LD C, MAX_Y
+	CALL gotoXY
+	LD A, '$'
+	CALL putChar
+	LD A, ':'
+	CALL putChar
+	LD A, (Points)
+	CALL bin2Bcd
+	PUSH AF
+	LD A, C
+	CALL putChar
+	LD A, B
+	CALL putChar
+	POP AF
+	CALL putChar
+	POP BC
+	RET
 
 snake_gameOver:
 		CALL clrScr
@@ -178,7 +200,8 @@ snake_gameOver:
 		LD IX, GameOver
 		CALL writeStr
 		CALL resetNmiHandler
-		CALL readKey
+		CALL bzr_beep
+		CALL keyInput
 		JP snake_main
 
 ; returns previous char at new head location in D
@@ -250,24 +273,24 @@ snake_drawFrame:
 		; vertical bars
 		LD D, HEIGHT - 1
 		LD B, 0
-		LD C, 1
+		LD C, 0
 	    CALL gotoXY
 _loop:
 		LD B, 0
-		INC C
 		CALL gotoXY
 		LD IX, FRAME2
 		CALL writeStr
+		INC C
 		DEC D
 		JR NZ, _loop
 		; horizontal bars
 		LD B, 0
-		LD C, 1
+		LD C, 0
 		CALL gotoXY
 		LD IX, FRAME1
 		CALL writeStr
 		LD B, 0
-		LD C, HEIGHT
+		LD C, MAX_Y - 1
 		CALL gotoXY
 		LD IX, FRAME1
 		CALL writeStr
