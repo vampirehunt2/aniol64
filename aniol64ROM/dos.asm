@@ -498,7 +498,7 @@ _end:
 	RET	
 ENDP
 
-; checks if the string at IX represents a valid directory name
+; checks if the string at IX represents a valid file name
 ; result in A
 PROC
 dos_validateFilename:
@@ -928,6 +928,7 @@ _loop:
 	CALL dos_nextSector
 	DEC E
 	JR NZ, _loop
+	JR _end
 _diskFull:	
 	LD IX, ErrDiskFull
 	CALL writeLn
@@ -939,9 +940,66 @@ _invName:
 _end:
 	RET
 ENDP
-	
-	
 
+PROC
+dos_loadFile:
+	CALL str_shift
+	CALL dos_fileExists			; check if file already exists in the current directory
+	CP 0
+	JR Z, _notFound
+	PUSH AF						; save file table sector number on stack
+	; store filename
+	LD IX, CurrentFileName
+	PUSH IY
+_nameCpyLoop:
+	LD A, (IY + Filename)
+	CP 0
+	JR Z, _endNameCpy
+	LD (IX), A
+	INC IX
+	INC IY
+	JR _nameCpyLoop
+_endNameCpy:
+	LD (IX), A
+	POP IY
+	; copy file attributes
+	LD A, (IY + FileLen)
+	LD (CurrentFileSize), A		; set the file length
+	LD A, (FileLen + 1)
+	LD (IY + FileLen + 1), A	; set the file length
+	POP AF						; restore file table sector number from stack
+	; load the file
+	CALL dos_requiredSectors	; number of required sectors now in E
+	CALL dos_computeSector		; sector number in AB
+	LD HL, FileBuffer
+_loop:
+	CALL cf_setSector
+	CALL cf_readSector
+	CALL dos_nextSector
+	DEC E
+	JR NZ, _loop
+	RET
+_notFound:
+	LD IX, ErrFileNotFound
+	CALL writeLn
+	RET
+ENDP
 
-	
-	
+PROC
+dos_cat:
+	LD HL, (CurrentFileSize)
+	LD IX, FileBuffer
+_loop:
+	LD A, 0
+	CP H
+	JR NZ, _cont
+	CP L
+	JR NZ, _cont
+	RET
+_cont:
+	LD A, (IX)
+	CALL putChar
+	INC IX
+	DEC HL
+	JR _loop
+ENDP

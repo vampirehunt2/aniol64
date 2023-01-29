@@ -18,6 +18,7 @@ Put: 		defb "put", 0
 Get:		defb "get", 0
 Load: 		defb "load", 0
 Save:		defb "save", 0
+Cat:		defb "cat", 0
 Beep: 		defb "beep", 0
 Term: 		defb "term", 0
 DiskInfo: 	defb "di", 0
@@ -90,6 +91,10 @@ cmd_main:
 		LD IY, Save
 		CALL str_cmp
 		JP Z, _save
+		; cat command
+		LD IY, Cat
+		CALL str_cmp
+		JP Z, _cat
         ; beep command
         LD IY, Beep
         CALL str_cmp
@@ -180,10 +185,13 @@ _get:
 		CALL mon_get
 		JP _wrap
 _load:
-		CALL dos_load
+		CALL dos_loadFile
 		JP cmd_main
 _save:
-		CALL dos_save
+		CALL dos_saveFile
+		JP cmd_main
+_cat:
+		CALL dos_cat
 		JP cmd_main
 _beep:
         CALL bzr_beep
