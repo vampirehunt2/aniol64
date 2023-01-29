@@ -159,9 +159,10 @@ ENDP
 ; result in A
 PROC
 isDecDigit:
-        CP 30h
+        CP '0'
         JR C, _no ; if less than '0' then it's not a hex digit
-        CP 3Ah
+        CP '9'
+		JR Z, _yes
         JR C, _yes ; if less than ':' (which is the next ascii code after '9' then it's a hex digit
         JR _no
 _yes:
@@ -176,7 +177,8 @@ PROC
 isUppercaseLetter:
 		CP 'A'
 		JR C, _no
-		CP 'Z' + 1
+		CP 'Z'
+		JR Z, _yes
 		JR C, _yes
 		JR _no
 _yes:
@@ -191,7 +193,8 @@ PROC
 isLowercaseLetter:
 		CP 'a'
 		JR C, _no
-		CP 'z' + 1
+		CP 'z'
+		JR Z, _yes
 		JR C, _yes
 		JR _no
 _yes:
