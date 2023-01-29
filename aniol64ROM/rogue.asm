@@ -56,6 +56,9 @@ ENDP
 
 PROC
 rog_init:
+	LD A, FALSE
+	LD (Echo), A
+	CALL cursorOff
 	CALL rog_initCells
 	RET
 ENDP
