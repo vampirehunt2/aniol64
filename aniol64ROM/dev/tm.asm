@@ -113,15 +113,22 @@ _loop:
     RET
 ENDP
 
+PROC
 ; writes a string to the display at current cursor position
 ; IX - null-terminated string to write
 writeStr:
+	PUSH IX
+_loop:
 	LD A, (IX)
 	CP 0
-    RET Z
+    JR Z, _end
 	CALL putChar
 	INC IX
-	JR writeStr
+	JR _loop
+_end:
+	POP IX
+	RET
+ENDP
 
 ; goes to the next line of the display
 ; if there are free lines below the current ones, goes to the next one
