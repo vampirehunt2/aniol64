@@ -504,8 +504,8 @@ rog_sanitiseDoors:
 	LD C, 1
 _yLoop:
 	LD B, 1
-	CALL gotoXY
 _xLoop:
+	CALL gotoXY
 	CALL getChar
 	CP '+'
 	JR NZ, _notDoor
@@ -517,6 +517,7 @@ _notDoor:
 	JR NZ, _xLoop
 	INC C
 	LD A, MAX_Y - 1
+	CP C
 	JR NZ, _yLoop
 	RET
 ENDP
