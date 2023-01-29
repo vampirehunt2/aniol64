@@ -17,11 +17,11 @@ WEST equ 3
 WIDTH equ MAX_X + 1
 HEIGHT equ MAX_Y
 
-FRAME1: ds WIDTH, '#' 
+FRAME1: ds WIDTH - 1, '#' 
 defb 0
 
 FRAME2: defb "#"
-ds WIDTH - 2, ' '
+ds WIDTH - 3, ' '
 defb "#", 0
 
 GameOver: defb "GAME OVER!!!", 0
@@ -185,10 +185,13 @@ snake_printPoints:
 	CALL bin2Bcd
 	PUSH AF
 	LD A, C
+	ADD A, '0'
 	CALL putChar
 	LD A, B
+	ADD A, '0'
 	CALL putChar
 	POP AF
+	ADD A, '0'
 	CALL putChar
 	POP BC
 	RET
