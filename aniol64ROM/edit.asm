@@ -77,7 +77,7 @@ _noCmd:
 	LD A, FALSE
 	RET
 _esc:
-	LD A, False
+	LD A, FALSE
 	INC IX
 	RET
 _exit:
