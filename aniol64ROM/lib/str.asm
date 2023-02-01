@@ -217,17 +217,101 @@ _loop1:
 		RET
 ENDP
 
+PROC
+; concatenaes string pointed to by IX and IY
+; result in IY
 str_cat:
-		RET
+	PUSH IX
+	PUSH IY
+_start:
+	LD A, (IX)
+	CP 0
+	JR Z, _cat
+	INC IX
+	JR _start
+_cat:
+	LD A, (IY)
+	CP 0
+	LD (IX), A
+	JR Z, _end
+	INC IX
+	INC IY
+	JR _cat
+_end:
+	LD (IX), A
+	POP IY
+	POP IX
+	RET
+ENDP
 		
-str_contains:
-		RET
-		
+PROC
 str_indexOf:
-		RET
+	PUSH IX
+	LD B, 0
+_loop:
+	LD A, (IX)
+	CP 0
+	JR Z, _notFound
+	CP C
+	JR Z, _found
+	INC B
+	INC IX
+	JR _loop
+_found:
+	LD A, TRUE
+	JR _end
+_notFound
+	LD A, FALSE
+_end:
+	POP IX
+	RET
+ENDP
 
+PROC
+; returns Bth character of the string pointed to by IX
+; result in A
+str_charAt:
+	PUSH IX
+_loop:
+	LD A, (IX)
+	CP 0
+	JR Z, _end
+	DJNZ _loop
+_end:
+	POP IX
+	RET
+ENDP
+
+PROC
+; returns a substring of a string
+; stops at the end of the source string 
+; or C places after B, whichever is first
+; IX - input string
+; B - starting index
+; C - length
+; result in IY
 str_sub:
-		RET
-
-
+	PUSH IX
+_start:
+	LD A, B
+	CP 0
+	JR Z, _sub
+	DEC B
+	INC IX
+	JR _start
+_sub:
+	LD A, C
+	CP 0
+	JR Z, _end
+	LD A, (IX)
+	LD (IY), A
+	CP 0
+	JR Z, _end
+	DEC C
+	INC IX
+	INC IY
+_end:
+	POP IX
+	RET
+ENDP
 

@@ -138,6 +138,7 @@ include dos.asm
 include snake.asm
 include rogue.asm
 include onp.asm
+include edit.asm
 
 PROC
 handleNmi:

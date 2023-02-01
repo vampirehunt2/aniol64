@@ -25,7 +25,9 @@ DiskInfo: 	defb "di", 0
 DiskDiag:	defb "dd", 0
 Test:		defb "test", 0
 Snake:		defb "snake", 0
+Vh:			defb "vh", 0
 Onp:		defb "onp", 0
+Edit:		defb "edit", 0
 ; DOS commands
 Pwd:		defb "pwd", 0
 Ls:			defb "ls", 0
@@ -114,15 +116,23 @@ cmd_main:
 		; test command
 		LD IY, Test
 		CALL str_cmp
-		JP Z, rog_main
+		JP Z, _test
 		; snake 
 		LD IY, Snake
 		CALL str_cmp
 		JP Z, snake_main
+		; vh
+		LD IY, Vh
+		CALL str_cmp
+		JP Z, rog_main
 		; onp 
 		LD IY, Onp
 		CALL str_cmp
 		JP Z, _onp
+		; edit command
+		LD IY, Edit
+		CALL str_cmp
+		JP Z, _edit
 		; pwd command
 		LD IY, Pwd
 		CALL str_cmp
@@ -213,7 +223,7 @@ _dd:
 		CALL mon_printByteA
 		JP _wrap
 _test:
-		;CALL test_main
+		CALL test_main
 		JP cmd_main
 _mon:
         CALL mon_main
@@ -221,6 +231,9 @@ _mon:
         RET
 _onp:
 		CALL onp_main
+		JP cmd_main
+_edit:
+		CALL ed_main
 		JP cmd_main
 _pwd:
 		CALL dos_pwd

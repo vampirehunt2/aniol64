@@ -52,6 +52,7 @@ CurrentDir 		equ	DOS_AREA + 09h	; index of the current directory in the director
 TempDirname 	equ DOS_AREA + 0Ah	; 9 bytes: 8 for the folder name and 1 for the terminating zero
 CurrentFileName	equ DOS_AREA + 13h	; (8059h) 13 bytes: 12 for the file name and 1 for the terminating zero
 CurrentFileSize	equ DOS_AREA + 20h	; (8066h) 2 bytes
+FilePtr			equ DOS_AREA + 22h	; (8068h) 2 bytes
  
 ; filesystem constants:
 MAX_DIRNAME_LEN 		equ 8
@@ -113,7 +114,7 @@ dos_cfDiskInfo:
 	CALL nextLine
 	LD IX, LbaSectors		; LBA sectors
 	CALL writeStr
-	 	LD A, (SectorBuffer + 120)
+	LD A, (SectorBuffer + 120)
 	CALL mon_printByteA
 	LD A, (SectorBuffer + 121)
 	CALL mon_printByteA
@@ -804,7 +805,7 @@ dos_saveFileTabSector:
 	LD C, 0		; in the future, the logical drive number will go in C
 	CALL cf_setSector	; set sector to A:0:0, LSB to MSB
 	LD HL, SectorBuffer
-	CALL cf_writeSector	; read a sector of the file table
+	CALL cf_writeSector	; write a sector of the file table
 	POP BC
 	POP AF
 	RET
@@ -832,18 +833,23 @@ PROC
 ; file size in DE
 ; result in E
 dos_requiredSectors:
+	PUSH AF
+	PUSH BC
 	LD A, 0
 	LD B, 9
 _div:			; divides the number of bytes by sector size
-	SRL L
-	RR H
+	SRL E
+	RR D
 	JR NC, _cont
 	LD A, 1		; a non-zero bit was shifted out, meaning there is one extra, incomplete sector needed.
 _cont:
 	DJNZ _div
 	CP 0
-	RET Z
+	JR Z, _end
 	INC E
+_end:
+	POP BC
+	POP AF
 	RET
 ENDP
 
@@ -883,19 +889,14 @@ _skip2:
 ENDP
 
 ; moves AB to the next sector number within the current logical disk
-; moves HL to the next SECTOR_SIZE-byte area in memory
 dos_nextSector:
-	PUSH DE
-	LD DE, SECTOR_SIZE
-	ADD HL, DE
-	POP DE
-	AND A 	; clear carry
 	INC A
 	RET NZ
 	INC B
 	RET
 
 PROC
+defb "dos_saveFile"
 dos_saveFile:
 	LD IX, CurrentFileName
 	CALL dos_validateFilename	; first, check if the given file name is valid...
@@ -922,6 +923,7 @@ _cont:
 	CALL dos_requiredSectors	; number of required sectors now in E
 	CALL dos_computeSector		; sector number in AB
 	LD HL, FileBuffer
+	LD C, 0						; TODO: logical drive number goes here
 _loop:
 	CALL cf_setSector
 	CALL cf_writeSector
@@ -943,11 +945,15 @@ ENDP
 
 PROC
 dos_loadFile:
-	CALL str_shift
 	CALL dos_fileExists			; check if file already exists in the current directory
 	CP 0
 	JR Z, _notFound
 	PUSH AF						; save file table sector number on stack
+	; copy file attributes
+	LD A, (IY + FileLen)
+	LD (CurrentFileSize), A		; set the file length
+	LD A, (IY + FileLen + 1)
+	LD (CurrentFileSize + 1), A	; set the file length
 	; store filename
 	LD IX, CurrentFileName
 	PUSH IY
@@ -961,23 +967,20 @@ _nameCpyLoop:
 	JR _nameCpyLoop
 _endNameCpy:
 	LD (IX), A
-	POP IY
-	; copy file attributes
-	LD A, (IY + FileLen)
-	LD (CurrentFileSize), A		; set the file length
-	LD A, (FileLen + 1)
-	LD (IY + FileLen + 1), A	; set the file length
 	POP AF						; restore file table sector number from stack
 	; load the file
 	CALL dos_requiredSectors	; number of required sectors now in E
 	CALL dos_computeSector		; sector number in AB
 	LD HL, FileBuffer
+	LD C, 0
 _loop:
 	CALL cf_setSector
 	CALL cf_readSector
 	CALL dos_nextSector
 	DEC E
 	JR NZ, _loop
+	LD HL, 0
+	LD (FilePtr), HL
 	RET
 _notFound:
 	LD IX, ErrFileNotFound
@@ -987,6 +990,8 @@ ENDP
 
 PROC
 dos_cat:
+	CALL str_shift
+	CALL dos_loadFile
 	LD HL, (CurrentFileSize)
 	LD IX, FileBuffer
 _loop:
@@ -1003,3 +1008,73 @@ _cont:
 	DEC HL
 	JR _loop
 ENDP
+
+dos_seek:
+	LD (FilePtr), HL
+	RET
+	
+dos_fRead:
+	PUSH BC
+	PUSH HL
+	LD HL, (FilePtr)
+	INC HL
+	LD (FilePtr), HL
+	DEC HL
+	LD BC, FileBuffer
+	ADD HL, BC
+	LD A, (HL)
+	POP HL
+	POP BC
+	RET
+	
+PROC
+dos_fWrite:
+	PUSH BC
+	PUSH HL
+	LD B, A		; store the byte in B for safekeeping
+	CALL dos_eof
+	CP FALSE
+	JR Z, _skip
+	CALL dos_expand
+_skip:
+	LD A, B		; restore the byte to be written to A
+	LD HL, (FilePtr)
+	INC HL
+	LD (FilePtr), HL
+	DEC HL
+	LD BC, FileBuffer
+	ADD HL, BC
+	LD (HL), A
+	POP HL
+	POP BC
+	RET
+ENDP
+
+PROC
+dos_eof:
+	PUSH HL
+	PUSH BC
+	LD BC, (FilePtr)
+	LD HL, (CurrentFileSize)
+	AND A		; clear carry
+	SBC HL, BC
+	JR C, _true
+	JR Z, _true
+	LD A, FALSE
+	JR _end
+_true:
+	LD A, TRUE
+_end:
+	POP BC
+	POP HL
+	RET
+ENDP
+
+dos_expand:
+	PUSH HL
+	LD HL, (CurrentFileSize)
+	INC HL
+	LD (CurrentFileSize), HL
+	POP HL
+	RET
+	

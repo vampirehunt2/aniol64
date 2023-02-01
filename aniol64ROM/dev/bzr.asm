@@ -10,6 +10,8 @@
 BZR_PORT equ 10111111b  ; BFh buzzer is activated by A6
 
 bzr_beep:
+		PUSH AF
+		PUSH BC
         LD C, BZR_PORT
         LD A, 0FFh
         OUT (C), A
@@ -17,13 +19,19 @@ bzr_beep:
         CALL delay
         LD A, 00h
         OUT (C), A
+		POP BC
+		POP AF
         RET
 
 bzr_click:
+		PUSH AF
+		PUSH BC
         LD C, BZR_PORT
         LD A, 0FFh
         OUT (C), A
         CALL delay37us
         LD A, 00h
         OUT (C), A
+		POP BC
+		POP AF
         RET

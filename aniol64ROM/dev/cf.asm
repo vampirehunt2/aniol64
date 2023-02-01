@@ -133,6 +133,8 @@ PROC
 ; reads a sector from a cf card
 ; buffer address in HL
 cf_readSector:
+	PUSH AF
+	PUSH BC
 	CALL cf_waitCmd			; wait till the cf card is ready for command
 	LD A, CF_READ			; prepare read command
 	OUT	(CF_CMD), A			; send read command
@@ -148,13 +150,18 @@ _loop:
 	LD (HL), A
 	INC HL
 	DJNZ _loop
+	POP BC
+	POP AF
 	RET
 ENDP	
 
 PROC
 ; writes a sector from a cf card
+; moves HL to the next sector in memory
 ; buffer address in HL
 cf_writeSector:
+	PUSH AF
+	PUSH BC
 	CALL cf_waitCmd			; wait till the cf card is ready for command
 	LD A, CF_WRITE			; prepare the write command
 	OUT	(CF_CMD), A			; send the write command
@@ -170,7 +177,8 @@ _loop:
 	OUT (CF_DAT), A			; write a byte of data	
 	INC HL
 	DJNZ _loop
-_error:
+	POP BC
+	POP AF
 	RET
 ENDP
 
