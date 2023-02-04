@@ -53,6 +53,8 @@ TestAddr 			equ 8001h  		; points to the beginning of RAM
 KbdBuff 			equ 8012h       ; 1 byte buffer
 Echo 				equ 8013h
 Cursor				equ 8014h
+TxChA				equ 8015h
+TxChB				equ 8016h
 NmiCount 			equ 8035h		; 2 byte number
 Random 				equ 8037h		; 2 byte number
 Banks 				equ 8039h

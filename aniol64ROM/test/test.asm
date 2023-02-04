@@ -1,20 +1,13 @@
 PROC
 test_main:
-	CALL clrScr
-	LD A, 'x'
-	CALL putChar
-	LD A, 255
-	CALL delay
-	CALL home
-	CALL getChar
-	PUSH AF
-	LD A, 255
-	CALL delay
-	LD B, 10
-	LD C, 10
-	CALL gotoXY
-	POP AF
-	CALL putChar
+	;CALL ps2_clockInhibit
+	;CALL delay1520us
+	;CALL ps2_clockRelease
+	;RET
+	LD A, 0FFh;0EDh
+	CALL ps2_transmit
+	;LD A, 00000100b
+	;CALL ps2_transmit
 	RET
 ENDP
 

@@ -7,12 +7,13 @@ MAX_Y equ 24
 ESC   equ 1Bh
 LF    equ 10
 CR	  equ 13
+TXB   equ 01101000b	; DTR, Tx 8 bits, Tx enabled
 
 tm_initSeq:
 	defb 0, 00011000b	; channel reset
 	defb 4, 11000100b	; x64 clock, no parity, 1 stop bit
 	defb 3, 11000001b	; Rx 8 bits enable Rx
-	defb 5, 01101000b	; Tx 8 bits, Tx enabled
+	defb 5, TXB			; DTR, Tx 8 bits, Tx enabled
 	defb 1, 10000000b	; disable interrupts, enable WAIT
 
 Blank: defb "                                    ", 0
@@ -23,6 +24,8 @@ dspInit:
 	LD C, DART_B_CMD
 	OTIR
 	CALL tm_transmitEnable
+	LD A, TXB
+	LD (TxChB), A
     RET
 
 ; clears the screen 

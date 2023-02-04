@@ -1,23 +1,25 @@
-; 1 start bit, one stop bit, one parity bit
+; PS2 keyboard driver
+; Physical Interface: 	http://www.burtonsys.com/ps2_chapweske.htm
+; Logical protocol: 	http://www-ug.eecg.toronto.edu/msl/nios_devices/datasheets/PS2%20Keyboard%20Protocol.htm
 
 KEY_UP equ 0F0h
 EXT_KEY equ 0E0h
 LSHIFT equ 12h
 RSHIFT equ 59h
+TXA	equ 11101000b	; DTR, 8 bits, Tx enabled
 
 
 ps2_initSeq:
 		defb 0, 00011000b	; channel reset
 		defb 4, 00000111b	; x1 clock, 1 stop bit, odd parity 
 		defb 3, 11000001b	; Rx 8 bits enable Rx
-		defb 5, 00000000b	; Tx disabled
+		defb 5, TXA
 		defb 1, 10000000b	; disable interrupts, enable WAIT
 		
 handleInt:
 	RET
 
 keyInit:
-		DI					; disable interrupts
         LD A, 0
         LD (KbdBuff), A		; init the keyboard buffer to avoid a bogus character during the first read
 		LD A, TRUE
@@ -29,8 +31,16 @@ keyInit:
 		OTIR
 		LD A, 0
 		LD (Ps2Shift), A
-		CALL ps2_readScancode ; consume the BAT code
-		EI					; enable interrupts
+		LD A, TXA
+		LD (TxChA), A
+		CALL ps2_readScancode
+		LD A, 0FFh				; reset command
+		CALL ps2_transmit		
+		CALL ps2_wait4Tx		; wait for transmission to complete
+		CALL ps2_readScancode	; consume BAT codes
+		CALL ps2_readScancode
+		CALL ps2_readScancode
+		CALL ps2_readScancode
         RET
 		
 ; synchronously reads a scancode from the serial port
@@ -168,16 +178,83 @@ _return:
         RET
 ENDP
 
-; reads a single key from the buffer
-;readKey:
-;        LD A, (KbdBuff)
-;        CP 0
-;        JR Z, readKey
-;        PUSH AF
-;        LD A, 0
-;        LD (KbdBuff), A
-;        POP AF
-;        RET	
+;1)   Bring the Clock line low for at least 100 microseconds.
+;2)   Bring the Data line low.
+;3)   Release the Clock line.
+;4)   Wait for the device to bring the Clock line low.
+;5)   Set/reset the Data line to send the first data bit
+;6)   Wait for the device to bring Clock high.
+;7)   Wait for the device to bring Clock low.
+;8)   Repeat steps 5-7 for the other seven data bits and the parity bit
+;9)   Release the Data line.
+;10) Wait for the device to bring Data low.
+;11) Wait for the device to bring Clock  low.
+;12) Wait for the device to release Data and Clock
+ps2_transmit:
+		CALL ps2_wait4Tx
+		CALL ps2_clockInhibit
+		CALL delay1520us
+		CALL ps2_dataInhibit
+		CALL ps2_clockRelease
+		OUT (DART_A_DAT), A
+		CALL ps2_dataRelease
+		RET
+		
+PROC
+ps2_wait4Tx:
+		PUSH AF
+_loop:
+		IN A, (DART_A_CMD)
+		AND 00000100b
+		CP 0
+		JR Z, _loop
+		POP AF
+		RET
+ENDP
+
+ps2_clockInhibit:
+		PUSH AF
+		LD A, 5				; writing to WR5
+		OUT (DART_B_CMD), A
+		LD A, (TxChB)		; get previous value of WR5
+		OR 10000000b		; set  DTR (D7)	
+		OUT (DART_B_CMD), A
+		LD (TxChB), A
+		POP AF
+		RET
+	
+ps2_clockRelease:
+		PUSH AF				
+		LD A, 5				; writing to WR5
+		OUT (DART_B_CMD), A
+		LD A, (TxChB)		; get previous value of WR5
+		AND 01111111b		; clear  DTR (D7)
+		OUT (DART_B_CMD), A	
+		LD (TxChB), A
+		POP AF
+		RET
+	
+ps2_dataInhibit:
+		PUSH AF
+		LD A, 5				; writing to WR5
+		OUT (DART_A_CMD), A
+		LD A, (TxChA)		; get previous value of WR5
+		OR 00010000b		; send break (D4)
+		OUT (DART_A_CMD), A
+		LD (TxChA), A
+		POP AF
+		RET
+	
+ps2_dataRelease:
+		PUSH AF				
+		LD A, 5				; writing to WR5
+		OUT (DART_A_CMD), A
+		LD A, (TxChA)		; get previous value of WR5
+		AND 11101111b		; clear break (D4)
+		OUT (DART_A_CMD), A	
+		LD (TxChA), A
+		POP AF
+		RET
 		
 ps2Scancodes:
 		defb 00		; scancode 00

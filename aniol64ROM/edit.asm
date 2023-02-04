@@ -81,7 +81,7 @@ _esc:
 	INC IX
 	RET
 _exit:
-	POP IX	; jumping one routne level up
+	POP IX	; jumping one routine level up (EVIL)
 	CALL nextLine
 	RET
 ENDP
