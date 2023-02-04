@@ -16,35 +16,35 @@ ERR equ 01h
 ; BC - representation of one byte as two hex digits in ASCII
 ; result in string pointed to by IX
 asc2hexstr8b:
-        LD (IX+0), '$' ;arbitrary character indicating a hex number
-        LD (IX+1), B
-        LD (IX+2), C
-        LD (IX+3), 0
-        RET
+	LD (IX+0), '$' ;arbitrary character indicating a hex number
+	LD (IX+1), B
+	LD (IX+2), C
+	LD (IX+3), 0
+	RET
 
 ; converts a four-digit hex number to a printable string
 ; BCDE - representation of two bytes as four hex digits in ASCII
 ; result in string pointed to by IX
 asc2hexstr16b:
-        LD (IX+0), '$' ;arbitrary character indicating a hex number
-        CALL byte2asc
-        LD (IX+1), B
-        LD (IX+2), C
-        LD (IX+3), D
-        LD (IX+4), E
-        LD (IX+5), 0
-        RET
+	LD (IX+0), '$' ;arbitrary character indicating a hex number
+	CALL byte2asc
+	LD (IX+1), B
+	LD (IX+2), C
+	LD (IX+3), D
+	LD (IX+4), E
+	LD (IX+5), 0
+	RET
 
 ; converts a two digit hex number in ASCII to its value
 ; BA - two hex digits in ASCII
 ; result in B
 PROC
 asc2byte:
-        PUSH AF
-        LD A, B
+	PUSH AF
+	LD A, B
 
-        POP AF
-        RET
+	POP AF
+	RET
 ENDP
 
 ; parses a byte - two hex digits
@@ -53,31 +53,31 @@ ENDP
 ; parse errors reported in A
 PROC
 parseByte:
-        CALL isByteStr
-        CP 0
-        JR Z, _parseError
-        LD A, (IX + 0)
-        CALL hexDigit2nibble
-        SLA A
-        SLA A
-        SLA A
-        SLA A
-        LD B, A
-        LD A, (IX + 1)
-        CALL hexDigit2nibble
-        OR B
-        LD B, A
+	CALL isByteStr
+	CP 0
+	JR Z, _parseError
+	LD A, (IX + 0)
+	CALL hexDigit2nibble
+	SLA A
+	SLA A
+	SLA A
+	SLA A
+	LD B, A
+	LD A, (IX + 1)
+	CALL hexDigit2nibble
+	OR B
+	LD B, A
 _parseOk:
-        LD A, 0
-        RET
+	LD A, 0
+	RET
 _parseError:
-        LD A, 1
-        RET
+	LD A, 1
+	RET
 ENDP
 
 PROC
 parseByteDec:
-        RET
+	RET
 ENDP
 
 ; parses a double byte - four hex digits
@@ -86,52 +86,52 @@ ENDP
 ; parse errors reported in A
 PROC
 parseDByte:
-        CALL isDByteStr
-        CP 0
-        JR Z, _parseError
-        LD A, (IX + 0)
-        CALL hexDigit2nibble
-        SLA A
-        SLA A
-        SLA A
-        SLA A
-        LD B, A
-        LD A, (IX + 1)
-        CALL hexDigit2nibble
-        OR B
-        LD B, A
-        LD A, (IX + 2)
-        CALL hexDigit2nibble
-        SLA A
-        SLA A
-        SLA A
-        SLA A
-        LD C, A
-        LD A, (IX + 3)
-        CALL hexDigit2nibble
-        OR C
-        LD C, A
-        PUSH BC
-        POP HL
+	CALL isDByteStr
+	CP 0
+	JR Z, _parseError
+	LD A, (IX + 0)
+	CALL hexDigit2nibble
+	SLA A
+	SLA A
+	SLA A
+	SLA A
+	LD B, A
+	LD A, (IX + 1)
+	CALL hexDigit2nibble
+	OR B
+	LD B, A
+	LD A, (IX + 2)
+	CALL hexDigit2nibble
+	SLA A
+	SLA A
+	SLA A
+	SLA A
+	LD C, A
+	LD A, (IX + 3)
+	CALL hexDigit2nibble
+	OR C
+	LD C, A
+	PUSH BC
+	POP HL
 _parseOk:
-        LD A, 0
-        RET
+	LD A, 0
+	RET
 _parseError:
-        LD A, 1
-        RET
+	LD A, 1
+	RET
 ENDP
 
 PROC
 hexDigit2nibble:
-        CP 3Ah
-        JR C, _numbers
-        JR _letters
+	CP 3Ah
+	JR C, _numbers
+	JR _letters
 _numbers:
-        SUB 30h
-        RET
+	SUB 30h
+	RET
 _letters:
-        SUB 57h
-        RET
+	SUB 57h
+	RET
 ENDP
 
 ; checks if the byte in A is between 0 and 9 or between a dn f.
@@ -139,101 +139,101 @@ ENDP
 ; result in A
 PROC
 isHexDigit:
-        CP 30h
-        JR C, _no ; if less than '0' then it's not a hex digit
-        CP 67h
-        JR NC, _no ; if equal or more than 'g' then it's not a hex digit
-        CP 3Ah
-        JR C, _yes ; if less than ':' (which is the next ascii code after '9' then it's a hex digit
-        CP 61h
-        JR C, _yes ; if equal or more than 'a' then it's a hex digit
+	CP 30h
+	JR C, _no ; if less than '0' then it's not a hex digit
+	CP 67h
+	JR NC, _no ; if equal or more than 'g' then it's not a hex digit
+	CP 3Ah
+	JR C, _yes ; if less than ':' (which is the next ascii code after '9' then it's a hex digit
+	CP 61h
+	JR C, _yes ; if equal or more than 'a' then it's a hex digit
 _yes
-        LD A, 1
-        RET
+	LD A, 1
+	RET
 _no
-        LD A, 0
-        RET
+	LD A, 0
+	RET
 ENDP
 
 ; checks if the byte in A is between 0 and 9
 ; result in A
 PROC
 isDecDigit:
-        CP '0'
-        JR C, _no ; if less than '0' then it's not a hex digit
-        CP '9'
-		JR Z, _yes
-        JR C, _yes ; if less than ':' (which is the next ascii code after '9' then it's a hex digit
-        JR _no
+	CP '0'
+	JR C, _no ; if less than '0' then it's not a hex digit
+	CP '9'
+	JR Z, _yes
+	JR C, _yes ; if less than ':' (which is the next ascii code after '9' then it's a hex digit
+	JR _no
 _yes:
-        LD A, 1
-        RET
+	LD A, 1
+	RET
 _no:
-        LD A, 0
-        RET
+	LD A, 0
+	RET
 ENDP
 
 PROC
 isUppercaseLetter:
-		CP 'A'
-		JR C, _no
-		CP 'Z'
-		JR Z, _yes
-		JR C, _yes
-		JR _no
+	CP 'A'
+	JR C, _no
+	CP 'Z'
+	JR Z, _yes
+	JR C, _yes
+	JR _no
 _yes:
-        LD A, 1
-        RET
+	LD A, 1
+	RET
 _no:
-        LD A, 0
-        RET
+	LD A, 0
+	RET
 ENDP
 
 PROC
 isLowercaseLetter:
-		CP 'a'
-		JR C, _no
-		CP 'z'
-		JR Z, _yes
-		JR C, _yes
-		JR _no
+	CP 'a'
+	JR C, _no
+	CP 'z'
+	JR Z, _yes
+	JR C, _yes
+	JR _no
 _yes:
-        LD A, 1
-        RET
+	LD A, 1
+	RET
 _no:
-        LD A, 0
-        RET
+	LD A, 0
+	RET
 ENDP
 
 PROC
 isAlphanumeric:
-		PUSH AF
-		CALL isDecDigit
-		CP 1
-		JR Z, _true
-		POP AF
-		PUSH AF
-		CALL isUppercaseLetter
-		CP 1
-		JR Z, _true
-		POP AF
-		PUSH AF
-		CALL isLowercaseLetter
-		CP 1
-		JR Z, _true
-		POP AF
-		PUSH AF
-		CP '_'
-		JR Z, _true
-		JR _false
+	PUSH AF
+	CALL isDecDigit
+	CP 1
+	JR Z, _true
+	POP AF
+	PUSH AF
+	CALL isUppercaseLetter
+	CP 1
+	JR Z, _true
+	POP AF
+	PUSH AF
+	CALL isLowercaseLetter
+	CP 1
+	JR Z, _true
+	POP AF
+	PUSH AF
+	CP '_'
+	JR Z, _true
+	JR _false
 _true:
-		POP AF
-		LD A, TRUE
-		RET
+	POP AF
+	LD A, TRUE
+	RET
 _false:
-		POP AF
-		LD A, FALSE
-		RET
+	POP AF
+	LD A, FALSE
+	RET
 ENDP
 
 ; checks if a string represents a two-byte hex value
@@ -241,30 +241,30 @@ ENDP
 ; result in A: 0 - false, 1 - true
 PROC
 isDByteStr:
-        CALL str_len
-        CP 4              ; checks if the string is exactly 4 digits
-        JR NZ, _parseError
-        LD A, (IX+0)
-        CALL isHexDigit
-        CP 0
-        JR Z, _parseError
-        LD A, (IX+1)
-        CALL isHexDigit
-        CP 0
-        JR Z, _parseError
-        LD A, (IX+2)
-        CALL isHexDigit
-        CP 0
-        JR Z, _parseError
-        LD A, (IX+3)
-        CALL isHexDigit
-        CP 0
-        JR Z, _parseError
-        LD A, 1
-        RET
+	CALL str_len
+	CP 4			  ; checks if the string is exactly 4 digits
+	JR NZ, _parseError
+	LD A, (IX+0)
+	CALL isHexDigit
+	CP 0
+	JR Z, _parseError
+	LD A, (IX+1)
+	CALL isHexDigit
+	CP 0
+	JR Z, _parseError
+	LD A, (IX+2)
+	CALL isHexDigit
+	CP 0
+	JR Z, _parseError
+	LD A, (IX+3)
+	CALL isHexDigit
+	CP 0
+	JR Z, _parseError
+	LD A, 1
+	RET
 _parseError:
-        LD A, 0
-        RET
+	LD A, 0
+	RET
 ENDP
 
 ; checks if a string represents a one-byte hex value
@@ -272,68 +272,68 @@ ENDP
 ; result in A: 0 - false, 1 - true
 PROC
 isByteStr:
-        CALL str_len
-        CP 2              ; checks if the string is exactly 2 digits
-        JR NZ, _parseError
-        LD A, (IX+0)
-        CALL isHexDigit
-        CP 0
-        JR Z, _parseError
-        LD A, (IX+1)
-        CALL isHexDigit
-        CP 0
-        JR Z, _parseError
-        LD A, 1
-        RET
+	CALL str_len
+	CP 2			  ; checks if the string is exactly 2 digits
+	JR NZ, _parseError
+	LD A, (IX+0)
+	CALL isHexDigit
+	CP 0
+	JR Z, _parseError
+	LD A, (IX+1)
+	CALL isHexDigit
+	CP 0
+	JR Z, _parseError
+	LD A, 1
+	RET
 _parseError:
-        LD A, 0
-        RET
+	LD A, 0
+	RET
 ENDP
 
 PROC
 isByteDecStr:
-        CALL str_len
-        CP 4
-        LD A, 1
-        RET
+	CALL str_len
+	CP 4
+	LD A, 1
+	RET
 _parseError:
-        LD A, 0
-        RET
-        RET
+	LD A, 0
+	RET
+	RET
 ENDP
 
 ; converts a byte to its hex representation in ASCII
 ; A - input byte
 ; result in BA
 byte2asc:
-        PUSH AF
-        AND A         ; clear carry flag
-        SRA A
-        SRA A
-        SRA A
-        SRA A
-        AND 00001111b  ; upper nibble now in A
-        CALL nibble2asc
-        LD B, A
-        POP AF       ;
-        AND 00001111b  ; lower nibble now in A
-        CALL nibble2asc
-        RET
+	PUSH AF
+	AND A		 ; clear carry flag
+	SRA A
+	SRA A
+	SRA A
+	SRA A
+	AND 00001111b  ; upper nibble now in A
+	CALL nibble2asc
+	LD B, A
+	POP AF	   ;
+	AND 00001111b  ; lower nibble now in A
+	CALL nibble2asc
+	RET
 
 ; A - nibble to convert to an ASCII hex digit
 ; result in A
 nibble2asc:
-        AND A   ; clear carry flag
-        CP 0Ah  ; checks if nibble is 0-9
-        JR C, numbers
-        AND A   ; clear carry flag
-        SUB 0Ah
-        ADD A, 61h ; ASCII code for 'A'
-        RET
+	AND A   ; clear carry flag
+	CP 0Ah  ; checks if nibble is 0-9
+	JR C, numbers
+	AND A   ; clear carry flag
+	SUB 0Ah
+	ADD A, 61h ; ASCII code for 'A'
+	RET
 numbers:
-        AND A   ; clear carry flag
-        ADD A, 30h ; ASCII code for '0'
-        RET
+	AND A   ; clear carry flag
+	ADD A, 30h ; ASCII code for '0'
+	RET
 
 
 
@@ -344,195 +344,181 @@ numbers:
 ; units in A
 PROC
 bin2Bcd:
-        LD B, 0
-        LD C, 0
+	LD B, 0
+	LD C, 0
 _hundreds:
-        CP 100
-        JR C, _tens   ; if less than 100
-        SUB 100
-        INC C         ; hundreds counted in C
-        JR _hundreds
+	CP 100
+	JR C, _tens   ; if less than 100
+	SUB 100
+	INC C		 ; hundreds counted in C
+	JR _hundreds
 _tens:
-        CP 10
-        JR C, _units   ; if less than 10
-        SUB 10
-        INC B           ; tens and hundreds counted in B
-        JR _tens
-_units:                 ; least significant digit now in A
-        RET
+	CP 10
+	JR C, _units   ; if less than 10
+	SUB 10
+	INC B		   ; tens and hundreds counted in B
+	JR _tens
+_units:				 ; least significant digit now in A
+	RET
 ENDP
 
 ; converts a bcd number stored in C, B, A to ASCII
 ; result in C, B, A
 PROC
 bcd2asc:
-        PUSH AF
-        LD A, C
-        ADD A, 30h        ; ASCII code of the digit 0
-        LD C, A
-        LD A, B
-        ADD A, 30h        ; ASCII code of the digit 0
-        LD B, A
-        POP AF
-        ADD A, 30h        ; ASCII code of the digit 0
-        RET
+	PUSH AF
+	LD A, C
+	ADD A, 30h		; ASCII code of the digit 0
+	LD C, A
+	LD A, B
+	ADD A, 30h		; ASCII code of the digit 0
+	LD B, A
+	POP AF
+	ADD A, 30h		; ASCII code of the digit 0
+	RET
 ENDP
 
 ; A - delay x10ms
 delay:
-        CP 0
-        RET Z
-        DEC A
-        CALL delay10ms
-        JP delay
+	CP 0
+	RET Z
+	DEC A
+	CALL delay10ms
+	JP delay
 
 ; waits for 37us * 2.5MHz = 92 clock cycles
 ; which is just 16 NOPs, 4 cycles each
 ; plus 10 cycles for the RET
 ; plus 17 cycles to CALL this routine
 delay37us:
-        NOP
-        NOP
-        NOP
-        NOP
-        NOP
-        NOP
-        NOP
-        NOP
-        NOP
-        NOP
-        NOP
-		NOP
-		NOP
-		NOP
-		NOP
-		NOP
-        RET
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	RET
 
+PROC
 ; waits for 1520us,
-; which is 22 calls to delay37us
+; which is 41 calls to delay37us
 delay1520us:
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        CALL delay37us
-        RET
+	PUSH BC
+	LD B, 41
+_loop:		
+	CALL delay37us
+	DJNZ _loop
+	POP BC
+	RET
+ENDP
 
 delay10ms:
-        CALL delay1520us
-        CALL delay1520us
-        CALL delay1520us
-        CALL delay1520us
-        CALL delay1520us
-        CALL delay1520us
-        CALL delay1520us
-        CALL delay1520us
-        RET
+	CALL delay1520us
+	CALL delay1520us
+	CALL delay1520us
+	CALL delay1520us
+	CALL delay1520us
+	CALL delay1520us
+	CALL delay1520us
+	CALL delay1520us
+	RET
 
 defb "Rnd"
 PROC
 rnd:
-        PUSH BC
-        LD A, (Random)
-        CP 0               ; if Random is unitialised
-        JR NZ, _doRnd
-        LD A, (Random + 1)  ; checking both bytes of Random for 0
-        CP 0
-        CALL Z, randomize  ; we initialise it
+	PUSH BC
+	LD A, (Random)
+	CP 0			   ; if Random is unitialised
+	JR NZ, _doRnd
+	LD A, (Random + 1)  ; checking both bytes of Random for 0
+	CP 0
+	CALL Z, randomize  ; we initialise it
 _doRnd:
-        AND A ; clear carry
-        LD A, (Random + 1) ; load high byte of Random in case randomize overworte it
-         ; first we XOR bit 2 with bit 0
-        SLA A
-        SLA A
-        SLA A
-        SLA A
-        SLA A ; bit 2 now in bit 7
-        LD B, A
-        SLA A
-        SLA A ; bit 0 now in bit 7
-        XOR B ; XORing bit 2 and 0 together
-        AND 10000000b ; discarding lower bits
-        LD B, A
-        LD A, (Random + 1)
-        SLA A  ; processing bit 3
-        SLA A
-        SLA A
-        SLA A
-        XOR B
-        AND 10000000b
-        LD B, A
-        LD A, (Random + 1)
-        SLA A ; processing bit 5
-        SLA A
-        XOR B
-        AND 10000000b ; all bits now XORed and in bit 7
-        SLA A ; moving bit 7 to carry
-        LD A, (Random)
-        RRA
-        LD (Random), A
-        LD A, (Random + 1)
-        RRA
-        LD (Random + 1), A
-        POP BC
-        RET
+	AND A ; clear carry
+	LD A, (Random + 1) ; load high byte of Random in case randomize overworte it
+	 ; first we XOR bit 2 with bit 0
+	SLA A
+	SLA A
+	SLA A
+	SLA A
+	SLA A ; bit 2 now in bit 7
+	LD B, A
+	SLA A
+	SLA A ; bit 0 now in bit 7
+	XOR B ; XORing bit 2 and 0 together
+	AND 10000000b ; discarding lower bits
+	LD B, A
+	LD A, (Random + 1)
+	SLA A  ; processing bit 3
+	SLA A
+	SLA A
+	SLA A
+	XOR B
+	AND 10000000b
+	LD B, A
+	LD A, (Random + 1)
+	SLA A ; processing bit 5
+	SLA A
+	XOR B
+	AND 10000000b ; all bits now XORed and in bit 7
+	SLA A ; moving bit 7 to carry
+	LD A, (Random)
+	RRA
+	LD (Random), A
+	LD A, (Random + 1)
+	RRA
+	LD (Random + 1), A
+	POP BC
+	RET
 ENDP
 
 ; gets a random number from zero to C - 1
 ; result in A
 rndMod:
-		PUSH HL
-		PUSH BC
-		CALL rnd
-		LD H, A
-		CALL rnd
-		LD L, A
-		LD B, 0
-		CALL u16_div
-		LD A, L
-		POP BC
-		POP HL
-		RET
-		
+	PUSH HL
+	PUSH BC
+	CALL rnd
+	LD H, A
+	CALL rnd
+	LD L, A
+	LD B, 0
+	CALL u16_div
+	LD A, L
+	POP BC
+	POP HL
+	RET
+	
 ; gets a random number from zero to A - 1
 ; result in A
 rndMod8:
-		CP 0
-		RET Z
-		PUSH BC
-		LD B, A
-		CALL rnd
-		CALL u8_div
-		POP BC
-		RET
+	CP 0
+	RET Z
+	PUSH BC
+	LD B, A
+	CALL rnd
+	CALL u8_div
+	POP BC
+	RET
 
 
 randomize:
-		PUSH HL
-		PUSH AF
-        LD A, (NmiCount)
-        CP 0
-        JR Z, randomize
-        LD HL, (NmiCount)
-		LD (Random), HL
-		POP AF
-		POP HL
-        RET
+	PUSH HL
+	PUSH AF
+	LD A, (NmiCount)
+	CP 0
+	JR Z, randomize
+	LD HL, (NmiCount)
+	LD (Random), HL
+	POP AF
+	POP HL
+	RET

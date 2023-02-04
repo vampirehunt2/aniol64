@@ -13,6 +13,7 @@ org 0000h
         IM 2            ; set interupt mode to 2
         LD A, 01h       ; higher byte of the interrupt vector table
         LD I, A         ; set the vector table address
+		;CALL copyRom2Ram
 		EI				; enable interrupts
 		CALL resetNmiHandler
         JP boot         ; jump over the interrupt handlers for NMI and mode 1 INT
