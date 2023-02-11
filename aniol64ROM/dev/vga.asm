@@ -277,8 +277,8 @@ _loop:
 ENDP
 
 PROC
-; destroys A
 vga_advanceCur:
+		PUSH AF
         PUSH BC
         CALL cursorOff
         LD A, (VgaCurX)
@@ -307,6 +307,7 @@ _end:
         LD (VgaCurY), A
         CALL cursorOn
         POP BC
+		POP AF
         RET
 ENDP
 

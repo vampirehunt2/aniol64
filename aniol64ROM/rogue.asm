@@ -4,6 +4,12 @@ Rooms equ PROGRAM_DATA + 0 	;
 
 ROOMRECSIZE	equ 10h
 MAXROOMS 	equ 6
+FLOOR		equ '.'
+DOOR		equ '/'
+STAIR		equ '>'
+WALL		equ '#'
+PC 			equ '@'
+
 ; room record format
 ; 8 bytes per room
 RoomX0 		equ 00h
@@ -28,17 +34,21 @@ Y0			equ DATA + 04h
 X1			equ DATA + 05h
 Y1			equ DATA + 06h
 DoorSet		equ DATA + 07h
+PcX			equ DATA + 08h
+PcY			equ DATA + 09h
+PcOn		equ DATA + 0Ah	; the character on the tile the PC is standing on
+Cmd			equ DATA + 0Bh
+Map			equ DATA + 0Ch
 
 
 MAP_W		equ MAX_X + 1
 MAP_H		equ MAX_Y - 1	; saving two lines for status and messages
+MAP_SIZE	equ 64 * MAP_H
 CELL_W		equ MAP_W / 3
 CELL_H		equ MAP_H / 2
 ROOMMIN		equ 4
 ROOMMAXW	equ CELL_W - 2
 ROOMMAXH	equ CELL_H - 2
-
-
 
 PROC
 defb "rog_main"
@@ -48,11 +58,329 @@ rog_main:
 	CALL rog_generateRooms
 	CALL rog_drawRooms
 	CALL rog_makeConnections
-	CALL rog_sanitiseDoors
-	CALL readKey
-	JR rog_main
+	CALL rog_sanitiseMap
+	CALL rog_placeStair
+	CALL rog_placePc
+	NOP
+	CALL rog_play
 	RET
 ENDP 
+
+
+rog_play:
+	CALL readKey
+	LD (Cmd), A
+	CALL isDecDigit
+	CP FALSE
+	LD A, (Cmd)
+	CALL NZ, rog_move
+	CP 'Q'
+	RET Z
+	CALL rog_los
+	JP rog_play
+	
+PROC
+rog_isMovable:
+	CP FLOOR
+	JR Z, _true
+	CP DOOR
+	JR Z, _true
+	CP STAIR
+	JR Z, _true
+	LD A, FALSE
+	RET
+_true:
+	LD A, TRUE
+	RET
+ENDP
+
+PROC
+rog_move:
+	CP '8'
+	JR Z, _moveN
+	CP '2'
+	JR Z, _moveS
+	CP '4'
+	JR Z, _moveW
+	CP '6'
+	JR Z, _moveE
+	CP '1'
+	JR Z, _moveSW
+	CP '3'
+	JR Z, _moveSE
+	CP '7'
+	JR Z, _moveNW
+	CP '9'
+	JR Z, _moveNE
+_moveN:
+	LD A, (PcY)
+	DEC A			; Y := Y - 1
+	LD C, A
+	LD A, (PcX)
+	LD B, A
+	JR _step
+_moveS:
+	LD A, (PcY)
+	INC A			; Y := Y + 1
+	LD C, A
+	LD A, (PcX)
+	LD B, A
+	JR _step
+_moveW:
+	LD A, (PcY)
+	LD C, A
+	LD A, (PcX)
+	DEC A			; X := X - 1
+	LD B, A
+	JR _step
+_moveE:
+	LD A, (PcY)
+	LD C, A
+	LD A, (PcX)
+	INC A			; X := X + 1
+	LD B, A
+	JR _step
+_moveNW:
+	LD A, (PcY)
+	DEC A			; Y := Y - 1
+	LD C, A
+	LD A, (PcX)
+	DEC A			; X := X - 1
+	LD B, A
+	JR _step
+_moveSW:
+	LD A, (PcY)
+	INC A			; Y := Y + 1
+	LD C, A
+	LD A, (PcX)
+	DEC A			; X := X - 1
+	LD B, A
+	JR _step
+_moveNE:
+	LD A, (PcY)
+	DEC A			; Y := Y - 1
+	LD C, A
+	LD A, (PcX)
+	DEC A			; X := X - 1
+	LD B, A
+	JR _step
+_moveSE:
+	LD A, (PcY)
+	INC A			; Y := Y + 1
+	LD C, A
+	LD A, (PcX)
+	INC A			; X := X + 1
+	LD B, A
+	JR _step
+_step:
+	CALL rog_getChar
+	CALL rog_isMovable
+	CP FALSE
+	RET Z		; skip if the tile cannot be moved onto
+	LD D, B		; save new X coordinate in D
+	LD E, C		; save new Y coordinate in E
+	LD A, (PcX)
+	LD B, A
+	LD A, (PcY)
+	LD C, A
+	LD A, (PcOn)
+	CALL rog_putChar  	; remove the PC character and draw whatever it was standing on
+	LD B, D
+	LD C, E 			; restore new XY coordinates 
+	CALL rog_getChar
+	LD (PcOn), A		; save the tile the PC will be standing on
+	CALL gotoXY
+	LD A, PC
+	CALL putChar
+	LD A, B
+	LD (PcX), A 		; store new X coordinates
+	LD A, C
+	LD (PcY), A
+	RET
+ENDP
+
+rog_printTile:
+	CALL gotoXY
+	CALL rog_getChar
+	CALL putChar
+	RET
+	
+PROC
+rog_isTransparent:
+	CP FLOOR
+	JR Z, _true
+	CP DOOR
+	JR Z, _true
+	CP STAIR
+	JR Z, _true
+	LD A, FALSE
+	RET
+_true:
+	LD A, TRUE
+	RET
+ENDP
+	
+PROC
+rog_lookW:
+	PUSH BC
+	DEC B
+	CALL rog_printTile
+	CALL rog_isTransparent
+	CP FALSE
+	JR Z, _end
+	DEC B
+	DEC C
+	CALL rog_printTile
+	INC C
+	CALL rog_printTile
+	INC C 
+	CALL rog_printTile
+_end:
+	POP BC
+	RET
+ENDP
+
+PROC
+rog_lookE:
+	PUSH BC
+	INC B
+	CALL rog_printTile
+	CALL rog_isTransparent
+	CP FALSE
+	JR Z, _end
+	INC B
+	DEC C
+	CALL rog_printTile
+	INC C
+	CALL rog_printTile
+	INC C 
+	CALL rog_printTile
+_end:
+	POP BC
+	RET
+ENDP
+	
+PROC
+rog_lookN:
+	PUSH BC
+	DEC C
+	CALL rog_printTile
+	CALL rog_isTransparent
+	CP FALSE
+	JR Z, _end
+	DEC C
+	DEC B
+	CALL rog_printTile
+	INC B
+	CALL rog_printTile
+	INC B
+	CALL rog_printTile
+_end:
+	POP BC
+	RET
+ENDP
+	
+PROC
+rog_lookS:
+	PUSH BC
+	INC C
+	CALL rog_printTile
+	CALL rog_isTransparent
+	CP FALSE
+	JR Z, _end
+	INC C
+	DEC B
+	CALL rog_printTile
+	INC B
+	CALL rog_printTile
+	INC B
+	CALL rog_printTile
+_end:
+	POP BC
+	RET
+ENDP
+	
+PROC
+rog_lookNW:
+	PUSH BC
+	DEC B
+	DEC C
+	CALL rog_printTile
+	CALL rog_isTransparent
+	CP FALSE
+	JR Z, _end
+	DEC B
+	DEC C
+	CALL rog_printTile
+_end:
+	POP BC
+	RET
+ENDP
+	
+PROC
+rog_lookNE:
+	PUSH BC
+	INC B
+	DEC C
+	CALL rog_printTile
+	CALL rog_isTransparent
+	CP FALSE
+	JR Z, _end
+	INC B
+	DEC C
+	CALL rog_printTile
+_end:
+	POP BC
+	RET
+ENDP
+	
+PROC
+rog_lookSW:
+	PUSH BC
+	DEC B
+	INC C
+	CALL rog_printTile
+	CALL rog_isTransparent
+	CP FALSE
+	JR Z, _end
+	DEC B
+	INC C
+	CALL rog_printTile
+_end:
+	POP BC
+	RET
+ENDP
+	
+PROC
+defb "rog_lookSE"
+rog_lookSE:
+	PUSH BC
+	INC B
+	INC C
+	CALL rog_printTile
+	CALL rog_isTransparent
+	CP FALSE
+	JR Z, _end
+	INC B
+	INC C
+	CALL rog_printTile
+_end:
+	POP BC
+	RET
+ENDP
+
+PROC
+rog_los:
+	CALL rog_lookE
+	CALL rog_lookN
+	CALL rog_lookS
+	CALL rog_lookW
+	CALL rog_lookNE
+	CALL rog_lookNW
+	CALL rog_lookSE
+	CALL rog_lookSW
+	RET
+ENDP
 
 PROC
 rog_init:
@@ -60,8 +388,57 @@ rog_init:
 	LD (Echo), A
 	CALL cursorOff
 	CALL rog_initCells
+	CALL rog_clearMap
 	RET
 ENDP
+
+; DEBUG only
+;rog_displayEntireMap:
+;	LD HL, Map
+;	LD DE, VRAM
+;	LD BC, MAP_SIZE
+;	LDIR
+;	RET
+
+rog_clearMap:
+	LD A, '%'
+	LD (Map), A
+	LD HL, Map
+	LD DE, Map + 1
+	LD BC, MAP_SIZE
+	LDIR
+	RET
+	
+PROC
+rog_getMapAddr:
+	PUSH DE
+	PUSH BC
+	LD L, B
+	LD B, 0
+	LD E, 6
+_loop:
+	SLA C
+	RL B
+	DEC E
+	JR NZ, _loop
+	LD H, 0
+	ADD HL, BC
+	LD BC, Map
+	ADD HL, BC
+	POP BC
+	POP DE
+	RET
+ENDP
+	
+rog_putChar:
+	CALL rog_getMapAddr
+	LD (HL), A
+	RET
+
+rog_getChar:
+	CALL rog_getMapAddr
+	LD A, (HL)
+	RET
 
 PROC
 rog_initCells:
@@ -111,7 +488,6 @@ _loop:
 ENDP
 
 PROC
-defb "rog_generateRoom"
 rog_generateRoom:
 	PUSH BC
 	; randomize X position
@@ -199,10 +575,9 @@ _vLoop:
 	LD D, A
 	LD A, (IY + RoomX0)
 	LD B, A
-	CALL gotoXY
 _hLoop:
 	CALL rog_selectRoomChar
-	CALL putChar
+	CALL rog_putChar
 	INC B
 	DEC D
 	JR NZ, _hLoop
@@ -228,92 +603,32 @@ rog_selectRoomChar:
 	LD A, (IY + RoomY1)
 	CP C
 	JR Z, _wall
-	LD A, '.'
+	LD A, FLOOR
 	RET
 _wall:
-	LD A, '#'
-	RET
-ENDP
-
-PROC
-; checks if two rooms interiors (excluding walls) have any horizontal overlap 
-; 	- room records pointed to by IX and IY
-; 	- result in A: overlap size or 0 if no overlap
-rog_hOverlap:
-	PUSH BC
-	; compute maximum of the two rooms' X1 coeffs
-	LD A, (IX + RoomX0)
-	LD B, A
-	LD A, (IY + RoomX0)
-	CALL u8_max
-	INC A				; exclude the wall
-	LD C, A	; maximum X0 of the two rooms now in C
-	; compute minimum of the two rooms' X1 coeffs
-	LD A, (IX + RoomX1)
-	DEC A				; exclude the wall
-	LD B, A
-	LD A, (IY + RoomX1)
-	DEC A				; exclude the wall
-	CALL u8_min ; minimum X1 of the two rooms now in A
-	DEC A		; exclude the wall
-	SUB C
-	BIT 7, A
-	JR Z, _end
-	LD A, 0		; no overlap
-_end:
-	POP BC
-	RET
-ENDP
-
-PROC
-; checks if two rooms interiors (excluding walls) have any vertical overlap 
-; 	- room records pointed to by IX and IY
-; 	- result in A: overlap size or 0 if no overlap
-rog_vOverlap:
-	PUSH BC
-	; compute maximum of the two rooms' X1 coeffs
-	LD A, (IX + RoomY0)
-	LD B, A
-	LD A, (IY + RoomY0)
-	CALL u8_max
-	INC A				; exclude the wall
-	LD C, A	; maximum X0 of the two rooms now in C
-	; compute minimum of the two rooms' X1 coeffs
-	LD A, (IX + RoomY1)
-	DEC A				; exclude the wall
-	LD B, A
-	LD A, (IY + RoomY1)
-	DEC A				; exclude the wall
-	CALL u8_min ; minimum X1 of the two rooms now in A
-	DEC A		; exclude the wall
-	SUB C
-	BIT 7, A
-	JR Z, _end
-	LD A, 0		; no overlap
-_end:
-	POP BC
+	LD A, WALL
 	RET
 ENDP
 
 PROC
 rog_selectCorridorChar:
 	PUSH BC
-	CALL getChar
-	CP '#'
+	CALL rog_getChar
+	CP WALL
 	JR Z, _wall
 _floor
-	LD A, '.'
+	LD A, FLOOR
 	JR _end
 _wall:
 	LD A, (DoorSet)
 	CP FALSE
 	JR Z, _door
-	LD A, '.'
+	LD A, FLOOR
 	JR _end
 _door:
 	LD A, TRUE
 	LD (DoorSet), A
-	LD A, '+'
+	LD A, DOOR
 _end:
 	POP BC
 	PUSH AF
@@ -369,6 +684,28 @@ _cont:
 	DJNZ _loop
 	LD A, C
 	POP IY
+	RET
+ENDP
+
+PROC
+; returns a random unconnected room
+; returns room record pointer in IY
+rog_randomRoom:
+	PUSH AF
+	PUSH BC
+	LD A, MAXROOMS
+	CALL rndMod8
+	LD B, A
+	INC B
+	LD IY, Rooms
+_loop:
+	DEC B
+	JR Z, _end
+	CALL rog_nextRoom
+	JR _loop
+_end:
+	POP BC
+	POP AF
 	RET
 ENDP
 
@@ -467,9 +804,8 @@ _yCont:
 	LD A, FALSE
 	LD (DoorSet), A
 _xLoop:
-	CALL gotoXY
 	CALL rog_selectCorridorChar
-	CALL putChar
+	CALL rog_putChar
 	LD A, (X1)
 	CP B
 	JR Z, _yLoopSetup
@@ -483,9 +819,8 @@ _yLoopSetup:
 	LD A, FALSE
 	LD (DoorSet), A
 _yLoop:
-	CALL gotoXY
 	CALL rog_selectCorridorChar
-	CALL putChar
+	CALL rog_putChar
 	LD A, (Y0)
 	CP C
 	JR Z, _end
@@ -499,20 +834,51 @@ _end:
 	RET
 ENDP
 
-PROC
-rog_sanitiseDoors:
-	LD C, 1
-_yLoop:
-	LD B, 1
-_xLoop:
+rog_placeStair:
+	LD A, STAIR
+	CALL rog_randomPlace
+	RET
+	
+rog_placePc:
+	LD A, PC
+	CALL rog_randomPoint
+	LD A, B
+	LD (PcX), A
+	LD A, C
+	LD (PcY), A
+	CALL rog_getChar
+	LD (PcOn), A
 	CALL gotoXY
-	CALL getChar
-	CP '+'
-	JR NZ, _notDoor
+	LD A, PC
+	CALL putChar
+	CALL rog_los
+	RET
+	
+rog_randomPoint:
+	CALL rog_randomRoom
+	CALL rog_randomPtInRoom
+	RET
+
+rog_randomPlace:
+	CALL rog_randomPoint
+	CALL rog_putChar
+	RET
+
+PROC
+rog_sanitiseMap:
+	LD C, 0
+_yLoop:
+	LD B, 0
+_xLoop:
+	CALL rog_getChar
+	CP '%'
+	JR Z, _wall
+	CP DOOR
+	JR NZ, _next
 	CALL rog_sanitiseDoor
-_notDoor:
+_next:
 	INC B
-	LD A, MAX_X - 1
+	LD A, MAX_X + 1
 	CP B
 	JR NZ, _xLoop
 	INC C
@@ -520,6 +886,10 @@ _notDoor:
 	CP C
 	JR NZ, _yLoop
 	RET
+_wall:
+	LD A, WALL
+	CALL rog_putChar
+	JR _next
 ENDP
 
 rog_sanitiseDoor:
@@ -542,17 +912,15 @@ rog_sanitiseDoor:
 	CP 2
 	RET Z
 	PUSH BC
-	CALL gotoXY
-	LD A, '.'
-	CALL putChar
+	LD A, FLOOR
+	CALL rog_putChar
 	POP BC
 	RET
 
 PROC
 rog_checkWall:
-	CALL gotoXY
-	CALL getChar
-	CP '#'
+	CALL rog_getChar
+	CP WALL
 	JR Z, _wall
 	RET
 _wall:
@@ -568,6 +936,7 @@ ENDP
 ; - X coefficient in B
 ; - Y coefficient in C
 rog_randomPtInRoom:
+	PUSH AF
 	LD A, (IY + RoomW)
 	DEC A
 	DEC A
@@ -586,6 +955,7 @@ rog_randomPtInRoom:
 	LD A, (IY + RoomY0)
 	ADD A, C
 	LD C, A
+	POP AF
 	RET
 
 PROC
