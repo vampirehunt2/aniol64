@@ -10,6 +10,8 @@
 VRAM equ 3800h
 MAX_X equ 39
 MAX_Y equ 29
+LF    equ 10
+CR	  equ 13
 
 Blank:		defb "                                      ", 0
 
