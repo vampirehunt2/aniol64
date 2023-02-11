@@ -15,7 +15,7 @@ bzr_beep:
         LD C, BZR_PORT
         LD A, 0FFh
         OUT (C), A
-        LD A, 20 ; delay 200ms
+        LD A, 10 ; delay 100ms
         CALL delay
         LD A, 00h
         OUT (C), A
