@@ -6,7 +6,7 @@ KEY_UP equ 0F0h
 EXT_KEY equ 0E0h
 LSHIFT equ 12h
 RSHIFT equ 59h
-TXA	equ 11101000b	; DTR, 8 bits, Tx enabled
+TXA	equ 01101000b	; DTR, 8 bits, Tx enabled
 
 
 ps2_initSeq:
@@ -92,18 +92,15 @@ keyInput:
 		CP RSHIFT
 		JR Z, _shiftDn
 		CALL ps2_scancode2asc
-		LD (KbdBuff), A
 		RET
 _shiftDn:
 		LD A, TRUE
 		LD (Ps2Shift), A
-		JR _zero
-		RET
+		JR keyInput
 _shiftUp:
 		LD A, FALSE
 		LD (Ps2Shift), A
-		JR _zero
-		RET
+		JR keyInput
 _keyUp:
 _extKey:
 		CALL ps2_readScancode ; ignore the next scancode, it's the code of the key that's going up
@@ -112,10 +109,7 @@ _extKey:
 		JR Z, _shiftUp
 		CP RSHIFT
 		JR Z, _shiftUp
-_zero:
-		LD A, 0
-		LD (KbdBuff), A
-		RET
+		JR keyInput
 ENDP
 
 PROC
@@ -215,22 +209,22 @@ ENDP
 ps2_clockInhibit:
 		PUSH AF
 		LD A, 5				; writing to WR5
-		OUT (DART_B_CMD), A
-		LD A, (TxChB)		; get previous value of WR5
+		OUT (DART_A_CMD), A
+		LD A, (TxChA)		; get previous value of WR5
 		OR 10000000b		; set  DTR (D7)	
-		OUT (DART_B_CMD), A
-		LD (TxChB), A
+		OUT (DART_A_CMD), A
+		LD (TxChA), A
 		POP AF
 		RET
 	
 ps2_clockRelease:
 		PUSH AF				
 		LD A, 5				; writing to WR5
-		OUT (DART_B_CMD), A
-		LD A, (TxChB)		; get previous value of WR5
+		OUT (DART_A_CMD), A
+		LD A, (TxChA)		; get previous value of WR5
 		AND 01111111b		; clear  DTR (D7)
-		OUT (DART_B_CMD), A	
-		LD (TxChB), A
+		OUT (DART_A_CMD), A	
+		LD (TxChA), A
 		POP AF
 		RET
 	
