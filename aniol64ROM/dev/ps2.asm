@@ -8,6 +8,14 @@ LSHIFT equ 12h
 RSHIFT equ 59h
 TXA	equ 01101000b	; DTR, 8 bits, Tx enabled
 
+MOVE_N	equ '8'
+MOVE_S equ 'k'
+MOVE_W equ 'u'
+MOVE_E equ 'o'
+MOVE_NE equ '9'
+MOVE_SE equ 'l'
+MOVE_NW equ '7'
+MOVE_SW equ 'j'
 
 ps2_initSeq:
 		defb 0, 00011000b	; channel reset

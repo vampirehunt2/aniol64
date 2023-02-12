@@ -4,6 +4,8 @@ Rooms equ PROGRAM_DATA + 0 	;
 
 ROOMRECSIZE	equ 10h
 MAXROOMS 	equ 6
+
+; Dungeon features
 FLOOR		equ '.'
 DOOR		equ '/'
 STAIR		equ '>'
@@ -38,7 +40,8 @@ PcX			equ DATA + 08h
 PcY			equ DATA + 09h
 PcOn		equ DATA + 0Ah	; the character on the tile the PC is standing on
 Cmd			equ DATA + 0Bh
-Map			equ DATA + 0Ch
+DungeonLev	equ DATA + 0Ch
+Map			equ DATA + 0Dh
 
 
 MAP_W		equ MAX_X + 1
@@ -54,26 +57,85 @@ PROC
 defb "rog_main"
 rog_main:
 	CALL rog_init
+	CALL rog_initLevel
+	NOP
+	CALL rog_play
+	RET
+ENDP 
+
+rog_initLevel:
 	CALL clrScr
+	LD A, (DungeonLev)
+	INC A
+	LD (DungeonLev), A
 	CALL rog_generateRooms
 	CALL rog_drawRooms
 	CALL rog_makeConnections
 	CALL rog_sanitiseMap
 	CALL rog_placeStair
 	CALL rog_placePc
-	NOP
-	CALL rog_play
+	CALL rog_printStatus
 	RET
-ENDP 
+	
+rog_printStatus:
+	; print points
+	PUSH BC
+	LD B, 0
+	LD C, MAX_Y
+	CALL gotoXY
+	LD A, 'L'
+	CALL putChar
+	LD A, ':'
+	CALL putChar
+	LD A, (DungeonLev)
+	CALL bin2Bcd
+	PUSH AF
+	LD A, C
+	ADD A, '0'
+	CALL putChar
+	LD A, B
+	ADD A, '0'
+	CALL putChar
+	POP AF
+	ADD A, '0'
+	CALL putChar
+	POP BC
+	RET
 
+PROC
+rog_isDirKey:
+	CP MOVE_N
+	JR Z, _true
+	CP MOVE_S
+	JR Z, _true
+	CP MOVE_W
+	JR Z, _true
+	CP MOVE_E
+	JR Z, _true
+	CP MOVE_NE
+	JR Z, _true
+	CP MOVE_SE
+	JR Z, _true
+	CP MOVE_NW
+	JR Z, _true
+	CP MOVE_SW
+	JR Z, _true
+	LD A, FALSE
+	RET
+_true:
+	LD A, TRUE
+	RET
+ENDP	
 
 rog_play:
 	CALL readKey
 	LD (Cmd), A
-	CALL isDecDigit
+	CALL rog_isDirKey
 	CP FALSE
 	LD A, (Cmd)
 	CALL NZ, rog_move
+	CP '>'
+	CALL Z, rog_descend
 	CP 'Q'
 	RET Z
 	CALL rog_los
@@ -95,22 +157,31 @@ _true:
 ENDP
 
 PROC
+rog_descend:
+	LD A, (PcOn)
+	CP STAIR
+	RET NZ 		; abort and do nothing if the PC isn't standing on the stairs
+	CALL rog_initLevel
+	RET
+ENDP
+
+PROC
 rog_move:
-	CP '8'
+	CP MOVE_N
 	JR Z, _moveN
-	CP '2'
+	CP MOVE_S
 	JR Z, _moveS
-	CP '4'
+	CP MOVE_W
 	JR Z, _moveW
-	CP '6'
+	CP MOVE_E
 	JR Z, _moveE
-	CP '1'
+	CP MOVE_SW
 	JR Z, _moveSW
-	CP '3'
+	CP MOVE_SE
 	JR Z, _moveSE
-	CP '7'
+	CP MOVE_NW
 	JR Z, _moveNW
-	CP '9'
+	CP MOVE_NE
 	JR Z, _moveNE
 _moveN:
 	LD A, (PcY)
@@ -161,7 +232,7 @@ _moveNE:
 	DEC A			; Y := Y - 1
 	LD C, A
 	LD A, (PcX)
-	DEC A			; X := X - 1
+	INC A			; X := X + 1
 	LD B, A
 	JR _step
 _moveSE:
@@ -352,7 +423,6 @@ _end:
 ENDP
 	
 PROC
-defb "rog_lookSE"
 rog_lookSE:
 	PUSH BC
 	INC B
@@ -371,6 +441,10 @@ ENDP
 
 PROC
 rog_los:
+	LD A, (PcX)
+	LD B, A
+	LD A, (PcY)
+	LD C, A
 	CALL rog_lookE
 	CALL rog_lookN
 	CALL rog_lookS
@@ -386,6 +460,8 @@ PROC
 rog_init:
 	LD A, FALSE
 	LD (Echo), A
+	LD A, 0
+	LD (DungeonLev), A
 	CALL cursorOff
 	CALL rog_initCells
 	CALL rog_clearMap
