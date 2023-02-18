@@ -28,16 +28,32 @@ FirmwareRev: 	defb "Firmware Rev: ", 0
 LbaSectors: 	defb "LBA Sectors: ", 0
 Bytes			defb " bytes", 0
 
-; error messages
-InvalidSector: 	defb "Invalid sector", 0
-ErrInvDirName:	defb "Invalid directory name", 0
-ErrInvFileName:	defb "Invalid file name", 0
-ErrDirExists:	defb "Directory already exists", 0
-ErrFileExists:	defb "File already exists", 0
-ErrFileNotFound:defb "File not found", 0
-ErrTooManyDirs:	defb "Too many directories", 0
-ErrNoSuchDir:	defb "No such directory", 0
-ErrDiskFull:	defb "Disk full", 0
+; status messages
+DosOk:				defb "I/O success", 0
+ErrInvalidSector: 	defb "Invalid sector", 0
+ErrInvDirName:		defb "Invalid directory name", 0
+ErrInvFileName:		defb "Invalid file name", 0
+ErrDirExists:		defb "Directory already exists", 0
+ErrFileExists:		defb "File already exists", 0
+ErrFileNotFound:	defb "File not found", 0
+ErrTooManyDirs:		defb "Too many directories", 0
+ErrNoSuchDir:		defb "No such directory", 0
+ErrDiskFull:		defb "Disk full", 0
+ErrNoDisk:			defb "No disk", 0
+ErrUnknown:			defb "Unknown error", 0
+
+; status codes
+DOS_OK				equ 00h
+INVALID_SECTOR: 	equ 01h
+INVALID_DIRNAME:	equ 02h
+INVALID_FILENAME:	equ 03h	
+DIR_EXISTS:			equ 04h
+FILE_EXISTS:		equ 05h
+FILE_NOT_FOUND:		equ 06h
+TOO_MANY_DIRS:		equ 07h
+NO_SUCH_DIR:		equ 08h
+DISK_FULL:			equ 09h
+NO_DISK:			equ 0Ah
 
 ; dos strings:
 FsInfo:			defb "AFS 1.0", 0
@@ -53,6 +69,7 @@ TempDirname 	equ DOS_AREA + 0Ah	; 9 bytes: 8 for the folder name and 1 for the t
 CurrentFileName	equ DOS_AREA + 13h	; (8059h) 13 bytes: 12 for the file name and 1 for the terminating zero
 CurrentFileSize	equ DOS_AREA + 20h	; (8066h) 2 bytes
 FilePtr			equ DOS_AREA + 22h	; (8068h) 2 bytes
+DosErr			equ DOS_AREA + 24h	; status of the last disk I/O operation, 
  
 ; filesystem constants:
 MAX_DIRNAME_LEN 		equ 8
@@ -172,7 +189,7 @@ _invalidAddress:
 	CALL writeLn
 	RET
 _invalidSector:
-	LD IX, InvalidSector
+	LD IX, ErrInvalidSector
 	CALL writeLn
 	RET
 ENDP
@@ -202,7 +219,7 @@ _invalidAddress:
 	CALL writeLn
 	RET
 _invalidSector:
-	LD IX, InvalidSector
+	LD IX, ErrInvalidSector
 	CALL writeLn
 	RET
 ENDP
@@ -238,6 +255,72 @@ _loop:
 	LD HL, SectorBuffer
 	CALL cf_setSector
 	CALL cf_writeSector
+	RET
+ENDP
+
+PROC
+dos_getStatusMsg:
+	PUSH AF
+	LD A, (DosErr)
+	CP DOS_OK
+	JR Z, _ok
+	CP INVALID_SECTOR
+	JR Z, _invSector
+	CP INVALID_DIRNAME
+	JR Z, _invDirname
+	CP INVALID_FILENAME
+	JR Z, _invFilename
+	CP DIR_EXISTS
+	JR Z, _dirExists
+	CP FILE_EXISTS
+	JR Z, _fileExists
+	CP FILE_NOT_FOUND
+	JR Z, _fileNoteFound
+	CP TOO_MANY_DIRS
+	JR Z, _tooManyDirs
+	CP NO_SUCH_DIR
+	JR Z, _noSuchDir
+	CP DISK_FULL
+	JR Z, _diskFull
+	CP NO_DISK
+	JR Z, _noDisk
+	LD IX, ErrUnknown
+	JR _end
+_ok:
+	LD IX, DosOk
+	JR _end
+_invSector:
+	LD IX, ErrInvalidSector
+	JR _end
+_invDirname
+	LD IX, ErrInvDirName
+	JR _end
+_invFilename:
+	LD IX, ErrInvFileName
+	JR _end
+_dirExists
+	LD IX, ErrDirExists
+	JR _end
+_fileExists:
+	LD IX, ErrFileExists
+	JR _end
+_fileNoteFound:
+	LD IX, ErrFileNotFound
+	JR _end
+_tooManyDirs:
+	LD IX, ErrTooManyDirs
+	JR _end
+_noSuchDir:
+	LD IX, ErrNoSuchDir
+	JR _end
+_diskFull:
+	LD IX, ErrDiskFull
+	JR _end
+_noDisk:
+	LD IX, ErrNoDisk
+	JR _end
+_end:
+	POP AF
 	RET
 ENDP
 
@@ -896,7 +979,6 @@ dos_nextSector:
 	RET
 
 PROC
-defb "dos_saveFile"
 dos_saveFile:
 	LD IX, CurrentFileName
 	CALL dos_validateFilename	; first, check if the given file name is valid...
@@ -1027,6 +1109,17 @@ dos_fRead:
 	POP BC
 	RET
 	
+dos_fPeek:
+	PUSH BC
+	PUSH HL
+	LD HL, (FilePtr)
+	LD BC, FileBuffer
+	ADD HL, BC
+	LD A, (HL)
+	POP HL
+	POP BC
+	RET
+	
 PROC
 dos_fWrite:
 	PUSH BC
@@ -1075,6 +1168,13 @@ dos_expand:
 	LD HL, (CurrentFileSize)
 	INC HL
 	LD (CurrentFileSize), HL
+	POP HL
+	RET
+	
+dos_reset:
+	PUSH HL
+	LD HL, 0
+	LD (FilePtr), HL
 	POP HL
 	RET
 	
