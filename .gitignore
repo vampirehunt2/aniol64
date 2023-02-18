@@ -33,3 +33,6 @@ workspace/.metadata/.plugins/ps.edu.cupl.ui/dialog_settings.xml
 workspace/.metadata/version.ini
 *.bin
 aniol64ROM/aniol64.bin
+workspace/.metadata/.log
+workspace/.metadata/.plugins/org.eclipse.core.resources/.safetable/org.eclipse.core.resources
+*.xmi

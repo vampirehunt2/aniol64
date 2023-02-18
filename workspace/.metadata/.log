@@ -181,3 +181,4 @@ java.io.FileNotFoundException: C:\8bit\GitHub\aniol64\workspace\.metadata\.plugi
 	at org.eclipse.core.internal.resources.Workspace.save(Workspace.java:2333)
 	at org.eclipse.ui.internal.ide.application.IDEWorkbenchAdvisor.lambda$1(IDEWorkbenchAdvisor.java:509)
 	at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:122)
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
