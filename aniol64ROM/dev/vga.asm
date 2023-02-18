@@ -7,7 +7,7 @@
 ;
 ;----------------------------------------------------
 
-VRAM equ 3800h
+VRAM equ 3800h + 64	; + 64 is for skipping the first line of display that is skewed.
 MAX_X equ 39
 MAX_Y equ 29
 LF    equ 10
