@@ -10,6 +10,15 @@
 
 KBD_PORT equ 10111111b  ; BFh keyboard is selected with A6
 
+MOVE_N	equ 'i'
+MOVE_S equ 'n'
+MOVE_W equ 'j'
+MOVE_E equ 'l'
+MOVE_NE equ 'o'
+MOVE_SE equ 'm'
+MOVE_NW equ 'u'
+MOVE_SW equ 'b'
+
 PROC
 handleInt:
         LD A, (KbdBuff)
