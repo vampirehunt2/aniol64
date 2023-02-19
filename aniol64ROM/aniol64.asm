@@ -48,9 +48,9 @@ org 0100h
 									; note, low order byte goes first
 
 
+
 Aniol: 
-ds (MAX_X + 1) - 4
-defb   "_ANIOL64_"
+defb   "               _ANIOL64_"
 defb 0
 
 RAMTOP 				equ 0BFFFh
