@@ -1099,12 +1099,12 @@ dos_fRead:
 	PUSH BC
 	PUSH HL
 	LD HL, (FilePtr)
-	INC HL
-	LD (FilePtr), HL
-	DEC HL
 	LD BC, FileBuffer
 	ADD HL, BC
 	LD A, (HL)
+	LD HL, (FilePtr)
+	INC HL
+	LD (FilePtr), HL
 	POP HL
 	POP BC
 	RET
@@ -1133,11 +1133,12 @@ _skip:
 	LD A, B		; restore the byte to be written to A
 	LD HL, (FilePtr)
 	INC HL
-	LD (FilePtr), HL
-	DEC HL
 	LD BC, FileBuffer
 	ADD HL, BC
 	LD (HL), A
+	LD HL, (FilePtr)
+	INC HL
+	LD (FilePtr), HL
 	POP HL
 	POP BC
 	RET
