@@ -468,7 +468,7 @@ mon_printDByte:
 
 ; prints the value the lower byte of IX to the lcd screen
 ; IX - the value of the double byte to print
-mon_printLByte
+mon_printLByte:
         PUSH IX
         POP DE
         LD A, E
