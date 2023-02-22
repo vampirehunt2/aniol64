@@ -8,8 +8,8 @@ SUB_T:			defb "-", 	0
 MUL_T:			defb "*", 	0
 DIV_T: 			defb "/", 	0
 MOD_T: 			defb "\\", 	0
-ASSIGN_T: 		defb ":=", 	0
-EQUAL_T:		defb "=", 	0
+ASSIGN_T: 		defb "=", 	0
+EQUAL_T:		defb "==", 	0
 NOT_EQUAL_T:	defb "<>", 	0
 QUOTE_T:		defb "'", 	0
 LEFT_PAREN_T:	defb "(", 	0
@@ -33,8 +33,8 @@ SUB_B			equ '-'
 MUL_B			equ '*' 	
 DIV_B 			equ '/' 	
 MOD_B 			equ '\' 	
-ASSIGN_B 		equ ':' 	
-EQUAL_B			equ '=' 	
+ASSIGN_B 		equ '=' 	
+EQUAL_B			equ 'q' 	
 NOT_EQUAL_B		equ 'n' 	
 QUOTE_B			equ '''' 	
 LEFT_PAREN_B	equ '(' 	
@@ -376,10 +376,49 @@ _true:
 ENDP
 
 PROC
+apl_getOperatorCode:
+	LD A, (IY + 1)	; checking if it's an operator with length of 1
+	CP 0
+	JR Z, _one
+	LD IX, EQUAL_T
+	CALL str_cmp
+	CP 0
+	JR Z, _eq
+	LD IX, NOT_EQUAL_T
+	CALL str_cmp
+	CP 0
+	JR Z, _neq
+	LD IX, GREATER_EQUAL_T
+	CALL str_cmp
+	CP 0
+	JR Z, _ge
+	LD IX, LESSER_EQUAL_T
+	CALL str_cmp
+	CP 0
+	JR Z, _le
+	LD A, 0		; not a known operator
+	RET
+_eq:
+	LD A, EQUAL_B
+	RET
+_neq:
+	LD A, NOT_EQUAL_B
+	RET
+_ge:
+	LD A, GREATER_EQUAL_B
+	RET
+_le:
+	LD A, LESSER_EQUAL_B
+	RET
+_one:
+	LD A, (IY)
+	RET
+ENDP
+
+PROC
 ; returns the bytecode corresponding to the keyword
 ; passed in IY, or zero if it's not a keyword
 ; result in A
-defb "apl_getKeywordCode"
 apl_getKeywordCode:
 	PUSH IX
 	PUSH BC
