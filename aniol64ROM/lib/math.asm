@@ -330,7 +330,6 @@ ENDP
 ; mod result in HL
 ; errors reported in A
 PROC
-defb "u16_mul"
 u16_mul:
         PUSH DE        ; store register state on stack
         LD D, H        ; transfer HL to DE
@@ -518,6 +517,19 @@ ENDP
 
 PROC
 u16_formatHex:
+		LD (IX), '$'
+		LD A, H
+		CALL byte2asc
+		LD (IX + 2), A
+		LD A, B
+		LD (IX + 1), A
+		LD A, L
+		CALL byte2asc
+		LD (IX + 4), A
+		LD A, B
+		LD (IX + 3), A
+		LD A, 0
+		LD (IX + 5), A
         RET
 ENDP
 
