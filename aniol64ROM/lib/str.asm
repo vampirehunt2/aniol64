@@ -315,3 +315,73 @@ _end:
 	RET
 ENDP
 
+PROC
+str_toUpper:
+	PUSH IX
+_loop:
+	LD A, (IX)
+	CP 0
+	JR Z, _end
+	CALL isLowercaseLetter
+	CP FALSE
+	JR _next
+	SUB 32	; convert to uppercase
+	LD (IX), A
+_next:
+	INC IX
+	JR _loop
+_end:
+	POP IX
+	RET
+ENDP
+
+PROC
+str_toLower:
+	PUSH IX
+_loop:
+	LD A, (IX)
+	CP 0
+	JR Z, _end
+	CALL isUppercaseLetter
+	CP FALSE
+	JR _next
+	ADD A, 32	; convert to lowercase
+	LD (IX), A
+_next:
+	INC IX
+	JR _loop
+_end:
+	POP IX
+	RET
+ENDP
+
+PROC
+; checks if the string pointed to by IX 
+; starts with the string pointed to by IY
+; result in A
+str_startsWith:
+	PUSH IX
+	PUSH IY
+	PUSH BC
+_loop:
+	LD A, (IY)
+	CP 0
+	JR Z, _true
+	LD B, (IX)
+	CP B
+	JR NZ, _false
+	INC IX
+	INC IY
+	JR _loop
+_false:
+	LD A, FALSE
+	JR _end
+_true:
+	LD A, TRUE
+_end:
+	POP BC
+	POP IY
+	POP IX
+	RET
+ENDP
+
