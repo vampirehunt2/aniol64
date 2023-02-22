@@ -58,35 +58,25 @@ CALL_B			equ 'b'
 SYSCALL_B		equ 's'
 NUM_B			equ 'm'	
 COMMENT_B		equ ';'
+NL_B			equ 00h
 
-; keyword tokens
-PROG_T: 	defb "PROG", 	0
-PROC_T: 	defb "PROC", 	0
-FUN_T:		defb "FUN", 	0
-END_T:		defb "END", 	0
-RET_T:		defb "RET", 	0
-IF_T: 		defb "IF", 		0
-ELSE_T:		defb "ELSE", 	0
-ENDIF_T:	defb "ENDIF", 	0
-WHILE_T:	defb "WHILE", 	0
-LOOP_T:		defb "LOOP", 	0
-FOR_T:		defb "FOR", 	0
-NEXT_T:		defb "NEXT", 	0
-
-; keyword bycodes
-PROG_B 		equ 'P'
-PROC_B 		equ 'R'
-FUN_B		equ 'F'
-END_B		equ 'E'
-RET_B		equ 'T'
-IF_B 		equ 'I'
-ELSE_B		equ 'L'
-ENDIF_B		equ 'N'
-WHILE_B		equ 'W'
-LOOP_B		equ 'O'
-FOR_B		equ 'f'
-NEXT_B		equ 'N'
-NL_B		equ 00h
+; keyword tokens and their corresponding bytecodes
+KeywordTokens:
+PROG_T: 	defb "PROG", 	0, 'P'
+PROC_T: 	defb "PROC", 	0, 'p'
+FUN_T:		defb "FUN", 	0, 'F'
+END_T:		defb "END", 	0, 'E'
+RET_T:		defb "RET", 	0, 'R'
+IF_T: 		defb "IF", 		0, 'I'
+ELSE_T:		defb "ELSE", 	0, 'E'
+ENDIF_T:	defb "ENDIF", 	0, 'e'
+WHILE_T:	defb "WHILE", 	0, 'W'
+LOOP_T:		defb "LOOP", 	0, 'L'
+FOR_T:		defb "FOR", 	0, 'f'
+NEXT_T:		defb "NEXT", 	0, 'N'
+ARRAY_T:	defb "ARR", 	0, 'A'
+STRING_T:	defb "STR", 	0, 'S'	
+defb 0
 
 ; bytecode types
 ; TODO
@@ -382,6 +372,57 @@ apl_isHexDigit:
 	RET
 _true:
 	LD A, TRUE
+	RET
+ENDP
+
+PROC
+; returns the bytecode corresponding to the keyword
+; passed in IY, or zero if it's not a keyword
+; result in A
+defb "apl_getKeywordCode"
+apl_getKeywordCode:
+	PUSH IX
+	PUSH BC
+	LD IX, KeywordTokens
+_loop:
+	CALL str_len	; check the length of the keyword token
+	CP 0			; the keyword token table ends with an empty string
+	JR Z, _end		; so if we find a zero-length token it means we've reached the end
+	CALL apl_keywordCmp
+	CP 0
+	JR NZ, _end
+	JR _loop
+_end:
+	POP BC
+	POP IX
+	RET			; just return the zero that's already in A
+ENDP
+
+PROC
+; destroys BC
+apl_keywordCmp:
+	PUSH IY
+	LD C, TRUE
+_loop:
+	LD A, (IX)
+	LD B, (IY)
+	CP B
+	JR Z, _next
+	LD C, FALSE
+_next:
+	CP 0
+	JR Z, _end
+	INC IX
+	INC IY
+	JR _loop
+_end:
+	INC IX
+	INC IX
+	LD A, C
+	POP IY
+	CP FALSE
+	RET Z
+	LD A, (IX - 1)
 	RET
 ENDP
 
