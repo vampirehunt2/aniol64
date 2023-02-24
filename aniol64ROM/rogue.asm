@@ -460,6 +460,7 @@ PROC
 rog_init:
 	LD A, FALSE
 	LD (Echo), A
+	LD (Cursor), A
 	LD A, 0
 	LD (DungeonLev), A
 	CALL cursorOff

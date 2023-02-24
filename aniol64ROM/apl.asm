@@ -1,6 +1,6 @@
 ; apl
 
-SpecialChars: defb "+-*/\:=()[]<>&#!@^", 0
+SpecialChars: defb "+-*/\:=()[]<>&|!@^", 0
 
 ; operator tokens
 ADD_T:			defb "+", 	0
@@ -8,8 +8,8 @@ SUB_T:			defb "-", 	0
 MUL_T:			defb "*", 	0
 DIV_T: 			defb "/", 	0
 MOD_T: 			defb "\\", 	0
-ASSIGN_T: 		defb "=", 	0
-EQUAL_T:		defb "==", 	0
+ASSIGN_T: 		defb ":", 	0
+EQUAL_T:		defb "=", 	0
 NOT_EQUAL_T:	defb "<>", 	0
 QUOTE_T:		defb "'", 	0
 LEFT_PAREN_T:	defb "(", 	0
@@ -21,7 +21,7 @@ LESSER_T: 		defb ">", 	0
 GREATER_EQUAL_T:defb ">=", 	0
 LESSER_EQUAL_T:	defb "<=", 	0
 CONJUNCTION_T: 	defb "&", 	0
-ALTERNATIVE_T: 	defb "#", 	0
+ALTERNATIVE_T: 	defb "|", 	0
 NOT_T: 			defb "!", 	0		; TODO perhaps change to ! and change the binary literal marker to %
 ADDR_T: 		defb "@", 	0
 DEREFERENCE_T: 	defb "^", 	0
@@ -33,8 +33,8 @@ SUB_B			equ '-'
 MUL_B			equ '*' 	
 DIV_B 			equ '/' 	
 MOD_B 			equ '\' 	
-ASSIGN_B 		equ '=' 	
-EQUAL_B			equ 'q' 	
+ASSIGN_B 		equ ':' 	
+EQUAL_B			equ '=' 	
 NOT_EQUAL_B		equ 'n' 	
 QUOTE_B			equ '''' 	
 LEFT_PAREN_B	equ '(' 	
@@ -46,7 +46,7 @@ LESSER_B 		equ '>'
 GREATER_EQUAL_B	equ 'g' 	
 LESSER_EQUAL_B	equ 'l' 	
 CONJUNCTION_B 	equ '&' 	
-ALTERNATIVE_B 	equ '#' 	
+ALTERNATIVE_B 	equ '|' 	
 NOT_B 			equ '!' 			
 ADDR_B 			equ '@' 	
 DEREFERENCE_B 	equ '^' 	
@@ -57,7 +57,7 @@ VAR_B			equ 'v'
 CALL_B			equ 'b'
 SYSCALL_B		equ 's'
 NUM_B			equ 'm'	
-COMMENT_B		equ ';'
+COMMENT_B		equ '#'
 NL_B			equ 00h
 
 ; keyword tokens and their corresponding bytecodes
@@ -78,12 +78,17 @@ ARRAY_T:	defb "ARR", 	0, 'A'
 STRING_T:	defb "STR", 	0, 'S'	
 defb 0
 
+; 128 variables with names of up to 8 characters, 
+VARNAMES_SIZE equ 128 * 8
+
 ; bytecode types
 ; TODO
 
-ProgramPtr equ PROGRAM_DATA + 00h 	; 2 bytes
-Token equ PROGRAM_DATA + 02h	  	; 256 bytes for current token
-Bytecodes equ PROGRAM_DATA + 102h
+VarnamePtr	equ PROGRAM_DATA + 00h	; 2 byte pointer into the variable name table
+ProgramPtr 	equ PROGRAM_DATA + 02h 	; 2 bytes
+Token 		equ PROGRAM_DATA + 04h	; 256 bytes for current token
+Varnames 	equ PROGRAM_DATA + 104h
+Bytecodes 	equ PROGRAM_DATA + 104h + VARNAMES_SIZE
 
 
 PROC
@@ -91,6 +96,21 @@ apl_main:
 	LD HL, Bytecodes
 	LD (ProgramPtr), HL
 	CALL apl_tokenize
+	RET
+ENDP
+
+PROC
+; fills the var names table with all zeroes
+; and points VarnamePtr to the beginning of the table
+init_varnameTab:
+	LD HL, Varnames
+	LD (VarnamePtr), HL
+	LD HL, 00h
+	LD (Varnames), HL
+	LD DE, Varnames
+	INC HL
+	LD BC VARNAMES_SIZE
+	LDIR
 	RET
 ENDP
 
@@ -130,7 +150,7 @@ _next:
 	JP Z, apl_tokenizeString
 	;
 	LD A, B
-	CP ';'
+	CP '#'
 	JP Z, apl_tokenizeComment
 	RET
 ENDP
@@ -376,6 +396,69 @@ _true:
 ENDP
 
 PROC
+; token in Token
+apl_getVarCode:
+	LD D, 255		; counting the variables within the varname table in D
+	LD IX, VarnamePtr
+_varLoop:
+	LD IY, Token
+	INC D
+	LD E, 0			; counting the characters within the variable name in E
+	LD A, (IX)
+	CP 0			; if we've find a lone zero, that means we've reached past the last variable
+	JR Z, _notFound 
+_charLoop:
+	LD A, 8
+	CP E			; check if we've reached 8 characters of variable name
+	JR Z, _found
+	LD A, (IX)
+	CP 0
+	JR Z, _found
+	LD B, (IY)
+	CP B
+	JR NZ, _nextVar
+	INC E
+	INC IX
+	INC IY
+	JR _charLoop
+_nextVar:
+	INC IX			; going to the next character in the varname table
+	INC E
+	LD A, 8
+	CP E			; check if we've reached 8 characters of variable name
+	JR Z, _varLoop  ; loop to the next character
+_notFound:
+	LD IY, Token
+	LD E, 0
+	INC D
+_copyLoop:
+	LD A, (IY)
+	LD (IX), A
+	CP 0
+	JR Z, _found
+	INC E
+	LD A, 8
+	CP E
+	JR Z, _found:
+	INC IX
+	INC IY
+	JR _copyLoop
+_found:
+	LD A, D			; load the var index into A
+	OR 10000000b	; set the first bit to indicate that the bytecode refers to a variable
+	RET
+_end:
+	RET
+ENDP
+
+PROC
+apl_varnameMatch:
+	
+	RET
+ENDP
+
+PROC
+; token in IY
 apl_getOperatorCode:
 	LD A, (IY + 1)	; checking if it's an operator with length of 1
 	CP 0
