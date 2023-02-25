@@ -87,8 +87,8 @@ VARNAMES_SIZE equ 128 * 8
 VarnamePtr	equ PROGRAM_DATA + 00h	; 2 byte pointer into the variable name table
 ProgramPtr 	equ PROGRAM_DATA + 02h 	; 2 bytes
 Token 		equ PROGRAM_DATA + 04h	; 256 bytes for current token
-Varnames 	equ PROGRAM_DATA + 104h
-Bytecodes 	equ PROGRAM_DATA + 104h + VARNAMES_SIZE
+Varnames 	equ PROGRAM_DATA + 108h	; need to be aligned to 8 byte boundary
+Bytecodes 	equ PROGRAM_DATA + 108h + VARNAMES_SIZE
 
 
 PROC
@@ -109,7 +109,7 @@ init_varnameTab:
 	LD (Varnames), HL
 	LD DE, Varnames
 	INC HL
-	LD BC VARNAMES_SIZE
+	LD BC, VARNAMES_SIZE
 	LDIR
 	RET
 ENDP
@@ -397,64 +397,85 @@ ENDP
 
 PROC
 ; token in Token
+defb "apl_getVarCode"
 apl_getVarCode:
-	LD D, 255		; counting the variables within the varname table in D
-	LD IX, VarnamePtr
-_varLoop:
-	LD IY, Token
-	INC D
-	LD E, 0			; counting the characters within the variable name in E
-	LD A, (IX)
-	CP 0			; if we've find a lone zero, that means we've reached past the last variable
-	JR Z, _notFound 
-_charLoop:
-	LD A, 8
-	CP E			; check if we've reached 8 characters of variable name
-	JR Z, _found
+	LD D, 0		; counting the variables within the varname table in D
+	LD IX, Varnames
+_loop:
 	LD A, (IX)
 	CP 0
+	JR Z, _notFound
+	CALL apl_varnameMatch
+	CP TRUE
 	JR Z, _found
-	LD B, (IY)
-	CP B
-	JR NZ, _nextVar
-	INC E
-	INC IX
-	INC IY
-	JR _charLoop
-_nextVar:
-	INC IX			; going to the next character in the varname table
-	INC E
-	LD A, 8
-	CP E			; check if we've reached 8 characters of variable name
-	JR Z, _varLoop  ; loop to the next character
+	CALL apl_nextVar
+	INC D
+	JR _loop
 _notFound:
-	LD IY, Token
-	LD E, 0
-	INC D
-_copyLoop:
-	LD A, (IY)
-	LD (IX), A
-	CP 0
-	JR Z, _found
-	INC E
-	LD A, 8
-	CP E
-	JR Z, _found:
-	INC IX
-	INC IY
-	JR _copyLoop
+	CALL apl_newVar
 _found:
-	LD A, D			; load the var index into A
-	OR 10000000b	; set the first bit to indicate that the bytecode refers to a variable
-	RET
-_end:
+	LD A, D
+	OR 10000000b
 	RET
 ENDP
 
 PROC
 apl_varnameMatch:
-	
+	LD E, 0
+	LD IY, Token
+_loop:
+	LD A, (IX)
+	LD B, (IY)
+	CP B
+	JR NZ, _false
+	CP 0
+	JR Z, _true
+	INC E
+	LD A, 8
+	CP E
+	JR Z, _true
+	INC IX
+	INC IY
+	JR _loop
+_true:
+	LD A, TRUE
 	RET
+_false:
+	LD A, FALSE
+	RET
+ENDP
+
+PROC
+apl_newVar:
+	LD IY, Token
+	LD E, 0
+_loop:
+	LD A, (IY)
+	LD (IX), A
+	CP 0
+	RET Z
+	INC E
+	LD A, 8
+	CP E
+	RET Z
+	INC IX
+	INC IY
+	JR _loop
+ENDP
+
+PROC
+apl_nextVar:
+	PUSH IX
+	POP HL
+	LD A, L
+	AND 11111000b
+	LD L, A
+	LD B, 0
+	LD C, 8
+	ADD HL, BC
+	PUSH HL
+	POP IX
+	RET	
 ENDP
 
 PROC
@@ -463,10 +484,6 @@ apl_getOperatorCode:
 	LD A, (IY + 1)	; checking if it's an operator with length of 1
 	CP 0
 	JR Z, _one
-	LD IX, EQUAL_T
-	CALL str_cmp
-	CP 0
-	JR Z, _eq
 	LD IX, NOT_EQUAL_T
 	CALL str_cmp
 	CP 0
@@ -480,9 +497,6 @@ apl_getOperatorCode:
 	CP 0
 	JR Z, _le
 	LD A, 0		; not a known operator
-	RET
-_eq:
-	LD A, EQUAL_B
 	RET
 _neq:
 	LD A, NOT_EQUAL_B
