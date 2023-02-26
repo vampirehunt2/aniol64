@@ -1,6 +1,6 @@
 ; apl
 
-SpecialChars: defb "+-*/\:=()[]<>&|!@^", 0
+SpecialChars: defb "+-*/\:=()[]<>&|!@^,;", 0
 
 ; operator tokens
 ADD_T:			defb "+", 	0
@@ -22,10 +22,12 @@ GREATER_EQUAL_T:defb ">=", 	0
 LESSER_EQUAL_T:	defb "<=", 	0
 CONJUNCTION_T: 	defb "&", 	0
 ALTERNATIVE_T: 	defb "|", 	0
-NOT_T: 			defb "!", 	0		; TODO perhaps change to ! and change the binary literal marker to %
+NOT_T: 			defb "!", 	0
 ADDR_T: 		defb "@", 	0
 DEREFERENCE_T: 	defb "^", 	0
 INDEX_T:		defb ".", 	0
+SEPARATOR_T:	defb ",", 	0
+TERMINATOR_T:	defb ";", 	0
 
 ; operator bytecodes
 ADD_B			equ '+' 	
@@ -51,6 +53,8 @@ NOT_B 			equ '!'
 ADDR_B 			equ '@' 	
 DEREFERENCE_B 	equ '^' 	
 INDEX_B			equ '.' 
+SEPARATOR_B		equ ','
+TERMINATOR_B	equ ';'
 
 ; other bytecodes
 VAR_B			equ 'v'
@@ -65,7 +69,7 @@ KeywordTokens:
 PROG_T: 	defb "PROG", 	0, 'P'
 PROC_T: 	defb "PROC", 	0, 'p'
 FUN_T:		defb "FUN", 	0, 'F'
-END_T:		defb "END", 	0, 'E'
+END_T:		defb "END", 	0, 'D'
 RET_T:		defb "RET", 	0, 'R'
 IF_T: 		defb "IF", 		0, 'I'
 ELSE_T:		defb "ELSE", 	0, 'E'
@@ -92,7 +96,9 @@ Bytecodes 	equ PROGRAM_DATA + 108h + VARNAMES_SIZE
 
 
 PROC
+defb "apl_main"
 apl_main:
+	CALL init_varnameTab
 	LD HL, Bytecodes
 	LD (ProgramPtr), HL
 	CALL apl_tokenize
@@ -101,16 +107,13 @@ ENDP
 
 PROC
 ; fills the var names table with all zeroes
-; and points VarnamePtr to the beginning of the table
 init_varnameTab:
-	LD HL, Varnames
-	LD (VarnamePtr), HL
-	LD HL, 00h
-	LD (Varnames), HL
-	LD DE, Varnames
-	INC HL
-	LD BC, VARNAMES_SIZE
-	LDIR
+	XOR A           ;LD A, 0
+    LD HL, Varnames
+    LD DE, Varnames + 1
+    LD (HL), A   		
+    LD BC, VARNAMES_SIZE  
+    LDIR         
 	RET
 ENDP
 
@@ -120,14 +123,14 @@ _loop:
 	LD HL, Token
 	CALL dos_fPeek
 	LD B, A
-	CALL apl_isSeparator
+	CALL apl_isWhitespace
 	CP TRUE
-	JR Z, _separator
+	JR Z, _whitespace
 	JR _next
-_separator:
+_whitespace:
 	CALL dos_fRead
 	JR _loop
-	; skipped separators
+	; skipped whitespace
 _next:
 	CALL apl_isLetter
 	CP TRUE
@@ -135,7 +138,7 @@ _next:
 	;
 	CALL apl_isDecDigit
 	CP TRUE
-	JP Z, apl_tokenizeNumber
+	JP Z, apl_tokenizeDec
 	;
 	CALL apl_isSpecialChar
 	CP TRUE
@@ -156,11 +159,14 @@ _next:
 ENDP
 
 PROC
-defb "apl_tokenize"
 apl_tokenize:
 _loop:
 	CALL apl_getToken
-	JR _loop
+	LD IX, Token
+	LD IY, END_T
+	CALL str_cmp
+	CP 0
+	JR NZ, _loop
 	RET
 ENDP
 	
@@ -184,11 +190,12 @@ _next:
 _end:
 	LD (HL), 0
 	INC HL
+	CALL apl_processVar		; TODO add checking for keywords, constants, system calls, users calls
 	RET
 ENDP
 
 PROC
-apl_tokenizeNumber:
+apl_tokenizeDec:
 _loop:
 	CALL dos_fPeek
 	LD B, A
@@ -204,29 +211,18 @@ _next:
 _end:
 	LD (HL), 0
 	INC HL
+	CALL apl_processDec
 	RET
 ENDP
 
 PROC
-apl_tokenizeOperator:
-_loop:
-	CALL dos_fPeek
-	LD B, A
-	CALL apl_isSpecialChar 
-	CP TRUE
-	JR Z, _next
-	JR _end
-_next:
-	CALL dos_fRead
-	LD (HL), A
-	INC HL
-	JR _loop
-_end:
-	LD (HL), 0
-	INC HL
+apl_processDec:
+	LD IX, Token
+	CALL u16_parseDec
+	CALL apl_processNumber
 	RET
 ENDP
-	
+
 PROC
 apl_tokenizeHex:
 	CALL dos_fRead	; reading in the '$' symbol
@@ -247,6 +243,72 @@ _next:
 _end:
 	LD (HL), 0
 	INC HL
+	CALL apl_processHex
+	RET
+ENDP
+
+PROC
+apl_processHex:
+	LD IX, Token
+	CALL u16_parseHex
+	CALL apl_processNumber
+	RET
+ENDP
+
+PROC
+apl_processNumber:
+	LD A, NUM_B
+	LD IX, (ProgramPtr)
+	LD (IX), A
+	INC IX
+	LD A, L
+	LD (IX), A
+	INC IX
+	LD A, H
+	LD (IX), A
+	LD (ProgramPtr), IX
+	RET
+ENDP
+
+PROC
+apl_tokenizeOperator:
+_loop:
+	CALL dos_fPeek
+	LD B, A
+	CALL apl_isSpecialChar 
+	CP TRUE
+	JR Z, _next
+	JR _end
+_next:
+	CALL dos_fRead
+	LD (HL), A
+	INC HL
+	JR _loop
+_end:
+	LD (HL), 0
+	INC HL
+	CALL apl_processOperator
+	RET
+ENDP
+
+PROC
+apl_processOperator:
+	CALL apl_getOperatorCode
+	LD HL, (ProgramPtr)
+	LD (HL), A
+	INC HL
+	LD (ProgramPtr), HL
+	RET
+ENDP
+
+PROC
+defb "apl_processVar"
+apl_processVar:
+	CALL apl_getVarCode
+	LD HL, (ProgramPtr)
+	LD (HL), A
+	INC HL
+	LD (ProgramPtr), HL
 	RET
 ENDP
 
@@ -266,7 +328,6 @@ _end:
 ENDP
 
 PROC
-defb "apl_tokenizeString"
 apl_tokenizeString
 	CALL dos_fRead	; read the opening quote
 	LD (HL), A
@@ -358,11 +419,13 @@ _end:
 ENDP
 
 PROC
-apl_isSeparator:
+apl_isWhitespace:
 	LD A, B
 	CP ' '
 	JR Z, _true
-	CP ','
+	CP '\t'
+	JR Z, _true
+	CP LF
 	JR Z, _true
 	LD A, FALSE
 	RET
@@ -396,8 +459,13 @@ _true:
 ENDP
 
 PROC
-; token in Token
-defb "apl_getVarCode"
+; variable name is passed in the Token variable
+; and is a null-terminated string
+; characters past the 8th are silently ignored
+; returns the index of the variable in the Varnames table
+; adds the variable at the end of the table if not already present
+; result in A
+; destroys D, IX
 apl_getVarCode:
 	LD D, 0		; counting the variables within the varname table in D
 	LD IX, Varnames
@@ -420,6 +488,10 @@ _found:
 ENDP
 
 PROC
+; checks whether variable names pointed to by IX and IY match.
+; the variable name at IX has an 8-byte maximum lenght
+; and it is null-terminated only if the length is less than 8
+; destroys E, IY, A, B, IX
 apl_varnameMatch:
 	LD E, 0
 	LD IY, Token
@@ -446,6 +518,9 @@ _false:
 ENDP
 
 PROC
+; adds a new record to the Varnames table
+; at the current IX position (assumes IX is at the end of the table)
+; destroys A, E, IX, IY
 apl_newVar:
 	LD IY, Token
 	LD E, 0
@@ -464,6 +539,10 @@ _loop:
 ENDP
 
 PROC
+; moves IX to the begginign of the next record
+; in the Varnames table
+; assumes Varnames is aligned at 8 byte boundary
+; destroys A, HL, BC
 apl_nextVar:
 	PUSH IX
 	POP HL
@@ -479,8 +558,9 @@ apl_nextVar:
 ENDP
 
 PROC
-; token in IY
+; token in Token
 apl_getOperatorCode:
+	LD IY, Token
 	LD A, (IY + 1)	; checking if it's an operator with length of 1
 	CP 0
 	JR Z, _one
