@@ -1,6 +1,6 @@
 ; apl
 
-SpecialChars: defb "+-*/\:=()[]<>&|!@^,;", 0
+SpecialChars: defb "+-*/\:=[]<>&|!@^,;", 0
 
 ; operator tokens
 ADD_T:			defb "+", 	0
@@ -144,6 +144,10 @@ _next:
 	CP TRUE
 	JP Z, apl_tokenizeOperator
 	;
+	CALL apl_isBracket
+	CP TRUE
+	JP Z, apl_tokenizeBracket
+	;
 	LD A, B
 	CP '$'
 	JP Z, apl_tokenizeHex
@@ -266,9 +270,24 @@ apl_processNumber:
 	INC IX
 	LD A, H
 	LD (IX), A
+	INC IX
 	LD (ProgramPtr), IX
 	RET
 ENDP
+
+apl_tokenizeBracket:
+	CALL dos_fRead
+	LD (HL), A
+	INC HL
+	CALL apl_processBracket
+	RET
+
+apl_processBracket:
+	LD HL, (ProgramPtr)
+	LD (HL), A
+	INC HL
+	LD (ProgramPtr), HL
+	RET
 
 PROC
 apl_tokenizeOperator:
@@ -452,6 +471,20 @@ apl_isHexDigit:
 	CALL isHexDigit
 	CP FALSE
 	JR NZ, _true
+	RET
+_true:
+	LD A, TRUE
+	RET
+ENDP
+
+PROC
+apl_isBracket:
+	LD A, B
+	CP '('
+	JR Z, _true
+	CP ')'
+	JR Z, _true
+	LD A, FALSE
 	RET
 _true:
 	LD A, TRUE
