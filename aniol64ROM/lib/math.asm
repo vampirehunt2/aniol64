@@ -416,8 +416,18 @@ _end:
 ENDP
 
 PROC
+defb "i16_parseDec"
 i16_parseDec:
-        RET
+	LD A, (IX)
+	CP '-'		; check for leading minus
+	JR NZ, _pos
+	INC IX		; move past the minus sign
+	CALL u16_parseDec ; parse the absolute value of the number
+	CALL i16_neg
+	RET
+_pos:
+	CALL u16_parseDec  
+    RET
 ENDP
 
 PROC
@@ -513,6 +523,24 @@ _loop:
         POP HL
         POP BC
         RET
+ENDP
+
+PROC
+defb "i16_formatDec"
+i16_formatDec:
+	LD A, H
+	AND 10000000b	; isolate the sign of the number
+	CP 0
+	JR Z, _pos
+	LD A, H
+	AND 011111111b	; isolate the absolute value of the number
+	LD H, A
+	LD A, '-'
+	LD (IX), A
+	INC IX
+_pos:
+	CALL u16_formatDec
+	RET
 ENDP
 
 PROC
