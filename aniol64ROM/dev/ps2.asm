@@ -60,8 +60,7 @@ ps2_readScancode:
 		IN A, (DART_A_DAT)
 		RET
 		
-; converts a scancode to the corresponding ascii character
-PROC
+; converts a scancode to the corresponding ascii character
 ps2_scancode2asc:
 		PUSH BC
 		PUSH HL
@@ -69,116 +68,107 @@ ps2_scancode2asc:
 		LD B, 0
 		LD A, (Ps2Shift)
 		CP TRUE
-		JR Z, _shift
+		JR Z, .shift
 		LD HL, ps2Scancodes
-		JR _continue
-_shift:
+		JR .continue
+.shift:
 		LD HL, ps2ShiftScancodes
-_continue:
+.continue:
 		ADD HL, BC
 		LD A, (HL)
 		POP HL
 		POP BC
-		RET
-ENDP
+		RET
 
-
-PROC
+
 readKeyAsync:
-		RET
-ENDP
-
-PROC
+		RET
+
 keyInput:
 		CALL ps2_readScancode
 		CP KEY_UP
-		JR Z, _keyUp
+		JR Z, .keyUp
 		CP EXT_KEY
-		JR Z, _extKey
+		JR Z, .extKey
 		CP LSHIFT
-		JR Z, _shiftDn
+		JR Z, .shiftDn
 		CP RSHIFT
-		JR Z, _shiftDn
+		JR Z, .shiftDn
 		CALL ps2_scancode2asc
 		RET
-_shiftDn:
+.shiftDn:
 		LD A, TRUE
 		LD (Ps2Shift), A
 		JR keyInput
-_shiftUp:
+.shiftUp:
 		LD A, FALSE
 		LD (Ps2Shift), A
 		JR keyInput
-_keyUp:
-_extKey:
+.keyUp:
+.extKey:
 		CALL ps2_readScancode ; ignore the next scancode, it's the code of the key that's going up
-		JR Z, _extKey
+		JR Z, .extKey
 		CP LSHIFT
-		JR Z, _shiftUp
+		JR Z, .shiftUp
 		CP RSHIFT
-		JR Z, _shiftUp
-		JR keyInput
-ENDP
-
-PROC
+		JR Z, .shiftUp
+		JR keyInput
+
 readKey:
 		PUSH BC
 		CALL keyInput
 		LD B, A
         CP 08            	; check if BACKSPACE was pressed
-        JR Z, _bkspc
+        JR Z, .bkspc
         CP 20h              ; checks if the key corresponds to a control character
-        JR C, _noEcho   	; skip echo if less	
+        JR C, .noEcho   	; skip echo if less	
 		LD A, (Echo)
 		CP FALSE
-		JR Z, _noEcho
+		JR Z, .noEcho
 		LD A, B
         CALL putChar	; echo the character to screen, but don't remove it from the keyboard buffer
 		CALL bzr_click
-_noEcho:
+.noEcho:
 		LD A, B
 		POP BC
         RET
-_bkspc:
+.bkspc:
         CALL cursorLShift  ; TODO: check if you're already in the beginning of line
         LD A, ' '
         CALL putChar
         CALL cursorLShift
-        JR _noEcho
-ENDP
+        JR .noEcho
 
 ; reads a line from keyboard
 ; result in LineBuff
 ; result is only valid until next call of readLine
 ; if the result needs to persist, it needs to be copied to elswhere in memory
-; TODO: check for max line length (buffer overflow)
-PROC
+; TODO: check for max line length (buffer overflow)
 readLine:
 		PUSH BC
         LD BC, LineBuff       ; point BC to the beginning of the keyboard buffer
-_loop:
+.loop:
         CALL readKey     	 ; wait for a key to be pressed
         CP 13                ; check if RETURN key was pressed
-        JR Z, _return
+        JR Z, .return
         CP 08                 ; check if BACKSPACE was pressed
-        JR Z, _bkspc
+        JR Z, .bkspc
         CP 20h                ; checks if the key corresponds to a control character
-        JR C, _loop           ; skip if less
+        JR C, .loop           ; skip if less
         LD (BC), A            ; store the character in the keyboard buffer
         INC C                 ; point BC to the new position of keyboard buffer
-        JR _loop
-_bkspc:
+        JR .loop
+.bkspc:
         LD A, C                ; check if line buffer not empty
         CP 0
-        JR Z, _loop             ; TODO: beep if buffer is empty
+        JR Z, .loop             ; TODO: beep if buffer is empty
         DEC C                   ; go back one character
-        JR _loop
-_return:
+        JR .loop
+.return:
         LD A, 0                ; store end of line
         LD (BC), A
 		POP BC
-        RET
-ENDP
+        RET
 
 ;1)   Bring the Clock line low for at least 100 microseconds.
 ;2)   Bring the Data line low.
@@ -201,18 +191,16 @@ ps2_transmit:
 		OUT (DART_A_DAT), A
 		CALL ps2_dataRelease
 		RET
-		
-PROC
+		
 ps2_wait4Tx:
 		PUSH AF
-_loop:
+.loop:
 		IN A, (DART_A_CMD)
 		AND 00000100b
 		CP 0
-		JR Z, _loop
+		JR Z, .loop
 		POP AF
-		RET
-ENDP
+		RET
 
 ps2_clockInhibit:
 		PUSH AF

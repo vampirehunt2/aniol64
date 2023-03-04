@@ -95,8 +95,7 @@ putChar:
 	; waiting for the character to be sent is done automatically
 	; since WAIT function is enabled.
     RET
-
-PROC
+
 ; gets a single character from the screen at current cursor position
 ; and moves the cursor over by one
 ; result in A
@@ -105,30 +104,27 @@ getChar:
 	OUT (DART_B_DAT), A
 	LD A, '|'
 	OUT (DART_B_DAT), A
-_loop:
+.loop:
 	IN A, (DART_B_CMD)
 	BIT 0, A
-	JR Z, _loop
+	JR Z, .loop
 	IN A, (DART_B_DAT)
-    RET
-ENDP
-
-PROC
+    RET
+
 ; writes a string to the display at current cursor position
 ; IX - null-terminated string to write
 writeStr:
 	PUSH IX
-_loop:
+.loop:
 	LD A, (IX)
 	CP 0
-    JR Z, _end
+    JR Z, .end
 	CALL putChar
 	INC IX
-	JR _loop
-_end:
+	JR .loop
+.end:
 	POP IX
-	RET
-ENDP
+	RET
 
 ; goes to the next line of the display
 ; if there are free lines below the current ones, goes to the next one

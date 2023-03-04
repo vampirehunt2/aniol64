@@ -83,33 +83,31 @@ i16_xor:
 ; result in A
 ; returns 0 if they are equal
 ; 1 if HL is greater
-; -1 (FF) if HL is smaller
-PROC
+; -1 (FF) if HL is smaller
 u16_cmp:
         LD A, H
         CP B
-        JR NZ, _notEqual
+        JR NZ, .notEqual
         LD A, L
         CP C
-        JR NZ, _notEqual
+        JR NZ, .notEqual
         LD A, EQUAL
         RET
-_notEqual:
+.notEqual:
         LD A, H
         CP B
-        JR C, _smaller
-        JR NZ, _greater
+        JR C, .smaller
+        JR NZ, .greater
         LD A, L
         CP C
-        JR C, _smaller
-        JR _greater
-_smaller:
+        JR C, .smaller
+        JR .greater
+.smaller:
         LD A, SMALLER
         RET
-_greater:
+.greater:
         LD A, GREATER
-        RET
-ENDP
+        RET
 
 ; returns the absolute value of a signed 16-bit integer
 ; argument in HL
@@ -155,93 +153,89 @@ i16_not:
 ; result in A
 ; returns 0 if they are equal
 ; 1 if HL is greater
-; -1 (FF) if HL is smaller
-PROC
+; -1 (FF) if HL is smaller
 i16_cmp:
         PUSH DE
         LD A, H
         CP B
-        JR NZ, _notEqual
+        JR NZ, .notEqual
         LD A, L
         CP C
-        JR NZ, _notEqual
-_equal:
+        JR NZ, .notEqual
+.equal:
         LD A, EQUAL
-        JR _end
-_notEqual:
+        JR .end
+.notEqual:
         LD A, B
         AND SIGN
         LD D, A    ; storing the sign oh BC in D
         LD A, H
         AND SIGN
         CP D
-        JR Z, _sameSign
-        JR C, _greater
-        JR _smaller
-_greater:
+        JR Z, .sameSign
+        JR C, .greater
+        JR .smaller
+.greater:
         LD A, GREATER
-        JR _end
-_smaller:
+        JR .end
+.smaller:
         LD A, SMALLER
-        JR _end
-_sameSign:
+        JR .end
+.sameSign:
         CALL u16_cmp
         CP EQUAL
-        JR Z, _equal
+        JR Z, .equal
         LD E, A    ; save the comparison result
         LD A, D   ; get the stored sign of BC
         CP SIGN
-        JR Z, _invert
+        JR Z, .invert
         LD A, E
-        JR _end
-_invert:
+        JR .end
+.invert:
         LD A, E  ; load the comparison result into A
         CP GREATER
-        JR Z, _invertGreater
+        JR Z, .invertGreater
         LD A, GREATER
-        JR _end
-_invertGreater:
+        JR .end
+.invertGreater:
         LD A, SMALLER
-        JR _end
-_end:
+        JR .end
+.end:
         POP DE
-        RET
-ENDP
+        RET
 
 ; divides two unsigned 16-bit integers
 ; arguments in HL and BC
 ; division result in DE
 ; mod result in HL
-; errors reported in A
-PROC
+; errors reported in A
 u16_div:
         LD A, B    ; checking if it's not a division by zero
         CP 0
-        JR NZ, _proceed
+        JR NZ, .proceed
         LD A, C
         CP 0
-        JR NZ, _proceed
+        JR NZ, .proceed
         LD A, DIVBY0
         RET
-_proceed:
+.proceed:
         LD D, 0
         LD E, 0
-_loop:
+.loop:
         CALL u16_cmp
         CP SMALLER
-        JR Z, _end
+        JR Z, .end
         AND A   ; clear carry
         CALL u16_sub
         INC E
         LD A, E
         CP 0
-        JR NZ, _loop
+        JR NZ, .loop
         INC D
-        JR _loop
-_end:
+        JR .loop
+.end:
         LD A, OK
-        RET
-ENDP
+        RET
 
 ; calculates the sign of multiplication or division result
 ; operands in HL and BC
@@ -258,8 +252,7 @@ i16_mulSign:
         POP DE
         RET
 
-; converts signed intenegers in HL and BC to their absolute values
-PROC
+; converts signed intenegers in HL and BC to their absolute values
 i16_operands2abs:
         PUSH HL       ; converting both operands to their absolute values
         LD H, B
@@ -269,15 +262,13 @@ i16_operands2abs:
         LD C, L
         POP HL
         CALL i16_abs ; both operands now have their absolute values
-        RET
-ENDP
+        RET
 
 ; divides two signed 16-bit integers
 ; arguments in HL and BC
 ; division result in DE
 ; mod result in HL
-; errors reported in A
-PROC
+; errors reported in A
 i16_div:
         PUSH BC
         CALL i16_mulSign
@@ -285,10 +276,10 @@ i16_div:
         CALL i16_operands2abs
         CALL u16_div ; dividing two positive values
         CP 0
-        JR NZ, _divBy0
+        JR NZ, .divBy0
         POP AF       ; restoring the sign of the result in A
         CP 0
-        JR Z, _end
+        JR Z, .end
         PUSH HL
         LD H, D
         LD L, E
@@ -296,96 +287,88 @@ i16_div:
         LD D, H
         LD E, L
         POP HL
-_end:
+.end:
         POP BC
         RET
-_divBy0:
+.divBy0:
         POP BC
         LD A, DIVBY0
-        RET
-ENDP
+        RET
 
 ; checks if a 16-bit integer is zero
 ; argument in DE
-; result in A
-PROC
+; result in A
 i16_is0:
         LD A, D
         CP 0
-        JR NZ, _false
+        JR NZ, .false
         LD A, E
         CP 0
-        JR NZ, _false
+        JR NZ, .false
         LD A, TRUE
-        JR _end
-_false:
+        JR .end
+.false:
         LD A, FALSE
-_end:
-        RET
-ENDP
+.end:
+        RET
 
 ; multiplies two unsigned 16-bit integers
 ; arguments in HL and BC
 ; division result in DE
 ; mod result in HL
-; errors reported in A
-PROC
+; errors reported in A
 u16_mul:
         PUSH DE        ; store register state on stack
         LD D, H        ; transfer HL to DE
         LD E, L
         LD HL, 0
-_loop:
+.loop:
         CALL i16_is0
         CP TRUE
-        JR Z, _correct
+        JR Z, .correct
         AND A           ; clear carry
         ADD HL, BC      ; accumulate values into HL
-        JR C, _overflow
+        JR C, .overflow
         DEC DE          ; use DE as loop counter
-        JR _loop
-_overflow:
+        JR .loop
+.overflow:
         LD A, OVERFLOW
-        JR _end
-_correct:
+        JR .end
+.correct:
         LD A, OK
-        JR _end
-_end:
+        JR .end
+.end:
         POP DE         ; restore register state
-        RET
-ENDP
+        RET
 
 ; multiplies two signed 16-bit integers
 ; operands in HL and BC
 ; result in B
-; overflow reported in A (TODO: doesn't work)
-PROC
+; overflow reported in A (TODO: doesn't work)
 i16_mul:
         CALL i16_mulSign
         PUSH AF       ; storing the sign of the result on stack
         CALL i16_operands2abs
         CALL u16_mul ; multiply two positive values
         CP OK
-        JR NZ, _overflow
+        JR NZ, .overflow
         POP AF       ; restoring the sign of the result in A
         CP 0
-        JR Z, _correct
+        JR Z, .correct
         CALL i16_neg
-        JR _correct
-_overflow:
+        JR .correct
+.overflow:
         LD A, OVERFLOW
-        JR _end
-_correct:
+        JR .end
+.correct:
         LD A, OK
-        JR _end
-_end:
-        RET
-ENDP
+        JR .end
+.end:
+        RET
 
 ; multiplies two unsigned 8 bit integers
 ; arguments in B and C
-; result in HL
-PROC
+; result in HL
 u8_mul:
         LD HL, 0
 		LD A, B
@@ -393,62 +376,53 @@ u8_mul:
 		RET Z
 		LD D, 0
 		LD E, C
-_loop:
+.loop:
         ADD HL, DE
-		DJNZ _loop
-		RET
-ENDP
-
-PROC
+		DJNZ .loop
+		RET
+
 ; divides A by B
 ; result in C
 ; rest in A
 u8_div:
 		LD C, 0
-_loop:
+.loop:
 		CP B
-		JR C, _end
+		JR C, .end
 		SUB B
 		INC C
-		JP _loop
-_end:
-		RET
-ENDP
-
-PROC
+		JP .loop
+.end:
+		RET
+
 i16_parseDec:
 	LD A, (IX)
 	CP '-'		; check for leading minus
-	JR NZ, _pos
+	JR NZ, .pos
 	INC IX		; move past the minus sign
 	CALL u16_parseDec ; parse the absolute value of the number
 	CALL i16_neg
 	RET
-_pos:
+.pos:
 	CALL u16_parseDec  
-    RET
-ENDP
-
-PROC
+    RET
+
 u16_parseHex:
 		LD A, (IX)
         CP '$'         ; check if the string starts with $ indicating it's a hex number
-        JR NZ, _parseError
+        JR NZ, .parseError
         INC IX
 		CALL parseDByte
 		RET
-_parseError:
+.parseError:
 		LD A, FORMATERR
-        RET
-ENDP
-
-PROC
+        RET
+
 u16_parseBin:
 		CALL u8_parseBin
 		LD L, C
 		LD H, 0  
-        RET
-ENDP
+        RET
 
 ; parses a 16-bit unsigned number
 ; leading zeroes are not mandatory
@@ -456,50 +430,47 @@ ENDP
 ; result in HL
 ; errors reported in A
 ; in case of errors, address of first erroneous character is in IX
-; destroys IX
-PROC
+; destroys IX
 u16_parseDec:
         PUSH BC
         LD HL, 0   ; will be accumulating the value in HL
-_loop:
+.loop:
         LD A, (IX)
         SUB '0'  ; converts '0'-'9' to 0-9
         CP 10   ; check if we read a decimal digit
-        JR NC, _parseError
+        JR NC, .parseError
         LD C, A
         LD B, 0
         ADD HL, BC
         INC IX
         LD A, (IX)
         CP 0    ; check if we've reached end of string
-        JR Z, _end
+        JR Z, .end
         LD BC, 10
         CALL u16_mul
         CP OK
-        JR NZ, _overflow
-        JR _loop
-_parseError:
+        JR NZ, .overflow
+        JR .loop
+.parseError:
         LD A, FORMATERR
-        JR _end
-_overflow:
+        JR .end
+.overflow:
         LD A, OVERFLOW
-_end:
+.end:
         POP BC
-        RET
-ENDP
+        RET
 
 ; formats a 16-bit unsigned number as string
 ; result is a null-terminated string with leading zeroes
 ; argument in HL
 ; result in a string pointed to by IX
-; conserves both HL and IX
-PROC
+; conserves both HL and IX
 u16_formatDec:
         PUSH BC
         PUSH HL
         PUSH IX
         LD BC, 10000    ; divider stored in BC, numbers of up to 5 decimal digits are supported
-_loop:
+.loop:
         CALL u16_div    ; divide the number by divider to get the current digit
         LD A, E         ; load the division result to A
         AND A           ; clear carry
@@ -516,32 +487,28 @@ _loop:
         POP HL
         CALL i16_is0   ; check if divider is zero
         CP FALSE       ; if not, perform another loop
-        JR Z, _loop
+        JR Z, .loop
         LD (IX), 0     ; store end of line
         POP IX
         POP HL
         POP BC
-        RET
-ENDP
-
-PROC
+        RET
+
 i16_formatDec:
 	LD A, H
 	AND 10000000b	; isolate the sign of the number
 	CP 0
-	JR Z, _pos
+	JR Z, .pos
 	LD A, H
 	AND 011111111b	; isolate the absolute value of the number
 	LD H, A
 	LD A, '-'
 	LD (IX), A
 	INC IX
-_pos:
+.pos:
 	CALL u16_formatDec
-	RET
-ENDP
-
-PROC
+	RET
+
 u16_formatHex:
 		LD (IX), '$'
 		LD A, H
@@ -556,8 +523,7 @@ u16_formatHex:
 		LD (IX + 3), A
 		LD A, 0
 		LD (IX + 5), A
-        RET
-ENDP
+        RET
 
 ; parses an 8-bit unsigned binary number from a null-terminated string
 ; string format is !xxxxxxxx\0 where x is either '1' or '0'
@@ -565,40 +531,37 @@ ENDP
 ; in case of error a non-zero error code is in A
 ; and the address of the first erroneous character is IX
 ; in case of success a 0 is in A and result is in C
-; destroys B
-PROC
+; destroys B
 u8_parseBin:
         LD A, (IX)
         CP '!'         ; check if the string starts with ! indicating it's a binary number
-        JR NZ, _parseError
+        JR NZ, .parseError
         INC IX
         LD B, 8         ; initialise the loop
         LD C, 0
-_loop:
+.loop:
         SLA C
         LD A, (IX)
         SUB '0'         ; converting "0" and "1" to 0 and 1, respectively
         CP 2            ; check if the character is a binary digit
-        JR NC, _parseError
+        JR NC, .parseError
         OR C
         LD C, A
         INC IX
-        DJNZ _loop
+        DJNZ .loop
         LD A, (IX)
         CP 0            ; check for end of string
-        JR NZ, _parseError
+        JR NZ, .parseError
         LD A, OK
-        JR _end
-_parseError:
+        JR .end
+.parseError:
         LD A, FORMATERR
-_end:
-        RET
-ENDP
+.end:
+        RET
 
 ; converts an 8-bit unsigned number to its string representation
 ; number passed in A
-; result in a null-terminated string pointed to by IX
-PROC
+; result in a null-terminated string pointed to by IX
 u8_formatBin:
         PUSH AF
         PUSH BC
@@ -606,24 +569,23 @@ u8_formatBin:
         LD (IX), '!'
         INC IX
         LD B, 8
-_loop:
+.loop:
         LD A, C
         AND 10000000b
         CP 0
-        JR Z, _zero
+        JR Z, .zero
         LD (IX), '1'
-        JR _endLoop
-_zero:
+        JR .endLoop
+.zero:
         LD (IX), '0'
-_endLoop:
+.endLoop:
         INC IX
         SLA C
-        DJNZ _loop
+        DJNZ .loop
         LD (IX), 0
         POP BC
         POP AF
-        RET
-ENDP
+        RET
 
 u8_min:
 		CP B
@@ -639,32 +601,28 @@ u8_max:
 
 ; trims leading zeroes from a formatted number
 ; and replaces them with spaces for text adjustems
-; number in a string pointed to by IX
-PROC
+; number in a string pointed to by IX
 trimLeading0s:
         PUSH AF
         PUSH IX
-_loop:
+.loop:
         LD A, (IX)
         CP '0'
-        JR NZ, _end
+        JR NZ, .end
         LD (IX), ' '
         INC IX
-        JR _loop
-_end:
+        JR .loop
+.end:
         POP IX
-        POP AF
-ENDP
+        POP AF
 
 ; converts a 16-bit unsigned number to its string representation
 ; number passed in HL
-; result in a null-terminated string pointed to by IX
-PROC
+; result in a null-terminated string pointed to by IX
 u16_formatBin:
         LD A, H
         CALL u8_formatBin
         LD A, L
         CALL u8_formatBin
         LD (IX - 9), '-'     ; put a divider between higher and lower byte to enhance readability
-        RET
-ENDP
+        RET

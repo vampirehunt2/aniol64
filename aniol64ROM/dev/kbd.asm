@@ -18,33 +18,31 @@ MOVE_NE equ 'o'
 MOVE_SE equ 'm'
 MOVE_NW equ 'u'
 MOVE_SW equ 'b'
-
-PROC
+
 handleInt:
         LD A, (KbdBuff)
         CP 0            	; checking if keyboard buffer is empty
         RET NZ         		; this is essentially software debouncing
         CALL keyInput
         CP 08            	; check if BACKSPACE was pressed
-        JR Z, _bkspc
+        JR Z, .bkspc
         CP 20h              ; checks if the key corresponds to a control character
-        JR C, _noEcho   	; skip echo if less	
+        JR C, .noEcho   	; skip echo if less	
 		LD B, A
 		LD A, (Echo)
 		CP FALSE
-		JR Z, _noEcho
+		JR Z, .noEcho
 		LD A, B
         CALL putChar	; echo the character to screen, but don't remove it from the keyboard buffer
 		CALL bzr_click
-_noEcho:
+.noEcho:
         RET
-_bkspc:
+.bkspc:
         CALL cursorLShift  ; TODO: check if you're already in the beginning of line
         LD A, ' '
         CALL putChar
         CALL cursorLShift
-        JR _noEcho
-ENDP
+        JR .noEcho
 
 
 ; Converts keyboard code to ASCII code
@@ -93,34 +91,32 @@ readKey:
 ; result in LineBuff
 ; result is only valid until next call of readLine
 ; if the result needs to persist, it needs to be copied to elswhere in memory
-; TODO: check for max line length (buffer overflow)
-PROC
+; TODO: check for max line length (buffer overflow)
 readLine:
 		PUSH BC
         LD BC, LineBuff       ; point BC to the beginning of the keyboard buffer
-_loop:
+.loop:
         CALL readKey     	 ; wait for a key to be pressed
         CP 13                ; check if RETURN key was pressed
-        JR Z, _return
+        JR Z, .return
         CP 08                 ; check if BACKSPACE was pressed
-        JR Z, _bkspc
+        JR Z, .bkspc
         CP 20h                ; checks if the key corresponds to a control character
-        JR C, _loop           ; skip if less
+        JR C, .loop           ; skip if less
         LD (BC), A            ; store the character in the keyboard buffer
         INC C                 ; point BC to the new position of keyboard buffer
-        JR _loop
-_bkspc:
+        JR .loop
+.bkspc:
         LD A, C                ; check if line buffer not empty
         CP 0
-        JR Z, _loop             ; TODO: beep if buffer is empty
+        JR Z, .loop             ; TODO: beep if buffer is empty
         DEC C                   ; go back one character
-        JR _loop
-_return:
+        JR .loop
+.return:
         LD A, 0                ; store end of line
         LD (BC), A
 		POP BC
-        RET
-ENDP
+        RET
 
 KeyCodes:
     defb 71h	; 00-00-000b	q

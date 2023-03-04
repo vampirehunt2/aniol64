@@ -37,25 +37,22 @@ asc2hexstr16b:
 
 ; converts a two digit hex number in ASCII to its value
 ; BA - two hex digits in ASCII
-; result in B
-PROC
+; result in B
 asc2byte:
 	PUSH AF
 	LD A, B
 
 	POP AF
-	RET
-ENDP
+	RET
 
 ; parses a byte - two hex digits
 ; IX: null-terminated string containing the byte digits
 ; result in B
-; parse errors reported in A
-PROC
+; parse errors reported in A
 parseByte:
 	CALL isByteStr
 	CP 0
-	JR Z, _parseError
+	JR Z, .parseError
 	LD A, (IX + 0)
 	CALL hexDigit2nibble
 	SLA A
@@ -67,28 +64,24 @@ parseByte:
 	CALL hexDigit2nibble
 	OR B
 	LD B, A
-_parseOk:
+.parseOk:
 	LD A, 0
 	RET
-_parseError:
+.parseError:
 	LD A, 1
-	RET
-ENDP
-
-PROC
+	RET
+
 parseByteDec:
-	RET
-ENDP
+	RET
 
 ; parses a double byte - four hex digits
 ; IX: null-terminated string containing the double byte digits
 ; result in HL
-; parse errors reported in A
-PROC
+; parse errors reported in A
 parseDByte:
 	CALL isDByteStr
 	CP 0
-	JR Z, _parseError
+	JR Z, .parseError
 	LD A, (IX + 0)
 	CALL hexDigit2nibble
 	SLA A
@@ -113,194 +106,175 @@ parseDByte:
 	LD C, A
 	PUSH BC
 	POP HL
-_parseOk:
+.parseOk:
 	LD A, 0
 	RET
-_parseError:
+.parseError:
 	LD A, 1
-	RET
-ENDP
-
-PROC
+	RET
+
 hexDigit2nibble:
 	CP 3Ah
-	JR C, _numbers
-	JR _letters
-_numbers:
+	JR C, .numbers
+	JR .letters
+.numbers:
 	SUB 30h
 	RET
-_letters:
+.letters:
 	SUB 57h
-	RET
-ENDP
+	RET
 
 ; checks if the byte in A is between 0 and 9 or between a dn f.
 ; only lowercase letters are supported
-; result in A
-PROC
+; result in A
 isHexDigit:
 	CP 30h
-	JR C, _no ; if less than '0' then it's not a hex digit
+	JR C, .no ; if less than '0' then it's not a hex digit
 	CP 67h
-	JR NC, _no ; if equal or more than 'g' then it's not a hex digit
+	JR NC, .no ; if equal or more than 'g' then it's not a hex digit
 	CP 3Ah
-	JR C, _yes ; if less than ':' (which is the next ascii code after '9' then it's a hex digit
+	JR C, .yes ; if less than ':' (which is the next ascii code after '9' then it's a hex digit
 	CP 61h
-	JR C, _yes ; if equal or more than 'a' then it's a hex digit
-_yes
+	JR C, .yes ; if equal or more than 'a' then it's a hex digit
+.yes
 	LD A, 1
 	RET
-_no
+.no
 	LD A, 0
-	RET
-ENDP
+	RET
 
 ; checks if the byte in A is between 0 and 9
-; result in A
-PROC
+; result in A
 isDecDigit:
 	CP '0'
-	JR C, _no ; if less than '0' then it's not a hex digit
+	JR C, .no ; if less than '0' then it's not a hex digit
 	CP '9'
-	JR Z, _yes
-	JR C, _yes ; if less than ':' (which is the next ascii code after '9' then it's a hex digit
-	JR _no
-_yes:
+	JR Z, .yes
+	JR C, .yes ; if less than ':' (which is the next ascii code after '9' then it's a hex digit
+	JR .no
+.yes:
 	LD A, 1
 	RET
-_no:
+.no:
 	LD A, 0
-	RET
-ENDP
-
-PROC
+	RET
+
 isUppercaseLetter:
 	CP 'A'
-	JR C, _no
+	JR C, .no
 	CP 'Z'
-	JR Z, _yes
-	JR C, _yes
-	JR _no
-_yes:
+	JR Z, .yes
+	JR C, .yes
+	JR .no
+.yes:
 	LD A, 1
 	RET
-_no:
+.no:
 	LD A, 0
-	RET
-ENDP
-
-PROC
+	RET
+
 isLowercaseLetter:
 	CP 'a'
-	JR C, _no
+	JR C, .no
 	CP 'z'
-	JR Z, _yes
-	JR C, _yes
-	JR _no
-_yes:
+	JR Z, .yes
+	JR C, .yes
+	JR .no
+.yes:
 	LD A, 1
 	RET
-_no:
+.no:
 	LD A, 0
-	RET
-ENDP
-
-PROC
+	RET
+
 isAlphanumeric:
 	PUSH AF
 	CALL isDecDigit
 	CP 1
-	JR Z, _true
+	JR Z, .true
 	POP AF
 	PUSH AF
 	CALL isUppercaseLetter
 	CP 1
-	JR Z, _true
+	JR Z, .true
 	POP AF
 	PUSH AF
 	CALL isLowercaseLetter
 	CP 1
-	JR Z, _true
+	JR Z, .true
 	POP AF
 	PUSH AF
 	CP '_'
-	JR Z, _true
-	JR _false
-_true:
+	JR Z, .true
+	JR .false
+.true:
 	POP AF
 	LD A, TRUE
 	RET
-_false:
+.false:
 	POP AF
 	LD A, FALSE
-	RET
-ENDP
+	RET
 
 ; checks if a string represents a two-byte hex value
 ; IX - address of the input string
-; result in A: 0 - false, 1 - true
-PROC
+; result in A: 0 - false, 1 - true
 isDByteStr:
 	CALL str_len
 	CP 4			  ; checks if the string is exactly 4 digits
-	JR NZ, _parseError
+	JR NZ, .parseError
 	LD A, (IX+0)
 	CALL isHexDigit
 	CP 0
-	JR Z, _parseError
+	JR Z, .parseError
 	LD A, (IX+1)
 	CALL isHexDigit
 	CP 0
-	JR Z, _parseError
+	JR Z, .parseError
 	LD A, (IX+2)
 	CALL isHexDigit
 	CP 0
-	JR Z, _parseError
+	JR Z, .parseError
 	LD A, (IX+3)
 	CALL isHexDigit
 	CP 0
-	JR Z, _parseError
+	JR Z, .parseError
 	LD A, 1
 	RET
-_parseError:
+.parseError:
 	LD A, 0
-	RET
-ENDP
+	RET
 
 ; checks if a string represents a one-byte hex value
 ; IX - address of the input string
-; result in A: 0 - false, 1 - true
-PROC
+; result in A: 0 - false, 1 - true
 isByteStr:
 	CALL str_len
 	CP 2			  ; checks if the string is exactly 2 digits
-	JR NZ, _parseError
+	JR NZ, .parseError
 	LD A, (IX+0)
 	CALL isHexDigit
 	CP 0
-	JR Z, _parseError
+	JR Z, .parseError
 	LD A, (IX+1)
 	CALL isHexDigit
 	CP 0
-	JR Z, _parseError
+	JR Z, .parseError
 	LD A, 1
 	RET
-_parseError:
+.parseError:
 	LD A, 0
-	RET
-ENDP
-
-PROC
+	RET
+
 isByteDecStr:
 	CALL str_len
 	CP 4
 	LD A, 1
 	RET
-_parseError:
+.parseError:
 	LD A, 0
 	RET
-	RET
-ENDP
+	RET
 
 ; converts a byte to its hex representation in ASCII
 ; A - input byte
@@ -341,30 +315,27 @@ numbers:
 ; Result:
 ; hundreds in C
 ; tens in B
-; units in A
-PROC
+; units in A
 bin2Bcd:
 	LD B, 0
 	LD C, 0
-_hundreds:
+.hundreds:
 	CP 100
-	JR C, _tens   ; if less than 100
+	JR C, .tens   ; if less than 100
 	SUB 100
 	INC C		 ; hundreds counted in C
-	JR _hundreds
-_tens:
+	JR .hundreds
+.tens:
 	CP 10
-	JR C, _units   ; if less than 10
+	JR C, .units   ; if less than 10
 	SUB 10
 	INC B		   ; tens and hundreds counted in B
-	JR _tens
-_units:				 ; least significant digit now in A
-	RET
-ENDP
+	JR .tens
+.units:				 ; least significant digit now in A
+	RET
 
 ; converts a bcd number stored in C, B, A to ASCII
-; result in C, B, A
-PROC
+; result in C, B, A
 bcd2asc:
 	PUSH AF
 	LD A, C
@@ -375,8 +346,7 @@ bcd2asc:
 	LD B, A
 	POP AF
 	ADD A, 30h		; ASCII code of the digit 0
-	RET
-ENDP
+	RET
 
 ; A - delay x10ms
 delay:
@@ -408,19 +378,17 @@ delay37us:
 	NOP
 	NOP
 	RET
-
-PROC
+
 ; waits for 1520us,
 ; which is 41 calls to delay37us
 delay1520us:
 	PUSH BC
 	LD B, 41
-_loop:		
+.loop:		
 	CALL delay37us
-	DJNZ _loop
+	DJNZ .loop
 	POP BC
-	RET
-ENDP
+	RET
 
 delay10ms:
 	CALL delay1520us
@@ -433,17 +401,16 @@ delay10ms:
 	CALL delay1520us
 	RET
 
-defb "Rnd"
-PROC
+ defb "Rnd"
 rnd:
 	PUSH BC
 	LD A, (Random)
 	CP 0			   ; if Random is unitialised
-	JR NZ, _doRnd
+	JR NZ, .doRnd
 	LD A, (Random + 1)  ; checking both bytes of Random for 0
 	CP 0
 	CALL Z, randomize  ; we initialise it
-_doRnd:
+.doRnd:
 	AND A ; clear carry
 	LD A, (Random + 1) ; load high byte of Random in case randomize overworte it
 	 ; first we XOR bit 2 with bit 0
@@ -479,8 +446,7 @@ _doRnd:
 	RRA
 	LD (Random + 1), A
 	POP BC
-	RET
-ENDP
+	RET
 
 ; gets a random number from zero to C - 1
 ; result in A

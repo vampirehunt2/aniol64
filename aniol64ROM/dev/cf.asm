@@ -22,68 +22,60 @@ CF_WRITE		equ 30h
 CF_DIAG			equ 90h
 CF_ID			equ 0ECh
 CF_OK			equ 00h
-
-PROC
+
 ; checks if a cf drive is present in the system
 ; result in A
 cf_exists:
 	IN A, (CF_STATUS)
 	CP 0
-	JR NZ, _true
+	JR NZ, .true
 	CALL delay10ms
 	IN A, (CF_STATUS)
 	CP 0
-	JR NZ, _true
+	JR NZ, .true
 	CALL delay10ms
 	IN A, (CF_STATUS)
 	CP 0
-	JR NZ, _true
+	JR NZ, .true
 	RET				; return FALSE, ie. zero that we already have in the A register
-_true:
+.true:
 	LD A, TRUE
-	RET
-ENDP
+	RET
 	
 
 ; waits until the cf card is ready
 ; the READY pin on the card is optional as per the CF spec
-; some cards may not implement it
-PROC
+; some cards may not implement it
 cf_wait:
 	PUSH AF
-_loop:
+.loop:
 	IN A, (CF_STATUS)	; read the cf status word
 	BIT 7, A			; test busy bit
-	JR NZ, _loop		; loop until the busy bit (D7) is clear
+	JR NZ, .loop		; loop until the busy bit (D7) is clear
 	POP AF
-	RET
-ENDP
-	
-PROC
+	RET
+	
 cf_waitCmd:
 	PUSH AF
-_loop:
+.loop:
 	IN A, (CF_STATUS)	; read the cf status word
 	BIT 7, A
-	JR NZ, _loop		; busy bit (D7) should be 0
+	JR NZ, .loop		; busy bit (D7) should be 0
 	BIT	6, A
-	JR Z, _loop			; drvrdy (D6) should be 1 
+	JR Z, .loop			; drvrdy (D6) should be 1 
 	POP AF
-	RET
-ENDP
-
-PROC
+	RET
+
 cf_waitDat:
 	PUSH AF
-_loop:
+.loop:
 	IN A, (CF_STATUS)	; read the cf status word
 	BIT 7, A
-	JR NZ, _loop		; busy bit (D7) should be 0
+	JR NZ, .loop		; busy bit (D7) should be 0
 	BIT 3, A
-	JR Z, _loop			; drq bit (D3) should be 1
+	JR Z, .loop			; drq bit (D3) should be 1
 	POP AF
-	RET
-ENDP
+	RET
 	
 ; inits the cf card to 8 bit mode
 cf_init:
@@ -103,8 +95,7 @@ cf_error:
 	IN A,(CF_STATUS)					;Read status
 	AND 00000001b
 	RET
-	
-PROC
+	
 cf_di: 
 	CALL cf_wait
 	LD A, 1
@@ -116,7 +107,7 @@ cf_di:
 	LD A, CF_ID			
 	OUT (CF_CMD), A			; send the ID command
 	LD B, 0					; read 256 double bytes
-_loop:
+.loop:
 	CALL cf_wait			; wait until busy bit (D7) is cleared
 	IN A, (CF_DAT)			; read in a byte from the cf
 	LD (HL), A				; store it in memory
@@ -125,11 +116,9 @@ _loop:
 	IN A, (CF_DAT)			; read in a byte from the cf
 	LD (HL), A				; store it in memory
 	INC HL	
-	DJNZ _loop
-	RET
-ENDP
-
-PROC
+	DJNZ .loop
+	RET
+
 ; reads a sector from a cf card
 ; buffer address in HL
 cf_readSector:
@@ -140,7 +129,7 @@ cf_readSector:
 	OUT	(CF_CMD), A			; send read command
 	CALL cf_waitDat			; wait until data is ready to be read 
 	LD B, 0					; read 512 bytes, 2 bytes per loop iteration
-_loop:
+.loop:
 	CALL cf_wait	
 	IN A, (CF_DAT)			; get a byte of data	
 	LD (HL),A
@@ -149,13 +138,11 @@ _loop:
 	IN A, (CF_DAT)			;get a byte of data	
 	LD (HL), A
 	INC HL
-	DJNZ _loop
+	DJNZ .loop
 	POP BC
 	POP AF
-	RET
-ENDP	
-
-PROC
+	RET	
+
 ; writes a sector from a cf card
 ; moves HL to the next sector in memory
 ; buffer address in HL
@@ -167,7 +154,7 @@ cf_writeSector:
 	OUT	(CF_CMD), A			; send the write command
 	CALL cf_waitDat			; wait until data is ready to be written 
 	LD B, 0					; write 512 bytes, 2 bytes per loop iteration
-_loop:
+.loop:
 	CALL cf_wait	
 	LD A, (HL)
 	OUT (CF_DAT), A			; write a byte of data	
@@ -176,11 +163,10 @@ _loop:
 	LD A, (HL)
 	OUT (CF_DAT), A			; write a byte of data	
 	INC HL
-	DJNZ _loop
+	DJNZ .loop
 	POP BC
 	POP AF
-	RET
-ENDP
+	RET
 
 cf_diag:
 	CALL cf_waitCmd

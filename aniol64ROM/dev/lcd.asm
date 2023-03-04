@@ -61,20 +61,18 @@ lcd_showCursor:
         RET
 
 ; writes a null-terminated string to the LCD screen
-; IX: address of the string
-PROC
+; IX: address of the string
 lcd_wriStr:
         LD C, LCD_DAT_WR
-_loop:
+.loop:
         CALL lcd_wait
         LD A,(IX+0)
         CP 0                                  ;
         RET Z
         OUT (C),A
         INC IX
-        JR _loop
-        RET
-ENDP
+        JR .loop
+        RET
 
 ; puts a single character on the screen
 ; A - character to be written
@@ -172,48 +170,43 @@ lcd_setPos:
 
 ; reads a particular line from the display
 ; line number in A
-; result in LcdBuff
-PROC
+; result in LcdBuff
 lcd_readLn:
         CALL lcd_gotoLn
         LD IX, LcdBuff
         LD B, 20
-_loop:
+.loop:
         CALL lcd_getChar
         LD (IX+0), A
         INC IX
-        DJNZ _loop
+        DJNZ .loop
         LD A, 0
         LD (IX+0), A
-        RET
-ENDP
+        RET
 
 ; gets the physical line in which the cursor is
-; result in A
-PROC
+; result in A
 lcd_getCurrentLine:
         CALL lcd_getPos
         CP LINE3
-        JR C, _line1
+        JR C, .line1
         CP LINE2
-        JR C, _line3
+        JR C, .line3
         CP LINE4
-        JR C, _line2
-_line4:
+        JR C, .line2
+.line4:
         LD A, 4
         RET
-_line1:
+.line1:
         LD A, 1
         RET
-_line3:
+.line3:
         LD A, 3
         RET
-_line2:
+.line2:
         LD A, 2
-        RET
-ENDP
-
-PROC
+        RET
+
 lcd_nextLine:
         CALL lcd_getCurrentLine
         CP 1
@@ -224,8 +217,7 @@ lcd_nextLine:
         JP Z, lcd_gotoLn4
         ;CP 4
         CALL lcd_scroll
-        RET
-ENDP
+        RET
 
 lcd_scroll:
         CALL lcd_hideCursor

@@ -18,70 +18,66 @@ WIDTH equ MAX_X + 1
 HEIGHT equ MAX_Y
 
 FRAME1: ds WIDTH - 1, '#' 
-defb 0
+ defb 0
 
 FRAME2: defb "#"
-ds WIDTH - 3, ' '
-defb "#", 0
+ ds WIDTH - 3, ' '
+ defb "#", 0
 
 GameOver: defb "GAME OVER!!!", 0
-
-PROC
+
 snake_main:
 		CALL snake_init
-_loop:
+.loop:
 		CALL readKey
 		CP 'k'
-		JP Z, _n
+		JP Z, .n
 		CP 'n'
-		JP Z, _s
+		JP Z, .s
 		CP 'b'
-		JP Z, _w
+		JP Z, .w
 		CP 'm'
-		JP Z, _e
+		JP Z, .e
 		CP '8'
-		JP Z, _n
+		JP Z, .n
 		CP '2'
-		JP Z, _s
+		JP Z, .s
 		CP '4'
-		JP Z, _w
+		JP Z, .w
 		CP '6'
-		JP Z, _e
+		JP Z, .e
 		CP 'q'
-		JP Z, _end
-		JP _loop
-_n:		LD A, NORTH
+		JP Z, .end
+		JP .loop
+.n:		LD A, NORTH
 		LD (Dir), A
-		JP _loop
-_s:		LD A, SOUTH
+		JP .loop
+.s:		LD A, SOUTH
 		LD (Dir), A
-		JP _loop
-_e:		LD A, EAST
+		JP .loop
+.e:		LD A, EAST
 		LD (Dir), A
-		JP _loop
-_w:		LD A, WEST
+		JP .loop
+.w:		LD A, WEST
 		LD (Dir), A
-		JP _loop
-_end:
-		RET
-ENDP
-
-PROC
+		JP .loop
+.end:
+		RET
+
 snake_NmiHandler:
 		PUSH AF					; save register state
 		LD A, (DelayCounter)	; load the current value of delay counter
 		CP DELAY				; check if we've reached the delay value
-		JP Z, _reset			; if yes, reset te counter
+		JP Z, .reset			; if yes, reset te counter
 		INC A					; otherwise increment it
-		JP _set
-_reset:
+		JP .set
+.reset:
 		LD A, 0
 		CALL snake_move
-_set:
+.set:
 		LD (DelayCounter), A	; store the new counter value
 		POP AF					; restore register state
-		RET
-ENDP
+		RET
 
 snake_init:
 		CALL clrScr
@@ -108,8 +104,7 @@ snake_init:
 		CALL registerNmiHandler	; starts snake movement
 		RET 
 		
-		
-PROC
+		
 snake_move:		
 		PUSH AF
 		CALL snake_getHeadCoeffs
@@ -118,26 +113,26 @@ snake_move:
 		LD E, (HL)				; current head Y in E					
 		LD A, (Dir)
 		CP NORTH
-		JP Z, _n
+		JP Z, .n
 		CP SOUTH
-		JP Z, _s
+		JP Z, .s
 		CP EAST
-		JP Z, _e
+		JP Z, .e
 		CP WEST
-		JP Z, _w
-_n:
+		JP Z, .w
+.n:
 		DEC E
-		JP _cont
-_s:
+		JP .cont
+.s:
 		INC E
-		JP _cont
-_e:
+		JP .cont
+.e:
 		INC D
-		JP _cont
-_w:
+		JP .cont
+.w:
 		DEC D
-		JP _cont
-_cont: 
+		JP .cont
+.cont: 
 		LD A, (Head)
 		INC A
 		INC A
@@ -149,7 +144,7 @@ _cont:
 		CALL snake_moveHead
 		LD A, D
 		CP '$'
-		JR Z, _dollar		; if point is scored skip moving the tail, let the snake grow
+		JR Z, .dollar		; if point is scored skip moving the tail, let the snake grow
 		CP '#'
 		JP Z, snake_gameOver
 		CP '*'
@@ -159,18 +154,17 @@ _cont:
 		INC A
 		INC A
 		LD (Tail), A	 ; move tail by one (two indices into the Coeffs table)
-		JR _end
-_dollar:
+		JR .end
+.dollar:
 		LD A, (Points)
 		INC A
 		LD (Points), A
 		CALL bzr_click
 		CALL snake_printPoints
 		CALL snake_placeDollar
-_end:
+.end:
 		POP AF
-		RET	
-ENDP	
+		RET		
 
 snake_printPoints:
 	PUSH BC
@@ -249,8 +243,7 @@ snake_getTailCoeffs:
 		LD C, A
 		ADD HL, BC				; current tail coefficient now in (HL) and (HL + 1)
 		RET
-		
-PROC
+		
 snake_placeDollar:
 		CALL rnd
 		LD B, WIDTH - 2
@@ -271,24 +264,22 @@ snake_placeDollar:
 		CALL gotoXY
 		LD A, '$'
 		CALL putChar
-		RET
-ENDP
-
-PROC
+		RET
+
 snake_drawFrame:
 		; vertical bars
 		LD D, HEIGHT - 1
 		LD B, 0
 		LD C, 0
 	    CALL gotoXY
-_loop:
+.loop:
 		LD B, 0
 		CALL gotoXY
 		LD IX, FRAME2
 		CALL writeStr
 		INC C
 		DEC D
-		JR NZ, _loop
+		JR NZ, .loop
 		; horizontal bars
 		LD B, 0
 		LD C, 0
@@ -300,8 +291,7 @@ _loop:
 		CALL gotoXY
 		LD IX, FRAME1
 		CALL writeStr
-		RET
-ENDP
+		RET
 
 
 	

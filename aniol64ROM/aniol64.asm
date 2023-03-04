@@ -6,9 +6,10 @@
 ; Created with zDevStudio - Z80 Development Studio.
 ;
 ;----------------------------------------------------
+ 
+ device NOSLOT64K 
 
-
-org 0000h
+ org 0000h
 	LD SP, RAMTOP   ; initialise stack pointer to the top of available RAM
 	IM 2			; set interupt mode to 2
 	LD A, 01h	   ; higher byte of the interrupt vector table
@@ -18,11 +19,11 @@ org 0000h
 	CALL resetNmiHandler
 	JP boot		 ; jump over the interrupt handlers for NMI and mode 1 INT
 
-org 0020h
-	Version: defb 0, 0, 0, 0
-	Build: defw 0000h
+ ds 0020h - $, 0
+Version: defb 0, 0, 0, 0
+Build: defw 0000h
 
-org 0038h
+ ds 0038h - $, 0
 	; respond to mode 1 interrupt
 	EX AF, AF'	   
 	EXX
@@ -32,7 +33,7 @@ org 0038h
 	EI
 	RETI
 
-org 0066h
+ ds 0066h - $, 0
 	; NMI handler
 	PUSH AF
 	CALL handleNmi
@@ -41,17 +42,17 @@ org 0066h
 	EI
 	RETN
 
-org 0100h
+ ds 0100h - $, 0
 	; interrupt vector table
-	KeyClickHandler: defb 38h, 00h ; we're pointing back at the mode 1 INT handler
+KeyClickHandler: defb 38h, 00h ; we're pointing back at the mode 1 INT handler
 									; so that the routine works for both mode 1 and 2
 									; note, low order byte goes first
 
 
 
 Aniol: 
-defb   "               _ANIOL64_"
-defb 0
+ defb   "_ANIOL64_"
+ defb 0
 
 RAMTOP 				equ 0BFFFh
 TestAddr 			equ 8001h  		; points to the beginning of RAM
@@ -118,51 +119,49 @@ loop:
 
 
 ; device drivers
-include dev/bzr.asm
-include dev/vga.asm
+ include dev/bzr.asm
+ include dev/vga.asm
 ;include dev/tm.asm
-include dev/dart.asm
-include dev/cf.asm
-include dev/kbd.asm
+ include dev/dart.asm
+ include dev/cf.asm
+ include dev/kbd.asm
 ;include dev/ps2.asm
 
 ; libraries
-include lib/util.asm
-include lib/str.asm
-include lib/mem.asm
-include lib/list.asm
-include lib/math.asm
-include test/test.asm
+ include lib/util.asm
+ include lib/str.asm
+ include lib/mem.asm
+ include lib/list.asm
+ include lib/math.asm
+ include test/test.asm
 
 ; test routines
 ;include test/test.asm
 
 ; programs
-include cmd.asm
-include mon.asm
-include term.asm
-include dos.asm
-include snake.asm
-include rogue.asm
-include onp.asm
-include edit.asm
-include apl.asm
-
-PROC
+ include cmd.asm
+ include mon.asm
+ include term.asm
+ include dos.asm
+ include snake.asm
+ include rogue.asm
+ include onp.asm
+ include edit.asm
+ include apl.asm
+
 handleNmi:
 	LD A, (NmiCount)
 	INC A
 	LD (NmiCount), A
 	CP 0
-	JR Z, _inc2
-	JR _end
-_inc2:
+	JR Z, .inc2
+	JR .end
+.inc2:
 	LD A, (NmiCount + 1)
 	INC A
 	LD (NmiCount + 1), A
-_end:
-	RET
-ENDP
+.end:
+	RET
 
 ; allows to register a routine that will be executed each time NMI is fired
 ; the routine needs to end with a RET instruction

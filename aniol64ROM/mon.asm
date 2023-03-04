@@ -25,9 +25,8 @@ InvVal: 	defb "Invalid value", 	0
 
 MonCurrAddr equ PROGRAM_DATA 
 LINE_NUM 	equ MAX_Y - 2
-
-PROC
-defb "mon_main"
+
+ defb "mon_main"
 mon_main:
 		CALL clrScr
         LD A, 0  
@@ -105,15 +104,14 @@ mon_main_loop:
         LD IY, Bye
         CALL str_cmp
         CP 0
-        JR Z, _bye
+        JR Z, .bye
         ; unknown command 
         LD IX, UnknownCmd
         CALL mon_gotoStatusLine
         CALL writeStr
         JP mon_main_loop
-_bye:
-        RET
-ENDP
+.bye:
+        RET
 
 mon_gotoCmdLine:
 		LD B, 0
@@ -136,60 +134,55 @@ mon_gotoStatusLine:
 		LD C, LINE_NUM + 1
 		CALL gotoXY
 		RET
-
-PROC
+
 mon_setAddress:
         PUSH HL
         POP IX  ; setting IX to point to the argument of the adr command
         CALL parseDByte
         CP 0
-        JR NZ, _parseError
+        JR NZ, .parseError
         LD (MonCurrAddr), HL
         CALL mon_dsp
         JP mon_main_loop
-_parseError:
+.parseError:
         CALL mon_gotoStatusLine
         LD IX, InvAddr
         CALL writeStr
         CALL readKey
         CALL mon_refresh
-        JP mon_main_loop
-ENDP
-
-PROC
+        JP mon_main_loop
+
 mon_run:
         PUSH HL
         POP IX  ; setting IX to point to the argument of the adr command
         CALL parseDByte
         CP 0
-        JR NZ, _parseError
+        JR NZ, .parseError
         JP (HL)  ; we are assuming whatever program we call will
                 ;either continue running until system reset or jump back to a known location, such as mon_main
-_parseError:
+.parseError:
         CALL mon_gotoStatusLine
         LD IX, InvAddr
         CALL writeStr
         CALL readKey
         CALL mon_refresh
         JP mon_main_loop
-        RET
-ENDP
-
-PROC
+        RET
+
 mon_setValue:
         PUSH HL
         POP IX                  ; put the arguments of the set command in IX
         CALL str_len
         CP 0                    ; if we've reached the end of argument list
-        JP Z, _completed        ; return from this routine
+        JP Z, .completed        ; return from this routine
 		LD A, (IX)
 		CP '='
-		JP Z, _setDirect
+		JP Z, .setDirect
         CALL str_tok            ; extract the first of the remaining arguments
         PUSH HL                 ; save the rest of the arguments on stack
         CALL parseByte
         CP 0                    ; check if parse is successful
-        JR NZ, _parseError
+        JR NZ, .parseError
         LD A, B                 ; transfer the parsed value to A
         LD HL, (MonCurrAddr)
         LD (HL), A
@@ -197,34 +190,32 @@ mon_setValue:
         LD (MonCurrAddr), HL
         POP HL
         JR mon_setValue
-_setDirect:
+.setDirect:
 		CALL str_tok            ; extract the first of the remaining arguments
 		PUSH HL
 		LD HL, (MonCurrAddr)
-_loop:
+.loop:
 		INC IX
 		LD A, (IX)
 		CP 0
-		JP Z, _endSetDirect
+		JP Z, .endSetDirect
 		LD (HL), A
 		INC HL
-		JR _loop
-_endSetDirect:
+		JR .loop
+.endSetDirect:
 		LD (MonCurrAddr), HL
 		POP HL
 		JR mon_setValue
-_parseError:
+.parseError:
         CALL mon_gotoStatusLine
         LD IX, InvVal
         CALL writeStr
         CALL readKey
         JP mon_main_loop
-_completed:
+.completed:
         CALL mon_dsp
-        JP mon_main_loop
-ENDP
-
-PROC
+        JP mon_main_loop
+
 mon_fill:
         PUSH HL
         POP IX                  ; put the arguments of the fill command in IX
@@ -232,33 +223,31 @@ mon_fill:
                                 ; value now in a string pointed to by HL
         CALL parseByte
         CP 0
-        JP NZ, _parseError
+        JP NZ, .parseError
         PUSH BC                 ; saving the parsed number in B
         PUSH HL
         POP IX
         CALL parseByte          ; now parsing the value
         CP 0
-        JP NZ, _parseError
+        JP NZ, .parseError
         LD A, B                 ; value to fill now in A
         POP BC                  ; number of fills now in B
-_loop:
+.loop:
         LD HL, (MonCurrAddr)
         LD (HL), A
         INC HL
         LD (MonCurrAddr), HL    ; moving to the next address
-        DJNZ _loop              ; if B is not zero, repeat
+        DJNZ .loop              ; if B is not zero, repeat
         CALL mon_dsp
         JP mon_main_loop
-_parseError:
+.parseError:
         CALL mon_gotoStatusLine
         LD IX, InvVal
         CALL writeStr
         CALL readKey
         CALL mon_refresh
-        JP mon_main_loop
-ENDP
-
-PROC
+        JP mon_main_loop
+
 mon_copy:
         PUSH HL
         POP IX                  ; put the arguments of the copy command in IX
@@ -266,69 +255,64 @@ mon_copy:
                                 ; source address is now in a string pointed to by HL
         CALL parseByte
         CP 0
-        JP NZ, _invalidValue
+        JP NZ, .invalidValue
         PUSH BC                 ; saving the parsed number in B
         PUSH HL
         POP IX                  ; source address is now in a string pointed to by IX
         CALL parseDByte         ; now parsing the value
         CP 0
-        JP NZ, _invalidAddress
+        JP NZ, .invalidAddress
         PUSH HL
         POP IX
         POP BC
-_loop:
+.loop:
         LD A, (IX + 0)
         LD HL, (MonCurrAddr)
         LD (HL), A
         INC HL
         LD (MonCurrAddr), HL    ; moving to the next address
         INC IX
-        DJNZ _loop              ; if B is not zero, repeat
+        DJNZ .loop              ; if B is not zero, repeat
         CALL mon_dsp
         JP mon_main_loop
-_invalidValue:
+.invalidValue:
         CALL mon_gotoStatusLine
         LD IX, InvVal
         CALL writeStr
         CALL readKey
         CALL mon_refresh
         JP mon_main_loop
-_invalidAddress:
+.invalidAddress:
         CALL mon_gotoStatusLine
         LD IX, InvAddr
         CALL writeStr
         CALL readKey
         CALL mon_refresh
-        JP mon_main_loop
-ENDP
-
-PROC
+        JP mon_main_loop
+
 mon_nextScreen:
 		PUSH BC
         LD HL, (MonCurrAddr)
 		LD B, LINE_NUM
-_loop:
+.loop:
         CALL mon_nextAddrs
-        DJNZ _loop
+        DJNZ .loop
         LD (MonCurrAddr), HL
         CALL mon_dsp
 		POP BC
-        JP mon_main_loop
-ENDP
-
-PROC
+        JP mon_main_loop
+
 mon_prevScreen:
 		PUSH BC
         LD HL, (MonCurrAddr)
 		LD B, LINE_NUM
-_loop:
+.loop:
         CALL mon_prevAddrs
-		DJNZ _loop
+		DJNZ .loop
         LD (MonCurrAddr), HL
         CALL mon_dsp
 		POP BC
-        JP mon_main_loop
-ENDP
+        JP mon_main_loop
 
 ; scrolls one line down
 mon_nextLine:
@@ -345,8 +329,7 @@ mon_prevLine:
         LD (MonCurrAddr), HL
         CALL mon_dsp
         JP mon_main_loop
-
-PROC
+
 mon_dsp:
 		PUSH BC
         CALL cursorOff
@@ -356,18 +339,17 @@ mon_dsp:
 		LD L, A
 		CALL home
 		LD B, LINE_NUM
-_loop:
+.loop:
 		PUSH BC
         CALL mon_printAddrs
         CALL mon_printVals
         CALL nextLine
 		CALL mon_nextAddrs
 		POP BC
-		DJNZ _loop
+		DJNZ .loop
 		CALL cursorOn
 		POP BC
-        RET
-ENDP
+        RET
 
 ; prints the addresses for a single line of output of the dsp command
 ; the first address in is HL
@@ -378,8 +360,7 @@ mon_printAddrs:
         LD A, ":"
         CALL putChar
         RET
-
-PROC
+
 ; prints the values for a single line of output of the dsp command
 ; the first address in is HL
 mon_printVals:
@@ -387,18 +368,18 @@ mon_printVals:
         PUSH HL
         POP IX
 		LD B, 8
-_loop:
+.loop:
 		LD A, 8
 		CP B
-		JR Z, _skipSpace
+		JR Z, .skipSpace
         LD A, " "
         CALL putChar
-_skipSpace:
+.skipSpace:
 		PUSH BC
         CALL mon_printByte
 		INC IX
 		POP BC
-		DJNZ _loop
+		DJNZ .loop
 		POP BC
 		; print the actual characters
 		LD A, '|'
@@ -419,20 +400,17 @@ _skipSpace:
 		CALL mon_printChar
 		LD A, (IX - 1)
 		CALL mon_printChar
-        RET
-ENDP
-
-PROC
+        RET
+
 mon_printChar:
 		CP 32
-		JR C, _special
-		JR _print
-_special:
+		JR C, .special
+		JR .print
+.special:
 		LD A, ' '
-_print:
+.print:
 		CALL putChar
-		RET
-ENDP
+		RET
 
 mon_printByte:
         LD A, (IX + 0)
@@ -503,40 +481,35 @@ mon_prevAddrs:
         DEC HL
         DEC HL
         RET
-
-PROC
+
 mon_isWriteable:
         LD A, H
         CP 7Fh
-        JR C, _nonWriteable
+        JR C, .nonWriteable
         LD A, TRUE
         RET
-_nonWriteable:
+.nonWriteable:
         LD A, FALSE
-        RET
-ENDP
+        RET
 
 mon_refresh:
         CALL clrScr
         CALL mon_dsp
         RET
-
-PROC
+
 mon_peek:
 		CALL str_shift
         CALL parseDByte
         CP 0
-        JR NZ, _parseError
+        JR NZ, .parseError
         LD A, (HL)
         CALL mon_printByteA
         RET
-_parseError:
+.parseError:
         LD IX, InvAddr
         CALL writeStr
-        RET
-ENDP
-
-PROC
+        RET
+
 mon_poke:
 		CALL str_shift
         CALL str_tok        ; address now in a string pointed to by IX, value in a string pointed to by HL
@@ -544,26 +517,24 @@ mon_poke:
         POP IY              ; to IY for safekeeping
         CALL parseDByte     ; assuming parsing is OK, address is now in HL
         CP 0
-        JR NZ, _addrError
+        JR NZ, .addrError
         PUSH IY             ; transferring the value string
         POP IX              ; to IX
         CALL parseByte
         CP 0
-        JR NZ, _valError
+        JR NZ, .valError
         LD A, B
         LD (HL), A
         RET
-_addrError:
+.addrError:
         LD IX, InvAddr
         CALL writeStr
         RET
-_valError:
+.valError:
         LD IX, InvVal
         CALL writeStr
-        RET
-ENDP
-
-PROC
+        RET
+
 mon_put:
 		CALL str_shift
         CALL str_tok        ; port number now in a string pointed to by IX, value in a string pointed to by HL
@@ -571,38 +542,35 @@ mon_put:
         POP IY              ; to IY for safekeeping
         CALL parseByte      ; assuming parsing is OK, port number is now in B
         CP 0
-        JR NZ, _addrError
+        JR NZ, .addrError
         LD C, B             ; save port number in C
         PUSH IY             ; transferring the value string
         POP IX              ; to IX
         CALL parseByte      ; assuming parsing is OK, value is now in B
         CP 0
-        JR NZ, _valError
+        JR NZ, .valError
         LD A, B             ; load the value to A
         OUT (C), A          ; output the value to the port with the given number
         RET
-_addrError:
+.addrError:
         LD IX, InvAddr
         CALL writeStr
         RET
-_valError:
+.valError:
         LD IX, InvVal
         CALL writeStr
-        RET
-ENDP
-
-PROC
+        RET
+
 mon_get:
         CALL str_shift
 		CALL parseByte
 		CP 0
-		JR NZ, _addrError
+		JR NZ, .addrError
 		LD C, B
 		IN A, (C)
 		CALL mon_printByteA
 		RET
-_addrError:
+.addrError:
 		LD IX, InvAddr
         CALL writeStr
-        RET
-ENDP
+        RET

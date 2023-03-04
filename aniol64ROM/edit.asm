@@ -3,11 +3,10 @@
 FileLine	equ PROGRAM_DATA + 00h	; 2 bytes
 ScreenLine	equ PROGRAM_DATA + 02h
 StartLine	equ PROGRAM_DATA + 03h	; 2 bytes
-
-PROC
+
 ed_main:
 	CALL ed_init
-_loop:
+.loop:
 	LD B, 0
 	LD C, MAX_Y
 	CALL gotoXY
@@ -18,29 +17,28 @@ _loop:
 	LD IX, LineBuff
 	CALL ed_processCmds
 	CP TRUE
-	JR Z, _loop
+	JR Z, .loop
 	LD B, 0
 	LD A, (ScreenLine)
 	LD C, A
 	CALL gotoXY
-_loop2:
+.loop2:
 	LD A, (IX)
 	CP 0
-	JR Z, _endLoop2
+	JR Z, .endLoop2
 	CALL putChar
 	CALL dos_fWrite
 	INC IX
-	JR _loop2
-_endLoop2:
+	JR .loop2
+.endLoop2:
 	LD A, CR
 	CALL dos_fWrite
 	CALL nextLine
 	LD A, (ScreenLine)
 	INC A
 	LD (ScreenLine), A
-	JR _loop
-	RET
-ENDP
+	JR .loop
+	RET
 
 ed_init:
 	CALL str_shift
@@ -58,33 +56,31 @@ ed_init:
 	CALL dos_seek
 	CALL clrScr
 	RET
-
-PROC
+
 ed_processCmds:
 	LD A, (IX)
 	CP ':'
-	JR NZ, _noCmd
+	JR NZ, .noCmd
 	LD A, (IX + 1)
 	CP ':'
-	JR Z, _esc
+	JR Z, .esc
 	CP 'q'
-	JR Z, _exit
+	JR Z, .exit
 	CP 'w'
 	CALL Z, dos_saveFile
 	LD A, TRUE
 	RET
-_noCmd:
+.noCmd:
 	LD A, FALSE
 	RET
-_esc:
+.esc:
 	LD A, FALSE
 	INC IX
 	RET
-_exit:
+.exit:
 	POP IX	; jumping one routine level up (EVIL)
 	CALL nextLine
-	RET
-ENDP
+	RET
 	
 ed_showPage:
 	LD A, 0

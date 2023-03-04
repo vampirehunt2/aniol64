@@ -11,27 +11,24 @@
 ; Result:
 ; hundreds in C
 ; tens in B
-; units in A
-PROC
+; units in A
 dec_toBcd:
         CP 100
-        JR C, _tens   ; if less than 100
+        JR C, .tens   ; if less than 100
         SUB 100
         INC C         ; hundreds counted in C
         JR dec_toBcd
-_tens:
+.tens:
         CP 10
-        JR C, _units   ; if less than 10
+        JR C, .units   ; if less than 10
         SUB 10
         INC B           ; tens and hundreds counted in B
-        JR _tens
-_units:                 ; least significant digit now in A
-        RET
-ENDP
+        JR .tens
+.units:                 ; least significant digit now in A
+        RET
 
 ; converts a bcd number stored in C, B, A to ASCII
-; result in C, B, A
-PROC
+; result in C, B, A
 dec_bcd2asc:
         PUSH AF
         LD A, C
@@ -42,23 +39,18 @@ dec_bcd2asc:
         LD B, A
         POP AF
         ADD 30h
-        RET
-ENDP
-
-PROC
+        RET
+
 dec_format:
         RET
-
-ENDP
-
-PROC
+
+
 dec_parse:
         CP 10
-        JR C, _units   ; if less than 10,
+        JR C, .units   ; if less than 10,
         SUB 10
         INC B
-_units:
+.units:
         RET
         RET
-
-ENDP
+

@@ -29,8 +29,7 @@ obi equ PROGRAM_DATA + 2   ; open bracket index
 cti equ PROGRAM_DATA + 3  ; current token index
 token equ PROGRAM_DATA + 4 ; 20 byte buffer for the currently parsed token
 tokens equ PROGRAM_DATA + 24 ; array of 2-byte tokens
-
-PROC
+
 cal_main:
         CALL lcd_clrScr
         LD IX, Title
@@ -49,11 +48,11 @@ cal_main_loop:
         LD IX, LineBuff
         LD IY, CalExit
         CALL str_cmp
-        JR Z, _cal_main_exit ; if the string contains the exit command, quit
+        JR Z, .cal_main_exit ; if the string contains the exit command, quit
         LD IX, LineBuff ; reload, because str_cmp does not preserve IX
         CALL cal_tokenize
         JP cal_main_loop
-_cal_error:
+.cal_error:
         CALL lcd_gotoLn4
         LD IX, CalError
         CALL lcd_wriStr
@@ -62,21 +61,17 @@ _cal_error:
         LD IX, BlankLine
         CALL lcd_wriStr
         JP cal_main_loop
-_cal_main_exit:
-        RET
-ENDP
-
-PROC
+.cal_main_exit:
+        RET
+
 cal_eval:
-        RET
-ENDP
+        RET
 
 ; evaluates an expression that does not contain parantheses
 ; start - index of the first byte of the first token of the expression
 ;   in the tokens table
 ; stop - index of the first byte of the last token of the expression
-;   in the tokens table
-PROC
+;   in the tokens table
 db "cal_eval_simple"
 cal_eval_simple:
 ; save state
@@ -91,7 +86,7 @@ cal_eval_simple:
         ADD IX, BC        ; point IX to the first byte of the first token
         LD A, (stop)
         LD B, A           ; from now on the stop variable is stored in B
-_loop:
+.loop:
         LD A, (IX)        ; load the first byte of the current token
         CP ASTERISK
         CALL Z, cal_mul    ; do multiplication and division first...
@@ -99,18 +94,17 @@ _loop:
         CALL Z, cal_div
         LD A, (cti)
         CP B
-        JP Z, _end      ; if reached the end of the expression, exit
+        JP Z, .end      ; if reached the end of the expression, exit
         INC IX          ; else move two bytes over, to the next token
         INC IX
         INC A
         INC A
         LD (cti), A
-        JP _loop
-_end:
+        JP .loop
+.end:
         POP BC
         POP IX
-        RET
-ENDP
+        RET
 
 ; prepares operands for a binary arithmetic operation
 ; by putting the first one in B and the second one in C
@@ -127,8 +121,7 @@ cal_prep_operands:
         LD C, A  ; second operand stored in C
         POP IX
         RET
-
-PROC
+
 cal_shift_expr:
 ; IX at this point contains address of the first byte of the operator token
         PUSH IX
@@ -141,14 +134,14 @@ cal_shift_expr:
         INC IX
         LD (IX), A  ; store the number value
         INC IX ; now pointing IX to the first byte of the first token that needs to be overwritten
-_loop:
+.loop:
         LD A, (IX + 4) ; skipping over 2 tokens - the operator and the second operand
         LD (IX), A
         CP EOL      ; check if we've reached the end of the expression
         INC IX
         INC IX
-        JR NZ, _loop   ; if not, proceed on
-_end:
+        JR NZ, .loop   ; if not, proceed on
+.end:
         LD A, (stop)  ; after the shift the expression is now two tokens shorter...
         DEC A         ; ...because we've replaced two operands and one operator...
         DEC A         ; ...with a single result, so decreasing stop by 4
@@ -156,53 +149,48 @@ _end:
         DEC A
         LD (stop), A
         POP IX
-        RET
-ENDP
+        RET
 
-;
-PROC
+;
 cal_mul:
         AND A ; clear carry
         PUSH BC
         CALL cal_prep_operands
-_loop:
+.loop:
         PUSH AF
         LD A, B
         CP 0
-        JR Z, _zero
+        JR Z, .zero
         POP AF
         LD A, 0
         ADD A, C
-        DJNZ _loop
-        JR _end
-_zero:
+        DJNZ .loop
+        JR .end
+.zero:
         POP AF  ; if first operand is 0 then return 0 in A
         LD A, 0
-_end:
+.end:
         CALL cal_shift_expr
         POP BC
-        RET
-ENDP
-
-PROC
+        RET
+
 cal_div:
         PUSH BC
         CALL cal_prep_operands
         LD A, B
         LD B, 0
         AND A ; clear carry
-_loop:
+.loop:
         CP C
-        JR C, _end
+        JR C, .end
         SUB C
         INC B
-        JR _loop
-_end:
+        JR .loop
+.end:
         LD A, B
         CALL cal_shift_expr
         POP BC
-        RET
-ENDP
+        RET
 
 cal_add:
         PUSH BC
@@ -230,77 +218,74 @@ cal_sub:
 ; each token consists of two bytes:
 ; operators have the ascii code of the operator and a padding zero
 ; operands have a NUMBER constand follwed by the number itself
-; IX - address of the string to tokenize
-PROC
-defb "cal_tokenize"
+; IX - address of the string to tokenize
+ defb "cal_tokenize"
 cal_tokenize:
         ; init the variables
         LD A, -1
         LD (obi), A
         LD E, 0 ; current token index
-_tokenizeLoop:
+.tokenizeLoop:
         CALL str_ltrim
         CALL str_len
         CP 0
-        JR Z, _endOfLine
+        JR Z, .endOfLine
         CALL cal_nextToken
-        JR _tokenizeLoop
-_endOfLine
+        JR .tokenizeLoop
+.endOfLine
         LD IY, tokens          ; point IY to the beginning of the tokens array
         LD D, 0
         ADD IY, DE
         LD A, EOL
         LD (IY), A             ; store the EOL to the tokens table at current index
-        RET
-ENDP
+        RET
 
 ; processes the first token of a string
 ; and puts it in the tokens array at current index
 ; and modifies the input string to cut out the token
-; IX: address of the string
-PROC
-defb "cal_nextToken"
+; IX: address of the string
+ defb "cal_nextToken"
 cal_nextToken:
         LD A, (IX)
         CP OPEN_BRACKET
-        JR Z, _storeSymbol
+        JR Z, .storeSymbol
         CP CLOSE_BRACKET
-        JR Z, _storeSymbol
+        JR Z, .storeSymbol
         CP PLUS
-        JR Z, _storeSymbol
+        JR Z, .storeSymbol
         CP PLUS
-        JR Z, _storeSymbol
+        JR Z, .storeSymbol
         CP MINUS
-        JR Z, _storeSymbol
+        JR Z, .storeSymbol
         CP ASTERISK
-        JR Z, _storeSymbol
+        JR Z, .storeSymbol
         CP SLASH
-        JR Z, _storeSymbol
+        JR Z, .storeSymbol
         CP PERCENT
-        JR Z, _storeSymbol
+        JR Z, .storeSymbol
         CALL isHexDigit
         CP 1
-        JR Z, _tokenizeNumber
-_tokenizeNumber:
+        JR Z, .tokenizeNumber
+.tokenizeNumber:
         LD IY, token
-_tokenizeNumberLoop:
+.tokenizeNumberLoop:
         LD A, (IX)
         CALL isHexDigit
         CP 0
-        JR Z, _endOfNumber
+        JR Z, .endOfNumber
         LD A, (IX)
         LD (IY), A
         INC IX
         INC IY
-        JR _tokenizeNumberLoop
-_endOfNumber:
+        JR .tokenizeNumberLoop
+.endOfNumber:
         LD A, 0
         LD (IY), A
         PUSH IX
         LD IX, token
         CALL parseByte
         CP 0                   ; check for parsing errors
-        JR NZ, _error          ; process parse errors
+        JR NZ, .error          ; process parse errors
         LD IY, tokens          ; point IY to the beginning of the tokens array
         LD D, 0
         ADD IY, DE
@@ -312,7 +297,7 @@ _endOfNumber:
         INC E
         INC E
         RET
-_storeSymbol:                  ; saving the currently process math symbol in the tokens array
+.storeSymbol:                  ; saving the currently process math symbol in the tokens array
         LD IY, tokens          ; point IY to the beginning of the tokens array
         LD D, 0
         ADD IY, DE
@@ -323,9 +308,8 @@ _storeSymbol:                  ; saving the currently process math symbol in the
         INC E
         INC IX                 ; discard the processed token
         RET
-_error:
+.error:
         POP IX
-        RET
-ENDP
+        RET
 
 

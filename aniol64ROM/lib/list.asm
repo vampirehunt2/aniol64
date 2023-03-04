@@ -5,61 +5,55 @@ MAX_LIST_SIZE equ 127
 
 
 ; fills the entire list with zeroes without changing the list length
-; IX - address of the list
-PROC
+; IX - address of the list
 list_clear:
 		PUSH BC					; save register state
 		PUSH IX					
 		LD B, (IX + LIST_SIZE)	; load list size into B
 		CALL list_isEmpty			; is list is empty, do nothing
 		CP TRUE
-		JP Z, _end					
+		JP Z, .end					
 		INC IX					; skip over list size
 		XOR A					; load zero to A
-_loop:					
+.loop:					
 		LD (IX), A				; zero four bytes (one element)
 		INC IX
 		LD (IX), A
 		INC IX
-		DJNZ _loop
-_end:
+		DJNZ .loop
+.end:
 		POP IX					; restore register state
 		POP BC
-		RET
-ENDP
+		RET
 
 ; creates a list with a given length
 ; IX - address of the list
 ; B - number of elements in the list
-; errors reported in A
-PROC
+; errors reported in A
 list_create:
 		LD A, B
 		CP MAX_LIST_SIZE
-		JR NC, _error
+		JR NC, .error
 		LD (IX + LIST_SIZE), B
 		LD A, OK
 		RET
-_error:
+.error:
 		LD A, ERR
-		RET
-ENDP
+		RET
 
 ; checks if the list has as many elements as it can hold
 ; IX - address of the list
-; result in A
-PROC
+; result in A
 list_isFull:
 		LD A, (IX + LIST_SIZE)
 		CP MAX_LIST_SIZE
-		JR C, _notFull
+		JR C, .notFull
 		LD A, TRUE
 		RET
-_notFull:
+.notFull:
 		LD A, FALSE
 		RET
-		
-ENDP
+		
 
 ; returns the number of elements in the list in A
 ; IX - address of the list
@@ -70,30 +64,27 @@ list_len:
 ; increases the list size by 1
 ; by adding an unitialised element at the end		
 ; IX - address of the list
-; errors reported in A
-PROC
+; errors reported in A
 list_expand:
 		CALL list_isFull
 		CP TRUE
-		JR Z, _err
+		JR Z, .err
 		LD A, (IX + LIST_SIZE)	; increase list size by 1
 		INC A						
 		LD (IX + LIST_SIZE), A
 		LD A, 0
 		RET
-_err:
+.err:
 		LD A, ERR
-		RET
-ENDP
+		RET
 
 ; appends a new element at the end of the list
 ; IX - address of the list
-; new element in HL
-PROC
+; new element in HL
 list_append:
 		CALL list_isFull
 		CP TRUE
-		JR Z, _err
+		JR Z, .err
 		PUSH IX
 		CALL list_endAddr
 		CALL list_copyElem
@@ -101,31 +92,29 @@ list_append:
 		CALL list_expand
 		LD A, 0
 		RET
-_err:
+.err:
 		LD A, ERR
-		RET
-ENDP
+		RET
 
 ; inserts a new element at the beginning of the list
 ; address of the list in IX
-; new element in HL
-PROC
+; new element in HL
 list_insert:
 		CALL list_isFull
 		CP TRUE
-		JR Z, _err
+		JR Z, .err
 		PUSH IX
 		LD A, (IX + LIST_SIZE)
 		LD B, A
 		CALL list_endAddr
-_loop:
+.loop:
 		LD A, (IX - 2)
 		LD (IX), A
 		LD A, (IX - 1)
 		LD (IX + 1), A
 		DEC IX
 		DEC IX
-		DJNZ _loop
+		DJNZ .loop
 		CALL list_copyElem
 		POP IX
 		LD A, (IX + LIST_SIZE)
@@ -133,10 +122,9 @@ _loop:
 		LD (IX + LIST_SIZE), A
 		LD A, 0
 		RET
-_err:
+.err:
 		LD A, ERR
-		RET
-ENDP
+		RET
 
 ; removes last element from the list
 ; list address in IX	
@@ -151,26 +139,23 @@ list_trim:
 
 ; removes the last elements 
 ; leaving only first B elements in the list	
-; list address in IX	
-PROC
+; list address in IX	
 list_trunc:
 		CALL list_len
 		SUB B
 		LD B, A
-_loop:
+.loop:
 		CALL list_trim
-		DJNZ _loop
-		RET
-ENDP
+		DJNZ .loop
+		RET
 		
 ; removes the last element from the list 
 ; and returns it in HL
-; IX - address of the list
-PROC
+; IX - address of the list
 list_pull:
 		CALL list_isEmpty
 		CP TRUE
-		JP Z, _err
+		JP Z, .err
 		PUSH IX
 		CALL list_endAddr
 		LD A, (IX - 1)
@@ -181,10 +166,9 @@ list_pull:
 		CALL list_trim
 		LD A, 0
 		RET
-_err:
+.err:
 		LD A, ERR
-		RET
-ENDP
+		RET
 		
 ; sets the size of the list to zero
 ; IX - address of the list
@@ -195,55 +179,50 @@ list_empty:
 		
 ; checks if the list has zero elements
 ; IX - address of the list
-; result in A
-PROC
+; result in A
 list_isEmpty:
 		LD A, (IX + LIST_SIZE)
 		CP 0
-		JR NZ, _notEmpty
+		JR NZ, .notEmpty
 		LD A, TRUE
 		RET
-_notEmpty:
+.notEmpty:
 		LD A, FALSE
-		RET
-ENDP
+		RET
 
 ; checks if the list contains a specific value		
 ; list address in IX
 ; value in HL
-; result in A
-PROC
+; result in A
 list_contains:
 		PUSH IX
 		LD A, (IX + LIST_SIZE)
 		LD B, A
 		INC IX
-_loop:
+.loop:
 		LD A, (IX + 0)
 		CP L
-		JR NZ, _next
+		JR NZ, .next
 		LD A, (IX + 1)
 		CP L
-		JR NZ, _next
-		JR _true
-_next:
+		JR NZ, .next
+		JR .true
+.next:
 		INC IX
 		INC IX
-		DJNZ _loop
+		DJNZ .loop
 		LD A, FALSE
-		JP _end
-_true:
+		JP .end
+.true:
 		LD A, TRUE
-_end:
+.end:
 		POP IX
-		RET
-ENDP
+		RET
 		
 ; copies one list contents to another
 ; IX - source list
 ; IY - target list
-; destroys A
-PROC
+; destroys A
 list_copy:
 		PUSH IX
 		PUSH IY
@@ -252,25 +231,23 @@ list_copy:
 		INC IX
 		INC IY
 		LD B, A
-_loop:
+.loop:
 		LD A, (IX)
 		LD (IY), A
-		DJNZ _loop
+		DJNZ .loop
 		POP IY
 		POP IX
 		LD A, (IX + LIST_SIZE)
 		LD (IY + LIST_SIZE), A
-		RET
-ENDP
+		RET
 	
 ; returns the last item from the list
 ; list address in IX
-; result in HL	
-PROC
+; result in HL	
 list_last:
 		CALL list_isEmpty
 		CP TRUE
-		JP Z, _err
+		JP Z, .err
 		CALL list_endAddr
 		DEC IX
 		DEC IX
@@ -278,10 +255,9 @@ list_last:
 		LD H, (IX + 1)
 		LD A, 0
 		RET
-_err:
+.err:
 		LD A, ERR
-		RET
-ENDP
+		RET
 		
 list_copyElem:
 		LD A, L
@@ -337,8 +313,7 @@ list_putAt:
 		LD (IX + 1), A
 		POP IX
 		RET
-
-PROC		
+		
 list_removeAt:
 		PUSH IX
 		CALL list_len
@@ -347,39 +322,36 @@ list_removeAt:
 		SUB B
 		LD B, A
 		DEC B
-_loop:
+.loop:
 		LD A, (IX + 3)
 		LD (IX + 1), A
 		LD A, (IX + 2)
 		LD (IX + 0), A
 		INC IX
 		INC IX
-		DJNZ _loop
+		DJNZ .loop
 		POP IX
 		CALL list_trim
-		RET
-ENDP
-
-PROC
+		RET
+
 list_insertAt:
 		PUSH IX
 		CALL list_len
 		CALL list_endAddr
 		SUB B
 		LD B, A
-_loop:
+.loop:
 		LD A, (IX - 2)
 		LD (IX + 0), A
 		LD A, (IX - 1)
 		LD (IX + 1), A
 		DEC IX
 		DEC IX
-		DJNZ _loop
+		DJNZ .loop
 		LD (IX), L
 		LD (IX + 1), H
 		POP IX
-		RET
-ENDP
+		RET
 		
 ; gets the address of the B-th element of the list
 ; IX - list address

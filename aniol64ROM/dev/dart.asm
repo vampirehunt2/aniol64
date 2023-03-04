@@ -37,8 +37,7 @@ dart_putChar:
 		; waiting for the character to be sent is done automatically
 		; since WAIT function is enabled.
 		RET
-	 
-PROC 
+	  
 ; synchronously reads a character from the serial port
 ; when a character is available, it's ASCII code is in A
 dart_getChar:
@@ -46,8 +45,7 @@ dart_getChar:
 		BIT 0, A
 		JR Z, dart_getChar
 		IN A, (DART_B_DAT)
-		RET
-ENDP
+		RET
 		
 dart_xoff:
 		PUSH AF

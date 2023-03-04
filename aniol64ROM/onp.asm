@@ -21,9 +21,8 @@ SYNTAX_ERROR equ 2
  
 SyntaxError: defb "Syntax error", 0
 ArithmeticError: defb "Arithmetic error", 0
-
-PROC
-defb "onp_main"
+
+ defb "onp_main"
 onp_main:
         CALL str_shift
 		LD B, 0
@@ -31,32 +30,30 @@ onp_main:
 		LD IX, Stack		
 		CALL list_create	; creates a list that we will use as stack for the calculator
 		POP IX
-_loop:
+.loop:
 		CALL str_tok
 		PUSH HL
 		CALL str_len
 		CP 0
-		JR Z, _end
+		JR Z, .end
 		CALL onp_processToken
 		POP IX
-		JR _loop
-_end:
+		JR .loop
+.end:
 		LD IX, Stack
 		CALL list_len
 		CP 1
-		JR NZ, _syntaxErr
+		JR NZ, .syntaxErr
 		CALL list_pull
 		LD IX, Result
 		CALL u16_formatDec
 		CALL writeLn
 		RET
-_syntaxErr:
+.syntaxErr:
 		LD IX, SyntaxError
 		CALL writeLn
-		RET
-ENDP
-		
-PROC
+		RET
+		
 onp_processToken:
 		LD A, (IX + 0)		; load the first character of the token
 		CP PLUS
@@ -70,78 +67,74 @@ onp_processToken:
 		CP NEGATE
 		JP Z, onp_processOperator
 		CP MINUS
-		JP Z, _minus
+		JP Z, .minus
 		JP onp_processNumber
-_minus:
+.minus:
 		CALL str_len
 		CP 1
 		JP Z, onp_processOperator
 		JP onp_processNumber
-		RET
-ENDP
-		
-PROC
+		RET
+		
 onp_processNumber:
 		LD A, (IX + 0) 	; load the first character of the token
 		CP BIN
-		JR Z, _parseBin
+		JR Z, .parseBin
 		CP HEX
-		JR Z, _parseHex
-		JR _parseDec
-_parseBin:
+		JR Z, .parseHex
+		JR .parseDec
+.parseBin:
 		CALL u8_parseBin
 		CP OK
-		JP NZ, _error
+		JP NZ, .error
 		LD H, 0
 		LD L, C
-		JR _end
-_parseHex:
+		JR .end
+.parseHex:
 		CALL u16_parseHex
 		CP OK
-		JP NZ, _error
-		JR _end
-_parseDec:
+		JP NZ, .error
+		JR .end
+.parseDec:
 		CALL u16_parseDec
 		CP OK
-		JP NZ, _error
-_end:
+		JP NZ, .error
+.end:
 		CP 0
-		JR NZ, _error
+		JR NZ, .error
 		LD IX, Stack
 		CALL list_append
 		LD A, OK		; fall through to return zero
-_error:
-		RET
-ENDP
-
-PROC
-defb "onp_processOperator"	
+.error:
+		RET
+
+ defb "onp_processOperator"	
 onp_processOperator:
 		LD A, (IX + 0) 	; load the first character of the token
 		LD IX, Stack	; point IX to the stack
 		CP PLUS
-		JP Z, _plus
+		JP Z, .plus
 		CP DIVIDE
-		JP Z, _divide
+		JP Z, .divide
 		CP MULTIPLY
-		JP Z, _multiply
+		JP Z, .multiply
 		CP MODULO
-		JP Z, _mod
+		JP Z, .mod
 		CP MINUS
-		JP Z, _minus
+		JP Z, .minus
 		CP NEGATE
-		JP Z, _negate
-_plus:
+		JP Z, .negate
+.plus:
 		CALL list_pull
 		PUSH HL
 		POP BC
 		CALL list_pull
 		CALL i16_add
-		JR C, _error
+		JR C, .error
 		CALL list_append
 		LD A, OK
 		RET
-_divide:
+.divide:
 		CALL list_pull
 		PUSH HL
 		POP BC
@@ -151,7 +144,7 @@ _divide:
 		POP HL
 		CALL list_append
 		RET
-_multiply:
+.multiply:
 		CALL list_pull
 		PUSH HL
 		POP BC
@@ -159,7 +152,7 @@ _multiply:
 		CALL i16_mul
 		CALL list_append
 		RET
-_mod:
+.mod:
 		CALL list_pull
 		PUSH HL
 		POP BC
@@ -167,7 +160,7 @@ _mod:
 		CALL i16_div
 		CALL list_append
 		RET
-_minus:
+.minus:
 		CALL list_pull
 		PUSH HL
 		POP BC
@@ -175,13 +168,12 @@ _minus:
 		CALL i16_sub
 		CALL list_append
 		RET
-_negate:
+.negate:
 		CALL list_pull
 		PUSH HL
 		CALL i16_neg
 		CALL list_append
-_error:
+.error:
 		LD A, ARITHMETIC_ERROR
-		RET
-ENDP
+		RET
 		

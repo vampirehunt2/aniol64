@@ -8,7 +8,7 @@
 ;----------------------------------------------------
 
 IF version=32
-include lcd.asm
+ include lcd.asm
 
 initDsp:
         CALL lcd_init
@@ -23,7 +23,7 @@ scroll:
         RET
 
 ELSE
-include vga.asm
+ include vga.asm
 
 initDsp:
         CALL vga_init

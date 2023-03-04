@@ -10,134 +10,124 @@
 ; compares two null-terminated strings
 ; IX, IY: addresses of the strings to compare
 ; result in A: 0 if equal, 1 if different
-; Z flag set if equal, reset if different
-PROC
+; Z flag set if equal, reset if different
 str_cmp:
 		PUSH IX
 		PUSH IY
-_loop:
+.loop:
         LD A, (IX)
         LD B, (IY)
         CP B
-        JR NZ, _neq
+        JR NZ, .neq
         CP 0
-        JR Z, _eq
+        JR Z, .eq
         INC IX
         INC IY
-        JP _loop
-_eq:
+        JP .loop
+.eq:
         LD A, 0
-        JR _end
-_neq:
+        JR .end
+.neq:
         LD A, 1
-        JR _end
-_end:
+        JR .end
+.end:
 		CP 0
 		POP IY
 		POP IX
-		RET
-ENDP
+		RET
 
 ; compares a null-terminated string with a memory area, 
 ; ignoring the terminating zero
 ; IX: address of the memory buffer to compare to
 ; IY: address of the string to compare
 ; result in A: 0 if equal, 1 if different
-; Z flag set if equal, reset if different
-PROC
+; Z flag set if equal, reset if different
 str_cmpMem:
 		PUSH IX
 		PUSH IY
-_loop:
+.loop:
 		LD A, (IY)
 		CP 0
-		JR Z, _eq
+		JR Z, .eq
 		CP (IX)
-		JR NZ, _neq
+		JR NZ, .neq
 		INC IX
 		INC IY
-		JR _loop
-_eq:
+		JR .loop
+.eq:
         LD A, 0
-        JR _end
-_neq:
+        JR .end
+.neq:
         LD A, 1
-        JR _end
-_end:
+        JR .end
+.end:
 		CP 0
 		POP IY
 		POP IX
-		RET
-ENDP
+		RET
 
 ; copies a null-terminated string
 ; IX: source string address
-; IY: target address
-PROC
+; IY: target address
 str_copy:
 		PUSH IX
 		PUSH IY
-_loop:
+.loop:
         LD A, (IX)
         LD (IY), A
         CP 0
-        JR Z, _end
+        JR Z, .end
         INC IX
         INC IY
-        JR _loop
-_end:
+        JR .loop
+.end:
 		POP IY
 		POP IX
-		RET
-ENDP
+		RET
 
 ; finds the length of a null-terminated string
 ; only supports strings up to 255 characters
 ; IX: address of the string
-; result in A
-PROC
+; result in A
 str_len:
         LD B, 0
         PUSH IX
-_loop:
+.loop:
         LD A, (IX+0)
         CP 0
-        JR Z, _eos
+        JR Z, .eos
         INC B
         INC IX
-        JR _loop
-_eos:
+        JR .loop
+.eos:
         LD A, B
         POP IX
-        RET
-ENDP
+        RET
 
 ; returns the first token of a string
 ; and modifies the input string to cut out the token
 ; IX: address of the string
 ; result in IX
-; rest of string in HL
-PROC
+; rest of string in HL
 str_tok:
         PUSH IX
-_loop:
+.loop:
         LD A, (IX+0)
         CP 20h          ; check if we've reached a space
-        JR Z, _space
+        JR Z, .space
         CP 0            ; check if we've reached end of line
-        JR Z, _end
+        JR Z, .end
         INC IX
-        JR _loop
-_space:
+        JR .loop
+.space:
         LD A, 0
         LD (IX+0), A
         INC IX
-_end:
+.end:
         PUSH IX
         POP HL
         POP IX
-        RET
-ENDP
+        RET
 
 ; shifts to the beginning of next token after calling str_tok
 str_shift:
@@ -151,138 +141,123 @@ str_shift:
 ; IY - string address
 ; B - number of bytes (length of the string)
 ; result in IX
-; destroys IY
-PROC
+; destroys IY
 str_2str:
 		PUSH IY
-_loop:
+.loop:
 		LD A, (IX)
 		LD (IY), A
 		INC IX
 		INC IY
-		DJNZ _loop
+		DJNZ .loop
 		LD A, 0
 		LD (IY), A
 		POP IX
-		RET
-ENDP
-
-PROC
+		RET
+
 str_2mem:
 		PUSH IX
 		PUSH IY
-_loop:
+.loop:
 		LD A, (IX)
 		CP 0
-		JR Z, _end
+		JR Z, .end
 		LD (IY), A
 		INC IX
 		INC IY
-		JR _loop
-_end:
+		JR .loop
+.end:
 		POP IY
-		POP IX
-ENDP
+		POP IX
 
 ; skips leading spaces in a string
 ; IX - string to trim
-; result in IX
-PROC
+; result in IX
 str_ltrim:
         LD A, (IX+0)
         CP 20h
-        JR Z, _loop
+        JR Z, .loop
         RET
-_loop:
+.loop:
         INC IX
-        JR str_ltrim
-ENDP
-
-PROC
+        JR str_ltrim
+
 str_rtrim:
 		PUSH IX
-_loop:
+.loop:
 		LD A, (IX)
 		INC IX
 		CP 0
-		JR NZ, _loop
-_loop1:
+		JR NZ, .loop
+.loop1:
 		LD A, (IX)
 		CP ' '
 		DEC IX
-		JR Z, _loop1
+		JR Z, .loop1
 		LD A, 0
 		LD (IX + 1), A
 		POP IX
-		RET
-ENDP
-
-PROC
+		RET
+
 ; concatenaes string pointed to by IX and IY
 ; result in IY
 str_cat:
 	PUSH IX
 	PUSH IY
-_start:
+.start:
 	LD A, (IX)
 	CP 0
-	JR Z, _cat
+	JR Z, .cat
 	INC IX
-	JR _start
-_cat:
+	JR .start
+.cat:
 	LD A, (IY)
 	CP 0
 	LD (IX), A
-	JR Z, _end
+	JR Z, .end
 	INC IX
 	INC IY
-	JR _cat
-_end:
+	JR .cat
+.end:
 	LD (IX), A
 	POP IY
 	POP IX
-	RET
-ENDP
-		
-PROC
+	RET
+		
 str_indexOf:
 	PUSH IX
 	LD B, 0
-_loop:
+.loop:
 	LD A, (IX)
 	CP 0
-	JR Z, _notFound
+	JR Z, .notFound
 	CP C
-	JR Z, _found
+	JR Z, .found
 	INC B
 	INC IX
-	JR _loop
-_found:
+	JR .loop
+.found:
 	LD A, TRUE
-	JR _end
-_notFound
+	JR .end
+.notFound
 	LD A, FALSE
-_end:
+.end:
 	POP IX
-	RET
-ENDP
-
-PROC
+	RET
+
 ; returns Bth character of the string pointed to by IX
 ; result in A
 str_charAt:
 	PUSH IX
-_loop:
+.loop:
 	LD A, (IX)
 	CP 0
-	JR Z, _end
-	DJNZ _loop
-_end:
+	JR Z, .end
+	DJNZ .loop
+.end:
 	POP IX
-	RET
-ENDP
-
-PROC
+	RET
+
 ; returns a substring of a string
 ; stops at the end of the source string 
 ; or C places after B, whichever is first
@@ -292,70 +267,64 @@ PROC
 ; result in IY
 str_sub:
 	PUSH IX
-_start:
+.start:
 	LD A, B
 	CP 0
-	JR Z, _sub
+	JR Z, .sub
 	DEC B
 	INC IX
-	JR _start
-_sub:
+	JR .start
+.sub:
 	LD A, C
 	CP 0
-	JR Z, _end
+	JR Z, .end
 	LD A, (IX)
 	LD (IY), A
 	CP 0
-	JR Z, _end
+	JR Z, .end
 	DEC C
 	INC IX
 	INC IY
-_end:
+.end:
 	POP IX
-	RET
-ENDP
-
-PROC
+	RET
+
 str_toUpper:
 	PUSH IX
-_loop:
+.loop:
 	LD A, (IX)
 	CP 0
-	JR Z, _end
+	JR Z, .end
 	CALL isLowercaseLetter
 	CP FALSE
-	JR _next
+	JR .next
 	SUB 32	; convert to uppercase
 	LD (IX), A
-_next:
+.next:
 	INC IX
-	JR _loop
-_end:
+	JR .loop
+.end:
 	POP IX
-	RET
-ENDP
-
-PROC
+	RET
+
 str_toLower:
 	PUSH IX
-_loop:
+.loop:
 	LD A, (IX)
 	CP 0
-	JR Z, _end
+	JR Z, .end
 	CALL isUppercaseLetter
 	CP FALSE
-	JR _next
+	JR .next
 	ADD A, 32	; convert to lowercase
 	LD (IX), A
-_next:
+.next:
 	INC IX
-	JR _loop
-_end:
+	JR .loop
+.end:
 	POP IX
-	RET
-ENDP
-
-PROC
+	RET
+
 ; checks if the string pointed to by IX 
 ; starts with the string pointed to by IY
 ; result in A
@@ -363,25 +332,24 @@ str_startsWith:
 	PUSH IX
 	PUSH IY
 	PUSH BC
-_loop:
+.loop:
 	LD A, (IY)
 	CP 0
-	JR Z, _true
+	JR Z, .true
 	LD B, (IX)
 	CP B
-	JR NZ, _false
+	JR NZ, .false
 	INC IX
 	INC IY
-	JR _loop
-_false:
+	JR .loop
+.false:
 	LD A, FALSE
-	JR _end
-_true:
+	JR .end
+.true:
 	LD A, TRUE
-_end:
+.end:
 	POP BC
 	POP IY
 	POP IX
-	RET
-ENDP
+	RET
 

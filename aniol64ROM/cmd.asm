@@ -40,8 +40,7 @@ Format:		defb "format", 0
 
 UnknownCmd: defb "Unknown cmd", 0
 Prompt: 	defb ">", 0
-
-PROC
+
 cmd_main:
 		LD IX, Prompt
 		CALL writeStr
@@ -52,55 +51,55 @@ cmd_main:
 		; clear screen command
         LD IY, Clr
         CALL str_cmp
-        JP Z, _clr
+        JP Z, .clr
         ; reset command
         LD IY, Reset
         CALL str_cmp
-        JP Z, _rst
+        JP Z, .rst
         ; echo command
         LD IY, EchoCmd
         CALL str_cmp
-        JP Z, _echo
+        JP Z, .echo
         ; rnd command
         LD IY, Rnd
         CALL str_cmp
-        JP Z, _rnd
+        JP Z, .rnd
         ; monitor program
         LD IY, Mon
         CALL str_cmp
-        JP Z, _mon
+        JP Z, .mon
         ; peek command
         LD IY, Peek
         CALL str_cmp
-        JP Z, _peek
+        JP Z, .peek
         ; poke command
         LD IY, Poke
         CALL str_cmp
-        JP Z, _poke
+        JP Z, .poke
         ; put command
         LD IY, Put
         CALL str_cmp
-        JP Z, _put
+        JP Z, .put
 		; get command
 		LD IY, Get
 		CALL str_cmp
-		JP Z, _get
+		JP Z, .get
 		; load command
 		LD IY, Load
 		CALL str_cmp
-		JP Z, _load
+		JP Z, .load
 		; save command
 		LD IY, Save
 		CALL str_cmp
-		JP Z, _save
+		JP Z, .save
 		; cat command
 		LD IY, Cat
 		CALL str_cmp
-		JP Z, _cat
+		JP Z, .cat
         ; beep command
         LD IY, Beep
         CALL str_cmp
-        JP Z, _beep
+        JP Z, .beep
 		; term program
 		LD IY, Term
 		CALL str_cmp
@@ -108,15 +107,15 @@ cmd_main:
 		; disk info
 		LD IY, DiskInfo
 		CALL str_cmp
-		JP Z, _di
+		JP Z, .di
 		; disk info
 		LD IY, DiskDiag
 		CALL str_cmp
-		JP Z, _dd
+		JP Z, .dd
 		; test command
 		LD IY, Test
 		CALL str_cmp
-		JP Z, _test
+		JP Z, .test
 		; snake 
 		LD IY, Snake
 		CALL str_cmp
@@ -128,85 +127,85 @@ cmd_main:
 		; onp 
 		LD IY, Onp
 		CALL str_cmp
-		JP Z, _onp
+		JP Z, .onp
 		; edit command
 		LD IY, Edit
 		CALL str_cmp
-		JP Z, _edit
+		JP Z, .edit
 		; pwd command
 		LD IY, Pwd
 		CALL str_cmp
-		JP Z, _pwd     
+		JP Z, .pwd     
 		; ls command
 		LD IY, Ls
 		CALL str_cmp
-		JP Z, _ls
+		JP Z, .ls
 		; mkdir command
 		LD IY, MkDir
 		CALL str_cmp
-		JP Z, _mkdir
+		JP Z, .mkdir
 		; rmdir command
 		LD IY, RmDir
 		CALL str_cmp
-		JP Z, _rmdir
+		JP Z, .rmdir
 		; cd command
 		LD IY, Cd
 		CALL str_cmp
-		JP Z, _cd
+		JP Z, .cd
 		; touch command
 		LD IY, Touch
 		CALL str_cmp
-		JP Z, _touch
+		JP Z, .touch
 		; rm command
 		LD IY, Rm
 		CALL str_cmp
-		JP Z, _rm
+		JP Z, .rm
 		; format command
 		LD IY, Format
 		CALL str_cmp
-		JP Z, _format
+		JP Z, .format
         ; unknown command
         LD IX, UnknownCmd
         CALL writeStr
         CALL bzr_beep
-_wrap:
+.wrap:
 		CALL nextLine
 		JP cmd_main
-_clr:
+.clr:
         CALL clrScr
         CALL home
         JP cmd_main
-_rst:
+.rst:
         RST 00h
-_echo:
+.echo:
         CALL str_shift
         CALL writeLn
         JP cmd_main
-_peek:
+.peek:
         CALL mon_peek
-        JP _wrap
-_poke:
+        JP .wrap
+.poke:
         CALL mon_poke
         JP cmd_main
-_put:
+.put:
         CALL mon_put
         JP cmd_main
-_get:
+.get:
 		CALL mon_get
-		JP _wrap
-_load:
+		JP .wrap
+.load:
 		CALL dos_loadFile
 		JP cmd_main
-_save:
+.save:
 		CALL dos_saveFile
 		JP cmd_main
-_cat:
+.cat:
 		CALL dos_cat
 		JP cmd_main
-_beep:
+.beep:
         CALL bzr_beep
         JP cmd_main
-_rnd:
+.rnd:
         CALL rnd
         CALL byte2asc
         PUSH AF
@@ -214,52 +213,51 @@ _rnd:
         CALL putChar
         POP AF
         CALL putChar
-        JP _wrap
-_di:
+        JP .wrap
+.di:
 		CALL dos_cfDiskInfo
-		JP _wrap
-_dd:	
+		JP .wrap
+.dd:	
 		CALL cf_diag
 		CALL mon_printByteA
-		JP _wrap
-_test:
+		JP .wrap
+.test:
 		CALL test_main
 		JP cmd_main
-_mon:
+.mon:
         CALL mon_main
-        JP _wrap
+        JP .wrap
         RET
-_onp:
+.onp:
 		CALL onp_main
 		JP cmd_main
-_edit:
+.edit:
 		CALL ed_main
 		JP cmd_main
-_pwd:
+.pwd:
 		CALL dos_pwd
 		JP cmd_main
-_ls:
+.ls:
 		CALL dos_ls
 		JP cmd_main
-_mkdir:
+.mkdir:
 		CALL dos_mkDir
 		JP cmd_main
-_rmdir:
+.rmdir:
 		CALL dos_rmDir
 		JP cmd_main
-_cd:
+.cd:
 		CALL dos_cd
 		JP cmd_main
-_touch:
+.touch:
 		CALL dos_touch
 		JP cmd_main
-_rm:
+.rm:
 		CALL dos_rm
 		JP cmd_main
-_format:
+.format:
 		CALL dos_format
-		JP cmd_main
-ENDP
+		JP cmd_main
 
 cmd_readLn:
         CALL readLine
