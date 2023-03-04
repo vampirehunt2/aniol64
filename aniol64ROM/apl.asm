@@ -90,7 +90,8 @@ VARNAMES_SIZE equ 128 * 8
 
 VarnamePtr	equ PROGRAM_DATA + 00h	; 2 byte pointer into the variable name table
 ProgramPtr 	equ PROGRAM_DATA + 02h 	; 2 bytes
-Token 		equ PROGRAM_DATA + 04h	; 256 bytes for current token
+IsOperator	equ PROGRAM_DATA + 03h
+Token 		equ PROGRAM_DATA + 08h	; 256 bytes for current token
 Varnames 	equ PROGRAM_DATA + 108h	; need to be aligned to 8 byte boundary
 Bytecodes 	equ PROGRAM_DATA + 108h + VARNAMES_SIZE
 
@@ -98,6 +99,8 @@ Bytecodes 	equ PROGRAM_DATA + 108h + VARNAMES_SIZE
 PROC
 defb "apl_main"
 apl_main:
+	LD A, FALSE
+	LD (IsOperator), A
 	CALL init_varnameTab
 	LD HL, Bytecodes
 	LD (ProgramPtr), HL
@@ -140,6 +143,15 @@ _next:
 	CP TRUE
 	JP Z, apl_tokenizeDec
 	;
+	CP '-'
+	JR Z, _checkNeg
+	JR _cont
+_checkNeg:
+	LD A, (IsOperator)
+	CP TRUE
+	JR NZ, _cont
+	JP Z, apl_tokenizeDec
+_cont:	
 	CALL apl_isSpecialChar
 	CP TRUE
 	JP Z, apl_tokenizeOperator
@@ -175,6 +187,7 @@ _loop:
 ENDP
 	
 PROC
+defb "apl_tokenizeLiteral"
 apl_tokenizeLiteral:
 _loop:
 	CALL dos_fPeek
@@ -195,6 +208,8 @@ _end:
 	LD (HL), 0
 	INC HL
 	CALL apl_processVar		; TODO add checking for keywords, constants, system calls, users calls
+	LD A, FALSE
+	LD (IsOperator), A
 	RET
 ENDP
 
@@ -216,13 +231,15 @@ _end:
 	LD (HL), 0
 	INC HL
 	CALL apl_processDec
+	LD A, FALSE
+	LD (IsOperator), A
 	RET
 ENDP
 
 PROC
 apl_processDec:
 	LD IX, Token
-	CALL u16_parseDec
+	CALL i16_parseDec
 	CALL apl_processNumber
 	RET
 ENDP
@@ -248,6 +265,8 @@ _end:
 	LD (HL), 0
 	INC HL
 	CALL apl_processHex
+	LD A, FALSE
+	LD (IsOperator), A
 	RET
 ENDP
 
@@ -280,6 +299,8 @@ apl_tokenizeBracket:
 	LD (HL), A
 	INC HL
 	CALL apl_processBracket
+	LD A, FALSE
+	LD (IsOperator), A
 	RET
 
 apl_processBracket:
@@ -290,23 +311,31 @@ apl_processBracket:
 	RET
 
 PROC
+defb "apl_tokenizeOperator"
 apl_tokenizeOperator:
-_loop:
-	CALL dos_fPeek
-	LD B, A
-	CALL apl_isSpecialChar 
-	CP TRUE
-	JR Z, _next
-	JR _end
-_next:
 	CALL dos_fRead
 	LD (HL), A
 	INC HL
-	JR _loop
-_end:
-	LD (HL), 0
+	CP '<'
+	JR Z, _next
+	CP '>'
+	JR Z, _next
+	JR _end
+_next:
+	CALL dos_fPeek
+	CP '>'
+	JR Z, _ld
+	CP '='
+	JR Z, _ld
+	JR _end
+_ld:
+	CALL dos_fRead
+	LD (HL), A
 	INC HL
+_end:
 	CALL apl_processOperator
+	LD A, TRUE
+	LD (IsOperator), A
 	RET
 ENDP
 
@@ -321,7 +350,6 @@ apl_processOperator:
 ENDP
 
 PROC
-defb "apl_processVar"
 apl_processVar:
 	CALL apl_getVarCode
 	LD HL, (ProgramPtr)

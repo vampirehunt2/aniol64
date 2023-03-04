@@ -416,7 +416,6 @@ _end:
 ENDP
 
 PROC
-defb "i16_parseDec"
 i16_parseDec:
 	LD A, (IX)
 	CP '-'		; check for leading minus
@@ -526,7 +525,6 @@ _loop:
 ENDP
 
 PROC
-defb "i16_formatDec"
 i16_formatDec:
 	LD A, H
 	AND 10000000b	; isolate the sign of the number
