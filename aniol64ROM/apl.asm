@@ -66,7 +66,8 @@ NL_B			equ 00h
 
 ; keyword tokens and their corresponding bytecodes
 KeywordTokens:
-PROG_T: 	defb "PROG", 	0, 'P'.T: 	defb "PROC", 	0, 'p'
+PROG_T: 	defb "PROG", 	0, 'P'
+.T: 	defb "PROC", 	0, 'p'
 FUN_T:		defb "FUN", 	0, 'F'
 END_T:		defb "END", 	0, 'D'
 RET_T:		defb "RET", 	0, 'R'
@@ -89,13 +90,14 @@ VARNAMES_SIZE equ 128 * 8
 
 VarnamePtr	equ PROGRAM_DATA + 00h	; 2 byte pointer into the variable name table
 ProgramPtr 	equ PROGRAM_DATA + 02h 	; 2 bytes
-IsOperator	equ PROGRAM_DATA + 03h
+IsOperator	equ PROGRAM_DATA + 04h
 Token 		equ PROGRAM_DATA + 08h	; 256 bytes for current token
 Varnames 	equ PROGRAM_DATA + 108h	; need to be aligned to 8 byte boundary
 Bytecodes 	equ PROGRAM_DATA + 108h + VARNAMES_SIZE
 
-
- defb "apl_main"
+
+
+
 apl_main:
 	LD A, FALSE
 	LD (IsOperator), A
@@ -103,8 +105,10 @@ apl_main:
 	LD HL, Bytecodes
 	LD (ProgramPtr), HL
 	CALL apl_tokenize
-	RET
-
+	RET
+
+
+
 ; fills the var names table with all zeroes
 init_varnameTab:
 	XOR A           ;LD A, 0
@@ -113,8 +117,9 @@ init_varnameTab:
     LD (HL), A   		
     LD BC, VARNAMES_SIZE  
     LDIR         
-	RET
-
+	RET
+
+
 apl_getToken:
 .loop:
 	LD HL, Token
@@ -137,6 +142,7 @@ apl_getToken:
 	CP TRUE
 	JP Z, apl_tokenizeDec
 	;
+	LD A, B
 	CP '-'
 	JR Z, .checkNeg
 	JR .cont
@@ -165,8 +171,10 @@ apl_getToken:
 	LD A, B
 	CP '#'
 	JP Z, apl_tokenizeComment
-	RET
-
+	RET
+
+
+
 apl_tokenize:
 .loop:
 	CALL apl_getToken
@@ -175,10 +183,11 @@ apl_tokenize:
 	CALL str_cmp
 	CP 0
 	JR NZ, .loop
-	RET
-	
- defb "apl_tokenizeLiteral"
+	RET
+
+
 apl_tokenizeLiteral:
+	LD HL, Token
 .loop:
 	CALL dos_fPeek
 	LD B, A
@@ -200,9 +209,19 @@ apl_tokenizeLiteral:
 	CALL apl_processVar		; TODO add checking for keywords, constants, system calls, users calls
 	LD A, FALSE
 	LD (IsOperator), A
-	RET
-
+	RET
+
+
 apl_tokenizeDec:
+	LD HL, Token
+	CALL dos_fPeek
+	CP '-'
+	JR Z, .neg
+	JR .loop
+.neg:
+	CALL dos_fRead
+	LD (HL), A
+	INC HL
 .loop:
 	CALL dos_fPeek
 	LD B, A
@@ -221,15 +240,19 @@ apl_tokenizeDec:
 	CALL apl_processDec
 	LD A, FALSE
 	LD (IsOperator), A
-	RET
-
+	RET
+
+
+
 apl_processDec:
 	LD IX, Token
 	CALL i16_parseDec
 	CALL apl_processNumber
-	RET
-
+	RET
+
+
 apl_tokenizeHex:
+	LD HL, Token
 	CALL dos_fRead	; reading in the '$' symbol
 	LD (HL), A
 	INC HL
@@ -251,14 +274,18 @@ apl_tokenizeHex:
 	CALL apl_processHex
 	LD A, FALSE
 	LD (IsOperator), A
-	RET
-
+	RET
+
+
+
 apl_processHex:
 	LD IX, Token
 	CALL u16_parseHex
 	CALL apl_processNumber
-	RET
-
+	RET
+
+
+
 apl_processNumber:
 	LD A, NUM_B
 	LD IX, (ProgramPtr)
@@ -271,11 +298,15 @@ apl_processNumber:
 	LD (IX), A
 	INC IX
 	LD (ProgramPtr), IX
-	RET
+	RET
+
 
 apl_tokenizeBracket:
+	LD HL, Token
 	CALL dos_fRead
 	LD (HL), A
+	INC HL
+	LD (HL), 0
 	INC HL
 	CALL apl_processBracket
 	LD A, FALSE
@@ -288,9 +319,9 @@ apl_processBracket:
 	INC HL
 	LD (ProgramPtr), HL
 	RET
-
- defb "apl_tokenizeOperator"
+
 apl_tokenizeOperator:
+	LD HL, Token
 	CALL dos_fRead
 	LD (HL), A
 	INC HL
@@ -311,28 +342,37 @@ apl_tokenizeOperator:
 	LD (HL), A
 	INC HL
 .end:
+	LD (HL), 0
+	INC HL
 	CALL apl_processOperator
 	LD A, TRUE
 	LD (IsOperator), A
-	RET
-
+	RET
+
+
+
 apl_processOperator:
 	CALL apl_getOperatorCode
 	LD HL, (ProgramPtr)
 	LD (HL), A
 	INC HL
 	LD (ProgramPtr), HL
-	RET
-
+	RET
+
+
+
 apl_processVar:
 	CALL apl_getVarCode
 	LD HL, (ProgramPtr)
 	LD (HL), A
 	INC HL
 	LD (ProgramPtr), HL
-	RET
-
+	RET
+
+
+
 apl_tokenizeComment:
+	LD HL, Token
 .loop:
 	CALL dos_fRead
 	CP 13
@@ -343,9 +383,12 @@ apl_tokenizeComment:
 .end:
 	LD (HL), 0
 	INC HL
-	RET 
-
+	RET 
+
+
+
 apl_tokenizeString
+	LD HL, Token
 	CALL dos_fRead	; read the opening quote
 	LD (HL), A
 	INC HL
@@ -361,8 +404,10 @@ apl_tokenizeString
 	INC HL
 	LD (HL), 0
 	INC HL
-	RET 
-
+	RET 
+
+
+
 apl_isLCaseLetter:
 	LD A, B
 	CP 'a'
@@ -376,8 +421,10 @@ apl_isLCaseLetter:
 	RET
 .no
 	LD A, FALSE
-	RET
-	
+	RET
+
+	
+
 apl_isUCaseLetter:
 	LD A, B
 	CP 'A'
@@ -391,8 +438,10 @@ apl_isUCaseLetter:
 	RET
 .no:
 	LD A, FALSE
-	RET
-	
+	RET
+
+	
+
 apl_isLetter:
 	CALL apl_isLCaseLetter
 	CP TRUE
@@ -404,8 +453,10 @@ apl_isLetter:
 	RET
 .true:
 	LD A, TRUE
-	RET
-
+	RET
+
+
+
 apl_isSpecialChar:
 	PUSH IX
 	LD IX, SpecialChars
@@ -424,8 +475,10 @@ apl_isSpecialChar:
 	LD A, FALSE
 .end:
 	POP IX
-	RET
-
+	RET
+
+
+
 apl_isWhitespace:
 	LD A, B
 	CP ' '
@@ -438,8 +491,10 @@ apl_isWhitespace:
 	RET
 .true:
 	LD A, TRUE
-	RET
-
+	RET
+
+
+
 apl_isDecDigit:
 	LD A, B
 	CALL isDecDigit
@@ -448,8 +503,10 @@ apl_isDecDigit:
 	RET
 .true:
 	LD A, TRUE
-	RET
-
+	RET
+
+
+
 apl_isHexDigit:
 	LD A, B
 	CALL isHexDigit
@@ -458,8 +515,10 @@ apl_isHexDigit:
 	RET
 .true:
 	LD A, TRUE
-	RET
-
+	RET
+
+
+
 apl_isBracket:
 	LD A, B
 	CP '('
@@ -470,8 +529,10 @@ apl_isBracket:
 	RET
 .true:
 	LD A, TRUE
-	RET
-
+	RET
+
+
+
 ; variable name is passed in the Token variable
 ; and is a null-terminated string
 ; characters past the 8th are silently ignored
@@ -497,8 +558,10 @@ apl_getVarCode:
 .found:
 	LD A, D
 	OR 10000000b
-	RET
-
+	RET
+
+
+
 ; checks whether variable names pointed to by IX and IY match.
 ; the variable name at IX has an 8-byte maximum lenght
 ; and it is null-terminated only if the length is less than 8
@@ -525,8 +588,10 @@ apl_varnameMatch:
 	RET
 .false:
 	LD A, FALSE
-	RET
-
+	RET
+
+
+
 ; adds a new record to the Varnames table
 ; at the current IX position (assumes IX is at the end of the table)
 ; destroys A, E, IX, IY
@@ -544,8 +609,10 @@ apl_newVar:
 	RET Z
 	INC IX
 	INC IY
-	JR .loop
-
+	JR .loop
+
+
+
 ; moves IX to the begginign of the next record
 ; in the Varnames table
 ; assumes Varnames is aligned at 8 byte boundary
@@ -561,8 +628,10 @@ apl_nextVar:
 	ADD HL, BC
 	PUSH HL
 	POP IX
-	RET	
-
+	RET	
+
+
+
 ; token in Token
 apl_getOperatorCode:
 	LD IY, Token
@@ -594,8 +663,10 @@ apl_getOperatorCode:
 	RET
 .one:
 	LD A, (IY)
-	RET
-
+	RET
+
+
+
 ; returns the bytecode corresponding to the keyword
 ; passed in IY, or zero if it's not a keyword
 ; result in A
@@ -614,8 +685,10 @@ apl_getKeywordCode:
 .end:
 	POP BC
 	POP IX
-	RET			; just return the zero that's already in A
-
+	RET			; just return the zero that's already in A
+
+
+
 ; destroys BC
 apl_keywordCmp:
 	PUSH IY
@@ -640,7 +713,8 @@ apl_keywordCmp:
 	CP FALSE
 	RET Z
 	LD A, (IX - 1)
-	RET
+	RET
+
 
 
 

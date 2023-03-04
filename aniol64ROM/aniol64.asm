@@ -148,7 +148,8 @@ loop:
  include onp.asm
  include edit.asm
  include apl.asm
-
+
+
 handleNmi:
 	LD A, (NmiCount)
 	INC A
@@ -161,7 +162,8 @@ handleNmi:
 	INC A
 	LD (NmiCount + 1), A
 .end:
-	RET
+	RET
+
 
 ; allows to register a routine that will be executed each time NMI is fired
 ; the routine needs to end with a RET instruction
