@@ -534,7 +534,6 @@ mon_poke:
         LD IX, InvVal
         CALL writeStr
         RET
-
 mon_put:
 		CALL str_shift
         CALL str_tok        ; port number now in a string pointed to by IX, value in a string pointed to by HL
@@ -546,11 +545,18 @@ mon_put:
         LD C, B             ; save port number in C
         PUSH IY             ; transferring the value string
         POP IX              ; to IX
+.loop:
+		CALL str_tok
+		CALL str_len
+		CP 0
+		RET Z
         CALL parseByte      ; assuming parsing is OK, value is now in B
         CP 0
         JR NZ, .valError
         LD A, B             ; load the value to A
         OUT (C), A          ; output the value to the port with the given number
+		CALL str_shift
+		JR .loop
         RET
 .addrError:
         LD IX, InvAddr
