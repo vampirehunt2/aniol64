@@ -22,6 +22,8 @@ dspInit:
 	LD B, 10
 	LD C, DART_B_CMD
 	OTIR
+	LD A, 25
+	CALL delay
 	CALL tm_transmitEnable
     RET
 
@@ -100,15 +102,27 @@ putChar:
 ; and moves the cursor over by one
 ; result in A
 getChar:
-	LD A, ESC
+	PUSH BC
+.empty:
+	IN A, (DART_B_CMD)
+	BIT 0, A
+	JR Z, .cont
+	IN A, (DART_B_DAT)
+	JR .empty				; make sure the transmitter buffer is empty
+.cont:
+	LD A, ESC				; send the transfer command
 	OUT (DART_B_DAT), A
 	LD A, '|'
 	OUT (DART_B_DAT), A
+	LD B, 50				; give some time the tm to respond
+.delay:						; 50x13 clock cycles...
+	DJNZ .delay				; ...is enough to send 10 bits at x64 UART clock
 .loop:
 	IN A, (DART_B_CMD)
 	BIT 0, A
 	JR Z, .loop
 	IN A, (DART_B_DAT)
+	POP BC
     RET
 
 ; writes a string to the display at current cursor position
@@ -141,9 +155,11 @@ nextLine:
 
 
 tm_transmitEnable:
+	LD A, 18h			; Cancel any pending escape sequence
+	OUT (DART_B_DAT), A
 	LD A, ESC
 	OUT (DART_B_DAT), A
-	LD A, '~'
+	LD A, 7Eh			; ~ character
 	OUT (DART_B_DAT), A
 	OUT (DART_B_DAT), A
 	OUT (DART_B_DAT), A
@@ -155,3 +171,10 @@ tm_diag:
 	OUT (DART_B_DAT), A
 	LD A, 'Q'
 	OUT (DART_B_DAT), A
+	
+tm_txWait:
+	IN A, (DART_B_CMD)
+	BIT 2, A
+	JR Z, tm_txWait
+	RET
+	
