@@ -97,7 +97,8 @@ putChar:
 	; waiting for the character to be sent is done automatically
 	; since WAIT function is enabled.
     RET
-
+
+
 ; gets a single character from the screen at current cursor position
 ; and moves the cursor over by one
 ; result in A
@@ -123,8 +124,10 @@ getChar:
 	JR Z, .loop
 	IN A, (DART_B_DAT)
 	POP BC
-    RET
-
+    RET
+
+
+
 ; writes a string to the display at current cursor position
 ; IX - null-terminated string to write
 writeStr:
@@ -138,7 +141,8 @@ writeStr:
 	JR .loop
 .end:
 	POP IX
-	RET
+	RET
+
 
 ; goes to the next line of the display
 ; if there are free lines below the current ones, goes to the next one

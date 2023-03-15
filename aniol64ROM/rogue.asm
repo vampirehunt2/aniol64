@@ -1,10 +1,5 @@
 ; rogue
 
-Rooms equ PROGRAM_DATA + 0 	;
-
-ROOMRECSIZE	equ 10h
-MAXROOMS 	equ 6
-
 ; Dungeon features
 FLOOR		equ '.'
 DOOR		equ '/'
@@ -14,6 +9,8 @@ PC 			equ '@'
 
 ; room record format
 ; 8 bytes per room
+ROOMRECSIZE	equ 10h
+MAXROOMS 	equ 6
 RoomX0 		equ 00h
 RoomY0 		equ 01h
 RoomX1		equ 02h
@@ -27,7 +24,25 @@ CellH		equ 09h
 RoomConn 	equ 0Ah
 RoomFlg		equ 0Bh
 
-DATA 		equ PROGRAM_DATA + ROOMRECSIZE * MAXROOMS
+; monster templates (Attack, Defence, Hits, Type, Name (zero-padded to 12 bytes))
+NUM_MNST_TEMPLATES equ 1	; how many distinct monster types there are
+MonsterTemplates:
+ defb 5, 5, 10, 0, "Monster", 0, 0, 0, 0, 0
+
+; monster record format
+MNSTRECSIZE equ 05h
+MAXMONSTERS equ 32
+MINMONSTERS equ 10
+Hits		equ 00h
+Template	equ 01h		; 2-byte pointer to a template
+MnstX		equ 03h
+MnstY		equ 04h
+
+; Data structures for the program
+Rooms 		equ PROGRAM_DATA + 0
+Monsters 	equ PROGRAM_DATA + ROOMRECSIZE * MAXROOMS
+
+DATA 		equ Monsters + MNSTRECSIZE * MAXMONSTERS
 Crossover	equ DATA + 00h
 xStep		equ DATA + 01h
 yStep		equ DATA + 02h
@@ -52,14 +67,16 @@ CELL_H		equ MAP_H / 2
 ROOMMIN		equ 4
 ROOMMAXW	equ CELL_W - 2
 ROOMMAXH	equ CELL_H - 2
-
+
+
  defb "rog_main"
 rog_main:
 	CALL rog_init
 	CALL rog_initLevel
 	NOP
 	CALL rog_play
-	RET 
+	RET
+ 
 
 rog_initLevel:
 	CALL clrScr
@@ -99,7 +116,8 @@ rog_printStatus:
 	CALL putChar
 	POP BC
 	RET
-
+
+
 rog_isDirKey:
 	CP MOVE_N
 	JR Z, .true
@@ -121,7 +139,8 @@ rog_isDirKey:
 	RET
 .true:
 	LD A, TRUE
-	RET	
+	RET
+	
 
 rog_play:
 	CALL readKey
@@ -136,7 +155,8 @@ rog_play:
 	RET Z
 	CALL rog_los
 	JP rog_play
-	
+	
+
 rog_isMovable:
 	CP FLOOR
 	JR Z, .true
@@ -148,15 +168,19 @@ rog_isMovable:
 	RET
 .true:
 	LD A, TRUE
-	RET
-
+	RET
+
+
+
 rog_descend:
 	LD A, (PcOn)
 	CP STAIR
 	RET NZ 		; abort and do nothing if the PC isn't standing on the stairs
 	CALL rog_initLevel
-	RET
-
+	RET
+
+
+
 rog_move:
 	CP MOVE_N
 	JR Z, .moveN
@@ -258,14 +282,16 @@ rog_move:
 	LD (PcX), A 		; store new X coordinates
 	LD A, C
 	LD (PcY), A
-	RET
+	RET
+
 
 rog_printTile:
 	CALL gotoXY
 	CALL rog_getChar
 	CALL putChar
 	RET
-	
+	
+
 rog_isTransparent:
 	CP FLOOR
 	JR Z, .true
@@ -277,8 +303,10 @@ rog_isTransparent:
 	RET
 .true:
 	LD A, TRUE
-	RET
-	
+	RET
+
+	
+
 rog_lookW:
 	PUSH BC
 	DEC B
@@ -295,8 +323,10 @@ rog_lookW:
 	CALL rog_printTile
 .end:
 	POP BC
-	RET
-
+	RET
+
+
+
 rog_lookE:
 	PUSH BC
 	INC B
@@ -313,8 +343,10 @@ rog_lookE:
 	CALL rog_printTile
 .end:
 	POP BC
-	RET
-	
+	RET
+
+	
+
 rog_lookN:
 	PUSH BC
 	DEC C
@@ -331,8 +363,10 @@ rog_lookN:
 	CALL rog_printTile
 .end:
 	POP BC
-	RET
-	
+	RET
+
+	
+
 rog_lookS:
 	PUSH BC
 	INC C
@@ -349,8 +383,10 @@ rog_lookS:
 	CALL rog_printTile
 .end:
 	POP BC
-	RET
-	
+	RET
+
+	
+
 rog_lookNW:
 	PUSH BC
 	DEC B
@@ -364,8 +400,10 @@ rog_lookNW:
 	CALL rog_printTile
 .end:
 	POP BC
-	RET
-	
+	RET
+
+	
+
 rog_lookNE:
 	PUSH BC
 	INC B
@@ -379,8 +417,10 @@ rog_lookNE:
 	CALL rog_printTile
 .end:
 	POP BC
-	RET
-	
+	RET
+
+	
+
 rog_lookSW:
 	PUSH BC
 	DEC B
@@ -394,8 +434,10 @@ rog_lookSW:
 	CALL rog_printTile
 .end:
 	POP BC
-	RET
-	
+	RET
+
+	
+
 rog_lookSE:
 	PUSH BC
 	INC B
@@ -409,8 +451,10 @@ rog_lookSE:
 	CALL rog_printTile
 .end:
 	POP BC
-	RET
-
+	RET
+
+
+
 rog_los:
 	LD A, (PcX)
 	LD B, A
@@ -424,8 +468,10 @@ rog_los:
 	CALL rog_lookNW
 	CALL rog_lookSE
 	CALL rog_lookSW
-	RET
-
+	RET
+
+
+
 rog_init:
 	LD A, FALSE
 	LD (Echo), A
@@ -435,7 +481,8 @@ rog_init:
 	CALL cursorOff
 	CALL rog_initCells
 	CALL rog_clearMap
-	RET
+	RET
+
 
 ; DEBUG only
 ;rog_displayEntireMap:
@@ -453,7 +500,8 @@ rog_clearMap:
 	LD BC, MAP_SIZE
 	LDIR
 	RET
-	
+	
+
 rog_getMapAddr:
 	PUSH DE
 	PUSH BC
@@ -471,7 +519,8 @@ rog_getMapAddr:
 	ADD HL, BC
 	POP BC
 	POP DE
-	RET
+	RET
+
 	
 rog_putChar:
 	CALL rog_getMapAddr
@@ -482,7 +531,8 @@ rog_getChar:
 	CALL rog_getMapAddr
 	LD A, (HL)
 	RET
-
+
+
 rog_initCells:
 	LD IY, Rooms
 	LD B, 0
@@ -504,8 +554,10 @@ rog_initCells:
 	CALL rog_nextRoom
 	LD B, CELL_W * 2
 	CALL rog_initCell
-	RET
-
+	RET
+
+
+
 rog_initCell:
 	LD A, B
 	LD (IY + CellX), A
@@ -513,8 +565,10 @@ rog_initCell:
 	LD (IY + CellY), A
 	LD A, FALSE
 	LD (IY + RoomConn), A
-	RET
-
+	RET
+
+
+
 rog_generateRooms:
 	LD IY, Rooms
 	LD B, MAXROOMS
@@ -522,8 +576,10 @@ rog_generateRooms:
 	CALL rog_generateRoom
 	CALL rog_nextRoom
 	DJNZ .loop
-	RET
-
+	RET
+
+
+
 rog_generateRoom:
 	PUSH BC
 	; randomize X position
@@ -581,8 +637,10 @@ rog_generateRoom:
 	LD A, FALSE
 	LD (IY + RoomConn), A
 	POP BC
-	RET
-
+	RET
+
+
+
 rog_drawRooms:
 	LD IY, Rooms
 	LD B, MAXROOMS
@@ -590,8 +648,10 @@ rog_drawRooms:
 	CALL rog_drawRoom
 	CALL rog_nextRoom
 	DJNZ .loop
-	RET 
-
+	RET 
+
+
+
 ; draws a room on screen
 ; room record pointed to by IY
 ; destroys A
@@ -618,8 +678,10 @@ rog_drawRoom:
 	JR NZ, .vLoop
 	POP DE
 	POP BC
-	RET
-
+	RET
+
+
+
 rog_selectRoomChar:
 	LD A, (IY + RoomX0)
 	CP B
@@ -637,8 +699,10 @@ rog_selectRoomChar:
 	RET
 .wall:
 	LD A, WALL
-	RET
-
+	RET
+
+
+
 rog_selectCorridorChar:
 	PUSH BC
 	CALL rog_getChar
@@ -662,8 +726,10 @@ rog_selectCorridorChar:
 	PUSH AF
 	CALL gotoXY
 	POP AF
-	RET
-
+	RET
+
+
+
 ; moves to te next room record
 ; room record pointer in IY
 rog_nextRoom:
@@ -673,8 +739,10 @@ rog_nextRoom:
 	INC IY
 	DJNZ .loop
 	POP BC
-	RET
-
+	RET
+
+
+
 ; returns the number of connected rooms in A
 rog_countConnectedRooms:
 	LD C, 0
@@ -688,8 +756,10 @@ rog_countConnectedRooms:
 .cont:
 	DJNZ .loop
 	LD A, C
-	RET
-
+	RET
+
+
+
 ; returns the number of unconnected rooms in A
 rog_countUnconnectedRooms:
 	PUSH IY
@@ -706,8 +776,10 @@ rog_countUnconnectedRooms:
 	DJNZ .loop
 	LD A, C
 	POP IY
-	RET
-
+	RET
+
+
+
 ; returns a random unconnected room
 ; returns room record pointer in IY
 rog_randomRoom:
@@ -726,8 +798,10 @@ rog_randomRoom:
 .end:
 	POP BC
 	POP AF
-	RET
-
+	RET
+
+
+
 ; returns a random unconnected room
 ; total number of unconnected rooms must be passed in A
 ; returns room record pointer in IY
@@ -748,7 +822,8 @@ rog_randomUnconnectedRoom:
 	JR .loop
 .end:
 	POP BC
-	RET
+	RET
+
 
 rog_makeConnections:
 	LD A, MAXROOMS
@@ -767,7 +842,8 @@ rog_connectRooms:
 	CALL rog_randomUnconnectedRoom
 	CALL rog_connectRoom
 	JR rog_connectRooms
-	
+	
+
 ; connects a room pointed to by IX 
 ; to a previously unconnected room
 ; pointed to by IY
@@ -847,7 +923,8 @@ rog_connectRoom:
 .end:
 	LD A, TRUE
 	LD (IY + RoomConn), A
-	RET
+	RET
+
 
 rog_placeStair:
 	LD A, STAIR
@@ -869,6 +946,9 @@ rog_placePc:
 	CALL rog_los
 	RET
 	
+; returns a random point in a random room
+; x coefficient in B
+; y coefficient in C
 rog_randomPoint:
 	CALL rog_randomRoom
 	CALL rog_randomPtInRoom
@@ -878,7 +958,8 @@ rog_randomPlace:
 	CALL rog_randomPoint
 	CALL rog_putChar
 	RET
-
+
+
 rog_sanitiseMap:
 	LD C, 0
 .yLoop:
@@ -903,7 +984,8 @@ rog_sanitiseMap:
 .wall:
 	LD A, WALL
 	CALL rog_putChar
-	JR .next
+	JR .next
+
 
 rog_sanitiseDoor:
 	PUSH BC
@@ -929,7 +1011,8 @@ rog_sanitiseDoor:
 	CALL rog_putChar
 	POP BC
 	RET
-
+
+
 rog_checkWall:
 	CALL rog_getChar
 	CP WALL
@@ -939,7 +1022,8 @@ rog_checkWall:
 	LD A, (DoorSet)
 	INC A
 	LD (DoorSet), A
-	RET
+	RET
+
 	
 ; returns a random point within a room
 ; room pointed to by IY
@@ -968,7 +1052,8 @@ rog_randomPtInRoom:
 	LD C, A
 	POP AF
 	RET
-
+
+
 ; checks whether a point is within a room, including the walls
 ; 	BC - XY coordinates of the point
 ; 	IY - points to room record
@@ -1001,5 +1086,64 @@ rog_isPointInRoom:
 .end:
 	POP DE
 	POP AF
-	RET
+	RET
+
+rog_generateMonsters:
+	LD A, MAXMONSTERS - MINMONSTERS
+	CALL rndMod8
+	ADD MINMONSTERS
+	LD B, A
+	LD IX, Monsters
+.loop:
+	CALL rog_placeMonster
+	CALL rog_nextMonster
+	DJNZ .loop
+	RET
+
+; move to the next monster record
+; current monster record passed in IX
+; result in IX
+rog_nextMonster:
+	PUSH BC
+	LD B, MNSTRECSIZE
+.loop:
+	INC IX
+	DJNZ .loop		
+	POP BC
+	RET
+
+; places a random monster in a random place in a random room
+; monster record address must be passed in IX
+rog_placeMonster:
+	PUSH BC
+	; select monster type
+	LD A, NUM_MNST_TEMPLATES
+	LD B, A
+	LD A, (DungeonLev)
+	CALL u8_min					; don't select monsters with level higher than the current dungeon level
+	CALL rndMod8				; randomly select the monster template
+	; find the template for the selected type
+	LD H, 0
+	LD L, A
+	LD BC, MNSTRECSIZE
+	CALL u16_mul
+	LD BC, MonsterTemplates
+	CALL u16_add				; template address now in HL
+	PUSH HL
+	POP IY						; template address now in IY
+	; transfer the data from the template to the monster 
+	LD A, L						; most data, like the name, the name, the attack, defence etc.
+	LD (IX + Template), L		; is taken directly from the templates
+	LD (IX + Template + 1), H
+	LD A, (IY + Hits)
+	LD (IX + Hits), A
+	; find a place to put the monster
+	CALL rog_randomPoint
+	LD (IX + MnstX), B			; TODO, check if the randomly selected spot isn't already occupied
+	LD (IX + MnstY), C	
+	POP BC
+	RET
+
+
+
 

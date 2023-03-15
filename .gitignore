@@ -38,3 +38,4 @@ workspace/.metadata/.plugins/org.eclipse.core.resources/.safetable/org.eclipse.c
 *.xmi
 *.bin
 *.bin
+*.sld
