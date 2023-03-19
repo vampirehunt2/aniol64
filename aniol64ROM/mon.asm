@@ -25,7 +25,8 @@ InvVal: 	defb "Invalid value", 	0
 
 MonCurrAddr equ PROGRAM_DATA 
 LINE_NUM 	equ MAX_Y - 2
-
+
+
  defb "mon_main"
 mon_main:
 		CALL clrScr
@@ -111,7 +112,8 @@ mon_main_loop:
         CALL writeStr
         JP mon_main_loop
 .bye:
-        RET
+        RET
+
 
 mon_gotoCmdLine:
 		LD B, 0
@@ -134,7 +136,8 @@ mon_gotoStatusLine:
 		LD C, LINE_NUM + 1
 		CALL gotoXY
 		RET
-
+
+
 mon_setAddress:
         PUSH HL
         POP IX  ; setting IX to point to the argument of the adr command
@@ -150,8 +153,10 @@ mon_setAddress:
         CALL writeStr
         CALL readKey
         CALL mon_refresh
-        JP mon_main_loop
-
+        JP mon_main_loop
+
+
+
 mon_run:
         PUSH HL
         POP IX  ; setting IX to point to the argument of the adr command
@@ -167,8 +172,10 @@ mon_run:
         CALL readKey
         CALL mon_refresh
         JP mon_main_loop
-        RET
-
+        RET
+
+
+
 mon_setValue:
         PUSH HL
         POP IX                  ; put the arguments of the set command in IX
@@ -214,8 +221,10 @@ mon_setValue:
         JP mon_main_loop
 .completed:
         CALL mon_dsp
-        JP mon_main_loop
-
+        JP mon_main_loop
+
+
+
 mon_fill:
         PUSH HL
         POP IX                  ; put the arguments of the fill command in IX
@@ -246,8 +255,10 @@ mon_fill:
         CALL writeStr
         CALL readKey
         CALL mon_refresh
-        JP mon_main_loop
-
+        JP mon_main_loop
+
+
+
 mon_copy:
         PUSH HL
         POP IX                  ; put the arguments of the copy command in IX
@@ -288,8 +299,10 @@ mon_copy:
         CALL writeStr
         CALL readKey
         CALL mon_refresh
-        JP mon_main_loop
-
+        JP mon_main_loop
+
+
+
 mon_nextScreen:
 		PUSH BC
         LD HL, (MonCurrAddr)
@@ -300,8 +313,10 @@ mon_nextScreen:
         LD (MonCurrAddr), HL
         CALL mon_dsp
 		POP BC
-        JP mon_main_loop
-
+        JP mon_main_loop
+
+
+
 mon_prevScreen:
 		PUSH BC
         LD HL, (MonCurrAddr)
@@ -312,7 +327,8 @@ mon_prevScreen:
         LD (MonCurrAddr), HL
         CALL mon_dsp
 		POP BC
-        JP mon_main_loop
+        JP mon_main_loop
+
 
 ; scrolls one line down
 mon_nextLine:
@@ -329,7 +345,8 @@ mon_prevLine:
         LD (MonCurrAddr), HL
         CALL mon_dsp
         JP mon_main_loop
-
+
+
 mon_dsp:
 		PUSH BC
         CALL cursorOff
@@ -349,7 +366,8 @@ mon_dsp:
 		DJNZ .loop
 		CALL cursorOn
 		POP BC
-        RET
+        RET
+
 
 ; prints the addresses for a single line of output of the dsp command
 ; the first address in is HL
@@ -360,48 +378,51 @@ mon_printAddrs:
         LD A, ":"
         CALL putChar
         RET
-
+
+
 ; prints the values for a single line of output of the dsp command
 ; the first address in is HL
 mon_printVals:
-		PUSH BC
+        PUSH BC
         PUSH HL
         POP IX
-		LD B, 8
+	LD B, 8
 .loop:
-		LD A, 8
-		CP B
-		JR Z, .skipSpace
+	LD A, 8
+	CP B
+	JR Z, .skipSpace
         LD A, " "
         CALL putChar
 .skipSpace:
-		PUSH BC
+	PUSH BC
         CALL mon_printByte
-		INC IX
-		POP BC
-		DJNZ .loop
-		POP BC
-		; print the actual characters
-		LD A, '|'
-		CALL putChar
-		LD A, (IX - 8)
-		CALL mon_printChar
-		LD A, (IX - 7)
-		CALL mon_printChar
-		LD A, (IX - 6)
-		CALL mon_printChar
-		LD A, (IX - 5)
-		CALL mon_printChar
-		LD A, (IX - 4)
-		CALL mon_printChar
-		LD A, (IX - 3)
-		CALL mon_printChar
-		LD A, (IX - 2)
-		CALL mon_printChar
-		LD A, (IX - 1)
-		CALL mon_printChar
-        RET
-
+	INC IX
+	POP BC
+	DJNZ .loop
+	POP BC
+	; print the actual characters
+	LD A, '|'
+	CALL putChar
+	LD A, (IX - 8)
+	CALL mon_printChar
+	LD A, (IX - 7)
+	CALL mon_printChar
+	LD A, (IX - 6)
+	CALL mon_printChar
+	LD A, (IX - 5)
+	CALL mon_printChar
+	LD A, (IX - 4)
+	CALL mon_printChar
+	LD A, (IX - 3)
+	CALL mon_printChar
+	LD A, (IX - 2)
+	CALL mon_printChar
+	LD A, (IX - 1)
+	CALL mon_printChar
+        RET
+
+
+
 mon_printChar:
 		CP 32
 		JR C, .special
@@ -410,17 +431,20 @@ mon_printChar:
 		LD A, ' '
 .print:
 		CALL putChar
-		RET
+		RET
+
 
 mon_printByte:
         LD A, (IX + 0)
 mon_printByteA:
+        PUSH BC
         CALL byte2asc
         PUSH AF
         LD A, B
         CALL putChar
         POP AF
         CALL putChar
+        POP BC
         RET
 
 ; prints the value of a double byte stored in IX to the lcd screen
@@ -481,7 +505,8 @@ mon_prevAddrs:
         DEC HL
         DEC HL
         RET
-
+
+
 mon_isWriteable:
         LD A, H
         CP 7Fh
@@ -490,13 +515,15 @@ mon_isWriteable:
         RET
 .nonWriteable:
         LD A, FALSE
-        RET
+        RET
+
 
 mon_refresh:
         CALL clrScr
         CALL mon_dsp
         RET
-
+
+
 mon_peek:
 		CALL str_shift
         CALL parseDByte
@@ -508,8 +535,10 @@ mon_peek:
 .parseError:
         LD IX, InvAddr
         CALL writeStr
-        RET
-
+        RET
+
+
+
 mon_poke:
 		CALL str_shift
         CALL str_tok        ; address now in a string pointed to by IX, value in a string pointed to by HL
@@ -533,7 +562,8 @@ mon_poke:
 .valError:
         LD IX, InvVal
         CALL writeStr
-        RET
+        RET
+
 mon_put:
 		CALL str_shift
         CALL str_tok        ; port number now in a string pointed to by IX, value in a string pointed to by HL
@@ -565,8 +595,10 @@ mon_put:
 .valError:
         LD IX, InvVal
         CALL writeStr
-        RET
-
+        RET
+
+
+
 mon_get:
         CALL str_shift
 		CALL parseByte
@@ -579,4 +611,5 @@ mon_get:
 .addrError:
 		LD IX, InvAddr
         CALL writeStr
-        RET
+        RET
+

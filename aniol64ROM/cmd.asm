@@ -40,7 +40,8 @@ Format:		defb "format", 0
 
 UnknownCmd: defb "Unknown cmd", 0
 Prompt: 	defb ">", 0
-
+
+
 cmd_main:
 		LD IX, Prompt
 		CALL writeStr
@@ -194,10 +195,10 @@ cmd_main:
 		CALL mon_get
 		JP .wrap
 .load:
-		CALL dos_loadFile
+		CALL cmd_loadFile
 		JP cmd_main
 .save:
-		CALL dos_saveFile
+		CALL cmd_saveFileAs
 		JP cmd_main
 .cat:
 		CALL dos_cat
@@ -257,7 +258,8 @@ cmd_main:
 		JP cmd_main
 .format:
 		CALL dos_format
-		JP cmd_main
+		JP cmd_main
+
 
 cmd_readLn:
         CALL readLine

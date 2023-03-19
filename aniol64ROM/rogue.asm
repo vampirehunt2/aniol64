@@ -1088,6 +1088,8 @@ rog_isPointInRoom:
 	POP AF
 	RET
 
+; generating monsters from templates
+; generated monsters are pointed to by the Monsters label
 rog_generateMonsters:
 	LD A, MAXMONSTERS - MINMONSTERS
 	CALL rndMod8

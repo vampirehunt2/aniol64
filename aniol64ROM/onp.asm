@@ -21,8 +21,8 @@ SYNTAX_ERROR equ 2
  
 SyntaxError: defb "Syntax error", 0
 ArithmeticError: defb "Arithmetic error", 0
-
- defb "onp_main"
+
+
 onp_main:
         CALL str_shift
 		LD B, 0
@@ -52,8 +52,10 @@ onp_main:
 .syntaxErr:
 		LD IX, SyntaxError
 		CALL writeLn
-		RET
-		
+		RET
+
+		
+
 onp_processToken:
 		LD A, (IX + 0)		; load the first character of the token
 		CP PLUS
@@ -74,8 +76,10 @@ onp_processToken:
 		CP 1
 		JP Z, onp_processOperator
 		JP onp_processNumber
-		RET
-		
+		RET
+
+		
+
 onp_processNumber:
 		LD A, (IX + 0) 	; load the first character of the token
 		CP BIN
@@ -106,8 +110,10 @@ onp_processNumber:
 		CALL list_append
 		LD A, OK		; fall through to return zero
 .error:
-		RET
-
+		RET
+
+
+
  defb "onp_processOperator"	
 onp_processOperator:
 		LD A, (IX + 0) 	; load the first character of the token
@@ -175,5 +181,6 @@ onp_processOperator:
 		CALL list_append
 .error:
 		LD A, ARITHMETIC_ERROR
-		RET
+		RET
+
 		

@@ -70,6 +70,7 @@ CurrentFileName	equ DOS_AREA + 13h	; (8059h) 13 bytes: 12 for the file name and 
 CurrentFileSize	equ DOS_AREA + 20h	; (8066h) 2 bytes
 FilePtr			equ DOS_AREA + 22h	; (8068h) 2 bytes
 DosErr			equ DOS_AREA + 24h	; status of the last disk I/O operation, 
+DiskPresent		equ DOS_AREA + 25h
  
 ; filesystem constants:
 MAX_DIRNAME_LEN 		equ 8
@@ -89,7 +90,7 @@ Filename 	equ 00h	; null-terminated string,
 FileExists  equ 00h	; first charatcter of the file name is 0 if the file record is empty
 FileDir 	equ 0Dh	; 1 byte directory index
 FileLen 	equ 0Eh	; 2 byte actual file length
- 
+
 dos_setUpCf:
 	CALL cf_exists
 	CP FALSE
@@ -100,11 +101,16 @@ dos_setUpCf:
 	LD IX, DiskFound2
 	CALL writeLn
 	CALL dos_cdRoot
+	LD A, TRUE
+	LD (DiskPresent), A
 	RET
 .noDisk:
+	LD A, FALSE
+	LD (DiskPresent), A
 	LD IX, DiskNotFound
 	CALL writeLn
-	RET
+	RET
+
 
 dos_cfDiskInfo:
 	LD HL, SectorBuffer
@@ -146,7 +152,8 @@ dos_printRecord:
 	INC IX
 	DJNZ dos_printRecord
 	RET
-
+
+
 dos_checkNvram:
 	CALL memTest
 	CP 0
@@ -158,8 +165,10 @@ dos_checkNvram:
 	JP .printMemTest
 .printMemTest:
 	CALL writeLn
-	RET
-
+	RET
+
+
+
 dos_load:
 	CALL str_shift
 	CALL str_tok
@@ -186,8 +195,10 @@ dos_load:
 .invalidSector:
 	LD IX, ErrInvalidSector
 	CALL writeLn
-	RET
-	
+	RET
+
+	
+
 dos_save:
 	CALL str_shift
 	CALL str_tok
@@ -214,8 +225,10 @@ dos_save:
 .invalidSector:
 	LD IX, ErrInvalidSector
 	CALL writeLn
-	RET
-
+	RET
+
+
+
 ; formats a compact flash disk to AFS 1.0
 ; destroys A, HL, BC, DE, IX, IY
 dos_format:
@@ -246,8 +259,12 @@ dos_format:
 	LD HL, SectorBuffer
 	CALL cf_setSector
 	CALL cf_writeSector
-	RET
-
+	RET
+
+
+; gets the success/error message associated with an error code
+; error code passed in DosErr
+; result in IX
 dos_getStatusMsg:
 	PUSH AF
 	LD A, (DosErr)
@@ -264,7 +281,7 @@ dos_getStatusMsg:
 	CP FILE_EXISTS
 	JR Z, .fileExists
 	CP FILE_NOT_FOUND
-	JR Z, .fileNoteFound
+	JR Z, .fileNotFound
 	CP TOO_MANY_DIRS
 	JR Z, .tooManyDirs
 	CP NO_SUCH_DIR
@@ -293,7 +310,7 @@ dos_getStatusMsg:
 .fileExists:
 	LD IX, ErrFileExists
 	JR .end
-.fileNoteFound:
+.fileNotFound:
 	LD IX, ErrFileNotFound
 	JR .end
 .tooManyDirs:
@@ -310,7 +327,8 @@ dos_getStatusMsg:
 	JR .end
 .end:
 	POP AF
-	RET
+	RET
+
 
 ; loads the directory table into memory at address SectorBuffer
 ; destroys A
@@ -346,7 +364,8 @@ dos_saveDirs:
 	POP BC
 	RET
 
-; lists on the screen all the directories in the root directory
+; lists on the screen all the directories in the root directory
+
 dos_listDirs:
 	PUSH BC		; save register state
 	PUSH DE
@@ -372,9 +391,11 @@ dos_listDirs:
 	POP IX
 	POP DE		; restore register state	
 	POP BC
-	RET
+	RET
 
-; lists on the screen all the files in the current directory
+
+; lists on the screen all the files in the current directory
+
 dos_listFiles:
 	LD A, 01h		; the first sector of the file table. Counting sectors in A
 .loop:
@@ -385,8 +406,10 @@ dos_listFiles:
 	INC A
 	CP FILE_TABLE_SECTORS
 	JR NZ, .loop
-	RET
-
+	RET
+
+
+
 dos_listFilesInSector:
 	PUSH IY
 	PUSH BC
@@ -418,8 +441,10 @@ dos_listFilesInSector:
 	DJNZ .loop
 	POP BC
 	POP IY
-	RET
-
+	RET
+
+
+
 dos_tabFileName:
 	PUSH AF
 	PUSH BC
@@ -435,9 +460,11 @@ dos_tabFileName:
 	DJNZ .loop
 	POP BC
 	POP AF
-	RET
+	RET
 
-
+
+
+
 dos_rm:
 	CALL str_shift
 	CALL dos_fileExists
@@ -452,8 +479,10 @@ dos_rm:
 .notFound:
 	LD IX, ErrFileNotFound
 	CALL writeLn
-	RET
-
+	RET
+
+
+
 dos_rmDir:
 	CALL str_shift
 	CALL dos_loadDirs
@@ -478,8 +507,10 @@ dos_rmDir:
 	CALL dos_saveDirs
 .end:
 	RET
-
-
+
+
+
+
 dos_mkDir:
 	PUSH BC		; save register state
 	PUSH DE
@@ -525,9 +556,11 @@ dos_mkDir:
 .end:
 	POP DE		; restore register state	
 	POP BC
-	RET
+	RET
 
-; checks if the string at IX represents a valid directory name
+
+; checks if the string at IX represents a valid directory name
+
 dos_validateDirname:
 	PUSH IX
 	CALL str_len
@@ -552,10 +585,12 @@ dos_validateDirname:
 	JR .end
 .end:
 	POP IX
-	RET	
+	RET	
+
 
 ; checks if the string at IX represents a valid file name
-; result in A
+; result in A
+
 dos_validateFilename:
 	PUSH IX
 	CALL str_len
@@ -584,14 +619,16 @@ dos_validateFilename:
 	JR .end
 .end:
 	POP IX
-	RET	
+	RET	
+
 
 ; checks if a directory with a given name exists
 ; IX - directory name
 ; result in A:
 ; - 0 if the directory doesn't exist
 ; - directory index if it exists
-; destroys IY, DE
+; destroys IY, DE
+
 dos_dirExists:
 	CALL dos_loadDirs
 	LD D, 1
@@ -611,9 +648,11 @@ dos_dirExists:
 	RET
 .yes:
 	LD A, D
-	RET
+	RET
 
-; moves IX over by the number of bytes corresponding to the length of a directory entry
+
+; moves IX over by the number of bytes corresponding to the length of a directory entry
+
 dos_nextDir:
 	PUSH BC
 	LD B, MAX_DIRNAME_LEN		; length of directory entry
@@ -621,7 +660,8 @@ dos_nextDir:
 	INC IX
 	DJNZ .loop
 	POP BC
-	RET
+	RET
+
 
 dos_pwd:
 	LD IX, CurrentPath
@@ -636,7 +676,8 @@ dos_cdRoot:
 	LD A, 0
 	LD (CurrentDir), A
 	RET
-	
+	
+
 dos_cd:
 	CALL str_shift	; transfer folder name from HL to IX
 	; check if user wants to go to the root folder
@@ -663,8 +704,10 @@ dos_cd:
 .root:
 	CALL dos_cdRoot
 .end:
-	RET
-
+	RET
+
+
+
 dos_ls:
 	LD A, (CurrentDir)
 	CP 0
@@ -672,10 +715,12 @@ dos_ls:
 	CALL dos_listDirs
 .listFiles:
 	CALL dos_listFiles
-	RET
+	RET
+
 
 ; creates an empty file
-; IX: file name
+; IX: file name
+
 dos_touch:
 	CALL str_shift
 	CALL dos_validateFilename	; first, check if the given file name is valid...
@@ -710,8 +755,10 @@ dos_touch:
 	CALL writeLn
 	JR .end
 .end:
-	RET
-
+	RET
+
+
+
 ; finds a free file slot
 ; A - FALSE if a free slot does not exist
 ;	- sector number otherwise
@@ -734,12 +781,14 @@ dos_findFreeFileSlot:
 	RET
 .found:
 	POP AF
-	RET
+	RET
+
 
 ; finds a free file slot (empty file record) in the SectorBuffer
 ; result in A
 ; if A is true, IY points to the beginning of the file record
-; and C is the index of the file record within the file table sector
+; and C is the index of the file record within the file table sector
+
 dos_findFreeFileSlotInSector:
 	LD IY, SectorBuffer
 	LD B, FILE_RECORDS_PER_SECTOR
@@ -755,8 +804,10 @@ dos_findFreeFileSlotInSector:
 	RET
 .found:
 	LD A, TRUE
-	RET
-
+	RET
+
+
+
 ; checks whether a file with a given name exists in the current directory
 ; IX: file name
 ; result: 
@@ -781,8 +832,10 @@ dos_fileExists:
 	RET
 .found:
 	POP AF
-	RET
-
+	RET
+
+
+
 ; checks whether a file with a given name exists 
 ; in the current file table sector
 ; IX: file name
@@ -815,7 +868,8 @@ dos_fileExistsInSector:
 	LD A, FALSE
 .end:
 	POP DE
-	RET
+	RET
+
 
 ; loads one sector of the file table into memory at address SectorBuffer
 ; number of sector in A
@@ -862,7 +916,8 @@ dos_nextFileRecord:
 	POP BC
 	POP HL
 	RET
-
+
+
 ; computes the number of sectors required to store a file of a given size
 ; file size in DE
 ; result in E
@@ -884,8 +939,10 @@ dos_requiredSectors:
 .end:
 	POP BC
 	POP AF
-	RET
-
+	RET
+
+
+
 ; file table sector number in A
 ; file record position in file table sector in C
 ; returns first file sector number of a file within a logical drive in AB, LSB to MSB
@@ -917,7 +974,7 @@ dos_computeSector:
 .skip2:
 	LD B, D
 	POP DE
-	RET
+	RET
 
 ; moves AB to the next sector number within the current logical disk
 dos_nextSector:
@@ -925,8 +982,29 @@ dos_nextSector:
 	RET NZ
 	INC B
 	RET
-
+
+; saves a file with the name given in IX
+cmd_saveFileAs:
+	CALL str_shift
+	LD IY, CurrentFileName
+	CALL str_copy
+	CALL cmd_saveFile
+	RET
+
+; saves a file with the name given in CurrentFileName
+cmd_saveFile:
+	CALL dos_saveFile
+	LD A, (DosErr)
+	CP DOS_OK
+	RET Z
+	CALL dos_getStatusMsg
+	CALL writeLn
+	RET
+
 dos_saveFile:
+	LD A, (DiskPresent)
+	CP TRUE
+	JR NZ, .noDisk
 	LD IX, CurrentFileName
 	CALL dos_validateFilename	; first, check if the given file name is valid...
 	CP FALSE					; ...as this doesn't require reding any data from disk 
@@ -959,31 +1037,50 @@ dos_saveFile:
 	CALL dos_nextSector
 	DEC E
 	JR NZ, .loop
-	JR .end
+	LD A, DOS_OK
+	LD (DosErr), A
+	RET
 .diskFull:	
-	LD IX, ErrDiskFull
-	CALL writeLn
-	JR .end
+	LD A, DISK_FULL
+	LD (DosErr), A
+	RET
 .invName:
-	LD IX, ErrInvFileName
+	LD A, INVALID_FILENAME
+	LD (DosErr), A
+	RET
+.noDisk:
+	LD A, NO_DISK
+	LD (DosErr), A
+	RET
+	
+
+cmd_loadFile:
+	CALL str_shift
+	CALL dos_loadFile
+	LD A, (DosErr)
+	CP DOS_OK
+	RET Z
+	CALL dos_getStatusMsg
 	CALL writeLn
-	JR .end
-.end:
-	RET
-
+	RET
+
 dos_loadFile:
-	CALL dos_fileExists			; check if file already exists in the current directory
-	CP 0
-	JR Z, .notFound
+	LD A, (DiskPresent)
+	CP TRUE
+	JP NZ, .noDisk
+	CALL dos_fileExists			; check if file already exists in the current directory... 
+	CP 0						; ...sets IY to the file record address
+	JP Z, .notFound
 	PUSH AF						; save file table sector number on stack
 	; copy file attributes
 	LD A, (IY + FileLen)
-	LD (CurrentFileSize), A		; set the file length
+	LD (CurrentFileSize), A		; set the file length, lower byte
+	LD E, A
 	LD A, (IY + FileLen + 1)
-	LD (CurrentFileSize + 1), A	; set the file length
+	LD (CurrentFileSize + 1), A	; set the file length, upper byte
+	LD D, A						; file size now in DE
 	; store filename
 	LD IX, CurrentFileName
-	PUSH IY
 .nameCpyLoop:
 	LD A, (IY + Filename)
 	CP 0
@@ -1006,14 +1103,19 @@ dos_loadFile:
 	CALL dos_nextSector
 	DEC E
 	JR NZ, .loop
-	LD HL, 0
-	LD (FilePtr), HL
+	call dos_reset
+	LD A, DOS_OK
+	LD (DosErr), A
 	RET
 .notFound:
-	LD IX, ErrFileNotFound
-	CALL writeLn
-	RET
-
+	LD A, FILE_NOT_FOUND
+	LD (DosErr), A
+	RET
+.noDisk:
+	LD A, NO_DISK
+	LD (DosErr), A
+	RET
+
 dos_cat:
 	CALL str_shift
 	CALL dos_loadFile
@@ -1025,13 +1127,14 @@ dos_cat:
 	JR NZ, .cont
 	CP L
 	JR NZ, .cont
+	CALL nextLine
 	RET
 .cont:
 	LD A, (IX)
 	CALL putChar
 	INC IX
 	DEC HL
-	JR .loop
+	JR .loop
 
 dos_seek:
 	LD (FilePtr), HL
@@ -1061,7 +1164,8 @@ dos_fPeek:
 	POP HL
 	POP BC
 	RET
-	
+	
+
 dos_fWrite:
 	PUSH BC
 	PUSH HL
@@ -1082,8 +1186,8 @@ dos_fWrite:
 	LD (FilePtr), HL
 	POP HL
 	POP BC
-	RET
-
+	RET
+
 dos_eof:
 	PUSH HL
 	PUSH BC
@@ -1100,7 +1204,7 @@ dos_eof:
 .end:
 	POP BC
 	POP HL
-	RET
+	RET
 
 dos_expand:
 	PUSH HL
