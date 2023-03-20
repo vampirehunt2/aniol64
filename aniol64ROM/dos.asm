@@ -1095,6 +1095,11 @@ dos_loadFile:
 	; load the file
 	CALL dos_requiredSectors	; number of required sectors now in E
 	CALL dos_computeSector		; sector number in AB
+	PUSH AF
+	LD A, E						; check for zero-length files
+	CP 0
+	POP AF
+	JR Z, .end					; don't do anything if file is zero-length
 	LD HL, FileBuffer
 	LD C, 0
 .loop:
@@ -1103,6 +1108,7 @@ dos_loadFile:
 	CALL dos_nextSector
 	DEC E
 	JR NZ, .loop
+.end:
 	call dos_reset
 	LD A, DOS_OK
 	LD (DosErr), A
@@ -1119,6 +1125,9 @@ dos_loadFile:
 dos_cat:
 	CALL str_shift
 	CALL dos_loadFile
+	LD A, (DosErr)
+	CP DOS_OK
+	JR NZ, .err
 	LD HL, (CurrentFileSize)
 	LD IX, FileBuffer
 .loop:
@@ -1135,6 +1144,10 @@ dos_cat:
 	INC IX
 	DEC HL
 	JR .loop
+.err:
+	CALL dos_getStatusMsg
+	CALL writeLn
+	RET
 
 dos_seek:
 	LD (FilePtr), HL
