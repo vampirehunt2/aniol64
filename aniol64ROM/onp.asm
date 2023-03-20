@@ -40,6 +40,7 @@ onp_main:
 		POP IX
 		JR .loop
 .end:
+		POP IX
 		LD IX, Stack
 		CALL list_len
 		CP 1
