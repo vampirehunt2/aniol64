@@ -179,8 +179,7 @@ cmd_main:
 .rst:
         RST 00h
 .echo:
-        CALL str_shift
-        CALL writeLn
+        CALL cmd_echo
         JP cmd_main
 .peek:
         CALL mon_peek
@@ -266,3 +265,37 @@ cmd_readLn:
         CALL nextLine
         LD IX, LineBuff
         RET
+
+
+cmd_echo:
+	CALL str_shift
+	PUSH IX
+.loop:
+	LD A, (IX)
+	CP '>'			; check if redirection character is present
+	JR Z, .toFile
+	CP 0
+	JR Z, .endLoop
+	INC IX
+	JR .loop
+.endLoop:
+	POP IX
+	CALL writeLn
+	RET
+.toFile:
+	LD A, 0
+	LD (IX), A		; write an EOL where the redirection was
+	INC IX
+	LD IY, CurrentFileName
+	CALL str_copy	; copy the file name to the dos file descriptor
+	POP IX			; point IX back to the beginning of the content string
+	CALL str_len
+	LD (CurrentFileSize), A		; copy the file size to the dos file descriptor
+	LD A, 0						; upper byte set to 0, due to command line length limitation...
+	LD (CurrentFileSize + 1), A ; ... the size of a file created by echo cannot be longer than 256 bytes
+	LD IY, FileBuffer
+	CALL str_copy				; copy the file contents
+	CALL cmd_saveFile
+	RET
+
+
