@@ -135,13 +135,11 @@ dos_cfDiskInfo:
 	CALL nextLine
 	LD IX, LbaSectors		; LBA sectors
 	CALL writeStr
-	LD A, (SectorBuffer + 120)
+	LD A, (SectorBuffer + 0Eh)
 	CALL mon_printByteA
-	LD A, (SectorBuffer + 121)
+	LD A, (SectorBuffer + 11h)
 	CALL mon_printByteA
-	LD A, (SectorBuffer + 122)
-	CALL mon_printByteA
-	LD A, (SectorBuffer + 123)
+	LD A, (SectorBuffer + 10h)
 	CALL mon_printByteA
 	RET 
 	
