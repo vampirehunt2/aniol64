@@ -1,6 +1,5 @@
 {
     "configurations": [
-
     {
         "type": "dezog",
         "request": "launch",
@@ -27,7 +26,7 @@
             { "path": "C:/8bit/git/aniol64ROM/aniol64.bin", "start": "0x0000" },
             { "path": "source.apl", "start": "0xC000" }
         ],
-        "execAddress": "rog_generateMonsters", 
+        "execAddress": "dos_test", 
         "topOfStack": "0xBFFF"
     }
     ]

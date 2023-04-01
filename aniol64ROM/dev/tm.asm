@@ -151,6 +151,15 @@ nextLine:
 	LD A, CR
 	OUT (DART_B_DAT), A
     RET
+
+scroll:
+	CALL tm_saveCursor
+	LD B, 0
+	LD C, MAX_Y
+	CALL gotoXY
+	CALL nextLine
+	CALL tm_restoreCursor
+	RET
 	
 	
 ; ###########################################################################
@@ -175,10 +184,25 @@ tm_diag:
 	OUT (DART_B_DAT), A
 	LD A, 'Q'
 	OUT (DART_B_DAT), A
+	RET
 	
 tm_txWait:
 	IN A, (DART_B_CMD)
 	BIT 2, A
 	JR Z, tm_txWait
+	RET
+
+tm_saveCursor:
+	LD A, ESC
+	OUT (DART_B_DAT), A
+	LD A, 'j'
+	OUT (DART_B_DAT), A
+	RET
+
+tm_restoreCursor:
+	LD A, ESC
+	OUT (DART_B_DAT), A
+	LD A, 'k'
+	OUT (DART_B_DAT), A
 	RET
 	

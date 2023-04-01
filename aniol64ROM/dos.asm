@@ -999,6 +999,9 @@ cmd_saveFile:
 	CALL writeLn
 	RET
 
+; Saves a file to disk
+; file metadata passed in memory
+; file name in CurrentFilename
 dos_saveFile:
 	LD A, (DiskPresent)
 	CP TRUE
@@ -1231,4 +1234,6 @@ dos_reset:
 	LD (FilePtr), HL
 	POP HL
 	RET
+
+
 	

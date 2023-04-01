@@ -3,7 +3,8 @@
 FileLine	equ PROGRAM_DATA + 00h	; 2 bytes
 ScreenLine	equ PROGRAM_DATA + 02h
 StartLine	equ PROGRAM_DATA + 03h	; 2 bytes
-
+
+
 ed_main:
 	CALL ed_init
 .loop:
@@ -35,10 +36,17 @@ ed_main:
 	CALL dos_fWrite
 	CALL nextLine
 	LD A, (ScreenLine)
+	CP MAX_Y - 1
+	JR Z, .scroll
 	INC A
 	LD (ScreenLine), A
+	JR .cont:
+.scroll:
+	CALL scroll
+.cont:
 	JR .loop
-	RET
+	RET
+
 
 ed_init:
 	CALL str_shift
@@ -56,7 +64,8 @@ ed_init:
 	CALL dos_seek
 	CALL clrScr
 	RET
-
+
+
 ed_processCmds:
 	LD A, (IX)
 	CP ':'
@@ -67,7 +76,7 @@ ed_processCmds:
 	CP 'q'
 	JR Z, .exit
 	CP 'w'
-	CALL Z, dos_saveFile
+	CALL Z, ed_save
 	LD A, TRUE
 	RET
 .noCmd:
@@ -80,10 +89,35 @@ ed_processCmds:
 .exit:
 	POP IX	; jumping one routine level up (EVIL)
 	CALL nextLine
-	RET
+	RET
+
 	
 ed_showPage:
 	LD A, 0
 	;
 	RET
+
+ed_save:
+	CALL str_tok
+	CALL str_shift
+	CALL str_len	
+	CP 0
+	JR Z, .save
+	LD IY, CurrentFileName
+	CALL str_copy
+.save:
+	CALL dos_saveFile
+; error checking:
+	LD A, (DosErr)
+	CP DOS_OK
+	RET Z
+	LD B, 0
+	LD C, MAX_Y
+	CALL gotoXY
+	LD IX, Blank
+	CALL writeStr
+	CALL dos_getStatusMsg
+	CALL writeStr
+	RET
+
 	

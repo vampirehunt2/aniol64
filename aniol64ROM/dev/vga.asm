@@ -27,7 +27,8 @@ home:
         LD (VgaCurY), A
         CALL cursorOn
         RET
-
+
+
 ; clears the screen by filling the entire VRAM area with zeroes
 ; this includes the blanking regions, which may be somewhat redundant
 ; and impact performance slightly, but at least it ensures no data is sent
@@ -49,8 +50,10 @@ clrScr:
         POP DE
         POP BC
         POP HL
-        RET
-  
+        RET
+
+ 
+ 
 ; turns on the cursor for the character at the current cursor position
 cursorOn:
 		LD A, (Cursor)
@@ -65,8 +68,10 @@ cursorOn:
         RET
 .noCursor:
 		CALL cursorOff
-		RET
-
+		RET
+
+
+
 ; turns off the cursor for the character at the current cursor position
 cursorOff:
 		PUSH HL
@@ -75,7 +80,8 @@ cursorOff:
         AND 01111111b    ; clear the cursor bit (D7)
         LD (HL), A
 		POP HL
-        RET
+        RET
+
 		
 writeLn:
 		CALL writeStr
@@ -95,7 +101,8 @@ gotoXY:
         LD (VgaCurY), A
         CALL cursorOn
         RET
-		
+		
+
 cursorLShift:
 		PUSH HL
 		CALL cursorOff
@@ -104,7 +111,8 @@ cursorLShift:
 		CALL vga_addr2XY
 		CALL cursorOn
 		POP HL
-		RET
+		RET
+
 
 ; puts a single character on the screen
 ; and moves the cursor over by one
@@ -131,7 +139,8 @@ getChar:
         AND 01111111b   ; make sure cursor data is not returned
         POP HL
         RET
-
+
+
 ; writes a string to the display at current cursor position
 ; IX - null-terminated string to write
 writeStr:
@@ -161,8 +170,10 @@ writeStr:
         CALL vga_addr2XY      ; store the final X and Y position in memory
 		POP IX
         POP HL                ; restore register state
-        RET
-
+        RET
+
+
+
 ; goes to the next line of the display
 ; if there are free lines below the current ones, goes to the next one
 ; if we're already in the last line, the whole display is scrolled up
@@ -178,16 +189,33 @@ nextLine:
         LD (VgaCurY), A
         JR .end
 .scroll:
-        CALL vga_scroll
+        CALL scroll
 .end:
         CALL cursorOn
-        RET
+        RET
 
+scroll:
+       ; store register values
+        PUSH HL
+        PUSH BC
+        PUSH DE
+
+        LD HL, VRAM + 64  ; 64 is the number of bytes for one display line
+        LD DE, VRAM
+        LD BC, 64 * 30  ; set loop counter to the size of visible memory (VRAM minus vertical blanking)
+        LDIR         ; repeatedly copy previous byte to the current byte
+
+        ; restore register values
+        POP DE
+        POP BC
+        POP HL
+        RET
 
 ; ###################################################################################
 ; ########## private functions ######################################################
 ; ###################################################################################
-
+
+
 ; checks whether screen coordinates are within the visible area [0..39, 0..29]
 ; D - X position
 ; E - Y position
@@ -201,8 +229,10 @@ vga_validAddr:
         CP E
         RET C ; if Y position is more than 29, return non zero code in A
         LD A, 0
-        RET
-
+        RET
+
+
+
 ; returns the VRAM address for current cursor position
 ; VgaCurX - X position
 ; VgaCurY - Y position
@@ -229,8 +259,10 @@ vga_XY2addr:
 
         POP DE
         POP BC          ; restore register values
-        RET
-
+        RET
+
+
+
 ; sets the X and Y cursor position based on VRAM address
 ; address in HL
 ; result:
@@ -256,8 +288,10 @@ vga_addr2XY:
         LD (VgaCurY), A ; store line number
 		POP HL			; restore re
         POP BC
-        RET
-
+        RET
+
+
+
 vga_advanceCur:
 		PUSH AF
         PUSH BC
@@ -289,8 +323,10 @@ vga_advanceCur:
         CALL cursorOn
         POP BC
 		POP AF
-        RET
-
+        RET
+
+
+
 vga_wrapLine:
 		CALL cursorOff
         XOR A           ; LD A, 0
@@ -304,21 +340,7 @@ vga_wrapLine:
 		LD A, 0
 .end:
         LD (VgaCurY), A
-		RET
+		RET
+
 		
-vga_scroll:
-       ; store register values
-        PUSH HL
-        PUSH BC
-        PUSH DE
 
-        LD HL, VRAM + 64  ; 64 is the number of bytes for one display line
-        LD DE, VRAM
-        LD BC, 64 * 30  ; set loop counter to the size of visible memory (VRAM minus vertical blanking)
-        LDIR         ; repeatedly copy previous byte to the current byte
-
-        ; restore register values
-        POP DE
-        POP BC
-        POP HL
-        RET
