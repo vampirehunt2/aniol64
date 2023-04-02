@@ -14,7 +14,7 @@
                 "path": "C:/8bit/git/aniol64ROM/aniol64.sld"
             }
         ],
-        "commandsAfterLaunch": ["-mv 0x8260 100"],
+        "commandsAfterLaunch": ["-mv 0x8100 100"],
         "history": {
             "reverseDebugInstructionCount": 1000000,
             "spotCount": 10,
@@ -24,9 +24,9 @@
         "rootFolder": "${workspaceFolder}",
         "loadObjs": [
             { "path": "C:/8bit/git/aniol64ROM/aniol64.bin", "start": "0x0000" },
-            { "path": "source.apl", "start": "0xC000" }
+            { "path": "edit.txt", "start": "0x8100" }
         ],
-        "execAddress": "dos_test", 
+        "execAddress": "ed_main", 
         "topOfStack": "0xBFFF"
     }
     ]

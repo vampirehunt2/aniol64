@@ -939,8 +939,6 @@ dos_requiredSectors:
 	POP AF
 	RET
 
-
-
 ; file table sector number in A
 ; file record position in file table sector in C
 ; returns first file sector number of a file within a logical drive in AB, LSB to MSB
@@ -1054,7 +1052,6 @@ dos_saveFile:
 	LD (DosErr), A
 	RET
 	
-
 cmd_loadFile:
 	CALL str_shift
 	CALL dos_loadFile
@@ -1166,6 +1163,41 @@ dos_fRead:
 	LD (FilePtr), HL
 	POP HL
 	POP BC
+	RET
+
+; reads a line from file into a specified buffer
+; buffer address passed in IX
+; destroys A
+dos_fReadLn:
+	PUSH IX
+.loop:
+	CALL dos_eof
+	CP TRUE
+	JR Z, .end
+	CALL dos_fRead
+	CP CR
+	JR Z, .end
+	LD (IX), A
+	INC IX
+	JR .loop
+.end:
+	LD A, 0
+	LD (IX), A
+	POP IX
+	RET
+
+dos_fWriteLine:
+	PUSH IX
+.loop:
+	LD A, (IX)
+	CP 0
+	JR Z, .end
+	CP CR
+	JR Z, .end
+	CALL dos_fWrite
+	JR .loop
+.end:
+	POP IX
 	RET
 	
 dos_fPeek:

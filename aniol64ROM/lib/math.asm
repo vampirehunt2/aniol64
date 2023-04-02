@@ -84,7 +84,6 @@ i16_xor:
 ; returns 0 if they are equal
 ; 1 if HL is greater
 ; -1 (FF) if HL is smaller
-
 u16_cmp:
         LD A, H
         CP B
