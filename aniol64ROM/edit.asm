@@ -86,11 +86,11 @@ ed_processCmds:
 	CP 'w'
 	CALL Z, ed_save
 	CP 'u'
-	CALL Z, ed_up
+	CALL Z, ed_upMulti
 	CP 'd'
 	CALL Z, ed_downMulti
 	CP 'e'
-	CALL Z, ed_eraseLine
+	CALL Z, ed_eraseMulti
 	CP 'h'
 	CALL Z, ed_home
 	LD A, TRUE
@@ -178,19 +178,19 @@ ed_computeTotalLines:
 .end:
 	RET
 
-
 ed_downMulti:
-	CALL str_tok
-	CALL str_shift
+	INC IX
+	INC IX
 	CALL str_len
 	CP 0
 	JR NZ, .multi
 	LD B, 1
 	JR .loop
 .multi
-	CALL parseByte
+	CALL u16_parseDec
 	CP OK
 	RET NZ 				; return if there is a parse error
+	LD B, L
 .loop:
 	CALL ed_down
 	DJNZ .loop
@@ -211,6 +211,24 @@ ed_down:
 	LD HL, (StartLine)
 	INC HL				; otherwise increase the start line	
 	LD (StartLine), HL
+	
+	
+ed_upMulti:
+	INC IX
+	INC IX
+	CALL str_len
+	CP 0
+	JR NZ, .multi
+	LD B, 1
+	JR .loop
+.multi
+	CALL u16_parseDec
+	CP OK
+	RET NZ 				; return if there is a parse error
+	LD B, L
+.loop:
+	CALL ed_up
+	DJNZ .loop
 	RET
 
 ; moves the cursor up the screen
@@ -416,7 +434,26 @@ ed_addLine:
 	CALL ed_down				; move to the next line
 	RET
 
+ed_eraseMulti:
+	INC IX
+	INC IX
+	CALL str_len
+	CP 0
+	JR NZ, .multi
+	LD B, 1
+	JR .loop
+.multi
+	CALL u16_parseDec
+	CP OK
+	RET NZ 				; return if there is a parse error
+	LD B, L
+.loop:
+	CALL ed_eraseLine
+	DJNZ .loop
+	RET
+
 ed_eraseLine:
+	PUSH BC
 	CALL ed_computeCursorAddress
 	LD HL, (CursorAddr)
 	CALL ed_lineLen
@@ -448,6 +485,7 @@ ed_eraseLine:
 	LD HL, (TotalLines)
 	DEC HL
 	LD (TotalLines), HL
+	POP BC
 	RET
 
 ed_home:

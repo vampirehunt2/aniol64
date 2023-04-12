@@ -428,14 +428,14 @@ i16_parseDec:
 
 
 u16_parseHex:
-		LD A, (IX)
+	LD A, (IX)
         CP '$'         ; check if the string starts with $ indicating it's a hex number
         JR NZ, .parseError
         INC IX
-		CALL parseDByte
-		RET
+	CALL parseDByte
+        RET
 .parseError:
-		LD A, FORMATERR
+        LD A, FORMATERR
         RET
 
 
