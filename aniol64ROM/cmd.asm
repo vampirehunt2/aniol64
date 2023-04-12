@@ -294,7 +294,7 @@ cmd_echo:
 	LD A, 0						; upper byte set to 0, due to command line length limitation...
 	LD (CurrentFileSize + 1), A ; ... the size of a file created by echo cannot be longer than 256 bytes
 	LD IY, FileBuffer
-	CALL str_copy				; copy the file contents
+	CALL str_copy				; copy the file contents TODO add a newline at the end
 	CALL cmd_saveFile
 	RET
 

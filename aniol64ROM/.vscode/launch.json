@@ -14,7 +14,7 @@
                 "path": "C:/8bit/git/aniol64ROM/aniol64.sld"
             }
         ],
-        "commandsAfterLaunch": ["-mv 0x8100 100"],
+        "commandsAfterLaunch": ["-mv 0xC000 0x100"],
         "history": {
             "reverseDebugInstructionCount": 1000000,
             "spotCount": 10,
@@ -24,9 +24,9 @@
         "rootFolder": "${workspaceFolder}",
         "loadObjs": [
             { "path": "C:/8bit/git/aniol64ROM/aniol64.bin", "start": "0x0000" },
-            { "path": "edit.txt", "start": "0x8100" }
+            { "path": "edit.txt", "start": "0xC000" }
         ],
-        "execAddress": "ed_main", 
+        "execAddress": "ed_showPage", 
         "topOfStack": "0xBFFF"
     }
     ]

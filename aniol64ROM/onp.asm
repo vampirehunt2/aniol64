@@ -113,9 +113,6 @@ onp_processNumber:
 .error:
 		RET
 
-
-
- defb "onp_processOperator"	
 onp_processOperator:
 		LD A, (IX + 0) 	; load the first character of the token
 		LD IX, Stack	; point IX to the stack

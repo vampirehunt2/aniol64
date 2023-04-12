@@ -38,7 +38,6 @@ asc2hexstr16b:
 ; converts a two digit hex number in ASCII to its value
 ; BA - two hex digits in ASCII
 ; result in B
-
 asc2byte:
 	PUSH AF
 	LD A, B
@@ -51,7 +50,6 @@ asc2byte:
 ; IX: null-terminated string containing the byte digits
 ; result in B
 ; parse errors reported in A
-
 parseByte:
 	CALL isByteStr
 	CP 0

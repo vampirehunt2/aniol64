@@ -483,7 +483,7 @@ apl_isWhitespace:
 	LD A, B
 	CP ' '
 	JR Z, .true
-	CP '\t' 	;TODO not recognized by sjasmplus
+	CP 8		 	; tab
 	JR Z, .true
 	CP LF
 	JR Z, .true

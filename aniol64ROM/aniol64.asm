@@ -51,7 +51,8 @@ KeyClickHandler: defb 38h, 00h ; we're pointing back at the mode 1 INT handler
 
 
 Aniol: 
- defb   "_ANIOL64_"
+ ds (MAX_X / 2) - 5, ' '
+ defb   "_ANIOL 64_"
  defb 0
 
 RAMTOP 				equ 0BFFFh
