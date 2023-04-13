@@ -80,6 +80,7 @@ rog_main:
 
 rog_initLevel:
 	CALL clrScr
+	CALL rog_clearMap
 	LD A, (DungeonLev)
 	INC A
 	LD (DungeonLev), A
@@ -500,7 +501,6 @@ rog_clearMap:
 	LD BC, MAP_SIZE
 	LDIR
 	RET
-	
 
 rog_getMapAddr:
 	PUSH DE
@@ -567,8 +567,6 @@ rog_initCell:
 	LD (IY + RoomConn), A
 	RET
 
-
-
 rog_generateRooms:
 	LD IY, Rooms
 	LD B, MAXROOMS
@@ -577,8 +575,6 @@ rog_generateRooms:
 	CALL rog_nextRoom
 	DJNZ .loop
 	RET
-
-
 
 rog_generateRoom:
 	PUSH BC
