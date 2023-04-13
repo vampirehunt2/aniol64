@@ -14,6 +14,8 @@ NewEofAddr		equ PROGRAM_DATA + 11h	; 2 bytes address of the end of the file afte
 NewBlockAddr	equ PROGRAM_DATA + 13h
 EdLineBuff		equ PROGRAM_DATA + 100h	; 256 bytes for line read from a file
 
+PressAnyKey:	defb ". Press any key", 0
+
 
 ed_main:
 	CALL ed_init
@@ -85,14 +87,20 @@ ed_processCmds:
 	JR Z, .exit
 	CP 'w'
 	CALL Z, ed_save
-	CP 'u'
+	CP 'k'
 	CALL Z, ed_upMulti
-	CP 'd'
+	CP '8'
+	CALL Z, ed_upMulti
+	CP 'n'
 	CALL Z, ed_downMulti
-	CP 'e'
+	CP '2'
+	CALL Z, ed_downMulti
+	CP 'd'
 	CALL Z, ed_eraseMulti
 	CP 'h'
 	CALL Z, ed_home
+	CP 'e'
+	CALL Z, ed_end
 	LD A, TRUE
 	RET
 .noCmd:
@@ -277,7 +285,13 @@ ed_save:
 	LD IX, Blank
 	CALL writeStr
 	CALL dos_getStatusMsg
+	LD B, 0
+	LD C, MAX_Y
+	CALL gotoXY
 	CALL writeStr
+	LD IX, PressAnyKey
+	CALL writeLn
+	CALL readKey
 	RET
 
 ed_processLine:
@@ -501,4 +515,8 @@ ed_newFile:
 	LD (StartLine), A
 	LD (StartLine + 1), A
 	LD (TotalLines), A
+	RET
+
+ed_end:
+
 	RET
