@@ -17,7 +17,6 @@ Blank:		defb "                                      ", 0
 
 dspInit:
         CALL clrScr
-        CALL home
         RET
 
 home:
@@ -34,6 +33,7 @@ home:
 ; and impact performance slightly, but at least it ensures no data is sent
 ; to the display during blanking period
 clrScr:
+        ; TODO, move cursor to position 0,0
         ; store register values
         PUSH HL
         PUSH BC
@@ -45,6 +45,8 @@ clrScr:
         LD (HL), A   ; initialise the first byte of VRAM to 0
         LD BC, 2048  ; set loop counter to the full size of VRAM
         LDIR         ; repeatedly copy previous byte to the current byte
+
+        CALL home    ; move the cursor to 0,0   
 
         ; restore register values
         POP DE
