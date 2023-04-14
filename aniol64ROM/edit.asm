@@ -435,7 +435,7 @@ ed_addLine:
 	DJNZ .loop				; end of loop
 	LD A, CR				; line is terminated by a null-character
 	DEC HL					; go back over the null terminator char
-	LD (HL), A				; co we put there a CR instead
+	LD (HL), A				; and put there a CR instead
 	LD HL, (TotalLines)
 	INC HL
 	LD (TotalLines), HL		; increase total number of lines by 1
@@ -505,18 +505,40 @@ ed_eraseLine:
 ed_home:
 	LD A, 0
 	LD (CursorLine), A
-	LD (StartLine), A
+	LD HL, 0000h
+	LD (StartLine), HL
 	RET
 
-ed_newFile:
+ed_newFile:					; TODO, perhaps this should be part of DOS
 	LD A, 0
-	LD (CurrentFileSize), A
-	LD (CurrentFileSize + 1), A
-	LD (StartLine), A
-	LD (StartLine + 1), A
 	LD (TotalLines), A
+	LD HL, 0000h
+	LD (CurrentFileSize), HL
+	LD (StartLine), HL
 	RET
 
+; puts the cursor one line beyond the last line of the file
+; i.e. puts the editor in append mode (ed_isAppend will return TRUE after a call to this routine)
+; the routine does one of two things:
+; 	-	if the entire file fits on the screen, it will set up the display
+;	so that the file is displayed from the top of the screen and the cursor
+; 	is displayed after the last line of the file
+; 	- if the file has more lines than the usable screen area (screen minus the command line),
+; 	it will set up the display so that the last lines of the file fill all but one line of the 
+; 	usable screen area, and the cursor is in the very last line before the command line
 ed_end:
-
+	LD HL, (TotalLines)
+	LD B, 0
+	LD C, MAX_Y - 1
+	SUB HL, BC
+	LD A, H
+	AND 10000000b		; isolate the negative sign
+	CP 0				; check if result is negative
+	LD A, MAX_Y - 1		; preload A with the height of the screen, for the cursor to go in the last line above the command line
+	JR Z, .skip			; checking the result of the comparison 2 lines above
+	LD HL, 0000h		; if it is negative, use zero instead
+	LD A, (TotalLines)	; if this occurs, TotalLines will fit into one byte
+.skip:
+	LD (StartLine), HL
+	LD (CursorLine), A
 	RET
