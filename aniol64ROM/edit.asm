@@ -12,6 +12,7 @@ LineLen			equ PROGRAM_DATA + 0Eh	; length of the currently processed line, inclu
 EofAddr			equ PROGRAM_DATA + 0Fh	; 2 bytes address of the end of the file
 NewEofAddr		equ PROGRAM_DATA + 11h	; 2 bytes address of the end of the file after a new line is inserted
 NewBlockAddr	equ PROGRAM_DATA + 13h
+FileLastAddr	equ PROGRAM_DATA + 15h
 EdLineBuff		equ PROGRAM_DATA + 100h	; 256 bytes for line read from a file
 
 PressAnyKey:	defb ". Press any key", 0
@@ -467,6 +468,10 @@ ed_eraseMulti:
 	RET
 
 ed_eraseLine:
+	CALL ed_isAppend	; checking if we're in append mode
+	CP TRUE				; i.e. the cursor pointing beyond the last existing line
+	RET Z				; if so, there is nothing to delete
+	;
 	PUSH BC
 	CALL ed_computeCursorAddress
 	LD HL, (CursorAddr)
@@ -485,11 +490,16 @@ ed_eraseLine:
 	LD A, (LineLen)
 	LD C, A
 	SUB HL, BC
+	LD BC, 0000h
+	CALL u16_cmp			; check if we have zero bytes to copy, i.e. we're at the last line
+	CP 0					; if yes, no need to copy any memory over
+	JR Z, .cont				; just jump straight to tryncating the file
 	PUSH HL
 	POP BC
 	LD HL, (NewBlockAddr) 
 	LD DE, (CursorAddr)
 	LDIR
+.cont:
 	LD HL, (CurrentFileSize)
 	LD B, 0
 	LD A, (LineLen)
