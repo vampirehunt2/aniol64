@@ -31,13 +31,7 @@ i16_add:
 ; result in HL
 u16_sub:
 i16_sub:
-        AND A   ; clear carry
-        LD A, L
-        SUB C
-        LD L, A
-        LD A, H
-        SBC A, B
-        LD H, A
+        SUB HL, BC
         RET
 
 ; performs logical AND on two 16-bit integers
