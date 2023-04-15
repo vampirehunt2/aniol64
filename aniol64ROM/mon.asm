@@ -35,8 +35,8 @@ mon_main:
         LD (MonCurrAddr + 1), A
 		CALL mon_refresh
 mon_main_loop:
-		CALL cursorOn
-		CALL mon_gotoCmdLine
+	CALL cursorOn
+	CALL mon_gotoCmdLine
         CALL readLine
         LD IX, LineBuff
         CALL str_tok
@@ -44,67 +44,56 @@ mon_main_loop:
         LD IX, LineBuff
         LD IY, SetValue
         CALL str_cmp
-        CP 0
         JP Z, mon_setValue
         ; fill command
         LD IX, LineBuff
         LD IY, Fill
         CALL str_cmp
-        CP 0
         JP Z, mon_fill
         ; copy command
         LD IX, LineBuff
         LD IY, Copy
         CALL str_cmp
-        CP 0
         JP Z, mon_copy
         ; set address command
         LD IX, LineBuff
         LD IY, SetAddress
         CALL str_cmp
-        CP 0
         JP Z, mon_setAddress
         ; next screen command
         LD IX, LineBuff
         LD IY, NextScreen
         CALL str_cmp
-        CP 0
         JP Z, mon_nextScreen
         ; prev screen command
         LD IX, LineBuff
         LD IY, PrevScreen
         CALL str_cmp
-        CP 0
         JP Z, mon_prevScreen
         ; next line command
         LD IX, LineBuff
         LD IY, NextLine
         CALL str_cmp
-        CP 0
         JP Z, mon_nextLine
          ; prev line command
         LD IX, LineBuff
         LD IY, PrevLine
         CALL str_cmp
-        CP 0
         JP Z, mon_prevLine
         ; set command
         LD IX, LineBuff
         LD IY, SetValue
         CALL str_cmp
-        CP 0
         JP Z, mon_setValue
         ; run command
         LD IX, LineBuff
         LD IY, Run
         CALL str_cmp
-        CP 0
         JP Z, mon_run
         ; bye command
         LD IX, LineBuff
         LD IY, Bye
         CALL str_cmp
-        CP 0
         JR Z, .bye
         ; unknown command 
         LD IX, UnknownCmd

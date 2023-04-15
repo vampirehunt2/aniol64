@@ -181,7 +181,6 @@ apl_tokenize:
 	LD IX, Token
 	LD IY, END_T
 	CALL str_cmp
-	CP 0
 	JR NZ, .loop
 	RET
 
@@ -640,15 +639,12 @@ apl_getOperatorCode:
 	JR Z, .one
 	LD IX, NOT_EQUAL_T
 	CALL str_cmp
-	CP 0
 	JR Z, .neq
 	LD IX, GREATER_EQUAL_T
 	CALL str_cmp
-	CP 0
 	JR Z, .ge
 	LD IX, LESSER_EQUAL_T
 	CALL str_cmp
-	CP 0
 	JR Z, .le
 	LD A, 0		; not a known operator
 	RET

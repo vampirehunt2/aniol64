@@ -681,15 +681,12 @@ dos_cd:
 	; check if user wants to go to the root folder
 	LD IY, RootFolder
 	CALL str_cmp
-	CP 0
 	JR Z, .root
 	LD IY, ParentFolder
 	CALL str_cmp
-	CP 0
 	JR Z, .root
 	; if user isn't going to the root folder, find the appropriate folder
 	CALL dos_dirExists
-	CP 0
 	JR Z, .noDir
 	LD (CurrentDir), A
 	LD IY, CurrentPath
@@ -854,8 +851,7 @@ dos_fileExistsInSector:
 	LD A, (CurrentDir)		; load the current directory into A
 	CP D					; check if directory index of the file record equals the current directory
 	JR NZ, .continue	 	; if not, skip the current file record
-	CALL str_cmp			; check if file has the same name
-	CP 0			
+	CALL str_cmp			; check if file has the same name		
 	JR NZ, .continue		; if not, skip the current file record
 	LD A, TRUE
 	JR .end
