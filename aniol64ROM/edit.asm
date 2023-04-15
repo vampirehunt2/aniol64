@@ -12,7 +12,6 @@ LineLen			equ PROGRAM_DATA + 0Eh	; length of the currently processed line, inclu
 EofAddr			equ PROGRAM_DATA + 0Fh	; 2 bytes address of the end of the file
 NewEofAddr		equ PROGRAM_DATA + 11h	; 2 bytes address of the end of the file after a new line is inserted
 NewBlockAddr	equ PROGRAM_DATA + 13h
-FileLastAddr	equ PROGRAM_DATA + 15h
 EdLineBuff		equ PROGRAM_DATA + 100h	; 256 bytes for line read from a file
 
 PressAnyKey:	defb ". Press any key", 0
@@ -220,6 +219,7 @@ ed_down:
 	LD HL, (StartLine)
 	INC HL				; otherwise increase the start line	
 	LD (StartLine), HL
+	RET
 	
 	
 ed_upMulti:
@@ -297,8 +297,6 @@ ed_save:
 
 ed_processLine:
 	CALL ed_isAppend
-	PUSH AF
-	POP AF
 	CP TRUE
 	JR Z, .append
 	CALL ed_insertLine
