@@ -594,7 +594,8 @@ dos_validateFilename:
 	CALL str_len
 	CP 0
 	JR Z, .false
-	CP MAX_FILENAME_LEN		
+	CP MAX_FILENAME_LEN	
+	JR Z, .loop	
 	JR NC, .false
 .loop:
 	LD A, (IX)
