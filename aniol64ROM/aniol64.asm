@@ -56,6 +56,7 @@ Aniol:
  defb 0
 
 RAMTOP 				equ 0BFFFh
+HIGHROM				equ 4000h
 TestAddr 			equ 8001h  		; points to the beginning of RAM
 KbdBuff 			equ 8012h	   ; 1 byte buffer
 Echo 				equ 8013h
@@ -119,38 +120,6 @@ loop:
 	JP loop
 
 
-; device drivers
- include dev/bzr.asm
- ;include dev/vga.asm
- include dev/tm.asm
- include dev/dart.asm
- include dev/cf.asm
- ;include dev/kbd.asm
- include dev/ps2.asm
-
-; libraries
- include lib/util.asm
- include lib/str.asm
- include lib/mem.asm
- include lib/list.asm
- include lib/math.asm
- include test/test.asm
-
-; test routines
-;include test/test.asm
-
-; programs
- include cmd.asm
- include mon.asm
- include term.asm
- include dos.asm
- include snake.asm
- include rogue.asm
- include onp.asm
- include edit.asm
- include apl.asm
-
-
 handleNmi:
 	LD A, (NmiCount)
 	INC A
@@ -183,5 +152,40 @@ resetNmiHandler:
 	LD A, 0C9h					; RET instruction
 	LD (customNmiHandler), A	; by default we just return from the custom NMI handler
 	RET
+
+
+; device drivers
+ include dev/bzr.asm
+ ;include dev/vga.asm
+ include dev/tm.asm
+ include dev/dart.asm
+ include dev/cf.asm
+ ;include dev/kbd.asm
+ include dev/ps2.asm
+
+; libraries
+ include lib/util.asm
+ include lib/str.asm
+ include lib/mem.asm
+ include lib/list.asm
+ include lib/math.asm
+ include test/test.asm
+
+; test routines
+;include test/test.asm
+
+; programs
+ include cmd.asm
+ include mon.asm
+ include term.asm
+ include dos.asm
+ include snake.asm
+ include rogue.asm
+ include onp.asm
+ include edit.asm
+
+; high ROM code
+  ds HIGHROM - $, 0
+ include apl.asm
 
 
