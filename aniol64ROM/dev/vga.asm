@@ -86,9 +86,9 @@ cursorOff:
 
 		
 writeLn:
-		CALL writeStr
-		CALL nextLine
-		RET
+	CALL writeStr
+	CALL nextLine
+	RET
 
 ; moves the cursor to a new X, Y position on screen
 ; B - X position
@@ -147,7 +147,7 @@ getChar:
 ; IX - null-terminated string to write
 writeStr:
         PUSH HL           ; store register state
-		PUSH IX
+	PUSH IX
         CALL vga_XY2addr  ; loads current VRAM address into HL
 .loop:
         LD A, (IX)    ; loads the current character in the string to A
@@ -170,7 +170,7 @@ writeStr:
         JP .loop
 .end:
         CALL vga_addr2XY      ; store the final X and Y position in memory
-		POP IX
+	POP IX
         POP HL                ; restore register state
         RET
 
@@ -292,10 +292,8 @@ vga_addr2XY:
         POP BC
         RET
 
-
-
 vga_advanceCur:
-		PUSH AF
+	PUSH AF
         PUSH BC
         CALL cursorOff
         LD A, (VgaCurX)
