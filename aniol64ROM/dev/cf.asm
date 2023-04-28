@@ -22,7 +22,8 @@ CF_WRITE		equ 30h
 CF_DIAG			equ 90h
 CF_ID			equ 0ECh
 CF_OK			equ 00h
-
+
+
 ; checks if a cf drive is present in the system
 ; result in A
 cf_exists:
@@ -40,12 +41,14 @@ cf_exists:
 	RET				; return FALSE, ie. zero that we already have in the A register
 .true:
 	LD A, TRUE
-	RET
+	RET
+
 	
 
 ; waits until the cf card is ready
 ; the READY pin on the card is optional as per the CF spec
-; some cards may not implement it
+; some cards may not implement it
+
 cf_wait:
 	PUSH AF
 .loop:
@@ -53,8 +56,10 @@ cf_wait:
 	BIT 7, A			; test busy bit
 	JR NZ, .loop		; loop until the busy bit (D7) is clear
 	POP AF
-	RET
-	
+	RET
+
+	
+
 cf_waitCmd:
 	PUSH AF
 .loop:
@@ -64,8 +69,10 @@ cf_waitCmd:
 	BIT	6, A
 	JR Z, .loop			; drvrdy (D6) should be 1 
 	POP AF
-	RET
-
+	RET
+
+
+
 cf_waitDat:
 	PUSH AF
 .loop:
@@ -75,7 +82,8 @@ cf_waitDat:
 	BIT 3, A
 	JR Z, .loop			; drq bit (D3) should be 1
 	POP AF
-	RET
+	RET
+
 	
 ; inits the cf card to 8 bit mode
 cf_init:
@@ -95,7 +103,8 @@ cf_error:
 	IN A,(CF_STATUS)					;Read status
 	AND 00000001b
 	RET
-	
+	
+
 cf_di: 
 	CALL cf_wait
 	LD A, 1
@@ -117,8 +126,10 @@ cf_di:
 	LD (HL), A				; store it in memory
 	INC HL	
 	DJNZ .loop
-	RET
-
+	RET
+
+
+
 ; reads a sector from a cf card
 ; buffer address in HL
 cf_readSector:
@@ -141,8 +152,10 @@ cf_readSector:
 	DJNZ .loop
 	POP BC
 	POP AF
-	RET	
-
+	RET
+	
+
+
 ; writes a sector from a cf card
 ; moves HL to the next sector in memory
 ; buffer address in HL
@@ -166,7 +179,8 @@ cf_writeSector:
 	DJNZ .loop
 	POP BC
 	POP AF
-	RET
+	RET
+
 
 cf_diag:
 	CALL cf_waitCmd
@@ -177,10 +191,29 @@ cf_diag:
 	RET
 
 
+dbgSetSector: db "Setting sector: ", 0
+dbg_SetSector:
+	PUSH AF
+	PUSH BC
+	PUSH IX
+	LD IX, dbgSetSector
+	PUSH AF
+	CALL writeStr
+	POP AF
+	CALL mon_printByteA
+	LD A, B
+	CALL mon_printByteA
+	POP IX
+	POP BC
+	POP AF
+	RET
+
 ; sets the sector number for the next IO operation
 ; supports up to 2^24 = 16M sectors		
 ; sector number in ABC, LSB to MSB
 cf_setSector:
+	;CALL dbg_SetSector
+	PUSH AF
 	PUSH AF
 	CALL cf_wait
 	LD A, 1
@@ -197,5 +230,6 @@ cf_setSector:
 	CALL cf_wait
 	LD A, CF_LBA_MODE		;Selects CF as master
 	OUT (CF_LBA3), A		;LBA 24:27 + DRV 0 selected + bits 5:7=111
+	POP AF
 	RET
 	

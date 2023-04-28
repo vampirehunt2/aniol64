@@ -922,8 +922,8 @@ dos_requiredSectors:
 	LD A, 0
 	LD B, 9
 .div:			; divides the number of bytes by sector size
-	SRL E
-	RR D
+	SRL D
+	RR E
 	JR NC, .cont
 	LD A, 1		; a non-zero bit was shifted out, meaning there is one extra, incomplete sector needed.
 .cont:
