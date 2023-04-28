@@ -108,7 +108,7 @@ ed_processCmds:
 	RET
 .esc:
 	LD A, FALSE
-	INC IX
+	INC IX	; escaping the colon (replace two colons with one)
 	RET
 .exit:
 	POP IX	; jumping one routine level up (EVIL)
@@ -236,7 +236,9 @@ ed_upMulti:
 	RET NZ 				; return if there is a parse error
 	LD B, L
 .loop:
+	PUSH BC
 	CALL ed_up
+	POP BC
 	DJNZ .loop
 	RET
 
@@ -250,8 +252,7 @@ ed_up:
 	RET
 .scroll:
 	LD HL, (StartLine)
-	LD B, 0
-	LD C, 0
+	LD BC, 0000h
 	CALL u16_cmp		; check if the file is displayed from the first line already
 	CP 0				; if yes, there's nowhere to go, we're already at the top
 	RET Z				; so do nothing
