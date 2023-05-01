@@ -22,8 +22,8 @@ dspInit:
 home:
         CALL cursorOff
         XOR A           ;LD A, 0
-        LD (VgaCurX), A
-        LD (VgaCurY), A
+        LD (CurX), A
+        LD (CurY), A
         CALL cursorOn
         RET
 
@@ -58,30 +58,30 @@ clrScr:
  
 ; turns on the cursor for the character at the current cursor position
 cursorOn:
-		LD A, (Cursor)
-		CP FALSE
-		JR Z, .noCursor
-		PUSH HL
+	LD A, (Cursor)
+	CP FALSE
+	JR Z, .noCursor
+        PUSH HL
         CALL vga_XY2addr
         LD A, (HL)      ; get character at current cursor position
         OR 10000000b    ; set the cursor bit (D7)
         LD (HL), A
-		POP HL
+	POP HL
         RET
 .noCursor:
-		CALL cursorOff
-		RET
+	CALL cursorOff
+	RET
 
 
 
 ; turns off the cursor for the character at the current cursor position
 cursorOff:
-		PUSH HL
+	PUSH HL
         CALL vga_XY2addr
         LD A, (HL)      ; get character at current cursor position
         AND 01111111b    ; clear the cursor bit (D7)
         LD (HL), A
-		POP HL
+	POP HL
         RET
 
 		
@@ -98,22 +98,22 @@ writeLn:
 gotoXY:
         CALL cursorOff
         LD A, B
-        LD (VgaCurX), A
+        LD (CurX), A
         LD A, C
-        LD (VgaCurY), A
+        LD (CurY), A
         CALL cursorOn
         RET
 		
 
 cursorLShift:
-		PUSH HL
-		CALL cursorOff
-		CALL vga_XY2addr
-		DEC HL
-		CALL vga_addr2XY
-		CALL cursorOn
-		POP HL
-		RET
+	PUSH HL
+	CALL cursorOff
+	CALL vga_XY2addr
+	DEC HL
+	CALL vga_addr2XY
+	CALL cursorOn
+	POP HL
+	RET
 
 
 ; puts a single character on the screen
@@ -126,7 +126,7 @@ putChar:
         POP AF
         AND 01111111b   ; make sure cursor data is not stored
         LD (HL), A
-		CALL vga_advanceCur
+	CALL vga_advanceCur
         POP HL
         RET
 
@@ -182,13 +182,13 @@ writeStr:
 nextLine:
         CALL cursorOff
         XOR A           ; LD A, 0
-        LD (VgaCurX), A ; move the cursor to the beginning of line
-        LD A, (VgaCurY) ; load current cursor Y position (line number)
+        LD (CurX), A ; move the cursor to the beginning of line
+        LD A, (CurY) ; load current cursor Y position (line number)
         CP MAX_Y        ; if already at the bottom of the screen
         JR NC, .scroll   ; then scroll the screen
         JR Z, .scroll
         INC A           ; else move to the next line down
-        LD (VgaCurY), A
+        LD (CurY), A
         JR .end
 .scroll:
         CALL scroll
@@ -244,7 +244,7 @@ vga_XY2addr:
         PUSH BC         ; store register values
         PUSH DE
 
-        LD A, (VgaCurY) ; read in the Y position
+        LD A, (CurY) ; read in the Y position
         LD E, A
         LD D, 0         ; clear D
         AND A           ; clear carry
@@ -253,7 +253,7 @@ vga_XY2addr:
         SLA E           ; multiply the line number by 64...
         RL D            ; ... as there are 64 bytes per line
         DJNZ .loop      ; end multiply by 64
-        LD A, (VgaCurX)
+        LD A, (CurX)
         ADD A, E           ; add X position
         LD E, A
         LD HL, VRAM     ; load the base VRAM address
@@ -279,7 +279,7 @@ vga_addr2XY:
         SBC HL, BC		; subtracting the base VRAM address from HL
         LD A, L
         AND 00111111b	; extract column number (X position of the cursor)
-        LD (VgaCurX), A ; store column number
+        LD (CurX), A ; store column number
         AND A           ; clear carry
         LD B, 6         ; init loop conter
 .loop:
@@ -287,7 +287,7 @@ vga_addr2XY:
         RR L
         DJNZ .loop
         LD A, L         ; line number now in L
-        LD (VgaCurY), A ; store line number
+        LD (CurY), A ; store line number
 		POP HL			; restore re
         POP BC
         RET
@@ -296,9 +296,9 @@ vga_advanceCur:
 	PUSH AF
         PUSH BC
         CALL cursorOff
-        LD A, (VgaCurX)
+        LD A, (CurX)
         LD B, A         ; read in the X position
-        LD A, (VgaCurY)
+        LD A, (CurY)
         LD C, A         ; read in the Y position
         INC B           ; move the cursor to the next charatcter
         LD A, MAX_X     ; if we are over the line end
@@ -317,9 +317,9 @@ vga_advanceCur:
         LD C, 0
 .end:
         LD A, B        ; store new cursor location
-        LD (VgaCurX), A
+        LD (CurX), A
         LD A, C
-        LD (VgaCurY), A
+        LD (CurY), A
         CALL cursorOn
         POP BC
 		POP AF
@@ -330,8 +330,8 @@ vga_advanceCur:
 vga_wrapLine:
 		CALL cursorOff
         XOR A           ; LD A, 0
-        LD (VgaCurX), A ; move the cursor to the beginning of line
-        LD A, (VgaCurY) ; load current cursor Y position (line number)
+        LD (CurX), A ; move the cursor to the beginning of line
+        LD A, (CurY) ; load current cursor Y position (line number)
         CP MAX_Y        ; if already at the bottom of the screen
 		JR Z, .wrapScreen   
         INC A           ; else move to the next line down
@@ -339,7 +339,7 @@ vga_wrapLine:
 .wrapScreen:
 		LD A, 0
 .end:
-        LD (VgaCurY), A
+        LD (CurY), A
 		RET
 
 		
