@@ -21,7 +21,8 @@ Separator ds MAX_X, "="
 IntTable equ 0A000h
 IntTableSize equ 8   ; just a guess
 
-
+
+
 term_main: 
 		CALL dart_init
 		CALL term_resetScreen
@@ -33,14 +34,15 @@ term_main:
 		CP 13				; check if it's a carriage return
 		JR Z, .wrapLine
 		CALL putChar	; put the received character on screen
-		LD A, (VgaCurY)		; check if we're at the end of the screen
+		LD A, (CurY)		; check if we're at the end of the screen
 		CP MAX_Y
 		CALL Z, term_wrapScreen	; if yes, wrap around to the top
 		JR .loop
 .wrapLine:
 		CALL term_wrapLine
 		JR .loop
-		RET 
+		RET 
+
 
 term_wrapScreen:
 		LD B, 0
@@ -51,10 +53,10 @@ term_wrapScreen:
 term_wrapLine:
 		CALL cursorOff
         XOR A           ; LD A, 0
-        LD (VgaCurX), A ; move the cursor to the beginning of line
-        LD A, (VgaCurY) ; load current cursor Y position (line number)
+        LD (CurX), A ; move the cursor to the beginning of line
+        LD A, (CurY) ; load current cursor Y position (line number)
         INC A           
-		LD (VgaCurY), A
+		LD (CurY), A
 		CALL cursorOn
 		RET
 
@@ -68,7 +70,8 @@ term_resetScreen:
 		LD IX, Separator
 		CALL writeLn
 		RET
-			
+		
+	
 term_handleKeyClick:
 		EX AF, AF'       
         EXX 
@@ -77,8 +80,10 @@ term_handleKeyClick:
         EXX
         EX AF, AF'		
         EI
-        RETI
-				
+        RETI
+
+				
+
 handleDartRx:
 		EX AF, AF'       
         EXX
@@ -89,8 +94,10 @@ handleDartRx:
 		EXX
         EX AF, AF'		
 		EI
-		RETI
-
+		RETI
+
+
+
 term_setupInterrupts:
 		DI
 		LD HL, 0100h				; original interrupt handler table address
@@ -102,8 +109,10 @@ term_setupInterrupts:
 		LD HL, term_handleKeyClick	; load the new keyClick interrupt handler address to HL
 		LD (IntTable + 0), HL		; switch the keyClick interrupt handler to the new one
 		EI
-		RET
-
+		RET
+
+
+
 term_greet:
 		LD IX, Program
 .loop:
@@ -114,6 +123,7 @@ term_greet:
 		INC IX
 		JR .loop
 .end:
-		RET
+		RET
+
 
 		
