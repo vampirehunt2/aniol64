@@ -123,8 +123,9 @@ init_identifierTabs:
     LDIR         
 	RET
 
-
-apl_getToken:
+; reads the next token from the input source code file
+; and processes it
+apl_nextToken:
 .loop:
 	LD HL, Token
 	CALL dos_fPeek
@@ -180,7 +181,7 @@ apl_getToken:
 ; parses the input file and divides it into tokens
 apl_tokenize:
 .loop:
-	CALL apl_getToken
+	CALL apl_nextToken
 	LD IX, Token
 	LD IY, END_T		; TODO: check for end of file
 	CALL str_cmp
@@ -443,9 +444,19 @@ apl_tokenizeOperator:
 	LD (IsOperator), A
 	RET
 
+; adds the bytecode for the operator to the output file
 apl_processOperator:
-	CALL apl_getOperatorCode
 	LD HL, (ProgramPtr)
+	CALL apl_getOperatorCode
+	CP SEPARATOR_B				; check if the code is for the statement separator
+	JR NZ, .cont					; if not, continue
+	DEC HL						; move to the previous bytecode
+	LD A, (HL)
+	CP SEPARATOR_B				; check if the previous bytecode is also a separator
+	RET Z 						; if yes, do nothing. This avoids duplicated separators
+	INC HL						; otherwise, move back to the current bytecode
+	LD A, SEPARATOR_B
+.cont:
 	LD (HL), A
 	INC HL
 	LD (ProgramPtr), HL
