@@ -1,1 +1,3 @@
-x:x+-1-1;END
+Read x
+IF x=0: Write(x)
+END

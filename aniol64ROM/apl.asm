@@ -1,6 +1,6 @@
-; apl
+; apl tokenizer
 
-SpecialChars: defb "+-*/\\:=[]<>&|!@^,;", 0
+SpecialChars: defb "+-*/\\:=[]()<>&|!@^,;\n\r", 0
 
 ; operator tokens
 ADD_T:			defb "+", 	0
@@ -8,7 +8,6 @@ SUB_T:			defb "-", 	0
 MUL_T:			defb "*", 	0
 DIV_T: 			defb "/", 	0
 MOD_T: 			defb "\\", 	0
-ASSIGN_T: 		defb ":", 	0
 EQUAL_T:		defb "=", 	0
 NOT_EQUAL_T:	defb "<>", 	0
 QUOTE_T:		defb "'", 	0
@@ -26,8 +25,9 @@ NOT_T: 			defb "!", 	0
 ADDR_T: 		defb "@", 	0
 DEREFERENCE_T: 	defb "^", 	0
 INDEX_T:		defb ".", 	0
-SEPARATOR_T:	defb ",", 	0
+COMMA_T:		defb ",", 	0
 TERMINATOR_T:	defb ";", 	0
+SEPARATOR_T:	defb ":", 	0
 
 ; operator bytecodes
 ADD_B			equ '+' 	
@@ -67,7 +67,7 @@ NL_B			equ 00h
 ; keyword tokens and their corresponding bytecodes
 KeywordTokens:
 PROG_T: 	defb "PROG", 	0, 'P'
-.T: 	defb "PROC", 	0, 'p'
+PROC_T: 	defb "PROC", 	0, 'p'
 FUN_T:		defb "FUN", 	0, 'F'
 END_T:		defb "END", 	0, 'D'
 RET_T:		defb "RET", 	0, 'R'
@@ -80,6 +80,11 @@ FOR_T:		defb "FOR", 	0, 'f'
 NEXT_T:		defb "NEXT", 	0, 'N'
 ARRAY_T:	defb "ARR", 	0, 'A'
 STRING_T:	defb "STR", 	0, 'S'	
+ defb 0
+
+BuiltInFunctions:
+READ_T:		defb "Read", 	0, 'B', 0
+WRITE_T:	defb "Write", 	0, 'B', 1
  defb 0
 
 ; 128 variables with names of up to 8 characters, 
@@ -96,8 +101,6 @@ Varnames 	equ PROGRAM_DATA + 108h	; need to be aligned to 8 byte boundary
 Bytecodes 	equ PROGRAM_DATA + 108h + VARNAMES_SIZE
 
 
-
-
 apl_main:
 	LD A, FALSE
 	LD (IsOperator), A
@@ -106,8 +109,6 @@ apl_main:
 	LD (ProgramPtr), HL
 	CALL apl_tokenize
 	RET
-
-
 
 ; fills the var names table with all zeroes
 init_varnameTab:
@@ -174,12 +175,12 @@ apl_getToken:
 	RET
 
 
-
+; parses the input file and divides it into tokens
 apl_tokenize:
 .loop:
 	CALL apl_getToken
 	LD IX, Token
-	LD IY, END_T
+	LD IY, END_T		; TODO: check for end of file
 	CALL str_cmp
 	JR NZ, .loop
 	RET
@@ -196,21 +197,122 @@ apl_tokenizeLiteral:
 	CALL apl_isDecDigit 
 	CP TRUE
 	JR Z, .next
-	JR .end
+	JR .endLoop
 .next:
 	CALL dos_fRead
 	LD (HL), A
 	INC HL
 	JR .loop
-.end:
+.endLoop:
 	LD (HL), 0
 	INC HL
+	LD IX, Token
+	LD B, (IX)
+	CALL apl_isLCaseLetter	; variables start with a lowercase letter
+	CP TRUE
+	JR Z, .var
+	CALL apl_isKeyword
+	CP TRUE
+	JR Z, .kwd
+	CALL apl_isBuiltInFunction
+	CP TRUE
+	JR Z, .bif
+.kwd:
+	CALL apl_processKeyword
+	JR .end
+.bif:
+	CALL apl_processBuiltInFunction
+	JR .end
+.var:
 	CALL apl_processVar		; TODO add checking for keywords, constants, system calls, users calls
+.end:
 	LD A, FALSE
 	LD (IsOperator), A
 	RET
 
+; checks if the token in Token is a keyword
+; result in A
+; if result is TRUE, the bytecode for the keyword is returned in B
+apl_isKeyword:
+	LD IX, KeywordTokens
+.loop:
+	LD IY, Token
+	CALL str_len	; a zero-length keyword indicates end of the KeywordTokens table
+	CP 0
+	JR Z, .false	; if no match is found, return false
+.loop2:
+	LD A, (IY)		
+	CP 0			; if we reached the end of the token, that means the token is a match
+	JR Z, .true		; return true in that case
+	LD B, (IX)		
+	CP B			; compare Token character with the current keyword character
+	JR NZ, .next	; if they're not equal, it's not a match, move to the next keyword
+	INC IX
+	INC IY
+	JR .loop2
+.next:
+	LD A, (IX)		; check if we're at the end of a keyword
+	CP 0
+	JR Z, .endNext	
+	INC IX			; if not, move to the next character
+	JR .next		; and start over
+.endNext:
+	INC IX			; skipping over the null terminator
+	INC IX			; skipping over the actual bytecode in the KeywordTokens table
+	JR .loop		; check the next keyword
+.true:
+	LD A, TRUE
+	INC IX 
+	LD B, (IX)
+	RET
+.false:
+	LD A, FALSE
+	RET
 
+; checks if the token in Token is a built-in funtion
+; result in A
+; if result is TRUE, the bytecode for the built-in funtion is returned in BC
+apl_isBuiltInFunction:
+	LD IX, BuiltInFunctions
+.loop:
+	LD IY, Token
+	CALL str_len	; a zero-length keyword indicates end of the KeywordTokens table
+	CP 0
+	JR Z, .false	; if no match is found, return false
+.loop2:
+	LD A, (IY)		
+	CP 0			; if we reached the end of the token, that means the token is a match
+	JR Z, .true		; return true in that case
+	LD B, (IX)		
+	CP B			; compare Token character with the current keyword character
+	JR NZ, .next	; if they're not equal, it's not a match, move to the next keyword
+	INC IX
+	INC IY
+	JR .loop2
+.next:
+	LD A, (IX)		; check if we're at the end of a keyword
+	CP 0
+	JR Z, .endNext	
+	INC IX			; if not, move to the next character
+	JR .next		; and start over
+.endNext:
+	INC IX			; skipping over the null terminator
+	INC IX			; skipping over the actual bytecodes... 
+	INC IX			; ...in the BuiltInFunctions table
+	JR .loop		; check the next keyword
+.true:
+	LD A, TRUE
+	INC IX 
+	LD B, (IX)
+	INC IX
+	LD C, (IX)
+	RET
+.false:
+	LD A, FALSE
+	RET
+
+; parses out a token representing a decimal number
+; and puts in in Token
 apl_tokenizeDec:
 	LD HL, Token
 	CALL dos_fPeek
@@ -241,14 +343,11 @@ apl_tokenizeDec:
 	LD (IsOperator), A
 	RET
 
-
-
 apl_processDec:
 	LD IX, Token
 	CALL i16_parseDec
 	CALL apl_processNumber
 	RET
-
 
 apl_tokenizeHex:
 	LD HL, Token
@@ -275,15 +374,11 @@ apl_tokenizeHex:
 	LD (IsOperator), A
 	RET
 
-
-
 apl_processHex:
 	LD IX, Token
 	CALL u16_parseHex
 	CALL apl_processNumber
 	RET
-
-
 
 apl_processNumber:
 	LD A, NUM_B
@@ -298,7 +393,6 @@ apl_processNumber:
 	INC IX
 	LD (ProgramPtr), IX
 	RET
-
 
 apl_tokenizeBracket:
 	LD HL, Token
@@ -348,8 +442,6 @@ apl_tokenizeOperator:
 	LD (IsOperator), A
 	RET
 
-
-
 apl_processOperator:
 	CALL apl_getOperatorCode
 	LD HL, (ProgramPtr)
@@ -357,8 +449,6 @@ apl_processOperator:
 	INC HL
 	LD (ProgramPtr), HL
 	RET
-
-
 
 apl_processVar:
 	CALL apl_getVarCode
@@ -368,7 +458,27 @@ apl_processVar:
 	LD (ProgramPtr), HL
 	RET
 
+; adds the keyword bytecode to the output file 
+; assumes the keyword bytecode is in B
+; i.e. apl_isKeyword was called and returned TRUE
+apl_processKeyword:
+	LD HL, (ProgramPtr)
+	LD (HL), B
+	INC HL
+	LD (ProgramPtr), HL
+	RET
 
+; adds built-in function bytecodes to the output file 
+; assumes the built-in function bytecodes are in BC
+; i.e. apl_isBuiltInFunction was called and returned TRUE
+apl_processBuiltInFunction:
+	LD HL, (ProgramPtr)
+	LD (HL), B
+	INC HL
+	LD (HL), C
+	INC HL
+	LD (ProgramPtr), HL
+	RET
 
 apl_tokenizeComment:
 	LD HL, Token
@@ -383,8 +493,6 @@ apl_tokenizeComment:
 	LD (HL), 0
 	INC HL
 	RET 
-
-
 
 apl_tokenizeString
 	LD HL, Token
