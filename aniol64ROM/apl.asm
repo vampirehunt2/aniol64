@@ -84,12 +84,13 @@ STRING_T:	defb "STR", 	0, 'S'
  defb 0
 
 BuiltInFunctions:
-READ_T:		defb "Read", 	0, 'B', 0
-WRITE_T:	defb "Write", 	0, 'B', 1
+READ_T:		defb "Read", 	0, 0
+WRITE_T:	defb "Write", 	0, 1
  defb 0
 
 ; 128 variables with names of up to 8 characters, 
 VARNAMES_SIZE equ 128 * 8
+FUNNAMES_SIZE equ 128 * 8
 
 ; bytecode types
 ; TODO
@@ -99,25 +100,26 @@ ProgramPtr 	equ PROGRAM_DATA + 02h 	; 2 bytes
 IsOperator	equ PROGRAM_DATA + 04h
 Token 		equ PROGRAM_DATA + 08h	; 256 bytes for current token
 Varnames 	equ PROGRAM_DATA + 108h	; need to be aligned to 8 byte boundary
-Bytecodes 	equ PROGRAM_DATA + 108h + VARNAMES_SIZE
+Funnames    equ PROGRAM_DATA + 108h + VARNAMES_SIZE
+Bytecodes 	equ PROGRAM_DATA + 108h + VARNAMES_SIZE + FUNNAMES_SIZE
 
 
 apl_main:
 	LD A, FALSE
 	LD (IsOperator), A
-	CALL init_varnameTab
+	CALL init_identifierTabs
 	LD HL, Bytecodes
 	LD (ProgramPtr), HL
 	CALL apl_tokenize
 	RET
 
-; fills the var names table with all zeroes
-init_varnameTab:
+; fills the identifier tables with all zeroes
+init_identifierTabs:
 	XOR A           ;LD A, 0
     LD HL, Varnames
     LD DE, Varnames + 1
     LD (HL), A   		
-    LD BC, VARNAMES_SIZE  
+    LD BC, VARNAMES_SIZE + FUNNAMES_SIZE
     LDIR         
 	RET
 
@@ -175,7 +177,6 @@ apl_getToken:
 	JP Z, apl_tokenizeComment
 	RET
 
-
 ; parses the input file and divides it into tokens
 apl_tokenize:
 .loop:
@@ -185,7 +186,6 @@ apl_tokenize:
 	CALL str_cmp
 	JR NZ, .loop
 	RET
-
 
 apl_tokenizeLiteral:
 	LD HL, Token
@@ -218,6 +218,8 @@ apl_tokenizeLiteral:
 	CALL apl_isBuiltInFunction
 	CP TRUE
 	JR Z, .bif
+	CALL apl_processFunction
+	JR .end
 .kwd:
 	CALL apl_processKeyword
 	JR .end
@@ -298,15 +300,13 @@ apl_isBuiltInFunction:
 	JR .next		; and start over
 .endNext:
 	INC IX			; skipping over the null terminator
-	INC IX			; skipping over the actual bytecodes... 
-	INC IX			; ...in the BuiltInFunctions table
+	INC IX			; skipping over the actual bytecodes in the BuiltInFunctions table
 	JR .loop		; check the next keyword
 .true:
-	LD A, TRUE
+	LD B, SYSCALL_B
 	INC IX 
-	LD B, (IX)
-	INC IX
 	LD C, (IX)
+	LD A, TRUE
 	RET
 .false:
 	LD A, FALSE
@@ -451,6 +451,17 @@ apl_processOperator:
 	LD (ProgramPtr), HL
 	RET
 
+apl_processFunction:
+	LD HL, (ProgramPtr)
+	LD A, CALL_B
+	LD (HL), A
+	INC HL
+	CALL apl_getFunCode
+	LD (HL), A
+	INC HL
+	LD (ProgramPtr), HL
+	RET
+
 apl_processVar:
 	CALL apl_getVarCode
 	LD HL, (ProgramPtr)
@@ -514,8 +525,8 @@ apl_tokenizeString
 	INC HL
 	RET 
 
-
-
+; checks whether the character in B is an lowercaseletter
+; result in A
 apl_isLCaseLetter:
 	LD A, B
 	CP 'a'
@@ -531,8 +542,8 @@ apl_isLCaseLetter:
 	LD A, FALSE
 	RET
 
-	
-
+; checks whether the character in B is an uppercaseletter
+; result in A
 apl_isUCaseLetter:
 	LD A, B
 	CP 'A'
@@ -548,8 +559,8 @@ apl_isUCaseLetter:
 	LD A, FALSE
 	RET
 
-	
-
+; checks whether the character in B is a letter
+; result in A
 apl_isLetter:
 	CALL apl_isLCaseLetter
 	CP TRUE
@@ -563,8 +574,8 @@ apl_isLetter:
 	LD A, TRUE
 	RET
 
-
-
+; checks whether the character in B represents (part of) an APL operator
+; result in A
 apl_isSpecialChar:
 	PUSH IX
 	LD IX, SpecialChars
@@ -585,8 +596,8 @@ apl_isSpecialChar:
 	POP IX
 	RET
 
-
-
+; checks whether the character in B is a whitespace
+; result in A
 apl_isWhitespace:
 	LD A, B
 	CP ' '
@@ -601,8 +612,8 @@ apl_isWhitespace:
 	LD A, TRUE
 	RET
 
-
-
+; checks whether the character in B is a decimal digit
+; result in A
 apl_isDecDigit:
 	LD A, B
 	CALL isDecDigit
@@ -613,8 +624,8 @@ apl_isDecDigit:
 	LD A, TRUE
 	RET
 
-
-
+; checks whether the character in B is a hexadecimal digit
+; result in A
 apl_isHexDigit:
 	LD A, B
 	CALL isHexDigit
@@ -625,8 +636,8 @@ apl_isHexDigit:
 	LD A, TRUE
 	RET
 
-
-
+; checks whether the character in B is a bracket
+; result in A
 apl_isBracket:
 	LD A, B
 	CP '('
@@ -638,8 +649,6 @@ apl_isBracket:
 .true:
 	LD A, TRUE
 	RET
-
-
 
 ; variable name is passed in the Token variable
 ; and is a null-terminated string
@@ -655,26 +664,50 @@ apl_getVarCode:
 	LD A, (IX)
 	CP 0
 	JR Z, .notFound
-	CALL apl_varnameMatch
+	CALL apl_nameMatch
 	CP TRUE
 	JR Z, .found
-	CALL apl_nextVar
+	CALL apl_nextIdentifier
 	INC D
 	JR .loop
 .notFound:
-	CALL apl_newVar
+	CALL apl_newIdentifier
 .found:
 	LD A, D
 	OR 10000000b
 	RET
 
+; function name is passed in the Token variable
+; and is a null-terminated string
+; characters past the 8th are silently ignored
+; returns the index of the function in the Funnames table
+; adds the function at the end of the table if not already present
+; result in A
+; destroys D, IX
+apl_getFunCode:
+	LD D, 0		; counting the variables within the varname table in D
+	LD IX, Funnames
+.loop:
+	LD A, (IX)
+	CP 0
+	JR Z, .notFound
+	CALL apl_nameMatch
+	CP TRUE
+	JR Z, .found
+	CALL apl_nextIdentifier
+	INC D
+	JR .loop
+.notFound:
+	CALL apl_newIdentifier
+.found:
+	LD A, D
+	RET
 
-
-; checks whether variable names pointed to by IX and IY match.
-; the variable name at IX has an 8-byte maximum lenght
+; checks whether identifier names pointed to by IX and IY match.
+; the identifier name at IX has an 8-byte maximum lenght
 ; and it is null-terminated only if the length is less than 8
 ; destroys E, IY, A, B, IX
-apl_varnameMatch:
+apl_nameMatch:
 	LD E, 0
 	LD IY, Token
 .loop:
@@ -698,12 +731,10 @@ apl_varnameMatch:
 	LD A, FALSE
 	RET
 
-
-
-; adds a new record to the Varnames table
+; adds a new record to an identifier table
 ; at the current IX position (assumes IX is at the end of the table)
 ; destroys A, E, IX, IY
-apl_newVar:
+apl_newIdentifier:
 	LD IY, Token
 	LD E, 0
 .loop:
@@ -719,13 +750,11 @@ apl_newVar:
 	INC IY
 	JR .loop
 
-
-
 ; moves IX to the begginign of the next record
-; in the Varnames table
-; assumes Varnames is aligned at 8 byte boundary
+; in the identifier table
+; assumes identifiers are aligned at 8 byte boundary
 ; destroys A, HL, BC
-apl_nextVar:
+apl_nextIdentifier:
 	PUSH IX
 	POP HL
 	LD A, L
@@ -737,8 +766,6 @@ apl_nextVar:
 	PUSH HL
 	POP IX
 	RET	
-
-
 
 ; token in Token
 apl_getOperatorCode:
