@@ -53,8 +53,9 @@ NOT_B 			equ '!'
 ADDR_B 			equ '@' 	
 DEREFERENCE_B 	equ '^' 	
 INDEX_B			equ '.' 
-SEPARATOR_B		equ ','
+SEPARATOR_B		equ ':'
 TERMINATOR_B	equ ';'
+COMMA_B			equ ','
 
 ; other bytecodes
 VAR_B			equ 'v'
@@ -767,6 +768,11 @@ apl_getOperatorCode:
 	RET
 .one:
 	LD A, (IY)
+	CP CR
+	JR Z, .sep
+	RET
+.sep:
+	LD A, SEPARATOR_B
 	RET
 
 
