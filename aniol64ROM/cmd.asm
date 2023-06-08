@@ -37,6 +37,7 @@ Cd:			defb "cd", 0
 Touch:		defb "touch", 0
 Rm:			defb "rm", 0
 Format:		defb "format", 0
+Tar:		defb "tar", 0
 
 UnknownCmd: defb "Unknown cmd", 0
 Prompt: 	defb ">", 0
@@ -165,6 +166,10 @@ cmd_main:
 		LD IY, Format
 		CALL str_cmp
 		JP Z, .format
+		; tar command
+		LD IY, Tar
+		CALL str_cmp
+		JP Z, .tar
         ; unknown command
         LD IX, UnknownCmd
         CALL writeStr
@@ -257,6 +262,9 @@ cmd_main:
 		JP cmd_main
 .format:
 		CALL dos_format
+		JP cmd_main
+.tar:
+		CALL tar_main
 		JP cmd_main
 
 
