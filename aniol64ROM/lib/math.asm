@@ -348,7 +348,7 @@ u16_mul:
 
 ; multiplies two signed 16-bit integers
 ; operands in HL and BC
-; result in B
+; result in HL
 ; overflow reported in A (TODO: doesn't work)
 
 i16_mul:
