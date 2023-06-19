@@ -66,8 +66,8 @@ TxChB				equ 8016h
 NmiCount 			equ 8035h		; 2 byte number
 Random 				equ 8037h		; 2 byte number
 Banks 				equ 8039h
-VgaCurX 			equ 8040h
-VgaCurY 			equ 8041h
+CurX 				equ 8040h
+CurY 				equ 8041h
 customNmiHandler 	equ 8042h		; 3 byte procedure, either RET or JP **
 Ps2Shift			equ 8045h
 DOS_AREA			equ 8046h
@@ -156,12 +156,14 @@ resetNmiHandler:
 
 ; device drivers
  include dev/bzr.asm
- ;include dev/vga.asm
- include dev/tm.asm
+ ;include dev/pal.asm
+ include dev/vga.asm
+ ;include dev/tm.asm
  include dev/dart.asm
  include dev/cf.asm
- ;include dev/kbd.asm
- include dev/ps2.asm
+ include dev/kbd.asm
+ ;include dev/ps2.asm
+ include dev/cas.asm
 
 ; libraries
  include lib/util.asm
@@ -183,9 +185,11 @@ resetNmiHandler:
  include rogue.asm
  include onp.asm
  include edit.asm
+ include tar.asm
 
 ; high ROM code
   ds HIGHROM - $, 0
  include apl.asm
+ include run.asm
 
 
