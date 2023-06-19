@@ -101,26 +101,40 @@ IsOperator	equ PROGRAM_DATA + 04h
 Token 		equ PROGRAM_DATA + 08h	; 256 bytes for current token
 Varnames 	equ PROGRAM_DATA + 108h	; need to be aligned to 8 byte boundary
 Funnames    equ PROGRAM_DATA + 108h + VARNAMES_SIZE
-Bytecodes 	equ PROGRAM_DATA + 108h + VARNAMES_SIZE + FUNNAMES_SIZE
+AplBytecodes 	equ PROGRAM_DATA + 108h + VARNAMES_SIZE + FUNNAMES_SIZE
 
 
 apl_main:
 	LD A, FALSE
 	LD (IsOperator), A
-	CALL init_identifierTabs
-	LD HL, Bytecodes
+	CALL apl_initIdentifierTabs
+	LD HL, AplBytecodes
 	LD (ProgramPtr), HL
 	CALL apl_tokenize
 	RET
 
 ; fills the identifier tables with all zeroes
-init_identifierTabs:
+apl_initIdentifierTabs:
 	XOR A           ;LD A, 0
     LD HL, Varnames
     LD DE, Varnames + 1
     LD (HL), A   		
     LD BC, VARNAMES_SIZE + FUNNAMES_SIZE
     LDIR         
+	RET
+
+; moves the tokenised program file from Bytecodes to FilBuffer
+; and sets the file length
+apl_moveFile:
+	LD HL, ProgramPtr
+	LD BC, AplBytecodes
+	SUB HL, BC			; output file length in HL
+	PUSH HL
+	POP BC				; output file length in HL
+	LD (CurrentFileSize), HL
+	LD HL, AplBytecodes
+	LD DE, FileBuffer
+	LDIR				; transfer the output file to the file buffer
 	RET
 
 ; reads the next token from the input source code file
