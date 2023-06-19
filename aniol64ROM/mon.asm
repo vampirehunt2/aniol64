@@ -8,9 +8,9 @@
 ;----------------------------------------------------
 
 SetValue: 	defb "s", 0
-SetAddress: defb "a", 0
-NextScreen: defb "n", 0
-PrevScreen: defb "p", 0
+SetAddress:     defb "a", 0
+NextScreen:     defb "n", 0
+PrevScreen:     defb "p", 0
 NextLine: 	defb "d", 0
 PrevLine: 	defb "u", 0
 Fill: 		defb "f", 0
@@ -23,17 +23,16 @@ ParseErr: 	defb "Parse error", 	0
 InvAddr: 	defb "Invalid address", 0
 InvVal: 	defb "Invalid value", 	0 
 
-MonCurrAddr equ PROGRAM_DATA 
+MonCurrAddr     equ PROGRAM_DATA 
 LINE_NUM 	equ MAX_Y - 2
 
 
- defb "mon_main"
 mon_main:
-		CALL clrScr
+	CALL clrScr
         LD A, 0  
         LD (MonCurrAddr), A
         LD (MonCurrAddr + 1), A
-		CALL mon_refresh
+	CALL mon_refresh
 mon_main_loop:
 	CALL cursorOn
 	CALL mon_gotoCmdLine
@@ -105,26 +104,26 @@ mon_main_loop:
 
 
 mon_gotoCmdLine:
-		LD B, 0
-		LD C, LINE_NUM
-		CALL gotoXY
-		LD IX, Blank
-		CALL writeStr
-		LD B, 0
-		LD C, LINE_NUM
-		CALL gotoXY
-		RET
+	LD B, 0
+	LD C, LINE_NUM
+	CALL gotoXY
+	LD IX, Blank
+        CALL writeStr
+        LD B, 0
+	LD C, LINE_NUM
+	CALL gotoXY
+	RET
 		
 mon_gotoStatusLine:
-		LD B, 0
-		LD C, LINE_NUM + 1
-		CALL gotoXY
-		LD IX, Blank
-		CALL writeStr
-		LD B, 0
-		LD C, LINE_NUM + 1
-		CALL gotoXY
-		RET
+	LD B, 0
+	LD C, LINE_NUM + 1
+	CALL gotoXY
+	LD IX, Blank
+	CALL writeStr
+	LD B, 0
+	LD C, LINE_NUM + 1
+	CALL gotoXY
+	RET
 
 
 mon_setAddress:
@@ -144,8 +143,6 @@ mon_setAddress:
         CALL mon_refresh
         JP mon_main_loop
 
-
-
 mon_run:
         PUSH HL
         POP IX  ; setting IX to point to the argument of the adr command
@@ -163,17 +160,15 @@ mon_run:
         JP mon_main_loop
         RET
 
-
-
 mon_setValue:
         PUSH HL
         POP IX                  ; put the arguments of the set command in IX
         CALL str_len
         CP 0                    ; if we've reached the end of argument list
         JP Z, .completed        ; return from this routine
-		LD A, (IX)
-		CP '='
-		JP Z, .setDirect
+	LD A, (IX)
+	CP '='
+        JP Z, .setDirect
         CALL str_tok            ; extract the first of the remaining arguments
         PUSH HL                 ; save the rest of the arguments on stack
         CALL parseByte
@@ -187,21 +182,21 @@ mon_setValue:
         POP HL
         JR mon_setValue
 .setDirect:
-		CALL str_tok            ; extract the first of the remaining arguments
-		PUSH HL
-		LD HL, (MonCurrAddr)
+	CALL str_tok            ; extract the first of the remaining arguments
+	PUSH HL
+	LD HL, (MonCurrAddr)
 .loop:
-		INC IX
-		LD A, (IX)
-		CP 0
-		JP Z, .endSetDirect
-		LD (HL), A
-		INC HL
-		JR .loop
+	INC IX
+	LD A, (IX)
+	CP 0
+	JP Z, .endSetDirect
+	LD (HL), A
+	INC HL
+	JR .loop
 .endSetDirect:
-		LD (MonCurrAddr), HL
-		POP HL
-		JR mon_setValue
+	LD (MonCurrAddr), HL
+	POP HL
+	JR mon_setValue
 .parseError:
         CALL mon_gotoStatusLine
         LD IX, InvVal
@@ -211,8 +206,6 @@ mon_setValue:
 .completed:
         CALL mon_dsp
         JP mon_main_loop
-
-
 
 mon_fill:
         PUSH HL
@@ -293,29 +286,27 @@ mon_copy:
 
 
 mon_nextScreen:
-		PUSH BC
+	PUSH BC
         LD HL, (MonCurrAddr)
-		LD B, LINE_NUM
+	LD B, LINE_NUM
 .loop:
         CALL mon_nextAddrs
         DJNZ .loop
         LD (MonCurrAddr), HL
         CALL mon_dsp
-		POP BC
+        POP BC
         JP mon_main_loop
 
-
-
 mon_prevScreen:
-		PUSH BC
+	PUSH BC
         LD HL, (MonCurrAddr)
-		LD B, LINE_NUM
+	LD B, LINE_NUM
 .loop:
         CALL mon_prevAddrs
-		DJNZ .loop
+	DJNZ .loop
         LD (MonCurrAddr), HL
         CALL mon_dsp
-		POP BC
+	POP BC
         JP mon_main_loop
 
 
@@ -335,9 +326,8 @@ mon_prevLine:
         CALL mon_dsp
         JP mon_main_loop
 
-
 mon_dsp:
-		PUSH BC
+	PUSH BC
         CALL cursorOff
         LD HL, (MonCurrAddr) 
         LD A, L 

@@ -7,7 +7,7 @@
 ;
 ;----------------------------------------------------
 
-VRAM equ 3800h + 64 	; + 64 is for a one-line offset
+VRAM equ 3800h + 64 ; +64 is a one line offset
 MAX_X equ 49
 MAX_Y equ 31
 LF	equ 10
@@ -33,28 +33,23 @@ home:
 ; and impact performance slightly, but at least it ensures no data is sent
 ; to the display during blanking period
 clrScr:
-	; TODO, move cursor to position 0,0
 	; store register values
 	PUSH HL
 	PUSH BC
 	PUSH DE
-
-	XOR A	  ;LD A, 0
+	XOR A	        ;LD A, 0
 	LD HL, VRAM
 	LD DE, VRAM + 1
-	LD (HL), A   ; initialise the first byte of VRAM to 0
-	LD BC, 2048  ; set loop counter to the full size of VRAM
-	LDIR	; repeatedly copy previous byte to the current byte
-
-	CALL home	; move the cursor to 0,0   
-
+	LD (HL), A      ; initialise the first byte of VRAM to 0
+	LD BC, 2048     ; set loop counter to the full size of VRAM
+	LDIR	        ; repeatedly copy previous byte to the current byte
+	CALL home	    ; move the cursor to 0,0   
 	; restore register values
 	POP DE
 	POP BC
 	POP HL
 	RET
 
- 
  
 ; turns on the cursor for the character at the current cursor position
 cursorOn:
@@ -202,10 +197,19 @@ scroll:
 	PUSH BC
 	PUSH DE
 
-	LD HL, VRAM + 64  ; 64 is the number of bytes for one display line
+	LD HL, VRAM + 64            ; 64 is the number of bytes for one display line
 	LD DE, VRAM
-	LD BC, 64 * 30  ; set loop counter to the size of visible memory (VRAM minus vertical blanking)
-	LDIR	; repeatedly copy previous byte to the current byte
+	LD BC, 64 * (MAX_Y + 1)     ; set loop counter to the size of visible memory (VRAM minus vertical blanking)
+	LDIR	                    ; repeatedly copy previous byte to the current byte
+
+    LD B, 0
+    LD C, MAX_Y
+    CALL gotoXY
+    LD IX, Blank
+    CALL writeStr
+    LD B, 0
+    LD C, MAX_Y
+    CALL gotoXY
 
 	; restore register values
 	POP DE
