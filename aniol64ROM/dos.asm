@@ -1207,6 +1207,18 @@ dos_fPeek:
 	POP HL
 	POP BC
 	RET
+
+dos_fPeekAhead:
+	PUSH BC
+	PUSH HL
+	LD HL, (FilePtr)
+	INC HL
+	LD BC, FileBuffer
+	ADD HL, BC
+	LD A, (HL)
+	POP HL
+	POP BC
+	RET
 	
 
 dos_fWrite:

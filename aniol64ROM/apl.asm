@@ -169,7 +169,11 @@ apl_nextToken:
 	LD A, (IsOperator)
 	CP TRUE
 	JR NZ, .cont
-	JP Z, apl_tokenizeDec
+	CALL dos_fPeekAhead
+	CALL isDecDigit
+	CP FALSE
+	JR Z, .cont
+	JP NZ, apl_tokenizeDec
 .cont:	
 	CALL apl_isSpecialChar
 	CP TRUE
@@ -463,7 +467,7 @@ apl_processOperator:
 	LD HL, (ProgramPtr)
 	CALL apl_getOperatorCode
 	CP SEPARATOR_B				; check if the code is for the statement separator
-	JR NZ, .cont					; if not, continue
+	JR NZ, .cont				; if not, continue
 	DEC HL						; move to the previous bytecode
 	LD A, (HL)
 	CP SEPARATOR_B				; check if the previous bytecode is also a separator
