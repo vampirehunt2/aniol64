@@ -101,14 +101,14 @@ IsOperator	equ PROGRAM_DATA + 04h
 Token 		equ PROGRAM_DATA + 08h	; 256 bytes for current token
 Varnames 	equ PROGRAM_DATA + 108h	; need to be aligned to 8 byte boundary
 Funnames    equ PROGRAM_DATA + 108h + VARNAMES_SIZE
-AplBytecodes 	equ PROGRAM_DATA + 108h + VARNAMES_SIZE + FUNNAMES_SIZE
+Bytecodes 	equ PROGRAM_DATA + 108h + VARNAMES_SIZE + FUNNAMES_SIZE
 
 
 apl_main:
 	LD A, FALSE
 	LD (IsOperator), A
 	CALL apl_initIdentifierTabs
-	LD HL, AplBytecodes
+	LD HL, Bytecodes
 	LD (ProgramPtr), HL
 	CALL apl_tokenize
 	RET
@@ -127,12 +127,12 @@ apl_initIdentifierTabs:
 ; and sets the file length
 apl_moveFile:
 	LD HL, ProgramPtr
-	LD BC, AplBytecodes
+	LD BC, Bytecodes
 	SUB HL, BC			; output file length in HL
 	PUSH HL
 	POP BC				; output file length in HL
 	LD (CurrentFileSize), HL
-	LD HL, AplBytecodes
+	LD HL, Bytecodes
 	LD DE, FileBuffer
 	LDIR				; transfer the output file to the file buffer
 	RET

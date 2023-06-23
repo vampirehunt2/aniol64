@@ -12,11 +12,10 @@ StmtEnd         equ PROGRAM_DATA + 0Ch
 EvalProgress    equ PROGRAM_DATA + 0Eh
 Expression      equ 8280h
 Vars            equ 8300h
-RunBytecodes    equ 8400h
 
 ; initialises the apl interpreter
 run_init:
-    LD HL, RunBytecodes
+    LD HL, Bytecodes
     LD (StmtStart), HL      ; initilise the line pointer to the beginning of the program
     RET
 
