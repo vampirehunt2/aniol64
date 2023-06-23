@@ -169,8 +169,10 @@ run_evaluate:
     LD A, (Expression + 3)
     CP SEPARATOR_B
     JR NZ, .syntaxErr
+    LD A, 0
     RET                 ; success
 .syntaxErr:             ; TODO: handle the syntax error
+    LD A, 1
     RET
 
 
@@ -427,6 +429,21 @@ run_execAssignment:
     CP EQUAL_B          ; check if the next token is the assignment operator
     JR NZ, .syntaxError
     CALL run_evaluate
+    CP 0                ; check exit code for success
+    JR NZ, .syntaxError
+    LD HL, (StmtStart)  ; first bytecode of an assignment statement is a variable TODO: extract this to a routine
+    LD A, (HL)          ; load the variable bytecode
+    AND 01111111b       ; get the variable index
+    SLA A               ; multiply it by 2, as numeric variables are 2 bytes long
+    LD C, A
+    LD B, 0
+    LD HL, Vars         
+    ADD HL, BC          ; get the variable address
+    LD A, (Expression + 1)  ; lower byte of the result
+    LD (HL), A
+    INC HL
+    LD A, (Expression + 2)  ; higher byte of the result
+    LD (HL), A
     RET
 .syntaxError:
     ; TODO raise syntax error

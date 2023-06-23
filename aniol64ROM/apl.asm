@@ -111,6 +111,7 @@ apl_main:
 	LD HL, Bytecodes
 	LD (ProgramPtr), HL
 	CALL apl_tokenize
+	CALL run_main
 	RET
 
 ; fills the identifier tables with all zeroes
