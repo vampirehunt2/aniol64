@@ -156,6 +156,7 @@ run_evaluate:
     LD A, FALSE
     LD (EvalProgress), A
     CALL run_sanitiseParens
+    CALL run_evalUnary
     CALL run_evalMul
     CALL run_evalAdd
     LD A, (EvalProgress)
@@ -221,6 +222,73 @@ run_sanitiseParens:
 .end:
     POP HL
     RET
+
+run_evalUnary:
+    LD HL, Expression
+.loop:
+    PUSH HL             ; save the current pointer into the expression
+    LD A, (HL)
+    CP SEPARATOR_B      ; checking for end of expression
+    JR Z, .end          ; if end of expression reached, return
+    CALL run_isUnaryOperator    
+    CP TRUE
+    JR NZ, .next        ; if no, move to the next bytecode
+    INC HL              ; if yes, skip over the bytecode
+    LD A, (HL)          ; load the next bytecode after the operator to A
+    CP NUM_B            ; check if it's a value
+    JR NZ, .next        ; if no, move to the next bytecode  
+    LD A, TRUE
+    LD (EvalProgress), A; indicate that there was an action performed to reduce the expression
+; prepare operand
+    PUSH HL
+    POP IX              ; IX now pointing to NUM_B bytecode of the second operand
+    LD L, (IX + 1)      ; lower byte of the first operand
+    LD H, (IX + 2)      ; higher byte of the first operand
+    LD A, (IX - 1)      ; operator
+    CP NOT_B
+    JR Z, .not
+    CP MINUS_B
+    JR Z, .minus
+    CP ADDR_B
+    JR Z, .addr
+    CP DEREFERENCE_B
+    JR Z, .der
+.not:                   ; perform bitwise negation
+    CALL i16_not
+    JR .cont
+.minus:                 ; perform arithmetic negation
+    CALL i16_neg        
+    JR .cont
+.addr:                   
+   ; TODO
+    JR .cont
+.der:                   ; perform dereference
+    LD C, (HL)
+    INC HL
+    LD B, (HL)
+    LD H, B
+    LD L, C
+.cont:
+    LD (IX - 1), NUM_B
+    LD (IX + 0), L      ; store lower byte of result
+    LD (IX + 1), H      ; store higher byte of result
+.loop1:                 ; copy everything to the end of the expression back
+    LD A, (IX + 3)
+    LD (IX + 2), A
+    CP SEPARATOR_B      ; check for end of expression
+    JR Z, .next
+    INC IX              ; move to the next byte of the expression
+    JR .loop1
+    POP HL
+    JR .loop
+.next:
+    POP HL              ; restore the current pointer into the expression
+    CALL run_nextBC     ; move to the next bytecode 
+    JP .loop
+.end:
+    POP HL
+    RET
+
 
 ; computes and processes the result of a multiplication-type operation
 ; on two numerical operands
@@ -371,16 +439,17 @@ run_evalAdd:
     POP HL
     RET
 
-; checks if the bytecode in A is a single operand- type operator
+; checks if the bytecode in A is a single operand prefix operator
 ; result in A
-run_isOneOperandOp:
+run_isUnaryOperator:
     CP NOT_B
     JR Z, .true
     CP ADDR_B
     JR Z, .true
     CP DEREFERENCE_B
     JR Z, .true
-    ; TODO minus
+    CP MINUS_B
+    JR Z, .true
     LD A, FALSE
     RET 
 .true:

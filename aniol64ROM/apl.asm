@@ -1,6 +1,6 @@
 ; apl tokenizer
 
-SpecialChars: defb "+-*/\\:=[]()<>&|!@^,;\n\r", 0
+SpecialChars: defb "~+-*/\\:=[]()<>&|!@^,;\n\r", 0
 
 ; operator tokens
 ADD_T:			defb "+", 	0
@@ -32,6 +32,7 @@ SEPARATOR_T:	defb ":", 	0
 ; operator bytecodes
 ADD_B			equ '+' 	
 SUB_B			equ '-' 	
+MINUS_B			equ '~'
 MUL_B			equ '*' 	
 DIV_B 			equ '/' 	
 MOD_B 			equ '\' 	
@@ -163,7 +164,7 @@ apl_nextToken:
 	JP Z, apl_tokenizeDec
 	;
 	LD A, B
-	CP '-'
+	CP SUB_B
 	JR Z, .checkNeg
 	JR .cont
 .checkNeg:
@@ -173,7 +174,7 @@ apl_nextToken:
 	CALL dos_fPeekAhead
 	CALL isDecDigit
 	CP FALSE
-	JR Z, .cont
+	JP Z, apl_tokenizeMinus
 	JP NZ, apl_tokenizeDec
 .cont:	
 	CALL apl_isSpecialChar
@@ -434,6 +435,21 @@ apl_processBracket:
 	LD (ProgramPtr), HL
 	RET
 
+
+apl_tokenizeMinus:
+	LD HL, Token
+	CALL dos_fRead		; will read a minus '-' character. 
+						; We just call this to advance the file pointer 
+						; and discard the value
+	LD (HL), MINUS_B
+	INC HL
+	LD (HL), 0
+	INC HL
+	CALL apl_processMinus
+	LD A, FALSE			; TODO: is this really required?
+	LD (IsOperator), A
+	RET
+
 apl_tokenizeOperator:
 	LD HL, Token
 	CALL dos_fRead
@@ -461,6 +477,13 @@ apl_tokenizeOperator:
 	CALL apl_processOperator
 	LD A, TRUE
 	LD (IsOperator), A
+	RET
+
+apl_processMinus:
+	LD HL, (ProgramPtr)
+	LD (HL), MINUS_B
+	INC HL
+	LD (ProgramPtr), HL
 	RET
 
 ; adds the bytecode for the operator to the output file
