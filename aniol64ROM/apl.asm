@@ -1,6 +1,6 @@
 ; apl tokenizer
 
-SpecialChars: defb "~+-*/\\:=[]()<>&|!@^,;\n\r", 0
+SpecialChars: defb ".~+-*/\\:=[]()<>&|!@^,;\n\r", 0
 
 ; operator tokens
 ADD_T:			defb "+", 	0
@@ -499,6 +499,13 @@ apl_processOperator:
 	INC HL						; otherwise, move back to the current bytecode
 	LD A, SEPARATOR_B
 .cont:
+	CP LEFT_BRACKET_B
+	JR NZ, .cont1
+	LD A, INDEX_B
+	LD (HL), A
+	INC HL
+	LD A, LEFT_PAREN_B
+.cont1:
 	LD (HL), A
 	INC HL
 	LD (ProgramPtr), HL
@@ -850,6 +857,9 @@ apl_getOperatorCode:
 	LD A, (IY)
 	CP CR
 	JR Z, .sep
+	CP RIGHT_BRACKET_B
+	RET NZ
+	LD A, RIGHT_PAREN_B
 	RET
 .sep:
 	LD A, SEPARATOR_B

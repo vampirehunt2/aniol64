@@ -156,6 +156,7 @@ run_evaluate:
     LD A, FALSE
     LD (EvalProgress), A
     CALL run_sanitiseParens
+    CALL run_evalIndex
     CALL run_evalUnary
     CALL run_evalMul
     CALL run_evalAdd
@@ -285,6 +286,68 @@ run_evalUnary:
     POP HL              ; restore the current pointer into the expression
     CALL run_nextBC     ; move to the next bytecode 
     JP .loop
+.end:
+    POP HL
+    RET
+
+
+; computes and processes the result of an indexing operation (base addr + offset)
+; on two numerical operands
+run_evalIndex:
+    LD HL, Expression
+.loop:
+    PUSH HL             ; save the current pointer into the expression
+    LD A, (HL)
+    CP SEPARATOR_B      ; checking for end of expression
+    JR Z, .end          ; if end of expression reached, return
+    CP NUM_B            ; check if we have a numerical value
+    JR NZ, .next        ; if no, move to the next bytecode
+    INC HL              ; if yes, skip over the numerical value
+    INC HL
+    INC HL  
+    LD A, (HL)          ; load the next bytecode after the numerical value to A
+    CP INDEX_B
+    JR Z, .do
+    JR .next            ; if no index operator is found, move to the next bytecode
+.do:
+    INC HL
+    LD A, (HL)
+    CP NUM_B            ; check if the second operand is a value
+    JR NZ, .next        ; if not, skip
+    LD A, TRUE
+    LD (EvalProgress), A; indicate that there was an action performed to reduce the expression
+; prepare operands      ; TODO: extract subroutine
+    PUSH HL
+    POP IX              ; IX now pointing to NUM_B bytecode of the second operand
+    LD L, (IX - 3)      ; lower byte of the first operand
+    LD H, (IX - 2)      ; higher byte of the first operand
+    LD C, (IX + 1)      ; lower byte of the second operand
+    LD B, (IX + 2)      ; higher byte of the second operand
+; perform indexing operation
+    SLA C               ; m,ultiply BC by 2, which is the size of a value
+    RL B
+    ADD HL, BC          ; address of the value now in HL
+    LD C, (HL)          ; load lower byte of result to C
+    INC HL
+    LD B, (HL)          ; load higher value of result to B
+    LD H, B             ; transfer the result from BC to HL
+    LD L, C
+; store result          ; TODO: extract subroutine
+    LD (IX - 3), L      ; store lower byte of result
+    LD (IX - 2), H      ; store higher byte of result
+.loop1:                 ; copy everything to the end of the expression back
+    LD A, (IX + 3)
+    LD (IX - 1), A
+    CP SEPARATOR_B      ; check for end of expression
+    JR Z, .next
+    INC IX              ; move to the next byte of the expression
+    JR .loop1
+    POP HL
+    JR .loop
+.next:
+    POP HL              ; restore the current pointer into the expression
+    CALL run_nextBC     ; move to the next bytecode 
+    JR .loop
 .end:
     POP HL
     RET
