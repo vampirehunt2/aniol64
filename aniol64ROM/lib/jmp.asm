@@ -1,7 +1,10 @@
+; Jump table for assembler system calls
+
 ; Keyboard  ###############################
 
 ReadKey:    JP readKey
 ReadLn:     JP readLine
+Read:       JP read
 
 ; Display   ###############################
 

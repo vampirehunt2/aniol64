@@ -189,7 +189,7 @@ resetNmiHandler:
 
 ; high ROM code
   ds HIGHROM - $, 0
- include apl.asm
- include run.asm
+ include apl/apl.asm
+ include apl/run.asm
 
 
