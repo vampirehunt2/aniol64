@@ -1,5 +1,11 @@
-x=10
-x=x*x
-y=2*(45+5)
-z=x=y
+x=0
+y=1
+a=0
+b=0
+IF x
+    a=1
+    IF y
+        b=1
+    ENDIF
+ENDIF
 END

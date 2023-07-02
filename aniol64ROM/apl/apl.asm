@@ -64,6 +64,9 @@ CALL_B			equ 'b'
 SYSCALL_B		equ 's'
 NUM_B			equ 'm'	
 COMMENT_B		equ '#'
+IF_B			equ 'I'
+ELSE_B			equ "E"
+ENDIF_B			equ "e"
 NL_B			equ 00h
 
 ; keyword tokens and their corresponding bytecodes

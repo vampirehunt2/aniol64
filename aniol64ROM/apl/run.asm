@@ -10,6 +10,7 @@ ExprEnd         equ PROGRAM_DATA + 08h
 StmtStart       equ PROGRAM_DATA + 0Ah
 StmtEnd         equ PROGRAM_DATA + 0Ch
 EvalProgress    equ PROGRAM_DATA + 0Eh
+Ifs             equ PROGRAM_DATA + 0Fh
 Expression      equ 8280h
 Vars            equ 8300h
 
@@ -17,12 +18,12 @@ Vars            equ 8300h
 run_init:
     LD HL, Bytecodes
     LD (StmtStart), HL      ; initilise the line pointer to the beginning of the program
+    CALL run_findStmtEnd
     RET
 
 run_main:
     CALL run_init
 .loop:
-    CALL run_findStmtEnd
     CP FALSE                ; check for end of program
     JR Z, .end              ; end of program reached
     CALL run_execStmt       ; execute the current statement
@@ -57,6 +58,7 @@ run_nextStmt:
     LD HL, (StmtEnd)
     INC HL
     LD (StmtStart), HL
+    CALL run_findStmtEnd
     RET
 
 ; executes the current statement
@@ -67,6 +69,8 @@ run_execStmt:
     CP 0
     JP NZ, run_execAssignment
     LD A, (HL)
+    CP IF_B
+    JP Z, run_execCondition
     CP SYSCALL_B
     JP Z, run_execSyscall
     CP CALL_B
@@ -95,7 +99,7 @@ run_nextBC:
 ; evaluates an expression
 run_evaluate:   
     LD IX, Expression
-    INC HL              ; assuming this is called from run_execAssignment, and HL is pointing to the assignment operator
+    INC HL              ; assuming HL is pointing to the byte before the expression
 .loop:                  ; this loop copies the expression to Expression, evaluating all the variables in the process
     LD A, (HL)
     CP SEPARATOR_B      ; check if end of statement is reached,
@@ -691,6 +695,44 @@ run_execAssignment:
     RET
 .syntaxError:
     ; TODO raise syntax error
+    RET
+
+run_execCondition:
+    CALL run_evaluate
+    LD HL, (Expression + 1) ; check the result of the condition (+1 to skip the NUM_B bytecode)
+    LD BC, 0                ; 
+    CALL i16_cmp            ; compare it with zero
+    CP 0                    ; check if result is zero (logical FALSE)
+    RET NZ                  ; if it's not zero do nothing, let the program continue
+    LD A, 0
+    LD (Ifs), A             ; initialise the nested IF statement counter to zero
+.loop:
+    CALL run_nextStmt       ; move to the next statement
+    CP FALSE                ; check for end of program
+    JR Z, .syntaxErr        ; unexpected end of program reached
+    LD HL, (StmtStart)
+    LD A, (HL)
+    CP ENDIF_B              ; if end if is found, end the loop
+    JR Z, .endif
+    CP IF_B
+    JR Z, .if
+    JR .loop
+.endif:
+    LD A, (Ifs)
+    CP 0                    ; check if we're in a nexted IF statement
+    JR Z, .end              ; if no, end the loop
+    DEC A
+    LD (Ifs), A             ; if yes, decrement the nexted IF statement count
+    JR .loop
+.if:
+    LD A, (Ifs)
+    INC A
+    LD (Ifs), A             ; increment the nested IF statement counter
+    JR .loop
+.end:
+    RET
+.syntaxErr:
+    ; TODO handle syntax error
     RET
 
 ; executes a system function
