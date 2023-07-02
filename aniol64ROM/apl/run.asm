@@ -70,7 +70,9 @@ run_execStmt:
     JP NZ, run_execAssignment
     LD A, (HL)
     CP IF_B
-    JP Z, run_execCondition
+    JP Z, run_if
+    CP ELSE_B
+    JP Z, run_else
     CP SYSCALL_B
     JP Z, run_execSyscall
     CP CALL_B
@@ -697,7 +699,43 @@ run_execAssignment:
     ; TODO raise syntax error
     RET
 
-run_execCondition:
+; "executes" an else statement.
+; actually, else is not executed. If an else statement is encountered out in the wild, 
+; the entire block just needs to be skipped
+run_else:
+    LD A, 0
+    LD (Ifs), A             ; initialise the nested IF statement counter to zero
+.loop:
+    CALL run_nextStmt       ; move to the next statement
+    CP FALSE                ; check for end of program
+    JR Z, .syntaxErr        ; unexpected end of program reached
+    LD HL, (StmtStart)
+    LD A, (HL)
+    CP ENDIF_B              ; if end if is found, end the loop
+    JR Z, .endif
+    CP IF_B
+    JR Z, .if
+    JR .loop
+.endif:
+    LD A, (Ifs)
+    CP 0                    ; check if we're in a nexted IF statement
+    JR Z, .end              ; if no, end the loop
+    DEC A
+    LD (Ifs), A             ; if yes, decrement the nexted IF statement count
+    JR .loop
+.if:
+    LD A, (Ifs)
+    INC A
+    LD (Ifs), A             ; increment the nested IF statement counter
+    JR .loop
+.end:
+    RET
+.syntaxErr:
+    ; TODO handle syntax error
+    RET
+    
+; executes a conditional statement
+run_if:
     CALL run_evaluate
     LD HL, (Expression + 1) ; check the result of the condition (+1 to skip the NUM_B bytecode)
     LD BC, 0                ; 
@@ -716,6 +754,13 @@ run_execCondition:
     JR Z, .endif
     CP IF_B
     JR Z, .if
+    CP ELSE_B 
+    JR Z, .else
+    JR .loop
+.else:
+    LD A, (Ifs)
+    CP 0                    ; check if we're in a nexted IF statement
+    JR Z, .end              ; if no, end the loop
     JR .loop
 .endif:
     LD A, (Ifs)

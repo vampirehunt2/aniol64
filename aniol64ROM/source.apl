@@ -1,11 +1,5 @@
-x=0
-y=1
-a=0
-b=0
-IF x
-    a=1
-    IF y
-        b=1
-    ENDIF
+x=1
+IF x>1: a=1
+ELSE: a=2
 ENDIF
 END
