@@ -27,7 +27,7 @@ onp_main:
         CALL str_shift
 		LD B, 0
 		PUSH IX
-		LD IX, Stack		
+		LD IX, RunStack		
 		CALL list_create	; creates a list that we will use as stack for the calculator
 		POP IX
 .loop:
@@ -41,7 +41,7 @@ onp_main:
 		JR .loop
 .end:
 		POP IX
-		LD IX, Stack
+		LD IX, RunStack
 		CALL list_len
 		CP 1
 		JR NZ, .syntaxErr
@@ -107,7 +107,7 @@ onp_processNumber:
 .end:
 		CP 0
 		JR NZ, .error
-		LD IX, Stack
+		LD IX, RunStack
 		CALL list_append
 		LD A, OK		; fall through to return zero
 .error:
@@ -115,7 +115,7 @@ onp_processNumber:
 
 onp_processOperator:
 		LD A, (IX + 0) 	; load the first character of the token
-		LD IX, Stack	; point IX to the stack
+		LD IX, RunStack	; point IX to the stack
 		CP PLUS
 		JP Z, .plus
 		CP DIVIDE

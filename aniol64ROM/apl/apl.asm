@@ -44,8 +44,8 @@ LEFT_PAREN_B	equ '('
 RIGHT_PAREN_B 	equ ')' 	
 LEFT_BRACKET_B	equ '[' 	
 RIGHT_BRACKET_B	equ ']' 	
-GREATER_B 		equ '<' 	
-LESSER_B 		equ '>' 	
+GREATER_B 		equ '>' 	
+LESSER_B 		equ '<' 	
 GREATER_EQUAL_B	equ 'g' 	
 LESSER_EQUAL_B	equ 'l' 	
 CONJUNCTION_B 	equ '&' 	
@@ -67,6 +67,8 @@ COMMENT_B		equ '#'
 IF_B			equ 'I'
 ELSE_B			equ "E"
 ENDIF_B			equ "e"
+LOOP_B			equ 'L'
+WHILE_B			equ 'W'
 NL_B			equ 00h
 
 ; keyword tokens and their corresponding bytecodes

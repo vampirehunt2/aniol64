@@ -10,7 +10,9 @@ ExprEnd         equ PROGRAM_DATA + 08h
 StmtStart       equ PROGRAM_DATA + 0Ah
 StmtEnd         equ PROGRAM_DATA + 0Ch
 EvalProgress    equ PROGRAM_DATA + 0Eh
-Ifs             equ PROGRAM_DATA + 0Fh
+NestingLevel    equ PROGRAM_DATA + 0Fh
+StackPtr        equ PROGRAM_DATA + 10h
+RunStack        equ 8240h   
 Expression      equ 8280h
 Vars            equ 8300h
 
@@ -18,6 +20,8 @@ Vars            equ 8300h
 run_init:
     LD HL, Bytecodes
     LD (StmtStart), HL      ; initilise the line pointer to the beginning of the program
+    LD HL, RunStack            ; initialise the soft stack
+    LD (StackPtr), HL
     CALL run_findStmtEnd
     RET
 
@@ -73,6 +77,10 @@ run_execStmt:
     JP Z, run_if
     CP ELSE_B
     JP Z, run_else
+    CP WHILE_B
+    JP Z, run_while
+    CP LOOP_B
+    JP Z, run_loop
     CP SYSCALL_B
     JP Z, run_execSyscall
     CP CALL_B
@@ -704,7 +712,7 @@ run_execAssignment:
 ; the entire block just needs to be skipped
 run_else:
     LD A, 0
-    LD (Ifs), A             ; initialise the nested IF statement counter to zero
+    LD (NestingLevel), A             ; initialise the nested IF statement counter to zero
 .loop:
     CALL run_nextStmt       ; move to the next statement
     CP FALSE                ; check for end of program
@@ -717,17 +725,79 @@ run_else:
     JR Z, .if
     JR .loop
 .endif:
-    LD A, (Ifs)
+    LD A, (NestingLevel)
     CP 0                    ; check if we're in a nexted IF statement
     JR Z, .end              ; if no, end the loop
     DEC A
-    LD (Ifs), A             ; if yes, decrement the nexted IF statement count
+    LD (NestingLevel), A             ; if yes, decrement the nexted IF statement count
     JR .loop
 .if:
-    LD A, (Ifs)
+    LD A, (NestingLevel)
     INC A
-    LD (Ifs), A             ; increment the nested IF statement counter
+    LD (NestingLevel), A             ; increment the nested IF statement counter
     JR .loop
+.end:
+    RET
+.syntaxErr:
+    ; TODO handle syntax error
+    RET
+
+; executes a loop (end of while) statement
+run_loop:
+    LD HL, (StackPtr)
+    DEC HL
+    LD B, (HL)
+    DEC HL
+    LD C, (HL)
+    LD (StackPtr), HL
+    LD H, B
+    LD L, C
+    DEC HL
+    LD (StmtEnd), HL     ; load the return address of the loop on stack
+    RET
+
+;executes a while loop
+run_while:
+    CALL run_evaluate
+    LD HL, (Expression + 1) ; check the result of the condition (+1 to skip the NUM_B bytecode)
+    LD BC, 0                ; 
+    CALL i16_cmp            ; compare it with zero
+    CP 0                    ; check if result is zero (logical FALSE)
+    JR NZ, .true            
+    LD A, 0
+    LD (NestingLevel), A    ; initialise the nested WHILE statement counter to zero
+.loop:
+    CALL run_nextStmt       ; move to the next statement
+    CP FALSE                ; check for end of program
+    JR Z, .syntaxErr        ; unexpected end of program reached
+    LD HL, (StmtStart)
+    LD A, (HL)
+    CP LOOP_B              ; if end of loop is found, end the loop
+    JR Z, .endwhile
+    CP WHILE_B
+    JR Z, .while
+    JR .loop
+.while:
+    LD A, (NestingLevel)
+    INC A
+    LD (NestingLevel), A    ; increment the nested WHILE statement counter
+    JR .loop
+.endwhile:
+    LD A, (NestingLevel)
+    CP 0                    ; check if we're in a nested WHILE statement
+    JR Z, .end              ; if no, end the loop
+    DEC A
+    LD (NestingLevel), A    ; if yes, decrement the nested WHILE statement count
+    JR .loop
+.true:
+    LD BC, (StmtStart)      ; save the return address of the loop on stack
+    LD HL, (StackPtr)
+    LD (HL), C
+    INC HL
+    LD (HL), B
+    INC HL
+    LD (StackPtr), HL
+    RET
 .end:
     RET
 .syntaxErr:
@@ -743,7 +813,7 @@ run_if:
     CP 0                    ; check if result is zero (logical FALSE)
     RET NZ                  ; if it's not zero do nothing, let the program continue
     LD A, 0
-    LD (Ifs), A             ; initialise the nested IF statement counter to zero
+    LD (NestingLevel), A    ; initialise the nested IF statement counter to zero
 .loop:
     CALL run_nextStmt       ; move to the next statement
     CP FALSE                ; check for end of program
@@ -758,21 +828,21 @@ run_if:
     JR Z, .else
     JR .loop
 .else:
-    LD A, (Ifs)
+    LD A, (NestingLevel)
     CP 0                    ; check if we're in a nexted IF statement
     JR Z, .end              ; if no, end the loop
     JR .loop
 .endif:
-    LD A, (Ifs)
-    CP 0                    ; check if we're in a nexted IF statement
+    LD A, (NestingLevel)
+    CP 0                    ; check if we're in a nested IF statement
     JR Z, .end              ; if no, end the loop
     DEC A
-    LD (Ifs), A             ; if yes, decrement the nexted IF statement count
+    LD (NestingLevel), A    ; if yes, decrement the nested IF statement count
     JR .loop
 .if:
-    LD A, (Ifs)
+    LD A, (NestingLevel)
     INC A
-    LD (Ifs), A             ; increment the nested IF statement counter
+    LD (NestingLevel), A    ; increment the nested IF statement counter
     JR .loop
 .end:
     RET

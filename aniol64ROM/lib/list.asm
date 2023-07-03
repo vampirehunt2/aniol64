@@ -88,7 +88,7 @@ list_expand:
 ; appends a new element at the end of the list
 ; IX - address of the list
 ; new element in HL
-
+list_push:
 list_append:
 		CALL list_isFull
 		CP TRUE

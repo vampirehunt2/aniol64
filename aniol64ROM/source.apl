@@ -1,5 +1,11 @@
-x=1
-IF x>1: a=1
-ELSE: a=2
-ENDIF
+x=0
+i=0
+WHILE i<10
+    i=i+1
+    j=0
+    WHILE j<10
+        j=j+1
+        x=x+1
+    LOOP
+LOOP
 END
