@@ -78,11 +78,11 @@ PROC_T: 	defb "PROC", 	0, 'p'
 FUN_T:		defb "FUN", 	0, 'F'
 END_T:		defb "END", 	0, 'D'
 RET_T:		defb "RET", 	0, 'R'
-IF_T: 		defb "IF", 		0, 'I'
-ELSE_T:		defb "ELSE", 	0, 'E'
-ENDIF_T:	defb "ENDIF", 	0, 'e'
-WHILE_T:	defb "WHILE", 	0, 'W'
-LOOP_T:		defb "LOOP", 	0, 'L'
+IF_T: 		defb "IF", 		0, IF_B
+ELSE_T:		defb "ELSE", 	0, ELSE_B
+ENDIF_T:	defb "ENDIF", 	0, ENDIF_B
+WHILE_T:	defb "WHILE", 	0, WHILE_B
+LOOP_T:		defb "LOOP", 	0, LOOP_B
 FOR_T:		defb "FOR", 	0, 'f'
 NEXT_T:		defb "NEXT", 	0, 'N'
 ARRAY_T:	defb "ARR", 	0, 'A'
