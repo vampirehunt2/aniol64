@@ -5,19 +5,24 @@ MAX_EXPR_BCS    equ 64
 CurrentBC       equ PROGRAM_DATA + 00h
 PrevBC          equ PROGRAM_DATA + 02h
 NextBC          equ PROGRAM_DATA + 04h
-ExprStart       equ PROGRAM_DATA + 06
+ExprStart       equ PROGRAM_DATA + 06h  
 ExprEnd         equ PROGRAM_DATA + 08h
 StmtStart       equ PROGRAM_DATA + 0Ah
 StmtEnd         equ PROGRAM_DATA + 0Ch
 EvalProgress    equ PROGRAM_DATA + 0Eh
 NestingLevel    equ PROGRAM_DATA + 0Fh
-StackPtr        equ PROGRAM_DATA + 10h
+StackPtr        equ PROGRAM_DATA + 10h  ; 2 bytes
+Trap            equ PROGRAM_DATA + 12h  ; stack pointer at the beggining of the run, to fall back onto in case of a syntax error
+DataSeg         equ PROGRAM_DATA + 14h
+ProcAddr        equ PROGRAM_DATA + 16h
 RunStack        equ 8240h   
 Expression      equ 8280h
 Vars            equ 8300h
+Procedures      equ 8400h
 
 ; initialises the apl interpreter
 run_init:
+    CALL run_findProcedures
     LD HL, Bytecodes
     LD (StmtStart), HL      ; initilise the line pointer to the beginning of the program
     LD HL, RunStack            ; initialise the soft stack
@@ -25,8 +30,47 @@ run_init:
     CALL run_findStmtEnd
     RET
 
+run_findProcedures:
+    LD HL, Bytecodes
+.loop:
+    LD A, (HL)
+    CP END_B
+    JR Z, .end
+    CP PROC_B
+    JR Z, .proc
+    CALL run_nextBC
+    JR .loop
+.proc:
+    LD (CurrentBC), HL  ; save the current bytecode pointer           
+    INC HL              ; move HL to the procedure index
+    LD A, (HL)          ; procedure index now in A
+    SLA A               ; multiply the procedure index by two...
+    INC HL              ; point HL to the first bytecode beyond the procedure header, skip the proc index
+    INC HL              ; skip the statement separator
+    LD (ProcAddr), HL
+    LD HL, Procedures   ; point HL to the beginning of the procedure address table
+    LD C, A             ; get an index into the two-byte-per-element procedure address table  
+    LD B, 0
+    ADD HL, BC          ; pointer to the procedure address table entry now in HL
+    LD DE, (ProcAddr)
+    LD (HL), E
+    INC HL
+    LD (HL), D
+    LD HL, (CurrentBC)
+    CALL run_nextBC
+    JR .loop
+.end:
+    INC HL              ; one byte beyond the end of the program bytecodes
+    LD (DataSeg), HL    ; we can later start putting data (strings, arrays, records) from this address
+    RET
+
+run_syntaxError:
+    LD SP, (Trap)
+    RET
+
 run_main:
     CALL run_init
+    LD (Trap), SP
 .loop:
     CP FALSE                ; check for end of program
     JR Z, .end              ; end of program reached
@@ -752,8 +796,8 @@ run_loop:
     LD (StackPtr), HL
     LD H, B
     LD L, C
-    DEC HL
-    LD (StmtEnd), HL     ; load the return address of the loop on stack
+    DEC HL                  ; moving bck to the end of the previous statement, 
+    LD (StmtEnd), HL        ; so that the next run_nextStmt call goes back to the WHILE statement
     RET
 
 ;executes a while loop

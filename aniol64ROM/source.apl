@@ -8,4 +8,12 @@ WHILE i<10
         x=x+1
     LOOP
 LOOP
+
+
+PROC Test
+RET
+
+PROC Test2
+RET
+
 END

@@ -2,6 +2,15 @@
 
 SpecialChars: defb ".~+-*/\\:=[]()<>&|!@^,;\n\r", 0
 
+
+;
+;	# 	array index
+;	{}	also array index
+;	%	comment
+;	;	same as ENDIF
+;
+
+
 ; operator tokens
 ADD_T:			defb "+", 	0
 SUB_T:			defb "-", 	0
@@ -69,14 +78,16 @@ ELSE_B			equ "E"
 ENDIF_B			equ "e"
 LOOP_B			equ 'L'
 WHILE_B			equ 'W'
+END_B			equ 'D'
+PROC_B			equ 'p'
 NL_B			equ 00h
 
 ; keyword tokens and their corresponding bytecodes
 KeywordTokens:
 PROG_T: 	defb "PROG", 	0, 'P'
-PROC_T: 	defb "PROC", 	0, 'p'
+PROC_T: 	defb "PROC", 	0, PROC_B
 FUN_T:		defb "FUN", 	0, 'F'
-END_T:		defb "END", 	0, 'D'
+END_T:		defb "END", 	0, END_B
 RET_T:		defb "RET", 	0, 'R'
 IF_T: 		defb "IF", 		0, IF_B
 ELSE_T:		defb "ELSE", 	0, ELSE_B
@@ -518,9 +529,6 @@ apl_processOperator:
 
 apl_processFunction:
 	LD HL, (ProgramPtr)
-	LD A, CALL_B
-	LD (HL), A
-	INC HL
 	CALL apl_getFunCode
 	LD (HL), A
 	INC HL
@@ -750,6 +758,7 @@ apl_getVarCode:
 ; result in A
 ; destroys D, IX
 apl_getFunCode:
+	PUSH HL
 	LD D, 0		; counting the variables within the varname table in D
 	LD IX, Funnames
 .loop:
@@ -766,6 +775,7 @@ apl_getFunCode:
 	CALL apl_newIdentifier
 .found:
 	LD A, D
+	POP HL
 	RET
 
 ; checks whether identifier names pointed to by IX and IY match.
