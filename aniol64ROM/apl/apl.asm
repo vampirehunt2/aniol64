@@ -69,7 +69,7 @@ COMMA_B			equ ','
 
 ; other bytecodes
 VAR_B			equ 'v'
-CALL_B			equ 'b'
+USERCALL_B		equ 'u'
 SYSCALL_B		equ 's'
 NUM_B			equ 'm'	
 COMMENT_B		equ '#'
@@ -80,6 +80,8 @@ LOOP_B			equ 'L'
 WHILE_B			equ 'W'
 END_B			equ 'D'
 PROC_B			equ 'p'
+RET_B			equ 'R'
+STOP_B			equ 'T'
 NL_B			equ 00h
 
 ; keyword tokens and their corresponding bytecodes
@@ -88,7 +90,7 @@ PROG_T: 	defb "PROG", 	0, 'P'
 PROC_T: 	defb "PROC", 	0, PROC_B
 FUN_T:		defb "FUN", 	0, 'F'
 END_T:		defb "END", 	0, END_B
-RET_T:		defb "RET", 	0, 'R'
+RET_T:		defb "RET", 	0, RET_B
 IF_T: 		defb "IF", 		0, IF_B
 ELSE_T:		defb "ELSE", 	0, ELSE_B
 ENDIF_T:	defb "ENDIF", 	0, ENDIF_B
@@ -98,6 +100,7 @@ FOR_T:		defb "FOR", 	0, 'f'
 NEXT_T:		defb "NEXT", 	0, 'N'
 ARRAY_T:	defb "ARR", 	0, 'A'
 STRING_T:	defb "STR", 	0, 'S'	
+STOP_T: 	defb "STOP", 	0, STOP_B
  defb 0
 
 BuiltInFunctions:
@@ -529,6 +532,8 @@ apl_processOperator:
 
 apl_processFunction:
 	LD HL, (ProgramPtr)
+	LD (HL), USERCALL_B
+	INC HL
 	CALL apl_getFunCode
 	LD (HL), A
 	INC HL

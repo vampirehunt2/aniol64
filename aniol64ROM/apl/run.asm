@@ -41,12 +41,13 @@ run_findProcedures:
     CALL run_nextBC
     JR .loop
 .proc:
-    LD (CurrentBC), HL  ; save the current bytecode pointer           
+    LD (CurrentBC), HL  ; save the current bytecode pointer   
+    INC HL        
     INC HL              ; move HL to the procedure index
     LD A, (HL)          ; procedure index now in A
     SLA A               ; multiply the procedure index by two...
-    INC HL              ; point HL to the first bytecode beyond the procedure header, skip the proc index
-    INC HL              ; skip the statement separator
+    INC HL            
+    INC HL
     LD (ProcAddr), HL
     LD HL, Procedures   ; point HL to the beginning of the procedure address table
     LD C, A             ; get an index into the two-byte-per-element procedure address table  
@@ -127,8 +128,12 @@ run_execStmt:
     JP Z, run_loop
     CP SYSCALL_B
     JP Z, run_execSyscall
-    CP CALL_B
+    CP USERCALL_B
     JP Z, run_execUserCall
+    CP RET_B
+    JP Z, run_ret
+    CP STOP_B
+    JP Z, run_stop
     ; TODO: handle unrecognised token
 
 ; moves HL to the next bytecode
@@ -138,7 +143,7 @@ run_nextBC:
     JR Z, .three
     CP SYSCALL_B
     JR Z, .two          ; system calls are two bytes long
-    CP CALL_B
+    CP USERCALL_B
     JR Z, .two          ; as are user-defined procedures
     JR .one             ; all other bytecodes are one-byte long
     ; TODO: handle string literals
@@ -166,7 +171,7 @@ run_evaluate:
     JR Z, .num
     CP SYSCALL_B
     JR Z, .call          ; system calls are two bytes long...
-    CP CALL_B
+    CP USERCALL_B
     JR Z, .call          ; ...as are user-defined procedures
     JR .other
 .var:
@@ -794,10 +799,8 @@ run_loop:
     DEC HL
     LD C, (HL)
     LD (StackPtr), HL
-    LD H, B
-    LD L, C
-    DEC HL                  ; moving bck to the end of the previous statement, 
-    LD (StmtEnd), HL        ; so that the next run_nextStmt call goes back to the WHILE statement
+    DEC BC                  ; moving back to the end of the previous statement, 
+    LD (StmtEnd), BC        ; so that the next run_nextStmt call goes back to the WHILE statement
     RET
 
 ;executes a while loop
@@ -901,6 +904,43 @@ run_execSyscall:
 
 ; executes a user-defined procedure
 run_execUserCall:
+    LD BC, (StmtStart)      ; save the return address of the proc call on stack
+    LD HL, (StackPtr)
+    LD (HL), C
+    INC HL
+    LD (HL), B
+    INC HL
+    LD (StackPtr), HL
+    LD HL, (StmtStart)
+    INC HL              ; move HL to point to the procedure index
+    LD A, (HL)          ; load the procedure index to A
+    SLA A               ; multiply the procedure index by two...
+    LD HL, Procedures   ; point HL to the beginning of the procedure address table
+    LD C, A             ; get an index into the two-byte-per-element procedure address table  
+    LD B, 0
+    ADD HL, BC          ; pointer to the procedure address table entry now in HL
+    LD C, (HL)
+    INC HL
+    LD B, (HL)
+    DEC BC
+    LD (StmtEnd), BC
+    RET
+
+; returns from procedure
+run_ret:
+    LD HL, (StackPtr)
+    DEC HL
+    LD B, (HL)
+    DEC HL
+    LD C, (HL)
+    LD (StackPtr), HL
+    INC BC
+    INC BC
+    LD (StmtEnd), BC        ; so that the next run_nextStmt call goes to the next statement after the user call
+    RET
+
+run_stop:
+    HALT
     RET
 
 

@@ -1,19 +1,14 @@
 x=0
-i=0
-WHILE i<10
-    i=i+1
-    j=0
-    WHILE j<10
-        j=j+1
-        x=x+1
-    LOOP
-LOOP
-
+Test
+x=x+2
+STOP
 
 PROC Test
-RET
-
-PROC Test2
+y=5
+    WHILE y>0
+        x=x+1
+        y=y-1
+    LOOP
 RET
 
 END
