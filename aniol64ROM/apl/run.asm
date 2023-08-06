@@ -156,6 +156,7 @@ run_nextBC:
     RET
 
 ; evaluates an expression
+; assuming HL is pointing to the byte before the expression
 run_evaluate:   
     LD IX, Expression
     INC HL              ; assuming HL is pointing to the byte before the expression
@@ -732,7 +733,7 @@ run_isMulOp:
 run_execAssignment:
     LD HL, (StmtStart)  ; first bytecode of an assignment statement is a variable
     INC HL              ; move HL to the next bytode after the variable
-    LD A, (HL)          ; load the next butecode into A
+    LD A, (HL)          ; load the next bytecode into A
     CP EQUAL_B          ; check if the next token is the assignment operator
     JR NZ, .syntaxError
     CALL run_evaluate
@@ -899,6 +900,10 @@ run_if:
 
 ; executes a system function
 run_execSyscall:
+    INC HL          ; move HL to the syscall id
+    LD A, (HL)
+    CP SYS_WRITE_B
+    JP Z, sys_write
     RET
 
 

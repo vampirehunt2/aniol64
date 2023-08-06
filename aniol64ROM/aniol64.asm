@@ -191,5 +191,6 @@ resetNmiHandler:
   ds HIGHROM - $, 0
  include apl/apl.asm
  include apl/run.asm
+ include apl/sys.asm
 
 

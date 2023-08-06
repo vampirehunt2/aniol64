@@ -484,7 +484,6 @@ u16_parseDec:
 ; argument in HL
 ; result in a string pointed to by IX
 ; conserves both HL and IX
-
 u16_formatDec:
         PUSH BC
         PUSH HL
@@ -517,18 +516,18 @@ u16_formatDec:
 
 
 i16_formatDec:
+        PUSH IX
 	LD A, H
 	AND 10000000b	; isolate the sign of the number
 	CP 0
 	JR Z, .pos
-	LD A, H
-	AND 011111111b	; isolate the absolute value of the number
-	LD H, A
 	LD A, '-'
 	LD (IX), A
 	INC IX
+        CALL i16_neg
 .pos:
 	CALL u16_formatDec
+        POP IX
 	RET
 
 

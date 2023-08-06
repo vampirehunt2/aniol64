@@ -103,9 +103,12 @@ STRING_T:	defb "STR", 	0, 'S'
 STOP_T: 	defb "STOP", 	0, STOP_B
  defb 0
 
+; Built-In Functions
+SYS_READ_B	equ 00h
+SYS_WRITE_B equ 01h
 BuiltInFunctions:
-READ_T:		defb "Read", 	0, 0
-WRITE_T:	defb "Write", 	0, 1
+READ_T:		defb "Read", 	0, SYS_READ_B
+WRITE_T:	defb "Write", 	0, SYS_WRITE_B
  defb 0
 
 ; 128 variables with names of up to 8 characters, 
