@@ -1,4 +1,4 @@
-x=8
-Write (2+x)*3
+x = -10
+y = Abs(x*2) + 1
 STOP
 END

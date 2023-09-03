@@ -106,9 +106,22 @@ STOP_T: 	defb "STOP", 	0, STOP_B
 ; Built-In Functions
 SYS_READ_B	equ 00h
 SYS_WRITE_B equ 01h
+SYS_BEEP_B	equ 02h
+SYS_CLICK_B	equ 03h
+SYS_NEWLN_B	equ 04h
+SYS_ABS_B	equ 05h
+SYS_RND_B	equ	06h
+SYS_PEEK_B	equ 07h
+
 BuiltInFunctions:
 READ_T:		defb "Read", 	0, SYS_READ_B
 WRITE_T:	defb "Write", 	0, SYS_WRITE_B
+BEEP_T:		defb "Beep",	0, SYS_BEEP_B
+CLICK_T:	defb "Click",	0, SYS_CLICK_B
+NEWLN_T:	defb "NewLn", 	0, SYS_NEWLN_B
+ABS_T:		defb "Abs", 	0, SYS_ABS_B
+RND_T:		defb "Rnd",		0, SYS_RND_B
+PEEK_T:		defb "Peek", 	0, SYS_PEEK_B
  defb 0
 
 ; 128 variables with names of up to 8 characters, 
@@ -134,7 +147,7 @@ apl_main:
 	LD HL, Bytecodes
 	LD (ProgramPtr), HL
 	CALL apl_tokenize
-	CALL run_main
+	; CALL run_main DEBUG ONLY
 	RET
 
 ; fills the identifier tables with all zeroes
@@ -222,6 +235,7 @@ apl_nextToken:
 
 ; parses the input file and divides it into tokens
 apl_tokenize:
+	CALL dos_reset
 .loop:
 	CALL apl_nextToken
 	LD IX, Token

@@ -1,5 +1,7 @@
 ; apl bytecode interpreter
 
+Terminated:     defb "Program terminated", 0
+
 MAX_EXPR_BCS    equ 64
 
 CurrentBC       equ PROGRAM_DATA + 00h
@@ -19,6 +21,11 @@ RunStack        equ 8240h
 Expression      equ 8280h
 Vars            equ 8300h
 Procedures      equ 8400h
+
+run_debug:
+    CALL apl_main
+    CALL run_main
+    RET
 
 ; initialises the apl interpreter
 run_init:
@@ -220,6 +227,7 @@ run_evaluate:
     LD A, FALSE
     LD (EvalProgress), A
     CALL run_sanitiseParens
+    CALL run_evalFunction
     CALL run_evalIndex
     CALL run_evalUnary
     CALL run_evalMul
@@ -285,6 +293,51 @@ run_sanitiseParens:
     POP HL              ; restore the current pointer into the expression
     CALL run_nextBC     ; move to the next bytecode 
     JR .loop
+.end:
+    POP HL
+    RET
+
+
+run_evalFunction:
+    LD HL, Expression
+.loop:
+    PUSH HL             ; save the current pointer into the expression
+    LD A, (HL)
+    CP SEPARATOR_B      ; checking for end of expression
+    JR Z, .end          ; if end of expression reached, return
+    CP SYSCALL_B
+    JR NZ, .end        
+    INC HL  
+    INC HL              ; move to the operand            
+    LD A, (HL)          ; load the operand bytecode to A
+    CP NUM_B            ; check if it is a number
+    JR NZ, .next        ; if not, go to the next bytecode
+    LD A, TRUE
+    LD (EvalProgress), A; indicate that there was an action performed to reduce the expression
+; prepare operand
+    PUSH HL
+    POP IX              ; IX now pointing to NUM_B bytecode of the operand
+    LD L, (IX + 1)      ; lower byte of the first operand
+    LD H, (IX + 2)      ; higher byte of the first operand
+    LD A, (IX - 1)      ; syscall index
+    CALL run_execFunction
+.cont:
+    LD (IX - 2), NUM_B
+    LD (IX - 1), L      ; store lower byte of result
+    LD (IX + 0), H      ; store higher byte of result
+.loop1:                 ; copy everything to the end of the expression back
+    LD A, (IX + 3)
+    LD (IX + 1), A
+    CP SEPARATOR_B      ; check for end of expression
+    JR Z, .next
+    INC IX              ; move to the next byte of the expression
+    JR .loop1
+    POP HL
+    JR .loop
+.next:
+    POP HL              ; restore the current pointer into the expression
+    CALL run_nextBC     ; move to the next bytecode 
+    JP .loop
 .end:
     POP HL
     RET
@@ -898,12 +951,33 @@ run_if:
     ; TODO handle syntax error
     RET
 
-; executes a system function
+; executes a system procedure
 run_execSyscall:
     INC HL          ; move HL to the syscall id
     LD A, (HL)
     CP SYS_WRITE_B
     JP Z, sys_write
+    CP SYS_BEEP_B
+    JP Z, sys_beep
+    CP SYS_CLICK_B
+    JP Z, sys_click
+    CP SYS_NEWLN_B
+    JP Z, sys_nextLn
+    CP SYS_READ_B
+    JP Z, sys_read
+    RET
+
+; executes a system function
+; syscall index in A
+; argument in HL
+; result in HL
+run_execFunction:
+    CP SYS_ABS_B
+    JP Z, sys_abs
+    CP SYS_RND_B
+    JP Z, sys_rnd
+    CP SYS_PEEK_B
+    JP Z, sys_peek
     RET
 
 
@@ -945,7 +1019,9 @@ run_ret:
     RET
 
 run_stop:
-    HALT
+    LD IX, Terminated
+    CALL writeLn
+    LD SP, (Trap)
     RET
 
 

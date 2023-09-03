@@ -417,7 +417,7 @@ i16_parseDec:
 	RET
 .pos:
 	CALL u16_parseDec  
-    RET
+        RET
 
 
 

@@ -10,6 +10,7 @@
  device NOSLOT64K 
 
  org 0000h
+
 	LD SP, RAMTOP   ; initialise stack pointer to the top of available RAM
 	IM 2			; set interupt mode to 2
 	LD A, 01h	   ; higher byte of the interrupt vector table

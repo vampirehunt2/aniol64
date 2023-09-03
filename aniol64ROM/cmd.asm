@@ -39,6 +39,10 @@ Rm:			defb "rm", 0
 Format:		defb "format", 0
 Tar:		defb "tar", 0
 
+; APL commands
+Apl:		defb "apl", 0
+AplRun: 	defb "run", 0		
+
 UnknownCmd: defb "Unknown cmd", 0
 Prompt: 	defb ">", 0
 
@@ -170,6 +174,14 @@ cmd_main:
 		LD IY, Tar
 		CALL str_cmp
 		JP Z, .tar
+		; APL command
+		LD IY, Apl
+		CALL str_cmp
+		JP Z, .apl
+		; Run command
+		LD IY, AplRun
+		CALL str_cmp
+		JP Z, .run
         ; unknown command
         LD IX, UnknownCmd
         CALL writeStr
@@ -265,6 +277,12 @@ cmd_main:
 		JP cmd_main
 .tar:
 		CALL tar_main
+		JP cmd_main
+.apl:
+		CALL apl_main
+		JP cmd_main
+.run:
+		CALL run_main
 		JP cmd_main
 
 

@@ -26,7 +26,7 @@
             { "path": "C:/8bit/git/aniol64ROM/aniol64.bin", "start": "0x0000" },
             { "path": "source.apl", "start": "0xC000" }
         ],
-        "execAddress": "apl_main", 
+        "execAddress": "run_debug", 
         "topOfStack": "0xBFFF"
     }
     ]
