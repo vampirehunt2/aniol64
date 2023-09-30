@@ -22,6 +22,7 @@ Expression      equ 8280h
 Vars            equ 8300h
 Procedures      equ 8400h
 
+
 run_debug:
     CALL apl_main
     CALL run_main
@@ -60,6 +61,7 @@ run_findProcedures:
     LD C, A             ; get an index into the two-byte-per-element procedure address table  
     LD B, 0
     ADD HL, BC          ; pointer to the procedure address table entry now in HL
+    LD (DataSeg), HL    ; the last procedure declared so far is the beginning of the data segment (will be incremented later)
     LD DE, (ProcAddr)
     LD (HL), E
     INC HL
@@ -68,7 +70,9 @@ run_findProcedures:
     CALL run_nextBC
     JR .loop
 .end:
-    INC HL              ; one byte beyond the end of the program bytecodes
+    LD HL, (DataSeg)
+    INC HL
+    INC HL              
     LD (DataSeg), HL    ; we can later start putting data (strings, arrays, records) from this address
     RET
 
@@ -141,6 +145,8 @@ run_execStmt:
     JP Z, run_ret
     CP STOP_B
     JP Z, run_stop
+    CP ARRAY_B
+    JP Z, run_declareArray
     ; TODO: handle unrecognised token
 
 ; moves HL to the next bytecode
@@ -794,7 +800,7 @@ run_execAssignment:
     JR NZ, .syntaxError
     LD HL, (StmtStart)  ; first bytecode of an assignment statement is a variable TODO: extract this to a routine
     LD A, (HL)          ; load the variable bytecode
-    AND 01111111b       ; get the variable index
+    AND 01111111b       ; get the variable index        ; TODO extract below code to run_getVarAddr
     SLA A               ; multiply it by 2, as numeric variables are 2 bytes long
     LD C, A
     LD B, 0
@@ -1023,6 +1029,32 @@ run_stop:
     CALL writeLn
     LD SP, (Trap)
     RET
+
+; declared array or record
+run_declareArray:
+    INC HL          ; move HL to the variable being declared
+    PUSH HL         ; save the pointer into the statement
+    LD A, (HL)      ; load variable index to A
+    AND 01111111b   ; get the variable index
+    SLA A           ; multiply it by 2, as numeric variables are 2 bytes long
+    LD C, A
+    LD B, 0
+    LD HL, Vars         
+    ADD HL, BC      ; get the variable address
+    LD BC, (DataSeg)
+    LD (HL), C      ; save the current pointer into the data segment as the value of the new variable...
+    INC HL          ; ...i.e. set the variable to be the address of the beggining of the free space...
+    LD (HL), B      ; ...in the data segment
+    POP HL          ; restore the pointer into the statement
+    CALL run_evaluate
+    LD HL, (DataSeg)
+    LD BC, (Expression + 1) ; the +1 skips the NUM_B bytecode
+    SLA C           ; multiply the result of the expression by 2...
+    RL  B           ; as the value of the expression means the number of 2-byte elements
+    ADD HL, BC
+    LD (DataSeg), HL
+    RET
+
 
 
 ; checks if the bytecode pointed to by HL is a value

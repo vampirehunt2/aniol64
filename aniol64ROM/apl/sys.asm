@@ -73,9 +73,12 @@ sys_rnd:
     CALL rndMod
     RET
 
-; an 8-bit peek
+; a 16-bit peek
 sys_peek:
-    LD A, (HL)
-    LD H, 0
-    LD L, A
+    PUSH IX
+    PUSH HL
+    POP IX
+    LD H, (IX + 1)
+    LD L, (IX + 0)
+    POP IX
     RET

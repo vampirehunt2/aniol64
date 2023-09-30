@@ -82,6 +82,7 @@ END_B			equ 'D'
 PROC_B			equ 'p'
 RET_B			equ 'R'
 STOP_B			equ 'T'
+ARRAY_B			equ 'A'
 NL_B			equ 00h
 
 ; keyword tokens and their corresponding bytecodes
@@ -98,7 +99,8 @@ WHILE_T:	defb "WHILE", 	0, WHILE_B
 LOOP_T:		defb "LOOP", 	0, LOOP_B
 FOR_T:		defb "FOR", 	0, 'f'
 NEXT_T:		defb "NEXT", 	0, 'N'
-ARRAY_T:	defb "ARR", 	0, 'A'
+ARRAY_T:	defb "ARR", 	0, ARRAY_B
+RECORD_T:	defb "REC", 	0, ARRAY_B	; records are internally represented identically to arrays.
 STRING_T:	defb "STR", 	0, 'S'	
 STOP_T: 	defb "STOP", 	0, STOP_B
  defb 0

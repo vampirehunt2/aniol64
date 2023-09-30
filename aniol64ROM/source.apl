@@ -1,4 +1,13 @@
-x = -10
-y = Abs(x*2) + 1
+ARR a 10
+ARR b 10*2
+REC r 122
+
 STOP
+
+PROC Test
+RET
+
+PROC Test2
+RET
+
 END
