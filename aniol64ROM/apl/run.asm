@@ -147,6 +147,8 @@ run_execStmt:
     JP Z, run_stop
     CP ARRAY_B
     JP Z, run_declareArray
+    CP STRING_B
+    JP Z, run_declareString
     ; TODO: handle unrecognised token
 
 ; moves HL to the next bytecode
@@ -1032,7 +1034,22 @@ run_stop:
 
 ; declared array or record
 run_declareArray:
-    INC HL          ; move HL to the variable being declared
+    CALL run_declare
+    SLA C           ; multiply the result of the expression by 2...
+    RL  B           ; as the value of the expression means the number of 2-byte elements
+    ADD HL, BC
+    LD (DataSeg), HL
+    RET
+
+run_declareString:
+    CALL run_declare
+    INC BC                  ; add one byte for the null-terminator
+    ADD HL, BC
+    LD (DataSeg), HL
+    RET
+
+run_declare:
+    INC HL          ; move HL to the variable being declared    ; TODO: most of this is the same as run_declareArray
     PUSH HL         ; save the pointer into the statement
     LD A, (HL)      ; load variable index to A
     AND 01111111b   ; get the variable index
@@ -1049,13 +1066,7 @@ run_declareArray:
     CALL run_evaluate
     LD HL, (DataSeg)
     LD BC, (Expression + 1) ; the +1 skips the NUM_B bytecode
-    SLA C           ; multiply the result of the expression by 2...
-    RL  B           ; as the value of the expression means the number of 2-byte elements
-    ADD HL, BC
-    LD (DataSeg), HL
     RET
-
-
 
 ; checks if the bytecode pointed to by HL is a value
 ; i.e a literal or a variable

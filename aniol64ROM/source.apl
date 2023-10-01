@@ -1,6 +1,7 @@
 ARR a 10
-ARR b 10*2
+STR b 10*2
 REC r 122
+REC q 2
 
 STOP
 
