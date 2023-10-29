@@ -17,6 +17,8 @@ StackPtr        equ PROGRAM_DATA + 10h  ; 2 bytes
 Trap            equ PROGRAM_DATA + 12h  ; stack pointer at the beggining of the run, to fall back onto in case of a syntax error
 DataSeg         equ PROGRAM_DATA + 14h
 ProcAddr        equ PROGRAM_DATA + 16h
+ArrIndex        equ PROGRAM_DATA + 18h
+ArrAddr         equ PROGRAM_DATA + 1Ah
 RunStack        equ 8240h   
 Expression      equ 8280h
 Vars            equ 8300h
@@ -35,6 +37,10 @@ run_init:
     LD (StmtStart), HL      ; initilise the line pointer to the beginning of the program
     LD HL, RunStack            ; initialise the soft stack
     LD (StackPtr), HL
+    LD HL, (ProgramPtr)
+    INC HL
+    INC HL
+    LD (DataSeg), HL
     CALL run_findStmtEnd
     RET
 
@@ -61,7 +67,6 @@ run_findProcedures:
     LD C, A             ; get an index into the two-byte-per-element procedure address table  
     LD B, 0
     ADD HL, BC          ; pointer to the procedure address table entry now in HL
-    LD (DataSeg), HL    ; the last procedure declared so far is the beginning of the data segment (will be incremented later)
     LD DE, (ProcAddr)
     LD (HL), E
     INC HL
@@ -70,10 +75,6 @@ run_findProcedures:
     CALL run_nextBC
     JR .loop
 .end:
-    LD HL, (DataSeg)
-    INC HL
-    INC HL              
-    LD (DataSeg), HL    ; we can later start putting data (strings, arrays, records) from this address
     RET
 
 run_syntaxError:
@@ -179,6 +180,8 @@ run_evaluate:
     LD A, (HL)
     CP SEPARATOR_B      ; check if end of statement is reached,
     JR Z, .eval         ; if yes, proceed to evaluating
+    CP ASSIGNMENT_B     
+    JR Z, .eval
     AND 10000000b       ; check if the bytecode is a variable
     CP 0
     JR NZ, .var         ; if yes, evaluate the variable
@@ -229,7 +232,11 @@ run_evaluate:
     JR .loop
 ; the expression is now copied to Expression.
 ; evaluate the expression
-.eval:                  
+.eval:      
+    CP SEPARATOR_B
+    JR Z, .store
+    LD A, SEPARATOR_B    
+.store:        
     LD (IX), A          ; storing the separator bytecode, that marks the end of the expression
 .evalloop:
     LD A, FALSE
@@ -313,6 +320,8 @@ run_evalFunction:
     LD A, (HL)
     CP SEPARATOR_B      ; checking for end of expression
     JR Z, .end          ; if end of expression reached, return
+    CP ASSIGNMENT_B
+    JR Z, .end
     CP SYSCALL_B
     JR NZ, .end        
     INC HL  
@@ -357,6 +366,8 @@ run_evalUnary:
     LD A, (HL)
     CP SEPARATOR_B      ; checking for end of expression
     JR Z, .end          ; if end of expression reached, return
+    CP ASSIGNMENT_B
+    JR Z, .end
     CALL run_isUnaryOperator    
     CP TRUE
     JR NZ, .next        ; if no, move to the next bytecode
@@ -426,6 +437,8 @@ run_evalIndex:
     LD A, (HL)
     CP SEPARATOR_B      ; checking for end of expression
     JR Z, .end          ; if end of expression reached, return
+    CP ASSIGNMENT_B
+    JR Z, .end
     CP NUM_B            ; check if we have a numerical value
     JR NZ, .next        ; if no, move to the next bytecode
     INC HL              ; if yes, skip over the numerical value
@@ -488,6 +501,8 @@ run_evalMul:
     LD A, (HL)
     CP SEPARATOR_B      ; checking for end of expression
     JR Z, .end          ; if end of expression reached, return
+    CP ASSIGNMENT_B
+    JR Z, .end
     CP NUM_B            ; check if we have a numerical value
     JR NZ, .next        ; if no, move to the next bytecode
     INC HL              ; if yes, skip over the numerical value
@@ -554,7 +569,7 @@ run_evalMul:
 .next:
     POP HL              ; restore the current pointer into the expression
     CALL run_nextBC     ; move to the next bytecode 
-    JR .loop
+    JP .loop
 .end:
     POP HL
     RET
@@ -566,6 +581,8 @@ run_evalAdd:
     LD A, (HL)
     CP SEPARATOR_B      ; checking for end of expression
     JR Z, .end          ; if end of expression reached, return
+    CP ASSIGNMENT_B
+    JR Z, .end
     CP NUM_B            ; check if we have a numerical value
     JR NZ, .next        ; if no, move to the next bytecode
     INC HL              ; if yes, skip over the numerical value
@@ -637,6 +654,8 @@ run_evalComp:
     LD A, (HL)
     CP SEPARATOR_B      ; checking for end of expression
     JP Z, .end          ; if end of expression reached, return
+    CP ASSIGNMENT_B
+    JP Z, .end
     CP NUM_B            ; check if we have a numerical value
     JP NZ, .next        ; if no, move to the next bytecode
     INC HL              ; if yes, skip over the numerical value
@@ -795,8 +814,12 @@ run_execAssignment:
     LD HL, (StmtStart)  ; first bytecode of an assignment statement is a variable
     INC HL              ; move HL to the next bytode after the variable
     LD A, (HL)          ; load the next bytecode into A
-    CP EQUAL_B          ; check if the next token is the assignment operator
-    JR NZ, .syntaxError
+    CP ASSIGNMENT_B     ; check if the next token is the assignment operator
+    JR Z, .eval
+    CP INDEX_B
+    JP Z, run_execArrAssignment
+    JR .syntaxError
+.eval:
     CALL run_evaluate
     CP 0                ; check exit code for success
     JR NZ, .syntaxError
@@ -817,6 +840,52 @@ run_execAssignment:
 .syntaxError:
     ; TODO raise syntax error
     RET
+
+run_execArrAssignment:
+    PUSH HL
+    DEC HL                  ; point HL to the array variable
+    ; get the value of the array variable (the address of the variable)
+    LD A, (HL)  
+    AND 01111111b           ; get the variable index
+    SLA A                   ; multiply it by 2, as numeric variables are 2 bytes long
+    LD C, A
+    LD B, 0
+    LD HL, Vars         
+    ADD HL, BC  
+    LD C, (HL)
+    INC HL
+    LD B, (HL)      
+    LD (ArrAddr), BC        ; store the value of the array variable
+    ;
+    POP HL
+    PUSH HL
+    CALL run_evaluate       ; evaluate the expression within the index
+    LD HL, (Expression +1)  ; load evaluate result to HL, skipping the NUM_B bytecode
+    SLA L                   ; multiply HL by 2, which is the size of a value
+    RL H
+    LD BC, (ArrAddr)
+    ADD HL, BC              ; array element address now in HL
+    LD (ArrAddr), HL        ; store the element address
+    POP HL
+.loop:                      ; loops to the assignment operator
+    LD A, (HL)
+    CP ASSIGNMENT_B
+    JR Z, .break
+    CP SEPARATOR_B
+    JR Z, .syntaxErr
+    INC HL
+    JR .loop
+.break:
+    CALL run_evaluate
+    LD HL, (Expression +1)  ; load evaluate result to HL, skipping the NUM_B bytecode
+    LD IX, (ArrAddr)
+    LD (IX), L
+    LD (IX+1), H
+    RET
+.syntaxErr:
+    ; TODO
+    RET
+
 
 ; "executes" an else statement.
 ; actually, else is not executed. If an else statement is encountered out in the wild, 
@@ -1049,7 +1118,7 @@ run_declareString:
     RET
 
 run_declare:
-    INC HL          ; move HL to the variable being declared    ; TODO: most of this is the same as run_declareArray
+    INC HL          ; move HL to the variable being declared
     PUSH HL         ; save the pointer into the statement
     LD A, (HL)      ; load variable index to A
     AND 01111111b   ; get the variable index

@@ -28,6 +28,7 @@ GREATER_T: 		defb "<", 	0
 LESSER_T: 		defb ">", 	0
 GREATER_EQUAL_T:defb ">=", 	0
 LESSER_EQUAL_T:	defb "<=", 	0
+ASSIGNMENT_T:	defb "<-", 	0
 CONJUNCTION_T: 	defb "&", 	0
 ALTERNATIVE_T: 	defb "|", 	0
 NOT_T: 			defb "!", 	0
@@ -44,8 +45,7 @@ SUB_B			equ '-'
 MINUS_B			equ '~'
 MUL_B			equ '*' 	
 DIV_B 			equ '/' 	
-MOD_B 			equ '\' 	
-ASSIGN_B 		equ ':' 	
+MOD_B 			equ '\' 		
 EQUAL_B			equ '=' 	
 NOT_EQUAL_B		equ 'n' 	
 QUOTE_B			equ '''' 	
@@ -68,6 +68,7 @@ TERMINATOR_B	equ ';'
 COMMA_B			equ ','
 
 ; other bytecodes
+ASSIGNMENT_B	equ 'a'
 VAR_B			equ 'v'
 USERCALL_B		equ 'u'
 SYSCALL_B		equ 's'
@@ -75,7 +76,7 @@ NUM_B			equ 'm'
 COMMENT_B		equ '#'
 IF_B			equ 'I'
 ELSE_B			equ "E"
-ENDIF_B			equ "e"
+ENDIF_B			equ 'e'
 LOOP_B			equ 'L'
 WHILE_B			equ 'W'
 END_B			equ 'D'
@@ -505,6 +506,8 @@ apl_tokenizeOperator:
 	JR Z, .ld
 	CP '='
 	JR Z, .ld
+	CP '-'
+	JR Z, .ld
 	JR .end
 .ld:
 	CALL dos_fRead
@@ -882,6 +885,9 @@ apl_getOperatorCode:
 	LD IX, LESSER_EQUAL_T
 	CALL str_cmp
 	JR Z, .le
+	LD IX, ASSIGNMENT_T
+	CALL str_cmp
+	JR Z, .ass
 	LD A, 0		; not a known operator
 	RET
 .neq:
@@ -892,6 +898,9 @@ apl_getOperatorCode:
 	RET
 .le:
 	LD A, LESSER_EQUAL_B
+	RET
+.ass:
+	LD A, ASSIGNMENT_B
 	RET
 .one:
 	LD A, (IY)
