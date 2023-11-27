@@ -10,14 +10,6 @@
  device NOSLOT64K 
 
  org 0000h
-
-	LD SP, RAMTOP   ; initialise stack pointer to the top of available RAM
-	IM 2			; set interupt mode to 2
-	LD A, 01h	   ; higher byte of the interrupt vector table
-	LD I, A		 ; set the vector table address
-	;CALL copyRom2Ram
-	EI				; enable interrupts
-	CALL resetNmiHandler
 	JP boot		 ; jump over the interrupt handlers for NMI and mode 1 INT
 
  ds 0020h - $, 0
@@ -80,8 +72,26 @@ Ready: defb	 "Ready", 0
 Hello: defb	 "Hello", 0
 
 boot:
-	;LD A, 25
-	;CALL delay	; make sure all  subsystems are initialised before we start booting
+	; init the memory map
+ 	LD B, 0				; clear B, which will appear on A15-A8 during the following OUT instructions
+	LD C, CBAR
+	LD A, 0C8h			; sets common area 1 to C000 and bank area to 8000 in the logical address space
+	OUT (C), A
+	LD C, BBR
+	LD A, 78h			; sets the bank area to 80000 in the physical space
+	OUT (C), A
+	LD C, CBR			
+	LD A, 78h			; sets the common area1 to 84000 in the physical space
+	OUT (C), A
+
+	;
+	LD SP, RAMTOP   ; initialise stack pointer to the top of available RAM
+	IM 2			; set interupt mode to 2
+	LD A, 01h	   ; higher byte of the interrupt vector table
+	LD I, A		 ; set the vector table address
+	;CALL copyRom2Ram
+	EI				; enable interrupts
+	CALL resetNmiHandler
 	
 	; init the RNG:
 	LD A, 0
@@ -89,19 +99,19 @@ boot:
 	LD (Random + 1), A
 	
 	; init the display
-	CALL dspInit
+	;CALL dspInit
 
 	; initialise the keyboard
-	CALL keyInit
+	;CALL keyInit
 
 	; greetings
-	CALL nextLine
-	LD IX, Aniol
-	CALL writeLn
+	;CALL nextLine
+	;LD IX, Aniol
+	;CALL writeLn
 	
 	; set up permanent storage
-	CALL dos_setUpCf
-	CALL dos_checkNvram
+	;CALL dos_setUpCf
+	;CALL dos_checkNvram
 	
 	CALL bzr_beep
 	LD A, 25
@@ -187,6 +197,7 @@ resetNmiHandler:
  include onp.asm
  include edit.asm
  include tar.asm
+ include reg.asm
 
 ; high ROM code
   ds HIGHROM - $, 0

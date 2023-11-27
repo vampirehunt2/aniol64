@@ -7,7 +7,7 @@
 ;
 ;----------------------------------------------------
 
-BZR_PORT equ 10111111b  ; BFh buzzer is activated by A6
+BZR_PORT equ 10000000b  ; 80h 
 
 bzr_beep:
 		PUSH AF
