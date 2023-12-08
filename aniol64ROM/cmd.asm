@@ -107,9 +107,9 @@ cmd_main:
         CALL str_cmp
         JP Z, .beep
 		; term program
-		LD IY, Term
-		CALL str_cmp
-		JP Z, term_main
+		;LD IY, Term
+		;CALL str_cmp
+		;JP Z, term_main
 		; disk info
 		LD IY, DiskInfo
 		CALL str_cmp
@@ -276,7 +276,7 @@ cmd_main:
 		CALL dos_format
 		JP cmd_main
 .tar:
-		CALL tar_main
+		;CALL tar_main
 		JP cmd_main
 .apl:
 		CALL apl_main

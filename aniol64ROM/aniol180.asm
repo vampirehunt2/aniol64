@@ -97,29 +97,29 @@ boot:
 	LD A, 0
 	LD (Random), A
 	LD (Random + 1), A
+
+	CALL bzr_beep
+	LD A, 25
+	CALL delay
+	CALL bzr_beep
+	LD A, 25
+	CALL delay
+	CALL bzr_beep
 	
 	; init the display
-	;CALL dspInit
+	CALL dspInit
 
 	; initialise the keyboard
 	;CALL keyInit
 
 	; greetings
-	;CALL nextLine
-	;LD IX, Aniol
-	;CALL writeLn
+	CALL nextLine
+	LD IX, Aniol
+	CALL writeLn
 	
 	; set up permanent storage
 	;CALL dos_setUpCf
 	;CALL dos_checkNvram
-	
-	CALL bzr_beep
-	LD A, 25
-	CALL delay
-	CALL bzr_beep
-	LD A, 25
-	CALL delay
-	CALL bzr_beep
 	
 	LD IX, Ready
 	CALL writeLn
@@ -168,13 +168,12 @@ resetNmiHandler:
 ; device drivers
  include dev/bzr.asm
  ;include dev/pal.asm
- include dev/vga.asm
- ;include dev/tm.asm
- include dev/dart.asm
+ ;include dev/vga.asm
+ include dev/tm.asm
  include dev/cf.asm
  include dev/kbd.asm
  ;include dev/ps2.asm
- include dev/cas.asm
+ ;include dev/cas.asm
 
 ; libraries
  include lib/util.asm
@@ -190,13 +189,13 @@ resetNmiHandler:
 ; programs
  include cmd.asm
  include mon.asm
- include term.asm
+ ;include term.asm
  include dos.asm
  include snake.asm
  include rogue.asm
  include onp.asm
  include edit.asm
- include tar.asm
+ ;include tar.asm
  include reg.asm
 
 ; high ROM code
