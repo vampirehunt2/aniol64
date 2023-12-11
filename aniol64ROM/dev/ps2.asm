@@ -7,6 +7,10 @@ EXT_KEY equ 0E0h
 LSHIFT equ 12h
 RSHIFT equ 59h
 TXA	equ 01101000b	; DTR, 8 bits, Tx enabled
+PS2_DATA_PORT 	equ	0FFh
+PS2_START_BIT 	equ 1		; first bit is the start bit
+PS2_PARITY_BIT	equ 10		; tenth bit is the parity bit
+PS2_STOP_BIT	equ 11		; eleventh bit is the stop bit
 
 MOVE_N	equ '8'
 MOVE_S equ 'k'
@@ -29,38 +33,86 @@ handleInt:
 
 keyInit:
         LD A, 0
-        LD (KbdBuff), A		; init the keyboard buffer to avoid a bogus character during the first read
+        LD (KbdBuff), A			; init the keyboard buffer to avoid a bogus character during the first read
 		LD A, TRUE
 		LD (Cursor), A
 		LD (Echo), A
-		LD HL, ps2_initSeq
-		LD B, 10
-		LD C, DART_A_CMD
-		OTIR
-		LD A, 0
-		LD (Ps2Shift), A
-		LD A, TXA
-		LD (TxChA), A
-		CALL ps2_readScancode
-		LD A, 0FFh				; reset command
-		CALL ps2_transmit		
-		CALL ps2_wait4Tx		; wait for transmission to complete
-		CALL ps2_readScancode	; consume BAT codes
+		; enable interrupts
+		LD A, (IntTrapControl)
+		LD B, 0
+		LD C, ITC
+		OR 00000010b			; set bit 1, which it ITE1, unmasking INT1
+		OUT (C), A
+		LD (IntTrapControl), A
+		; consume BAT codes
+		CALL ps2_readScancode	
 		CALL ps2_readScancode
 		CALL ps2_readScancode
 		CALL ps2_readScancode
         RET
+
+
+; shifts in a single bit of a PS2 scancode
+ps2_shiftIn:
+	EX AF, AF'					; 4 clock cycles
+	PUSH BC						; 11
+	IN A, (PS2_DATA_PORT)		; 11	reads one bit on D7 from the PS2 data line
+	AND 10000000b				; 7 	isolates D7
+	LD B, A						; 8		store the bit for later
+	LD (ShiftCount), A			; 13
+	INC A						; 4
+	LD A, (ShiftCount)			; 13	increment the number of bits shifted in
+	CP PS2_STOP_BIT				; 7
+	JR Z, .stopBit				; 7
+	CP PS2_START_BIT			; 7		all the non-data bits are checked for errors, and not shifted it
+	JR Z, .startBit				; 7
+	CP PS2_PARITY_BIT			; 7
+	JR Z, .parityBit			; 7
+	LD A, (ShiftReg)			; 13
+	OR B						; 4		OR with the previously-stored data bit 
+	SRL A						; 8		shift the scancode by one bit
+	LD (ShiftReg), A			; 13	store the new value of the shifted byte
+	JR .end						; 12
+.startBit:
+	LD A, B
+	CP 0
+	JR NZ, .framingErr
+	JR Z, .end
+.parityBit:
+	; TODO: handle parity checking
+	JR .end
+.stopBit:
+	LD A, (ShiftBit)
+	CP 0
+	JR Z, .framingErr
+	; successfully reached the end of the transmission
+	LD A, (KbdBuff)
+	CP 0
+	JR Z, .end					; ignoring the scancode if the buffer is full 
+	LD A, (ShiftReg)			; copy the shifted-in scancode to the keyboard buffer
+	LD (KbdBuff), A
+	LD A, 0
+	LD (ShiftReg), A
+	LD (ShiftCount), A			; get things ready for the next transmission
+	JR .end
+.framingErr: 	; TODO: handle framing errors
+.parityErr:		; TODO: handle parity errors
+.end:
+	POP BC						; 11
+	EX AF, AF'					; 4
+	EI							; 4
+	RETI						; 14
 		
-; synchronously reads a scancode from the serial port
+; synchronously reads a scancode from the PS2 keyboard
 ; when the scancode is available, it's code is in A
 ps2_readScancode:
-		IN A, (DART_A_CMD)
-		BIT 0, A
-		JR Z, ps2_readScancode
-		IN A, (DART_A_DAT)
+		LD A, (KbdBuff)
+		CP 0
+		JR Z, ps2_readScancode		; wait until there's a value in the keyboard buffer
 		RET
 		
-; converts a scancode to the corresponding ascii character
+; converts a scancode to the corresponding ascii character
+
 ps2_scancode2asc:
 		PUSH BC
 		PUSH HL
@@ -78,12 +130,11 @@ ps2_scancode2asc:
 		LD A, (HL)
 		POP HL
 		POP BC
-		RET
+		RET
 
-
 readKeyAsync:
-		RET
-
+		RET
+
 keyInput:
 		CALL ps2_readScancode
 		CP KEY_UP
@@ -112,8 +163,9 @@ keyInput:
 		JR Z, .shiftUp
 		CP RSHIFT
 		JR Z, .shiftUp
-		JR keyInput
-
+		JR keyInput
+
+
 readKey:
 		PUSH BC
 		CALL keyInput
@@ -137,13 +189,15 @@ readKey:
         LD A, ' '
         CALL putChar
         CALL cursorLShift
-        JR .noEcho
+        JR .noEcho
+
 
 ; reads a line from keyboard
 ; result in LineBuff
 ; result is only valid until next call of readLine
 ; if the result needs to persist, it needs to be copied to elswhere in memory
-; TODO: check for max line length (buffer overflow)
+; TODO: check for max line length (buffer overflow)
+
 readLine:
 		PUSH BC
         LD BC, LineBuff       ; point BC to the beginning of the keyboard buffer
@@ -168,83 +222,10 @@ readLine:
         LD A, 0                ; store end of line
         LD (BC), A
 		POP BC
-        RET
+        RET
 
-;1)   Bring the Clock line low for at least 100 microseconds.
-;2)   Bring the Data line low.
-;3)   Release the Clock line.
-;4)   Wait for the device to bring the Clock line low.
-;5)   Set/reset the Data line to send the first data bit
-;6)   Wait for the device to bring Clock high.
-;7)   Wait for the device to bring Clock low.
-;8)   Repeat steps 5-7 for the other seven data bits and the parity bit
-;9)   Release the Data line.
-;10) Wait for the device to bring Data low.
-;11) Wait for the device to bring Clock  low.
-;12) Wait for the device to release Data and Clock
-ps2_transmit:
-		CALL ps2_wait4Tx
-		CALL ps2_clockInhibit
-		CALL delay1520us
-		CALL ps2_dataInhibit
-		CALL ps2_clockRelease
-		OUT (DART_A_DAT), A
-		CALL ps2_dataRelease
-		RET
-		
-ps2_wait4Tx:
-		PUSH AF
-.loop:
-		IN A, (DART_A_CMD)
-		AND 00000100b
-		CP 0
-		JR Z, .loop
-		POP AF
-		RET
-
-ps2_clockInhibit:
-		PUSH AF
-		LD A, 5				; writing to WR5
-		OUT (DART_A_CMD), A
-		LD A, (TxChA)		; get previous value of WR5
-		OR 10000000b		; set  DTR (D7)	
-		OUT (DART_A_CMD), A
-		LD (TxChA), A
-		POP AF
-		RET
 	
-ps2_clockRelease:
-		PUSH AF				
-		LD A, 5				; writing to WR5
-		OUT (DART_A_CMD), A
-		LD A, (TxChA)		; get previous value of WR5
-		AND 01111111b		; clear  DTR (D7)
-		OUT (DART_A_CMD), A	
-		LD (TxChA), A
-		POP AF
-		RET
 	
-ps2_dataInhibit:
-		PUSH AF
-		LD A, 5				; writing to WR5
-		OUT (DART_A_CMD), A
-		LD A, (TxChA)		; get previous value of WR5
-		OR 00010000b		; send break (D4)
-		OUT (DART_A_CMD), A
-		LD (TxChA), A
-		POP AF
-		RET
-	
-ps2_dataRelease:
-		PUSH AF				
-		LD A, 5				; writing to WR5
-		OUT (DART_A_CMD), A
-		LD A, (TxChA)		; get previous value of WR5
-		AND 11101111b		; clear break (D4)
-		OUT (DART_A_CMD), A	
-		LD (TxChA), A
-		POP AF
-		RET
 		
 ps2Scancodes:
 		defb 00		; scancode 00

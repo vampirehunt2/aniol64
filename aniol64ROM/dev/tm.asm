@@ -12,6 +12,7 @@ CR	  equ 13
 Blank: defb "                                    ", 0
 
 dspInit:
+	; initialise the ASCI that communicates with TellyMate
 	LD B, 0				; making sure bits A15-A8 of the I/O port number are 0 for the subsequent I/O operations
 	LD C, CNTLA0
 	LD A, 00111100b		; MPE off, RE off, TE on, RTS on, EFR on, mode: 8 data bits, no parity, 1 stop bit
@@ -22,6 +23,12 @@ dspInit:
 	LD C, STAT0 
 	LD A, 00h			; disable interrupts
 	CALL tm_txWaitSend
+	; initialise the TellyMate
+	LD C, TDR0
+	LD A, 'V'			
+	CALL tm_txWaitSend
+	CALL tm_txWaitSend
+	CALL clrScr
 	; LD A, 25
 	; CALL delay
 	; CALL tm_transmitEnable

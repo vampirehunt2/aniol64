@@ -12,3 +12,5 @@ CNTLB0  equ 02h         ; ASCI Control Register B, Channel 0
 STAT0   equ 04h         ; ASCI Status Channel 0
 TDR0    equ 06h         ; ASCI Transmit Data Register Channel 0
 TSR0    equ 08h         ; ASCI Receive Data Register Channel 0
+
+ITC     equ 34h         ; INT/TRAP Control Register        

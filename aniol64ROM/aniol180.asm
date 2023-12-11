@@ -18,12 +18,6 @@ Build: defw 0000h
 
  ds 0038h - $, 0
 	; respond to mode 1 interrupt
-	EX AF, AF'	   
-	EXX
-	CALL handleInt 
-	EXX
-	EX AF, AF'		
-	EI
 	RETI
 
  ds 0066h - $, 0
@@ -35,11 +29,11 @@ Build: defw 0000h
 	EI
 	RETN
 
- ds 0100h - $, 0
-	; interrupt vector table
-KeyClickHandler: defb 38h, 00h ; we're pointing back at the mode 1 INT handler
-									; so that the routine works for both mode 1 and 2
-									; note, low order byte goes first
+ ds 0100h - $, 0					; interrupt vector table
+KeyClickHandler: defb 80, 10		; INT1 interrupt vector (least significant byte first)
+
+ ds 0180h - $, 0						; interrupt handler table
+	JP ps2_shiftIn
 
 
 
@@ -56,13 +50,16 @@ Echo 				equ 8013h
 Cursor				equ 8014h
 TxChA				equ 8015h
 TxChB				equ 8016h
+ShiftReg			equ 8017h		; shift register for shifting in PS2 scancodes
+ShiftCount			equ 8018h		; keeps track of the number of bits shifted in
+IntTrapControl		equ 801Ah
 NmiCount 			equ 8035h		; 2 byte number
 Random 				equ 8037h		; 2 byte number
 Banks 				equ 8039h
 CurX 				equ 8040h
 CurY 				equ 8041h
 customNmiHandler 	equ 8042h		; 3 byte procedure, either RET or JP **
-Ps2Shift			equ 8045h
+Ps2Shift			equ 8045h		; indicates whether a shift key was pressed
 DOS_AREA			equ 8046h
 LineBuff 			equ 8100h		; 256 byte buffer
 PROGRAM_DATA 		equ 8200h
@@ -87,8 +84,8 @@ boot:
 	;
 	LD SP, RAMTOP   ; initialise stack pointer to the top of available RAM
 	IM 2			; set interupt mode to 2
-	LD A, 01h	   ; higher byte of the interrupt vector table
-	LD I, A		 ; set the vector table address
+	LD A, 01h	   	; higher byte of the interrupt vector table
+	LD I, A		 	; set the vector table address
 	;CALL copyRom2Ram
 	EI				; enable interrupts
 	CALL resetNmiHandler
@@ -171,8 +168,8 @@ resetNmiHandler:
  ;include dev/vga.asm
  include dev/tm.asm
  include dev/cf.asm
- include dev/kbd.asm
- ;include dev/ps2.asm
+ ;include dev/kbd.asm
+ include dev/ps2.asm
  ;include dev/cas.asm
 
 ; libraries
