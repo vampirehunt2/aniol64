@@ -19,7 +19,7 @@ DIV_T: 			defb "/", 	0
 MOD_T: 			defb "\\", 	0
 EQUAL_T:		defb "=", 	0
 NOT_EQUAL_T:	defb "<>", 	0
-QUOTE_T:		defb "'", 	0
+QUOTE_T:		defb "\"", 	0
 LEFT_PAREN_T:	defb "(", 	0
 RIGHT_PAREN_T: 	defb ")", 	0
 LEFT_BRACKET_T:	defb "[", 	0
@@ -48,7 +48,7 @@ DIV_B 			equ '/'
 MOD_B 			equ '\' 		
 EQUAL_B			equ '=' 	
 NOT_EQUAL_B		equ 'n' 	
-QUOTE_B			equ '''' 	
+QUOTE_B			equ '"' 	
 LEFT_PAREN_B	equ '(' 	
 RIGHT_PAREN_B 	equ ')' 	
 LEFT_BRACKET_B	equ '[' 	

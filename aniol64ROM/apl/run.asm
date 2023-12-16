@@ -176,6 +176,21 @@ run_nextBC:
 run_evaluate:   
     LD IX, Expression
     INC HL              ; assuming HL is pointing to the byte before the expression
+    LD A, (HL)
+    CP QUOTE_B          ; check if the expression is a string constant
+    JR NZ, .loop        ; if not, evaluate a numeric expression
+    INC HL              ; otherwise, evaluate the address of the string 
+    PUSH HL
+    POP BC
+    LD HL, Expression
+    LD (HL), NUM_B          
+    INC HL
+    LD (HL), C
+    INC HL
+    LD (HL), B
+    INC HL
+    LD (HL), SEPARATOR_B
+    JP .end
 .loop:                  ; this loop copies the expression to Expression, evaluating all the variables in the process
     LD A, (HL)
     CP SEPARATOR_B      ; check if end of statement is reached,
