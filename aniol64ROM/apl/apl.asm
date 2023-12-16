@@ -1,11 +1,11 @@
 ; apl tokenizer
 
-SpecialChars: defb ".~+-*/\\:=[]()<>&|!@^,;\n\r", 0
+SpecialChars: defb ".~+-*/\\:=[]()<>{}#&|!@^,;\n\r", 0
 
 
 ;
-;	# 	array index
-;	{}	also array index
+;	# 	string index
+;	{}	also string index
 ;	%	comment
 ;	;	same as ENDIF
 ;
@@ -73,7 +73,7 @@ VAR_B			equ 'v'
 USERCALL_B		equ 'u'
 SYSCALL_B		equ 's'
 NUM_B			equ 'm'	
-COMMENT_B		equ '#'
+COMMENT_B		equ '%'
 IF_B			equ 'I'
 ELSE_B			equ "E"
 ENDIF_B			equ 'e'
@@ -229,11 +229,11 @@ apl_nextToken:
 	JP Z, apl_tokenizeHex
 	;
 	LD A, B
-	CP ''''
+	CP '"'
 	JP Z, apl_tokenizeString
 	;
 	LD A, B
-	CP '#'
+	CP '%'
 	JP Z, apl_tokenizeComment
 	RET
 
@@ -593,11 +593,14 @@ apl_processBuiltInFunction:
 	LD (ProgramPtr), HL
 	RET
 
+; tokenizes the comment
+; since comments are not present in the compiled bytecode
+; the comment is not processed and is discarded after tokenization
 apl_tokenizeComment:
 	LD HL, Token
 .loop:
 	CALL dos_fRead
-	CP 13
+	CP LF
 	JR Z, .end
 	LD (HL), A
 	INC HL
@@ -608,22 +611,34 @@ apl_tokenizeComment:
 	RET 
 
 apl_tokenizeString
-	LD HL, Token
+	LD HL, (ProgramPtr)
 	CALL dos_fRead	; read the opening quote
 	LD (HL), A
 	INC HL
 .loop:
 	CALL dos_fRead
-	CP ''''
-	JR Z, .end
+	CP '"'
+	JR Z, .endQuote
+	CP SEPARATOR_B 
+	JR Z, .nl
+	CP LF
+	JR Z, .nl
+	CP CR
+	JR Z, .nl
 	LD (HL), A
 	INC HL
 	JR .loop
-.end:
-	LD (HL), ''''
-	INC HL
+.endQuote:
 	LD (HL), 0
 	INC HL
+	JR .end
+.nl:
+	LD (HL), 0
+	INC HL
+	LD (HL), SEPARATOR_B
+	INC HL
+.end:
+	LD (ProgramPtr), HL
 	RET 
 
 ; checks whether the character in B is an lowercaseletter

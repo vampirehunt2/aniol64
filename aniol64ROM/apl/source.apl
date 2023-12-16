@@ -1,3 +1,4 @@
+STR s "test"
 ARR a 4
 ARR b 4
 
