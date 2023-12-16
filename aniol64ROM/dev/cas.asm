@@ -13,4 +13,5 @@ cas_init:
 	LD B, 10
 	LD C, DART_A_CMD
 	OTIR
+	RET
 
