@@ -1,4 +1,4 @@
-STR s "test"
+STR s "test" %test string
 ARR a 4
 ARR b 4
 

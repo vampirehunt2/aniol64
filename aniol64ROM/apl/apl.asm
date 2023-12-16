@@ -233,7 +233,7 @@ apl_nextToken:
 	JP Z, apl_tokenizeString
 	;
 	LD A, B
-	CP '%'
+	CP COMMENT_B
 	JP Z, apl_tokenizeComment
 	RET
 
@@ -601,6 +601,8 @@ apl_tokenizeComment:
 .loop:
 	CALL dos_fRead
 	CP LF
+	JR Z, .end
+	CP CR
 	JR Z, .end
 	LD (HL), A
 	INC HL
