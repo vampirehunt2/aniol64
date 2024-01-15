@@ -1,19 +1,20 @@
-s <- "test" %test string
-ARR a 4
-ARR b 4
-
-i<-0
-WHILE i<4
-    a[i]<-i
-    b[i]<-i*10
-    i<-i+1
+x<-1
+WHILE x<20
+    d<-2
+    p<-1
+    WHILE d<x
+        IF x\d=0
+            d<-x
+            p<-0
+        ELSE
+            d<-d+1
+        ENDIF
     LOOP
-
-i<-0
-WHILE i<4
-    a[i]<-a[i]+b[i]
-    i<-i+1
-    LOOP
-
+    IF p=1
+        Write x
+        NewLn
+    ENDIF
+    x<-x+1
+LOOP 
 STOP
 END
