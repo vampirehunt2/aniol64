@@ -117,6 +117,8 @@ SYS_ABS_B	equ 05h
 SYS_RND_B	equ	06h
 SYS_PEEK_B	equ 07h
 
+SYS_WRITES_B equ 08h
+
 BuiltInFunctions:
 READ_T:		defb "Read", 	0, SYS_READ_B
 WRITE_T:	defb "Write", 	0, SYS_WRITE_B
@@ -126,6 +128,8 @@ NEWLN_T:	defb "NewLn", 	0, SYS_NEWLN_B
 ABS_T:		defb "Abs", 	0, SYS_ABS_B
 RND_T:		defb "Rnd",		0, SYS_RND_B
 PEEK_T:		defb "Peek", 	0, SYS_PEEK_B
+
+WRITES_T:	defb "WriteS",	0, SYS_WRITES_B
  defb 0
 
 ; 128 variables with names of up to 8 characters, 

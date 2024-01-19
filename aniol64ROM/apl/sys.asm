@@ -82,3 +82,15 @@ sys_peek:
     LD L, (IX + 0)
     POP IX
     RET
+
+sys_writeString:
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD IX, (Expression + 1)
+    CALL writeStr
+    RET
+.syntaxErr:
+    ; TODO
+    RET
+

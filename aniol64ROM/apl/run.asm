@@ -1057,6 +1057,8 @@ run_execSyscall:
     JP Z, sys_nextLn
     CP SYS_READ_B
     JP Z, sys_read
+    CP SYS_WRITES_B
+    JP Z, sys_writeString
     RET
 
 ; executes a system function
