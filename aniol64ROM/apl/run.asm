@@ -902,6 +902,8 @@ run_execAssignment:
     JR Z, .eval
     CP INDEX_B
     JP Z, run_execArrAssignment
+    CP STRINDEX_B
+    JP Z, run_execStrAssignment
     JR .syntaxError
 .eval:
     CALL run_evaluate
@@ -965,6 +967,50 @@ run_execArrAssignment:
     LD IX, (ArrAddr)
     LD (IX), L
     LD (IX+1), H
+    RET
+.syntaxErr:
+    ; TODO
+    RET
+
+; performs an assignment to a string element
+; TODO much of this code is duplicated from run_execArrAssignment
+run_execStrAssignment:
+    PUSH HL
+    DEC HL                  ; point HL to the string variable
+    ; get the value of the string variable (the address of the variable)
+    LD A, (HL)  
+    AND 01111111b           ; get the variable index
+    SLA A                   ; multiply it by 2, as numeric variables are 2 bytes long
+    LD C, A
+    LD B, 0
+    LD HL, Vars         
+    ADD HL, BC  
+    LD C, (HL)
+    INC HL
+    LD B, (HL)      
+    LD (ArrAddr), BC        ; store the value of the string variable, reusing the ArrAddr vzariable here
+    ;
+    POP HL
+    PUSH HL
+    CALL run_evaluate       ; evaluate the expression within the index
+    LD HL, (Expression +1)  ; load evaluate result to HL, skipping the NUM_B bytecode
+    LD BC, (ArrAddr)        ; TODO, this doesn't allow for array operators within array operators. ArrAddr should be stored on stack instead
+    ADD HL, BC              ; array element address now in HL
+    LD (ArrAddr), HL        ; store the element address
+    POP HL
+.loop:                      ; loops to the assignment operator
+    LD A, (HL)
+    CP ASSIGNMENT_B
+    JR Z, .break
+    CP SEPARATOR_B
+    JR Z, .syntaxErr
+    INC HL
+    JR .loop
+.break:
+    CALL run_evaluate
+    LD HL, (Expression +1)  ; load evaluate result to HL, skipping the NUM_B bytecode
+    LD IX, (ArrAddr)
+    LD (IX), L
     RET
 .syntaxErr:
     ; TODO

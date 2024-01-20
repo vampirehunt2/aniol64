@@ -501,7 +501,7 @@ trimDec:
         DJNZ .loop
 .end:
         LD A, C
-        CP TRUE
+        CP TRUE         ; check if number is negative
         RET NZ
         DEC IX
         LD (IX), '-'
