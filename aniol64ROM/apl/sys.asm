@@ -94,3 +94,14 @@ sys_writeString:
     ; TODO
     RET
 
+; returns the length of a string
+sys_len:
+    PUSH IX
+    PUSH HL
+    POP IX
+    CALL str_len
+    LD L, A
+    LD H, 0
+    POP IX
+    RET
+

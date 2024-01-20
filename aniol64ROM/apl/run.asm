@@ -176,27 +176,14 @@ run_nextBC:
 run_evaluate:   
     LD IX, Expression
     INC HL              ; assuming HL is pointing to the byte before the expression
-    LD A, (HL)
-    CP QUOTE_B          ; check if the expression is a string constant
-    JR NZ, .loop        ; if not, evaluate a numeric expression
-    INC HL              ; otherwise, evaluate the address of the string 
-    PUSH HL
-    POP BC
-    LD HL, Expression
-    LD (HL), NUM_B          
-    INC HL
-    LD (HL), C
-    INC HL
-    LD (HL), B
-    INC HL
-    LD (HL), SEPARATOR_B
-    JP .end
 .loop:                  ; this loop copies the expression to Expression, evaluating all the variables in the process
     LD A, (HL)
     CP SEPARATOR_B      ; check if end of statement is reached,
     JR Z, .eval         ; if yes, proceed to evaluating
     CP ASSIGNMENT_B     
     JR Z, .eval
+    CP QUOTE_B          ; check if the bytecode is a string constant
+    JR Z, .string       ; if yes, evaluate the string
     AND 10000000b       ; check if the bytecode is a variable
     CP 0
     JR NZ, .var         ; if yes, evaluate the variable
@@ -208,6 +195,22 @@ run_evaluate:
     CP USERCALL_B
     JR Z, .call          ; ...as are user-defined procedures
     JR .other
+.string:
+    LD A, NUM_B
+    LD (IX), A          ; store the number indicator
+    INC IX
+    INC HL              ; move to the first character of the string
+    LD (IX), L          ; store lower byte of string address
+    INC IX
+    LD (IX), H          ; store higher byte of string address
+    INC IX
+.strSkip:               ; skip to the end of the string
+    INC HL
+    LD A, (HL)
+    CP 0                ; look for null terminator
+    JR NZ, .strSkip
+    INC HL              ; move HL past the null terminator to the next bytecode
+    JR .loop
 .var:
     LD A, (HL)
     AND 01111111b       ; get the variable index
@@ -372,6 +375,12 @@ run_evalFunction:
     JP .loop
 .end:
     POP HL
+    RET
+
+; TODO consider not copying the entire string to the Expression
+; but instead evaluating the string upon creating the Expression
+run_evalString:
+
     RET
 
 run_evalUnary:
@@ -1072,6 +1081,8 @@ run_execFunction:
     JP Z, sys_rnd
     CP SYS_PEEK_B
     JP Z, sys_peek
+    CP SYS_LEN_B
+    JP Z, sys_len
     RET
 
 

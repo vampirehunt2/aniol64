@@ -1,4 +1,3 @@
-WriteS "Hello"
-x<-" world"
-WriteS x
+x<-Len("Hello World")+2
+Write x
 END

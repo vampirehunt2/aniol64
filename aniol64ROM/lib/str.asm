@@ -10,7 +10,8 @@
 ; compares two null-terminated strings
 ; IX, IY: addresses of the strings to compare
 ; result in A: 0 if equal, 1 if different
-; Z flag set if equal, reset if different
+; Z flag set if equal, reset if different
+
 str_cmp:
 		PUSH IX
 		PUSH IY
@@ -34,14 +35,16 @@ str_cmp:
 		CP 0
 		POP IY
 		POP IX
-		RET
+		RET
+
 
 ; compares a null-terminated string with a memory area, 
 ; ignoring the terminating zero
 ; IX: address of the memory buffer to compare to
 ; IY: address of the string to compare
 ; result in A: 0 if equal, 1 if different
-; Z flag set if equal, reset if different
+; Z flag set if equal, reset if different
+
 str_cmpMem:
 		PUSH IX
 		PUSH IY
@@ -64,11 +67,13 @@ str_cmpMem:
 		CP 0
 		POP IY
 		POP IX
-		RET
+		RET
+
 
 ; copies a null-terminated string
 ; IX: source string address
-; IY: target address
+; IY: target address
+
 str_copy:
 		PUSH IX
 		PUSH IY
@@ -83,12 +88,13 @@ str_copy:
 .end:
 		POP IY
 		POP IX
-		RET
+		RET
+
 
 ; finds the length of a null-terminated string
 ; only supports strings up to 255 characters
 ; IX: address of the string
-; result in A
+; result in A
 str_len:
         LD B, 0
         PUSH IX
@@ -102,13 +108,15 @@ str_len:
 .eos:
         LD A, B
         POP IX
-        RET
+        RET
+
 
 ; returns the first token of a string
 ; and modifies the input string to cut out the token
 ; IX: address of the string
 ; result in IX
-; rest of string in HL
+; rest of string in HL
+
 str_tok:
         PUSH IX
 .loop:
@@ -127,7 +135,8 @@ str_tok:
         PUSH IX
         POP HL
         POP IX
-        RET
+        RET
+
 
 ; shifts to the beginning of next token after calling str_tok
 str_shift:
@@ -141,7 +150,8 @@ str_shift:
 ; IY - string address
 ; B - number of bytes (length of the string)
 ; result in IX
-; destroys IY
+; destroys IY
+
 str_2str:
 		PUSH IY
 .loop:
@@ -153,8 +163,10 @@ str_2str:
 		LD A, 0
 		LD (IY), A
 		POP IX
-		RET
-
+		RET
+
+
+
 str_2mem:
 		PUSH IX
 		PUSH IY
@@ -168,11 +180,13 @@ str_2mem:
 		JR .loop
 .end:
 		POP IY
-		POP IX
+		POP IX
+
 
 ; skips leading spaces in a string
 ; IX - string to trim
-; result in IX
+; result in IX
+
 str_ltrim:
         LD A, (IX+0)
         CP 20h
@@ -180,8 +194,10 @@ str_ltrim:
         RET
 .loop:
         INC IX
-        JR str_ltrim
-
+        JR str_ltrim
+
+
+
 str_rtrim:
 		PUSH IX
 .loop:
@@ -197,8 +213,10 @@ str_rtrim:
 		LD A, 0
 		LD (IX + 1), A
 		POP IX
-		RET
-
+		RET
+
+
+
 ; concatenaes string pointed to by IX and IY
 ; result in IY
 str_cat:
@@ -222,8 +240,10 @@ str_cat:
 	LD (IX), A
 	POP IY
 	POP IX
-	RET
-		
+	RET
+
+		
+
 str_indexOf:
 	PUSH IX
 	LD B, 0
@@ -243,8 +263,10 @@ str_indexOf:
 	LD A, FALSE
 .end:
 	POP IX
-	RET
-
+	RET
+
+
+
 ; returns Bth character of the string pointed to by IX
 ; result in A
 str_charAt:
@@ -256,8 +278,10 @@ str_charAt:
 	DJNZ .loop
 .end:
 	POP IX
-	RET
-
+	RET
+
+
+
 ; returns a substring of a string
 ; stops at the end of the source string 
 ; or C places after B, whichever is first
@@ -287,8 +311,10 @@ str_sub:
 	INC IY
 .end:
 	POP IX
-	RET
-
+	RET
+
+
+
 str_toUpper:
 	PUSH IX
 .loop:
@@ -305,8 +331,10 @@ str_toUpper:
 	JR .loop
 .end:
 	POP IX
-	RET
-
+	RET
+
+
+
 str_toLower:
 	PUSH IX
 .loop:
@@ -323,8 +351,10 @@ str_toLower:
 	JR .loop
 .end:
 	POP IX
-	RET
-
+	RET
+
+
+
 ; checks if the string pointed to by IX 
 ; starts with the string pointed to by IY
 ; result in A
@@ -351,5 +381,6 @@ str_startsWith:
 	POP BC
 	POP IY
 	POP IX
-	RET
+	RET
+
 
