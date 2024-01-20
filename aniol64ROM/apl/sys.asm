@@ -11,6 +11,7 @@ sys_write:
     LD HL, (Expression + 1)
     LD IX, LineBuff 
     CALL i16_formatDec
+    CALL trimDec
     CALL writeStr
     RET
 .syntaxErr:

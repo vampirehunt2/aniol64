@@ -1,4 +1,3 @@
-s<-"Hello World"
-a<-s#4
+a<--11111
 Write a
 END
