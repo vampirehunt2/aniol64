@@ -625,6 +625,12 @@ apl_tokenizeComment:
 	INC HL
 	JR .loop
 .end:
+	PUSH HL
+	LD HL, (ProgramPtr)
+	LD (HL), SEPARATOR_B
+	INC HL
+	LD (ProgramPtr), HL
+	POP HL
 	LD (HL), 0
 	INC HL
 	RET 
