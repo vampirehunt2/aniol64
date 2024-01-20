@@ -35,6 +35,7 @@ NOT_T: 			defb "!", 	0
 ADDR_T: 		defb "@", 	0
 DEREFERENCE_T: 	defb "^", 	0
 INDEX_T:		defb ".", 	0
+STRINDEX_T:		defb "#", 	0
 COMMA_T:		defb ",", 	0
 TERMINATOR_T:	defb ";", 	0
 SEPARATOR_T:	defb ":", 	0
@@ -52,7 +53,9 @@ QUOTE_B			equ '"'
 LEFT_PAREN_B	equ '(' 	
 RIGHT_PAREN_B 	equ ')' 	
 LEFT_BRACKET_B	equ '[' 	
-RIGHT_BRACKET_B	equ ']' 	
+RIGHT_BRACKET_B	equ ']' 
+LEFT_CURLY_B	equ '{'
+RIGHT_CURLY_B	equ '}'	
 GREATER_B 		equ '>' 	
 LESSER_B 		equ '<' 	
 GREATER_EQUAL_B	equ 'g' 	
@@ -63,6 +66,7 @@ NOT_B 			equ '!'
 ADDR_B 			equ '@' 	
 DEREFERENCE_B 	equ '^' 	
 INDEX_B			equ '.' 
+STRINDEX_B		equ '#'
 SEPARATOR_B		equ ':'
 TERMINATOR_B	equ ';'
 COMMA_B			equ ','
@@ -551,7 +555,16 @@ apl_processOperator:
 	LD (HL), A
 	INC HL
 	LD A, LEFT_PAREN_B
+	JR .cont2
 .cont1:
+	CP LEFT_CURLY_B
+	JR NZ, .cont2
+	LD A, STRINDEX_B
+	LD (HL), A
+	INC HL
+	LD A, LEFT_PAREN_B
+	JR .cont2
+.cont2:
 	LD (HL), A
 	INC HL
 	LD (ProgramPtr), HL
@@ -927,9 +940,14 @@ apl_getOperatorCode:
 	LD A, (IY)
 	CP CR
 	JR Z, .sep
+	CP RIGHT_CURLY_B
+	JR Z, .paren
 	CP RIGHT_BRACKET_B
-	RET NZ
+	JR Z, .paren
+	JR .end
+.paren:
 	LD A, RIGHT_PAREN_B
+.end:
 	RET
 .sep:
 	LD A, SEPARATOR_B

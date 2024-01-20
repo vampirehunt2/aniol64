@@ -1,3 +1,4 @@
-x<-Len("Hello World")+2
-Write x
+s<-"Hello World"
+a<-s#4
+Write a
 END
