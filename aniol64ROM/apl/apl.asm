@@ -120,8 +120,10 @@ SYS_NEWLN_B		equ 04h
 SYS_ABS_B		equ 05h
 SYS_RND_B		equ	06h
 SYS_PEEK_B		equ 07h
-SYS_WRITES_B 	equ 08h
-SYS_LEN_B 		equ 09h
+SYS_READS_B		equ 08h
+SYS_WRITES_B 	equ 09h
+SYS_LEN_B 		equ 0Ah
+
 
 BuiltInFunctions:
 READ_T:		defb "Read", 	0, SYS_READ_B
@@ -132,8 +134,27 @@ NEWLN_T:	defb "NewLn", 	0, SYS_NEWLN_B
 ABS_T:		defb "Abs", 	0, SYS_ABS_B
 RND_T:		defb "Rnd",		0, SYS_RND_B
 PEEK_T:		defb "Peek", 	0, SYS_PEEK_B
+READS_T:	defb "ReadS",	0, SYS_READS_B
 WRITES_T:	defb "WriteS",	0, SYS_WRITES_B
 LEN_T:		defb "Len", 	0, SYS_LEN_B
+
+; DOS functions:
+;OPEN_T:		defb "Open", 	0, SYS_OPEN_B
+;SAVE_T:		defb "Save", 	0, SYS_SAVE_B
+;RESET_T:	defb "Reset", 	0, SYS_RESET_B
+;SEEK_T:		defb "Seek", 	0, SYS_SEEK_B
+;FREAD_T:	defb "FRead",	0, SYS_FREAD_B
+;FWRITE_T:	defb "FWrite", 	0, SYS_FWRITE_B
+;CHDIR_T:	defb "ChDir", 	0, SYS_CHDIR_B
+;NEXTFILE_T:	defb "NextFile",0, SYS_NEXTFILE_B
+;NEXTDIR_T:	defb "NextDir", 0, SYS_NEXTDIR_B
+;SIZE_T:		defb "Size", 	0, SYS_SIZE_B	
+;MKDIR_T:	defb "MkDir", 	0, SYS_MKDIR_B
+;RMDIR_T:	defb "RmDir", 	0, SYS_RMDIR_B
+;DOSERR_T:	defb "DosErr", 	0, SYS_DOSERR_B
+;DELETE_T:	defb "Delete", 	0, SYS_DELETE_B
+;PWD_T:		defb "Pwd", 	0, SYS_PWD_B
+;TOUCH_T:	defb "Touch", 	0, SYS_TOUCH_B
  defb 0
 
 ; 128 variables with names of up to 8 characters, 
@@ -146,6 +167,7 @@ FUNNAMES_SIZE equ 128 * 8
 VarnamePtr	equ PROGRAM_DATA + 00h	; 2 byte pointer into the variable name table
 ProgramPtr 	equ PROGRAM_DATA + 02h 	; 2 bytes
 IsOperator	equ PROGRAM_DATA + 04h
+IfOrWhile	equ PROGRAM_DATA + 05h
 Token 		equ PROGRAM_DATA + 08h	; 256 bytes for current token
 Varnames 	equ PROGRAM_DATA + 108h	; need to be aligned to 8 byte boundary
 Funnames    equ PROGRAM_DATA + 108h + VARNAMES_SIZE
@@ -565,9 +587,28 @@ apl_processOperator:
 	LD A, LEFT_PAREN_B
 	JR .cont2
 .cont2:
+	CP ';'
+	JR NZ, .cont3
+	LD A, SEPARATOR_B
+	LD (HL), A
+	INC HL
+	LD A, (IfOrWhile)
+	CP IF_B
+	JR Z, .if
+	CP WHILE_B
+	JR Z, .while
+	JR .syntaxErr
+.if:
+	LD A, ENDIF_B
+	JR .cont3
+.while
+	LD A, LOOP_B
+.cont3:
 	LD (HL), A
 	INC HL
 	LD (ProgramPtr), HL
+	RET
+.syntaxErr: ; TODO
 	RET
 
 apl_processFunction:
@@ -592,6 +633,15 @@ apl_processVar:
 ; assumes the keyword bytecode is in B
 ; i.e. apl_isKeyword was called and returned TRUE
 apl_processKeyword:
+	LD A, B
+	CP WHILE_B
+	JR Z, .ifOrwhile
+	CP IF_B
+	JR Z, .ifOrwhile
+	JR .cont
+.ifOrwhile:
+	LD (IfOrWhile), A
+.cont:
 	LD HL, (ProgramPtr)
 	LD (HL), B
 	INC HL

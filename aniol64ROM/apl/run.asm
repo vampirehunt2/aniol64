@@ -1172,6 +1172,8 @@ run_execSyscall:
     JP Z, sys_nextLn
     CP SYS_READ_B
     JP Z, sys_read
+    CP SYS_READS_B
+    JP Z, sys_readString
     CP SYS_WRITES_B
     JP Z, sys_writeString
     RET

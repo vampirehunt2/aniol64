@@ -186,6 +186,15 @@ isUppercaseLetter:
 	LD A, 0
 	RET
 
+toUpper:
+	CP 'a'
+	JR C, .end
+	CP 'z' + 1
+	JR NC, .end
+	ADD a, 'A' - 'a'
+.end:
+	RET
+
 
 
 isLowercaseLetter:

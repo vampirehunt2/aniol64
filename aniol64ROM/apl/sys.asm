@@ -18,6 +18,27 @@ sys_write:
     ; TODO
     RET
 
+; TODO: add a second argument for max string length
+sys_readString:
+    CALL readLine
+    LD IX, LineBuff
+    CALL nextLine
+    ; get variable to which to read the string 
+    ; TODO: this is the same code as in sys_read, may be good to refactor it out to a subroutine
+    INC HL              ; move to the variable 
+    LD A, (HL)          ; load the variable bytecode
+    AND 01111111b       ; get the variable index
+    SLA A               ; multiply it by 2, as numeric variables are 2 bytes long
+    LD C, A
+    LD B, 0
+    LD HL, Vars         
+    ADD HL, BC          ; get the variable address
+    ; 
+    PUSH HL             ; copy HL...
+    POP IY              ; ... to IY
+    CALL str_copy       ; copy the string that was read in to the memory area pointed to by IY (and therefore HL)
+    RET
+
 sys_read:
     PUSH HL             ; store the pointer into the statement bytecode on the stack
     CALL readLine
