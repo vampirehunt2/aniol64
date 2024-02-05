@@ -128,101 +128,80 @@ end TCL_Generic;&#13;
     <a name="clabelfont" val="SansSerif plain 12"/>
     <a name="circuitvhdl" val="false"/>
     <a name="circuitvhdlpath" val=""/>
-    <wire from="(260,250)" to="(320,250)"/>
-    <wire from="(260,210)" to="(320,210)"/>
-    <wire from="(370,270)" to="(430,270)"/>
-    <wire from="(240,170)" to="(430,170)"/>
-    <wire from="(480,290)" to="(530,290)"/>
+    <wire from="(340,350)" to="(530,350)"/>
     <wire from="(220,390)" to="(530,390)"/>
-    <wire from="(480,190)" to="(530,190)"/>
-    <wire from="(410,350)" to="(530,350)"/>
-    <wire from="(300,290)" to="(300,310)"/>
-    <wire from="(150,310)" to="(190,310)"/>
-    <wire from="(150,190)" to="(190,190)"/>
-    <wire from="(120,350)" to="(410,350)"/>
-    <wire from="(120,310)" to="(150,310)"/>
-    <wire from="(300,290)" to="(320,290)"/>
-    <wire from="(410,310)" to="(430,310)"/>
-    <wire from="(260,210)" to="(260,250)"/>
-    <wire from="(410,310)" to="(410,350)"/>
-    <wire from="(240,250)" to="(260,250)"/>
-    <wire from="(220,310)" to="(300,310)"/>
-    <wire from="(350,210)" to="(430,210)"/>
+    <wire from="(230,290)" to="(280,290)"/>
+    <wire from="(120,310)" to="(230,310)"/>
+    <wire from="(430,270)" to="(430,290)"/>
+    <wire from="(430,290)" to="(430,310)"/>
+    <wire from="(230,290)" to="(230,310)"/>
+    <wire from="(250,250)" to="(280,250)"/>
+    <wire from="(120,350)" to="(340,350)"/>
+    <wire from="(340,270)" to="(360,270)"/>
+    <wire from="(340,310)" to="(360,310)"/>
+    <wire from="(430,270)" to="(450,270)"/>
+    <wire from="(430,310)" to="(450,310)"/>
+    <wire from="(510,290)" to="(530,290)"/>
+    <wire from="(340,310)" to="(340,350)"/>
+    <wire from="(420,290)" to="(430,290)"/>
     <wire from="(120,390)" to="(190,390)"/>
-    <wire from="(150,190)" to="(150,310)"/>
     <wire from="(120,270)" to="(190,270)"/>
     <wire from="(120,230)" to="(190,230)"/>
-    <wire from="(120,150)" to="(190,150)"/>
-    <comp lib="1" loc="(370,270)" name="OR Gate"/>
-    <comp lib="8" loc="(570,394)" name="Text">
-      <a name="text" val="INT#"/>
-    </comp>
-    <comp lib="1" loc="(240,170)" name="AND Gate"/>
     <comp lib="8" loc="(74,355)" name="Text">
       <a name="text" val="INTA#"/>
     </comp>
-    <comp lib="1" loc="(190,390)" name="NOT Gate">
-      <a name="facing" val="west"/>
-    </comp>
-    <comp lib="8" loc="(83,101)" name="Text">
-      <a name="text" val="8085"/>
-    </comp>
-    <comp lib="8" loc="(82,395)" name="Text">
-      <a name="text" val="INTR"/>
-    </comp>
-    <comp lib="1" loc="(350,210)" name="NOT Gate"/>
-    <comp lib="0" loc="(530,290)" name="Pin">
-      <a name="facing" val="west"/>
-      <a name="output" val="true"/>
-    </comp>
-    <comp lib="0" loc="(120,150)" name="Pin"/>
-    <comp lib="0" loc="(530,390)" name="Pin">
-      <a name="facing" val="west"/>
-    </comp>
-    <comp lib="8" loc="(564,101)" name="Text">
-      <a name="text" val="EXP"/>
-    </comp>
-    <comp lib="0" loc="(120,350)" name="Pin"/>
-    <comp lib="1" loc="(480,190)" name="AND Gate"/>
-    <comp lib="8" loc="(86,154)" name="Text">
-      <a name="text" val="Ax"/>
-    </comp>
-    <comp lib="1" loc="(480,290)" name="AND Gate"/>
-    <comp lib="0" loc="(120,270)" name="Pin"/>
-    <comp lib="0" loc="(530,190)" name="Pin">
-      <a name="facing" val="west"/>
-      <a name="output" val="true"/>
-      <a name="labelloc" val="east"/>
-    </comp>
-    <comp lib="1" loc="(220,310)" name="NOT Gate"/>
-    <comp lib="0" loc="(530,350)" name="Pin">
-      <a name="facing" val="west"/>
-      <a name="output" val="true"/>
-    </comp>
-    <comp lib="1" loc="(240,250)" name="AND Gate"/>
-    <comp lib="8" loc="(84,234)" name="Text">
-      <a name="text" val="RD#"/>
-    </comp>
-    <comp lib="8" loc="(571,194)" name="Text">
-      <a name="text" val="LCDE"/>
-    </comp>
-    <comp lib="8" loc="(569,355)" name="Text">
-      <a name="text" val="M1#"/>
-    </comp>
-    <comp lib="8" loc="(577,294)" name="Text">
-      <a name="text" val="IORQ#"/>
+    <comp lib="8" loc="(83,274)" name="Text">
+      <a name="text" val="WR#"/>
     </comp>
     <comp lib="0" loc="(120,390)" name="Pin">
       <a name="output" val="true"/>
       <a name="labelloc" val="east"/>
     </comp>
-    <comp lib="0" loc="(120,310)" name="Pin"/>
+    <comp lib="1" loc="(340,270)" name="NAND Gate"/>
+    <comp lib="1" loc="(190,390)" name="NOT Gate">
+      <a name="facing" val="west"/>
+    </comp>
+    <comp lib="0" loc="(530,350)" name="Pin">
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+    </comp>
+    <comp lib="1" loc="(420,290)" name="NAND Gate"/>
+    <comp lib="0" loc="(120,270)" name="Pin"/>
+    <comp lib="0" loc="(530,290)" name="Pin">
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+    </comp>
+    <comp lib="8" loc="(569,355)" name="Text">
+      <a name="text" val="M1#"/>
+    </comp>
+    <comp lib="1" loc="(510,290)" name="NAND Gate"/>
     <comp lib="0" loc="(120,230)" name="Pin"/>
-    <comp lib="8" loc="(83,274)" name="Text">
-      <a name="text" val="WR#"/>
+    <comp lib="1" loc="(250,250)" name="NAND Gate"/>
+    <comp lib="8" loc="(564,101)" name="Text">
+      <a name="text" val="EXP"/>
+    </comp>
+    <comp lib="8" loc="(577,294)" name="Text">
+      <a name="text" val="IORQ#"/>
     </comp>
     <comp lib="8" loc="(70,316)" name="Text">
       <a name="text" val="MEM#/IO"/>
+    </comp>
+    <comp lib="8" loc="(570,394)" name="Text">
+      <a name="text" val="INT#"/>
+    </comp>
+    <comp lib="8" loc="(83,101)" name="Text">
+      <a name="text" val="8085"/>
+    </comp>
+    <comp lib="0" loc="(120,350)" name="Pin"/>
+    <comp lib="8" loc="(82,395)" name="Text">
+      <a name="text" val="INTR"/>
+    </comp>
+    <comp lib="0" loc="(120,310)" name="Pin"/>
+    <comp lib="8" loc="(84,234)" name="Text">
+      <a name="text" val="RD#"/>
+    </comp>
+    <comp lib="0" loc="(530,390)" name="Pin">
+      <a name="facing" val="west"/>
     </comp>
   </circuit>
 </project>
