@@ -1,3 +1,4 @@
-IF i=0: Write "Zero";
-WHILE i=0: Write "Zero";
+x<-$00ff
+Poke 10+1,x
+Put $00de, 7
 END

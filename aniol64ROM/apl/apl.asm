@@ -123,38 +123,56 @@ SYS_PEEK_B		equ 07h
 SYS_READS_B		equ 08h
 SYS_WRITES_B 	equ 09h
 SYS_LEN_B 		equ 0Ah
+SYS_GETCHAR_B	equ 0Bh
+SYS_GET_B		equ 0Ch
+SYS_CLRSCR_B	equ 0Dh
+SYS_POKE_B		equ 0Eh
+SYS_PUT_B		equ 0Fh
 
 
 BuiltInFunctions:
-READ_T:		defb "Read", 	0, SYS_READ_B
-WRITE_T:	defb "Write", 	0, SYS_WRITE_B
-BEEP_T:		defb "Beep",	0, SYS_BEEP_B
-CLICK_T:	defb "Click",	0, SYS_CLICK_B
-NEWLN_T:	defb "NewLn", 	0, SYS_NEWLN_B
-ABS_T:		defb "Abs", 	0, SYS_ABS_B
-RND_T:		defb "Rnd",		0, SYS_RND_B
-PEEK_T:		defb "Peek", 	0, SYS_PEEK_B
-READS_T:	defb "ReadS",	0, SYS_READS_B
-WRITES_T:	defb "WriteS",	0, SYS_WRITES_B
-LEN_T:		defb "Len", 	0, SYS_LEN_B
+
+; Console functions
+ defb "Read", 		0, SYS_READ_B
+ defb "Write", 		0, SYS_WRITE_B
+ defb "Beep",		0, SYS_BEEP_B
+ defb "Click",		0, SYS_CLICK_B
+ defb "NewLn", 		0, SYS_NEWLN_B
+ defb "ReadS",		0, SYS_READS_B
+ defb "WriteS",		0, SYS_WRITES_B
+ defb "GetChar", 	0, SYS_GETCHAR_B
+ defb "ClrScr",		0, SYS_CLRSCR_B
+
+; Math functions:
+ defb "Abs", 		0, SYS_ABS_B
+ defb "Rnd",		0, SYS_RND_B
+
+; String functions
+ defb "Len", 		0, SYS_LEN_B
+
+; Miscallenous functions 
+ defb "Peek", 		0, SYS_PEEK_B
+ defb "Poke",		0, SYS_POKE_B
+ defb "Get",		0, SYS_GET_B
+ defb "Put",		0, SYS_PUT_B
 
 ; DOS functions:
-;OPEN_T:		defb "Open", 	0, SYS_OPEN_B
-;SAVE_T:		defb "Save", 	0, SYS_SAVE_B
-;RESET_T:	defb "Reset", 	0, SYS_RESET_B
-;SEEK_T:		defb "Seek", 	0, SYS_SEEK_B
-;FREAD_T:	defb "FRead",	0, SYS_FREAD_B
-;FWRITE_T:	defb "FWrite", 	0, SYS_FWRITE_B
-;CHDIR_T:	defb "ChDir", 	0, SYS_CHDIR_B
-;NEXTFILE_T:	defb "NextFile",0, SYS_NEXTFILE_B
-;NEXTDIR_T:	defb "NextDir", 0, SYS_NEXTDIR_B
-;SIZE_T:		defb "Size", 	0, SYS_SIZE_B	
-;MKDIR_T:	defb "MkDir", 	0, SYS_MKDIR_B
-;RMDIR_T:	defb "RmDir", 	0, SYS_RMDIR_B
-;DOSERR_T:	defb "DosErr", 	0, SYS_DOSERR_B
-;DELETE_T:	defb "Delete", 	0, SYS_DELETE_B
-;PWD_T:		defb "Pwd", 	0, SYS_PWD_B
-;TOUCH_T:	defb "Touch", 	0, SYS_TOUCH_B
+; defb "Open", 	0, SYS_OPEN_B
+; defb "Save", 	0, SYS_SAVE_B
+; defb "Reset", 	0, SYS_RESET_B
+; defb "Seek", 	0, SYS_SEEK_B
+; defb "FRead",	0, SYS_FREAD_B
+; defb "FWrite", 	0, SYS_FWRITE_B
+; defb "ChDir", 	0, SYS_CHDIR_B
+; defb "NextFile",0, SYS_NEXTFILE_B
+; defb "NextDir", 0, SYS_NEXTDIR_B
+; defb "Size", 	0, SYS_SIZE_B	
+; defb "MkDir", 	0, SYS_MKDIR_B
+; defb "RmDir", 	0, SYS_RMDIR_B
+; defb "DosErr", 	0, SYS_DOSERR_B
+; defb "Delete", 	0, SYS_DELETE_B
+; defb "Pwd", 	0, SYS_PWD_B
+; defb "Touch", 	0, SYS_TOUCH_B
  defb 0
 
 ; 128 variables with names of up to 8 characters, 

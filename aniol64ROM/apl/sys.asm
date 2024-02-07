@@ -95,15 +95,47 @@ sys_rnd:
     CALL rndMod
     RET
 
-; a 16-bit peek
 sys_peek:
     PUSH IX
     PUSH HL
     POP IX
-    LD H, (IX + 1)
-    LD L, (IX + 0)
+    LD H, 0
+    LD L, (IX)
     POP IX
     RET
+
+
+sys_poke:
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD IY, (Expression + 1)
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD A, (Expression + 1)      ; load lower byte of the expression, ignore the higher byte
+    LD (IY), A
+    RET
+.syntaxErr:
+    ; TODO
+    RET
+
+sys_put:
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD A, (Expression + 1)      ; load lower byte of the expression, ignore the higher byte
+    LD C, A
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD A, (Expression + 1)      ; load lower byte of the expression, ignore the higher byte
+    OUT (C), A
+    RET
+.syntaxErr:
+    ; TODO
+    RET
+    
 
 sys_writeString:
     CALL run_evaluate
@@ -127,3 +159,23 @@ sys_len:
     POP IX
     RET
 
+sys_getChar:
+    LD B, H
+    LD C, L
+    CALL gotoXY
+    CALL getChar
+    LD H, 0
+    LD L, A
+    RET
+
+sys_get:
+    LD C, L
+    IN A, (C)
+    LD L, A
+    LD H, 0
+    RET
+
+sys_clrScr:
+    CALL clrScr
+    CALL home
+    RET

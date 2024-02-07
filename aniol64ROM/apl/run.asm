@@ -182,6 +182,8 @@ run_evaluate:
     JR Z, .eval         ; if yes, proceed to evaluating
     CP ASSIGNMENT_B     
     JR Z, .eval
+    CP COMMA_B
+    JR Z, .eval
     CP QUOTE_B          ; check if the bytecode is a string constant
     JR Z, .string       ; if yes, evaluate the string
     AND 10000000b       ; check if the bytecode is a variable
@@ -250,7 +252,8 @@ run_evaluate:
     JR .loop
 ; the expression is now copied to Expression.
 ; evaluate the expression
-.eval:      
+.eval:   
+    PUSH HL             ; save pointer to the end of current expression for later 
     CP SEPARATOR_B
     JR Z, .store
     LD A, SEPARATOR_B    
@@ -279,9 +282,11 @@ run_evaluate:
     CP SEPARATOR_B
     JR NZ, .syntaxErr
     LD A, 0
+    POP HL              ; restore the end of the current expression to HL
     RET                 ; success
 .syntaxErr:             ; TODO: handle the syntax error
-    LD A, 1
+    LD A, 1             
+    POP HL
     RET
 
 
@@ -1176,6 +1181,12 @@ run_execSyscall:
     JP Z, sys_readString
     CP SYS_WRITES_B
     JP Z, sys_writeString
+    CP SYS_CLRSCR_B
+    JP Z, sys_clrScr
+    CP SYS_POKE_B
+    JP Z, sys_poke
+    CP SYS_PUT_B
+    JP Z, sys_put
     RET
 
 ; executes a system function
@@ -1191,6 +1202,10 @@ run_execFunction:
     JP Z, sys_peek
     CP SYS_LEN_B
     JP Z, sys_len
+    CP SYS_GETCHAR_B
+    JP Z, sys_getChar
+    CP SYS_GET_B
+    JP Z, sys_get
     RET
 
 
