@@ -1,4 +1,3 @@
-x<-$00ff
-Poke 10+1,x
-Put $00de, 7
+STR s 10
+Copy s, "Hello"
 END
