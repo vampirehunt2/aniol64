@@ -128,6 +128,9 @@ SYS_GET_B		equ 0Ch
 SYS_CLRSCR_B	equ 0Dh
 SYS_POKE_B		equ 0Eh
 SYS_PUT_B		equ 0Fh
+SYS_CMP_B		equ 10h
+SYS_COPY_B		equ 11h
+SYS_DELAY_B		equ 12h
 
 
 BuiltInFunctions:
@@ -149,12 +152,15 @@ BuiltInFunctions:
 
 ; String functions
  defb "Len", 		0, SYS_LEN_B
+ defb "Cmp",		0, SYS_CMP_B
+ defb "Copy",		0, SYS_COPY_B
 
 ; Miscallenous functions 
  defb "Peek", 		0, SYS_PEEK_B
  defb "Poke",		0, SYS_POKE_B
  defb "Get",		0, SYS_GET_B
  defb "Put",		0, SYS_PUT_B
+ defb "Delay",		0, SYS_DELAY_B
 
 ; DOS functions:
 ; defb "Open", 	0, SYS_OPEN_B

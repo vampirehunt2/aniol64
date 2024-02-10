@@ -20,6 +20,7 @@ sys_write:
 
 ; TODO: add a second argument for max string length
 sys_readString:
+    CALL cursorOn
     CALL readLine
     LD IX, LineBuff
     CALL nextLine
@@ -40,6 +41,7 @@ sys_readString:
     RET
 
 sys_read:
+    CALL cursorOn
     PUSH HL             ; store the pointer into the statement bytecode on the stack
     CALL readLine
     CALL nextLine
@@ -93,6 +95,17 @@ sys_abs:
 
 sys_rnd:
     CALL rndMod
+    RET
+
+sys_delay:
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD A, (Expression + 1)  ; only use the lower bit of the argument
+    CALL delay
+    RET
+.syntaxErr:
+    ; TODO
     RET
 
 sys_peek:
@@ -157,6 +170,24 @@ sys_len:
     LD L, A
     LD H, 0
     POP IX
+    RET
+
+sys_cmp:
+    RET
+
+sys_copy:
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD IY, (Expression + 1)      
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD IX, (Expression + 1)
+    CALL str_copy
+    RET
+.syntaxErr:
+    ; TODO
     RET
 
 sys_getChar:

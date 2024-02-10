@@ -1187,6 +1187,12 @@ run_execSyscall:
     JP Z, sys_poke
     CP SYS_PUT_B
     JP Z, sys_put
+    CP SYS_CMP_B
+    JP Z, sys_cmp
+    CP SYS_COPY_B
+    JP Z, sys_copy
+    CP SYS_DELAY_B
+    JP Z, sys_delay
     RET
 
 ; executes a system function
