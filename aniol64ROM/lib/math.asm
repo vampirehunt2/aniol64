@@ -496,15 +496,16 @@ trimDec:
 .loop:
         LD A, (IX)
         CP '0'          ; check for leading zeroes
-        JR NZ, .end     ; if character other than zero found, end processing
+        JR NZ, .chkneg  ; if character other than zero found, end processing
         INC IX
         DJNZ .loop
-.end:
+.chkneg:
         LD A, C
         CP TRUE         ; check if number is negative
-        RET NZ
+        JR NZ, .end
         DEC IX
         LD (IX), '-'
+.end:
         POP BC
         RET
 
