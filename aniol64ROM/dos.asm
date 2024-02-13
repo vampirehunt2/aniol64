@@ -651,7 +651,6 @@ dos_dirExists:
 
 
 ; moves IX over by the number of bytes corresponding to the length of a directory entry
-
 dos_nextDir:
 	PUSH BC
 	LD B, MAX_DIRNAME_LEN		; length of directory entry
@@ -676,7 +675,6 @@ dos_cdRoot:
 	LD (CurrentDir), A
 	RET
 	
-
 dos_cd:
 	CALL str_shift	; transfer folder name from HL to IX
 	; check if user wants to go to the root folder
@@ -701,8 +699,6 @@ dos_cd:
 	CALL dos_cdRoot
 .end:
 	RET
-
-
 
 dos_ls:
 	LD A, (CurrentDir)
@@ -1135,7 +1131,15 @@ dos_cat:
 	RET
 .cont:
 	LD A, (IX)
+	CP CR
+	JR Z, .nl
+	CP LF
+	JR Z, .nl
 	CALL putChar
+	JR .cont2
+.nl:
+	CALL nextLine
+.cont2:
 	INC IX
 	DEC HL
 	JR .loop
