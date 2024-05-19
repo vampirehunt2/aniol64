@@ -1193,6 +1193,14 @@ run_execSyscall:
     JP Z, sys_copy
     CP SYS_DELAY_B
     JP Z, sys_delay
+    CP SYS_PUTCHAR_B
+    JP Z, sys_putChar
+    CP SYS_GOTOXY_B
+    JP Z, sys_gotoxy
+    CP SYS_UPPER_B
+    JP Z, sys_upper
+    CP SYS_LOWER_B
+    JP Z, sys_lower
     RET
 
 ; executes a system function
@@ -1212,6 +1220,8 @@ run_execFunction:
     JP Z, sys_getChar
     CP SYS_GET_B
     JP Z, sys_get
+    CP SYS_READKEY_B
+    JP Z, sys_readKey
     RET
 
 

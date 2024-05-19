@@ -108,6 +108,7 @@ sys_delay:
     ; TODO
     RET
 
+; 8-bit peek
 sys_peek:
     PUSH IX
     PUSH HL
@@ -118,6 +119,7 @@ sys_peek:
     RET
 
 
+; 8-bit poke
 sys_poke:
     CALL run_evaluate
     CP 0
@@ -128,6 +130,34 @@ sys_poke:
     JR NZ, .syntaxErr
     LD A, (Expression + 1)      ; load lower byte of the expression, ignore the higher byte
     LD (IY), A
+    RET
+.syntaxErr:
+    ; TODO
+    RET
+
+sys_gotoxy:
+    CALL run_evaluate           ; evaluate the X coefficient
+    CP 0                        ; check if a valid expression
+    JR NZ, .syntaxErr           ; if not, report error
+    LD A, (Expression + 1)      ; load the X coefficient to B...
+    LD B, A                     ; ...ignoring the higher byte
+    CALL run_evaluate           ; evaluate the Y coefficient
+    CP 0                        ; check if a valid expression
+    JR NZ, .syntaxErr           ; if not, report error
+    LD A, (Expression + 1)      ; load the Y coefficient to C...
+    LD C, A                     ; ...ignoring the higher byte
+    call gotoXY
+    RET
+.syntaxErr:
+    ; TODO
+    RET
+
+sys_putChar:
+    CALL run_evaluate           ; evaluate the character
+    CP 0                        ; check if a valid expression
+    JR NZ, .syntaxErr           ; if not, report error
+    LD A, (Expression + 1)      ; load the character ASCII code to A
+    call putChar
     RET
 .syntaxErr:
     ; TODO
@@ -156,6 +186,28 @@ sys_writeString:
     JR NZ, .syntaxErr
     LD IX, (Expression + 1)
     CALL writeStr
+    RET
+.syntaxErr:
+    ; TODO
+    RET
+
+sys_upper:
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD IX, (Expression + 1)
+    CALL str_toUpper
+    RET
+.syntaxErr:
+    ; TODO
+    RET
+
+sys_lower:
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD IX, (Expression + 1)
+    CALL str_toLower
     RET
 .syntaxErr:
     ; TODO
@@ -191,12 +243,18 @@ sys_copy:
     RET
 
 sys_getChar:
-    LD B, H
-    LD C, L
-    CALL gotoXY
+    ; ignores the parameter
     CALL getChar
-    LD H, 0
     LD L, A
+    LD H, 0
+    RET
+
+// TODO: idea - make the parameter specify if this call is supposed to bt sycnhronous
+sys_readKey:
+    ; ignores the parameter
+    CALL readKey
+    LD L, A
+    LD H, 0
     RET
 
 sys_get:

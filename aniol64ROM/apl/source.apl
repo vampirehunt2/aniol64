@@ -1,3 +1,5 @@
-STR s 10
-Copy s, "Hello"
+ClrScr
+s<-"TestUpper"
+Lower s
+WriteS s
 END

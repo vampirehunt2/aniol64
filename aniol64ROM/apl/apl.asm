@@ -131,7 +131,11 @@ SYS_PUT_B		equ 0Fh
 SYS_CMP_B		equ 10h
 SYS_COPY_B		equ 11h
 SYS_DELAY_B		equ 12h
-
+SYS_PUTCHAR_B	equ 13h
+SYS_GOTOXY_B	equ 14h
+SYS_READKEY_B	equ 15h
+SYS_UPPER_B		equ 16h
+SYS_LOWER_B		equ 17h
 
 BuiltInFunctions:
 
@@ -144,7 +148,10 @@ BuiltInFunctions:
  defb "ReadS",		0, SYS_READS_B
  defb "WriteS",		0, SYS_WRITES_B
  defb "GetChar", 	0, SYS_GETCHAR_B
+ defb "PutChar",	0, SYS_PUTCHAR_B
+ defb "GotoXY",		0, SYS_GOTOXY_B
  defb "ClrScr",		0, SYS_CLRSCR_B
+ defb "ReadKey",	0, SYS_READKEY_B
 
 ; Math functions:
  defb "Abs", 		0, SYS_ABS_B
@@ -154,6 +161,8 @@ BuiltInFunctions:
  defb "Len", 		0, SYS_LEN_B
  defb "Cmp",		0, SYS_CMP_B
  defb "Copy",		0, SYS_COPY_B
+ defb "Upper",		0, SYS_UPPER_B
+ defb "Lower",		0, SYS_LOWER_B
 
 ; Miscallenous functions 
  defb "Peek", 		0, SYS_PEEK_B

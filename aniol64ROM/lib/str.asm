@@ -317,19 +317,23 @@ str_sub:
 
 str_toUpper:
 	PUSH IX
+	PUSH BC
 .loop:
 	LD A, (IX)
 	CP 0
 	JR Z, .end
+	LD B, A
 	CALL isLowercaseLetter
 	CP FALSE
-	JR .next
+	JR Z, .next
+	LD A, B
 	SUB 32	; convert to uppercase
 	LD (IX), A
 .next:
 	INC IX
 	JR .loop
 .end:
+	POP BC
 	POP IX
 	RET
 
@@ -337,19 +341,23 @@ str_toUpper:
 
 str_toLower:
 	PUSH IX
+	PUSH BC
 .loop:
 	LD A, (IX)
 	CP 0
 	JR Z, .end
+	LD B, A
 	CALL isUppercaseLetter
 	CP FALSE
-	JR .next
+	JR Z, .next
+	LD A, B
 	ADD A, 32	; convert to lowercase
 	LD (IX), A
 .next:
 	INC IX
 	JR .loop
 .end:
+	POP BC
 	POP IX
 	RET
 
