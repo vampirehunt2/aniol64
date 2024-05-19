@@ -1,0 +1,25 @@
+      = 0030            sim     .equ    030h    ; ASMX doesn't seem to recognize these 8085 instructions
+      = 0020            rim     .equ    020h
+      = 0032            bittime .equ    032h    ; 2400 baud for 6.144MHz clock
+
+0000                    loop1:	
+0000  3E FF             	mvi a,0FFh
+0002                    loop2:
+0002  3D                	dcr a
+0003  C2 0200           	jnz loop2
+0006  3E 00             	mvi a, 00h
+0008  30                	db sim
+                        	;
+0009  3E FF             	mvi a, 0FFh
+000B                    loop3:
+000B  3D                	dcr a
+000C  C2 0B00           	jnz loop3
+000F  3E 80             	mvi a, 80h
+0011  30                	db sim
+0012  C3 0000           	jmp loop1
+                        	
+
+00000 Total Error(s)
+
+BITTIME            0032 E  LOOP1              0000    LOOP2              0002
+LOOP3              000B    RIM                0020 E  SIM                0030 E

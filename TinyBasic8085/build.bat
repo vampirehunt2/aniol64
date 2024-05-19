@@ -1,0 +1,1 @@
+..\asmx\asmx20.exe -C 8085 -b -e -w -l tinybasic.lst 8080_8085\Tiny_Basic\tinybasic.a85
