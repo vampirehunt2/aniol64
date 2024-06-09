@@ -196,6 +196,9 @@ SORRY:  DB   'SORRY'
 ; (SEE NEXT SECTION). "CURRNT" SHOULD POINT TO A 0.
 ;
 RSTART: LXI  SP,STACK
+		MVI A, 0
+		MOV (Saving), A
+		OUT 0BFh						; send the contents of the accumulator to port 0
 ST1:    CALL CRLF                       ;AND JUMP TO HERE
         LXI  D,OK                       ;DE->STRING
         SUB  A                          ;A=0
@@ -355,6 +358,10 @@ GOTO:   RST  3                          ;*** GOTO EXPR ***
 ; PRINTED OR IF THE LIST IS A NULL LIST.  HOWEVER IF THE LIST
 ; ENDED WITH A COMMA, NO (CRLF) IS GENERATED.
 ;
+SAVE:
+		MVI A, 0FFh
+		MOV (Saving), A
+		OUT 0BFh						; send the contents of the accumulator to mode selection port
 LIST:   CALL TSTNUM                     ;TEST IF THERE IS A #
         CALL ENDCHK                     ;IF NO # WE GET A 0
         CALL FNDLN                      ;FIND THIS OR NEXT LINE
@@ -1390,7 +1397,7 @@ PATLOP:
         LXI  H,START
         SHLD RANPNT
         LXI  H,TXTBGN
-        SHLD TXTUNF
+        ;SHLD TXTUNF					; comment line to avoid erasing program on warm reset
         JMP  RSTART
 OC2:    JNZ  OC3                        ;IT IS ON
         POP  PSW                        ;IT IS OFF
@@ -1617,7 +1624,7 @@ bl1:
 ; C = value to transmit
 ; Changes A
 ; Preserves BC
-;cout:
+tapeout:
         push    d
         push    b
         push    h
@@ -1678,15 +1685,20 @@ ci5:
 
 
 ; PAL driver
-
-; video ram starting address
-vram 		equ 3800h 		; +64 is a one line offset
+vram 		equ 3800h 		; video ram starting address	
 vramsize 	equ 800h		; 
 linelen		equ 64
 lastline	equ vram + 64 * 28		; address of the beginning of the last visible line
-offs		equ 8			; first character is displayed starting from pos. 8 in the line, previous characters are covered by the horizontal blanking
+offs		equ 8					; first character is displayed starting from pos. 8 in the line, 
+									; previous characters are covered by the horizontal blanking
 
 cout:
+	mov a, Saving
+	cpi 0
+	jz cout0
+	call tapeout
+	ret
+cout0:
 	push b
 	push d
 	push h
@@ -1787,6 +1799,7 @@ LOPLN:  DS   2                          ;LINE NUMBER
 LOPPT:  DS   2                          ;TEXT POINTER
 RANPNT: DS   2                          ;RANDOM NUMBER POINTER
 TXTUNF: DS   2                          ;->UNFILLED TEXT AREA
+SAVING:	DS   1							; WHETHER A SAVE IS IN PROGRESS
 TXTBGN: DS   2                          ;TEXT SAVE AREA BEGINS
 ;       ORG  1366H
 ;       ORG  1F00H
