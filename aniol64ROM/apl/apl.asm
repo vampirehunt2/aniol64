@@ -136,6 +136,11 @@ SYS_GOTOXY_B	equ 14h
 SYS_READKEY_B	equ 15h
 SYS_UPPER_B		equ 16h
 SYS_LOWER_B		equ 17h
+SYS_OPEN_B		equ 18h
+SYS_SAVE_B		equ 19h
+SYS_RESET_B		equ 1Ah
+SYS_SEEK_B		equ 1Bh
+SYS_FREAD_B		equ 1Ch
 
 BuiltInFunctions:
 
@@ -172,11 +177,11 @@ BuiltInFunctions:
  defb "Delay",		0, SYS_DELAY_B
 
 ; DOS functions:
-; defb "Open", 	0, SYS_OPEN_B
-; defb "Save", 	0, SYS_SAVE_B
-; defb "Reset", 	0, SYS_RESET_B
-; defb "Seek", 	0, SYS_SEEK_B
-; defb "FRead",	0, SYS_FREAD_B
+ defb "Open", 		0, SYS_OPEN_B
+ defb "Save", 		0, SYS_SAVE_B
+ defb "Reset", 		0, SYS_RESET_B
+ defb "Seek", 		0, SYS_SEEK_B
+ defb "FRead",		0, SYS_FREAD_B
 ; defb "FWrite", 	0, SYS_FWRITE_B
 ; defb "ChDir", 	0, SYS_CHDIR_B
 ; defb "NextFile",0, SYS_NEXTFILE_B

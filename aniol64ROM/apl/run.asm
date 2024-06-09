@@ -1201,6 +1201,16 @@ run_execSyscall:
     JP Z, sys_upper
     CP SYS_LOWER_B
     JP Z, sys_lower
+    CP SYS_OPEN_B
+    JP Z, sys_open
+    CP SYS_SAVE_B
+    JP Z, sys_save
+    CP SYS_RESET_B
+    JP Z, sys_reset
+    CP SYS_SEEK_B
+    JP Z, sys_seek
+    CP SYS_FREAD_B
+    JP Z, sys_fread
     RET
 
 ; executes a system function
