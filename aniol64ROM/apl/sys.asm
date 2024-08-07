@@ -178,6 +178,26 @@ sys_put:
 .syntaxErr:
     ; TODO
     RET
+
+; TODO incomplete
+sys_startsWith:
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD IX, (Expression + 1)      
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD IY, (Expression + 1)      
+    CALL str_startsWith
+    CP TRUE
+    JR .true
+.true:
+    ; TODO
+    RET
+.syntaxErr:
+    ; TODO
+    RET
     
 
 sys_writeString:
@@ -267,4 +287,63 @@ sys_get:
 sys_clrScr:
     CALL clrScr
     CALL home
+    RET
+
+; #################### DOS functions ########################
+
+; Open a file from disk and load it to the file buffer
+sys_open:
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr 
+    LD HL, (Expression + 1)     ; load the file name pointer to HL
+    PUSH HL
+    POP IX                      ; transfer file name pointer to IX
+	CALL dos_loadFile           ; load the file
+	LD A, (DosErr)              ; check if loading was successful
+	CP DOS_OK
+	RET Z                       ; return if yes
+.ioErr:
+    ; TODO I/O error handling
+    RET                         ; otherwise drop through to the IO error handling
+.syntaxErr:
+    ; TODO
+    RET
+
+; Save a file to disk
+sys_save:
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr 
+    LD HL, (Expression + 1)     ; load the file name pointer to HL
+    PUSH HL
+    POP IX                      ; transfer file name pointer to IX
+    CALL dos_saveFile
+    LD A, (DosErr)              ; check if loading was successful
+	CP DOS_OK
+	RET Z
+.ioErr:
+    ; TODO I/O error handling
+    RET                         ; otherwise drop through to the IO error handling
+.syntaxErr:
+    ; TODO
+    RET
+
+; Restart reading/writing the file from the first byte
+sys_reset:
+    CALL dos_reset
+    RET
+
+; Put the file Read/Write pointer at the specified offset within the file buffer.
+sys_seek:
+    CALL run_evaluate       ; evaluate the new file pointer
+    CP 0
+    JR NZ, .syntaxErr 
+    CALL dos_seek
+    RET
+.syntaxErr:
+    ; TODO  
+    RET
+
+sys_fread:
     RET
