@@ -1,0 +1,90 @@
+; POWER-ON/RESET
+bios_boot:
+    CALL dspInit
+    CALL keyInit
+    RET
+
+; WARM BOOT
+bios_wboot:
+    //TODO
+    RET
+
+;CONSOLE STATUS, RETURN 0FFH IF CHARACTER READY, 00H IF NOT
+bios_const:
+    CALL keyPressed
+    JR Z, _no
+    LD A, 0FFh
+    RET
+_no:
+    LD A, 0
+    RET
+
+;CONSOLE CHARACTER INTO REGISTER A
+bios_conin:
+    CALL readKey
+    RET
+
+;CONSOLE CHARACTER OUTPUT FROM REGISTER C
+bios_conout:
+    LD A, C
+    CALL putChar
+    RET
+
+; 12: Printer output
+bios_list	
+    // no printer support yet
+    RET
+
+;15: Paper tape punch output
+bios_punch:
+    // no tape punch support
+    RET 
+    
+;18: Paper tape reader input
+bios_reader:
+// no tape punch support
+    RET
+	
+;21: Move disc head to track 0
+bios_home:	
+    //TODO
+    RET
+
+;24: Select disc drive
+bios_seldsk:
+    //TODO
+    RET
+
+;27: Set track number
+bios_settrk:  
+    //TODO
+    RET
+
+;30: Set sector number
+bios_setsec:
+   //TODO
+    RET
+
+;33: Set DMA address
+bios_setdma:
+   //TODO
+    RET
+
+;36: Read a sector
+bios_read:
+    //TODO
+    RET
+
+;39: Write a sector
+bios_write:
+    //TODO
+    RET
+
+;42: Status of list device
+bios_listst:
+    // no printer support yet
+    RET
+
+;45: Sector translation for skewing
+bios_sectran:
+    RET
