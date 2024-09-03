@@ -21,16 +21,19 @@ SyntaxCheck	MOV A,M	;A=Byte of BASIC program.
 	INX H	;Return address++;
 	XTHL	;
 	JNZ SyntaxError	;Error if not what was expected.
-NextChar	INX H	
+NextChar	
+	INX H	
 	MOV A,M	
 	CPI 0x3A	
 	RNC	
 	JMP NextChar_tail	
-OutChar	PUSH PSW	
+OutChar	
+	PUSH PSW	
 	LDA TERMINAL_X	
 	JMP OutChar_tail	
 	NOP	
-CompareHLDE	MOV A,H	
+CompareHLDE	
+	MOV A,H	
 	SUB D	
 	RNZ	
 	MOV A,L	
@@ -471,17 +474,20 @@ InputNext	CALL InputChar	;
 	INR B	;
 L036A	RST 03	;RST OutChar	;
 	JMP InputNext	;
-OutChar_tail	CPI 0x48	;
+OutChar_tail	
+	CPI 0x48	;
 	CZ NewLine	;
 	INR A	;
 	STA TERMINAL_X	;
-WaitTermReady	IN 00	;
+WaitTermReady	
+	IN 00	;
 	ANI 80h	;
 	JNZ WaitTermReady	;
 	POP PSW	;
 	OUT 01	;
 	RET	;
-InputChar	IN 00	; 
+InputChar	
+	IN 00	; 
 	ANI 01	; 
 	JNZ InputChar	;
 	IN 01	; 
