@@ -1,0 +1,39 @@
+program A64Visualiser;
+
+uses crt, dos;
+
+var filename: string;
+    f: file of byte;
+    a, i, j: byte;
+    z, c: char;
+
+const start: word = $3800;
+      W: byte = 64;
+      W0: byte = 40;
+      H: byte = 32;
+
+begin
+filename := 'c:\8bit\a64.bin';
+textmode(co80 or font8x8);
+z := 'x';
+while z <> 'q' do
+      begin
+      clrscr;
+      assign(f, filename);
+      reset(f);
+      seek(f, start);
+      for j := 1 to H do
+          begin
+          for i := 1 to W do
+              begin
+              read(f, a);
+              a := a and $7F;
+              c := char(a);
+              if i <= W0 then write(c);
+              end;
+              writeln;
+          end;
+          close(f);
+      z := readkey;
+      end;
+end.

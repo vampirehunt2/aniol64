@@ -9,8 +9,8 @@ var inputFn, outputFn: string;
     w: word;
 
 begin
-inputFn := 'test.fnt';
-outputFn := 'test_c.fnt';
+inputFn := 'game.fnt';
+outputFn := 'game_c.fnt';
 assign(input, inputFn);
 assign(output, outputFn);
 reset(input);
@@ -19,10 +19,11 @@ w := 0;
 while not eof(input) do
       begin
       read(input, b);
-      if w mod 8 = 7 then b := 255;
+      if w mod 8 >=6 then b := 255;
       write(output, b);
       w := w + 1;
       end;
 close(input);
 close(output);
+readln;
 end.

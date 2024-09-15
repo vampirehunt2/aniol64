@@ -3,9 +3,9 @@ AVRVGA.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         00001426  00000000  00000000  00000074  2**1
+  0 .text         00001428  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .bss          00000304  00800060  00800060  0000149a  2**0
+  1 .bss          00000304  00800060  00800060  0000149c  2**0
                   ALLOC
   2 .stab         00000738  00000000  00000000  0000149c  2**2
                   CONTENTS, READONLY, DEBUGGING
@@ -264,7 +264,7 @@ Disassembly of section .text:
      c8e:	b1 07       	cpc	r27, r17
      c90:	e1 f7       	brne	.-8      	; 0xc8a <.do_clear_bss_loop>
      c92:	7e d3       	rcall	.+1788   	; 0x1390 <main>
-     c94:	c6 c3       	rjmp	.+1932   	; 0x1422 <_exit>
+     c94:	c7 c3       	rjmp	.+1934   	; 0x1424 <_exit>
 
 00000c96 <__bad_interrupt>:
      c96:	b4 c9       	rjmp	.-3224   	; 0x0 <__vectors>
@@ -453,7 +453,7 @@ Disassembly of section .text:
      ea8:	93 e0       	ldi	r25, 0x03	; 3
      eaa:	66 e2       	ldi	r22, 0x26	; 38
      eac:	7c e0       	ldi	r23, 0x0C	; 12
-     eae:	b2 d2       	rcall	.+1380   	; 0x1414 <strcpy_P>
+     eae:	b3 d2       	rcall	.+1382   	; 0x1416 <strcpy_P>
      eb0:	78 94       	sei
      eb2:	20 91 62 00 	lds	r18, 0x0062
      eb6:	30 91 63 00 	lds	r19, 0x0063
@@ -661,7 +661,7 @@ Disassembly of section .text:
     1074:	80 91 64 00 	lds	r24, 0x0064
     1078:	90 91 65 00 	lds	r25, 0x0065
     107c:	be 01       	movw	r22, r28
-    107e:	b6 d1       	rcall	.+876    	; 0x13ec <__udivmodhi4>
+    107e:	b7 d1       	rcall	.+878    	; 0x13ee <__udivmodhi4>
     1080:	63 31       	cpi	r22, 0x13	; 19
     1082:	f8 f4       	brcc	.+62     	; 0x10c2 <pal_render+0x228>
     1084:	e0 91 64 00 	lds	r30, 0x0064
@@ -757,12 +757,12 @@ Disassembly of section .text:
     1158:	91 e0       	ldi	r25, 0x01	; 1
     115a:	6d e4       	ldi	r22, 0x4D	; 77
     115c:	7c e0       	ldi	r23, 0x0C	; 12
-    115e:	5a d1       	rcall	.+692    	; 0x1414 <strcpy_P>
+    115e:	5b d1       	rcall	.+694    	; 0x1416 <strcpy_P>
     1160:	85 ee       	ldi	r24, 0xE5	; 229
     1162:	91 e0       	ldi	r25, 0x01	; 1
     1164:	61 e6       	ldi	r22, 0x61	; 97
     1166:	7c e0       	ldi	r23, 0x0C	; 12
-    1168:	55 d1       	rcall	.+682    	; 0x1414 <strcpy_P>
+    1168:	56 d1       	rcall	.+684    	; 0x1416 <strcpy_P>
     116a:	78 94       	sei
     116c:	20 91 60 00 	lds	r18, 0x0060
     1170:	30 91 61 00 	lds	r19, 0x0061
@@ -917,7 +917,7 @@ Disassembly of section .text:
     12c4:	80 91 64 00 	lds	r24, 0x0064
     12c8:	90 91 65 00 	lds	r25, 0x0065
     12cc:	be 01       	movw	r22, r28
-    12ce:	8e d0       	rcall	.+284    	; 0x13ec <__udivmodhi4>
+    12ce:	8f d0       	rcall	.+286    	; 0x13ee <__udivmodhi4>
     12d0:	63 31       	cpi	r22, 0x13	; 19
     12d2:	f8 f4       	brcc	.+62     	; 0x1312 <vga_render+0x1ca>
     12d4:	e0 91 64 00 	lds	r30, 0x0064
@@ -1024,7 +1024,7 @@ Disassembly of section .text:
     13be:	8e bd       	out	0x2e, r24	; 46
     13c0:	1f bc       	out	0x2f, r1	; 47
     13c2:	29 bf       	out	0x39, r18	; 57
-    13c4:	0b c0       	rjmp	.+22     	; 0x13dc <main+0x4c>
+    13c4:	0c c0       	rjmp	.+24     	; 0x13de <main+0x4e>
     13c6:	93 9a       	sbi	0x12, 3	; 18
     13c8:	8b 9a       	sbi	0x11, 3	; 17
     13ca:	92 9a       	sbi	0x12, 2	; 18
@@ -1036,52 +1036,53 @@ Disassembly of section .text:
     13d6:	83 bf       	out	0x33, r24	; 51
     13d8:	81 e0       	ldi	r24, 0x01	; 1
     13da:	89 bf       	out	0x39, r24	; 57
-    13dc:	99 99       	sbic	0x13, 1	; 19
-    13de:	02 c0       	rjmp	.+4      	; 0x13e4 <main+0x54>
-    13e0:	5c dd       	rcall	.-1352   	; 0xe9a <pal_render>
-    13e2:	01 c0       	rjmp	.+2      	; 0x13e6 <main+0x56>
-    13e4:	b1 de       	rcall	.-670    	; 0x1148 <vga_render>
-    13e6:	80 e0       	ldi	r24, 0x00	; 0
-    13e8:	90 e0       	ldi	r25, 0x00	; 0
-    13ea:	08 95       	ret
+    13dc:	88 bf       	out	0x38, r24	; 56
+    13de:	99 99       	sbic	0x13, 1	; 19
+    13e0:	02 c0       	rjmp	.+4      	; 0x13e6 <main+0x56>
+    13e2:	5b dd       	rcall	.-1354   	; 0xe9a <pal_render>
+    13e4:	01 c0       	rjmp	.+2      	; 0x13e8 <main+0x58>
+    13e6:	b0 de       	rcall	.-672    	; 0x1148 <vga_render>
+    13e8:	80 e0       	ldi	r24, 0x00	; 0
+    13ea:	90 e0       	ldi	r25, 0x00	; 0
+    13ec:	08 95       	ret
 
-000013ec <__udivmodhi4>:
-    13ec:	aa 1b       	sub	r26, r26
-    13ee:	bb 1b       	sub	r27, r27
-    13f0:	51 e1       	ldi	r21, 0x11	; 17
-    13f2:	07 c0       	rjmp	.+14     	; 0x1402 <__udivmodhi4_ep>
+000013ee <__udivmodhi4>:
+    13ee:	aa 1b       	sub	r26, r26
+    13f0:	bb 1b       	sub	r27, r27
+    13f2:	51 e1       	ldi	r21, 0x11	; 17
+    13f4:	07 c0       	rjmp	.+14     	; 0x1404 <__udivmodhi4_ep>
 
-000013f4 <__udivmodhi4_loop>:
-    13f4:	aa 1f       	adc	r26, r26
-    13f6:	bb 1f       	adc	r27, r27
-    13f8:	a6 17       	cp	r26, r22
-    13fa:	b7 07       	cpc	r27, r23
-    13fc:	10 f0       	brcs	.+4      	; 0x1402 <__udivmodhi4_ep>
-    13fe:	a6 1b       	sub	r26, r22
-    1400:	b7 0b       	sbc	r27, r23
+000013f6 <__udivmodhi4_loop>:
+    13f6:	aa 1f       	adc	r26, r26
+    13f8:	bb 1f       	adc	r27, r27
+    13fa:	a6 17       	cp	r26, r22
+    13fc:	b7 07       	cpc	r27, r23
+    13fe:	10 f0       	brcs	.+4      	; 0x1404 <__udivmodhi4_ep>
+    1400:	a6 1b       	sub	r26, r22
+    1402:	b7 0b       	sbc	r27, r23
 
-00001402 <__udivmodhi4_ep>:
-    1402:	88 1f       	adc	r24, r24
-    1404:	99 1f       	adc	r25, r25
-    1406:	5a 95       	dec	r21
-    1408:	a9 f7       	brne	.-22     	; 0x13f4 <__udivmodhi4_loop>
-    140a:	80 95       	com	r24
-    140c:	90 95       	com	r25
-    140e:	bc 01       	movw	r22, r24
-    1410:	cd 01       	movw	r24, r26
-    1412:	08 95       	ret
+00001404 <__udivmodhi4_ep>:
+    1404:	88 1f       	adc	r24, r24
+    1406:	99 1f       	adc	r25, r25
+    1408:	5a 95       	dec	r21
+    140a:	a9 f7       	brne	.-22     	; 0x13f6 <__udivmodhi4_loop>
+    140c:	80 95       	com	r24
+    140e:	90 95       	com	r25
+    1410:	bc 01       	movw	r22, r24
+    1412:	cd 01       	movw	r24, r26
+    1414:	08 95       	ret
 
-00001414 <strcpy_P>:
-    1414:	fb 01       	movw	r30, r22
-    1416:	dc 01       	movw	r26, r24
-    1418:	05 90       	lpm	r0, Z+
-    141a:	0d 92       	st	X+, r0
-    141c:	00 20       	and	r0, r0
-    141e:	e1 f7       	brne	.-8      	; 0x1418 <strcpy_P+0x4>
-    1420:	08 95       	ret
+00001416 <strcpy_P>:
+    1416:	fb 01       	movw	r30, r22
+    1418:	dc 01       	movw	r26, r24
+    141a:	05 90       	lpm	r0, Z+
+    141c:	0d 92       	st	X+, r0
+    141e:	00 20       	and	r0, r0
+    1420:	e1 f7       	brne	.-8      	; 0x141a <strcpy_P+0x4>
+    1422:	08 95       	ret
 
-00001422 <_exit>:
-    1422:	f8 94       	cli
+00001424 <_exit>:
+    1424:	f8 94       	cli
 
-00001424 <__stop_program>:
-    1424:	ff cf       	rjmp	.-2      	; 0x1424 <__stop_program>
+00001426 <__stop_program>:
+    1426:	ff cf       	rjmp	.-2      	; 0x1426 <__stop_program>

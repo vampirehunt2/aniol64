@@ -234,7 +234,7 @@ printCurrentChar;
 end;
 
 procedure runLoad;
-var filename: string;
+var filename, s: string;
 begin
 printMenu('Enter filename');
 goToXy(2, 21);
@@ -261,15 +261,28 @@ until k = char(13);
 cleanMenuArea;
 end;
 
+procedure number;
+var n: byte;
+begin
+printMenu('Enter ASCII code');
+gotoxy(2, 21);
+readln(n);
+currChar := char(n);
+paintRaster;
+editFont;
+cleanMenuArea;
+end;
+
 procedure runMenu;
 var k: char;
 begin
-printMenu('[L]oad, [S]ave, [Q]uit, [T]est, [C]ancel');
+printMenu('[L]oad, [S]ave, [Q]uit, [T]est, [N]um, [C]ancel');
 k := readKey;
 case k of
      'L': runLoad;
      'S': runSave;
      'T': test;
+     'N': number;
      'Q': halt;
 end;
 cleanMenu;

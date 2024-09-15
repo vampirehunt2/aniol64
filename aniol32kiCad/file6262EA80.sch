@@ -198,10 +198,10 @@ Wire Wire Line
 Wire Wire Line
 	2850 2100 2950 2100
 $Comp
-L Connector_Generic:Conn_02x08_Odd_Even SERIAL?
+L Connector_Generic:Conn_02x08_Odd_Even SERIAL
 U 1 1 62639475
 P 3850 2400
-F 0 "SERIAL?" H 3800 1900 50  0000 L CNN
+F 0 "SERIAL" H 3750 1850 50  0000 L CNN
 F 1 "Conn_02x08_Odd_Even" V 3900 1900 50  0000 L CNN
 F 2 "Connector_PinSocket_2.54mm:PinSocket_2x08_P2.54mm_Horizontal" H 3850 2400 50  0001 C CNN
 F 3 "~" H 3850 2400 50  0001 C CNN
@@ -231,4 +231,6 @@ Wire Wire Line
 	4150 2700 4250 2700
 Wire Wire Line
 	4250 2700 4250 1400
+Text GLabel 1650 4350 2    50   Input ~ 0
+IO_IEO
 $EndSCHEMATC
