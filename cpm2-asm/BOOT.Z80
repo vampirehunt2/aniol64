@@ -1,0 +1,19 @@
+; CPM bootloader
+; Loads CPM from the ROM
+
+BANK_PORT equ 11011111b  ; DFh bank switching is activated with A5
+
+; copy ROM code to low RAM
+; initially, both ROM and low RAM are in the same area of the addres space (0000-7FFF)
+; ROM is responding to read signals, and low RAM is responding to write signals.
+copyRom2Ram:
+	LD HL, 0400h    ; leaving 1K for the installer itself
+	LD DE, E400h    ; target address is 64K - 7K
+	LD BC, 7 * 1024 ; 7K: size of CPM, including the BIOS
+	LDIR
+
+switchOutRom:
+	LD A, 00
+	OUT (BANK_PORT), A  ; switch the ROM out of the memory map
+
+	JP CBASE            ; start the CCP

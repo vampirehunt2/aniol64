@@ -1,0 +1,36 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "dezog",
+            "request": "launch",
+            "name": "Simulator - Bare Z80",
+            "remoteType": "zsim",
+            "zsim": {
+                "visualMemory": true,
+                "memoryModel": "RAM"
+            },
+            "sjasmplus": [
+                {
+                    "path": "C:/8bit/git/cpm2-asm/cpm.sld"
+                }
+            ],
+            "commandsAfterLaunch": ["-mv 0e400h 100"],
+            "history": {
+                "reverseDebugInstructionCount": 1000000,
+                "spotCount": 10,
+                "codeCoverageEnabled": true
+            },
+            "startAutomatically": false,
+            "rootFolder": "${workspaceFolder}",
+            "loadObjs": [
+                { "path": "C:/8bit/git/cpm2-asm/cpm22.bin", "start": "0xE400" }
+        ],
+            "execAddress": "BOOT",
+            "topOfStack": "0xFFFF"
+        }
+    ]
+}

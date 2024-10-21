@@ -1,0 +1,23 @@
+ device NOSLOT64K 
+
+BANK_PORT equ 11011111b  	; DFh bank switching is activated with A5
+BOOT equ 0FA00h				; the address of the BOOT label
+
+    LD SP, 0FFFFh
+
+copyRom2Ram:
+	LD HL, 0400h    ; leaving 1K for the installer itself
+	LD DE, 0E400h   ; target address is 64K - 7K
+	LD BC, 7 * 1024 ; 7K: size of CPM, including the BIOS
+	LDIR
+
+saveToDisk:
+
+switchOutRom:
+	LD A, 00
+	OUT (BANK_PORT), A  ; switch the ROM out of the memory map
+
+jumpToCpm:
+    JP BOOT            ; start the system by jumping to BOOT
+
+	

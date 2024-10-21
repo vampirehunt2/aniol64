@@ -1,0 +1,3 @@
+cd A64ROM
+call cpmloade.exe
+exit

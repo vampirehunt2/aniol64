@@ -1,13 +1,35 @@
+
+
 ; POWER-ON/RESET
 bios_boot:
+    CALL bzr_beep
     CALL dspInit
+    LD A, 'X'
+    CALL putChar
     CALL keyInit
-    RET
+    // fall through to wboot
 
 ; WARM BOOT
 bios_wboot:
-    //TODO
-    RET
+    LD HL, 0000h
+    LD (HL), 0C3h       ; JP instruction
+    INC HL              ; HL = 1
+    LD (HL), 03h        ; bios_wboot lower address byte
+    INC HL              ; HL = 2
+    LD (HL), 0FAh       ; bios_wboot higher address byte
+    INC HL              ; HL = 3
+    LD (HL), 00000001b  ; IOBYTE, as per http://www.gaby.de/cpm/manuals/archive/cpm22htm/ch6.htm#Section_6.6
+                        ; Console assigned to CRT
+    INC HL              ; HL = 4
+    LD (HL), 00h        ; user = 0, disk = 0
+    INC HL              ; HL = 5
+    LD (HL), 0C3h       ; JP instruction
+    INC HL              ; HL = 6
+    LD (HL), 06h        ; bdos entry point lower address byte
+    INC HL              ; HL = 7
+    LD (HL), 0ECh       ; bdos entry point higher address byte
+    LD C, 0             ; pass current disk number to CCP in C
+    JP COMMAND
 
 ;CONSOLE STATUS, RETURN 0FFH IF CHARACTER READY, 00H IF NOT
 bios_const:
@@ -88,3 +110,11 @@ bios_listst:
 ;45: Sector translation for skewing
 bios_sectran:
     RET
+
+; device drivers
+ include "PS2.Z80"
+ include "TM.Z80"
+ include "BZR.Z80"
+
+
+ DB "EndOfBios"

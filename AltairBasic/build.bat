@@ -1,1 +1,1 @@
-..\asmx\asmx20.exe -C 8085 -b -e -w -l 4k.lst 4k.a85
+..\..\asmx\asmx20.exe -C 8085 -b -e -w -l 4k.lst 4k.a85

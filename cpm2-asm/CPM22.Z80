@@ -1,3 +1,4 @@
+  device NOSLOT64K 
 ;**************************************************************
 ;*
 ;*             C P / M   version   2 . 2
@@ -42,7 +43,7 @@ DEL	EQU	7FH		;rubout
 	ORG	(MEM-7)*1024
 ;
 CBASE:
-		JP	COMMAND		;execute command processor (ccp).
+	JP	COMMAND		;execute command processor (ccp).
 	JP	CLEARBUF	;entry to empty input buffer before starting ccp.
 
 ;
@@ -50,7 +51,7 @@ CBASE:
 ; (actual length), (char #1), (char #2), (char #3), etc.
 ;
 INBUFF:
-		DEFB	127		;length of input buffer.
+	DEFB	127		;length of input buffer.
 	DEFB	0		;current length of contents.
 	DEFB	'Copyright'
 	DEFB	' 1979 (c) by Digital Research      '
@@ -67,14 +68,14 @@ NAMEPNT:
 ;   Routine to print (A) on the console. All registers used.
 ;
 PRINT:
-		LD	E,A		;setup bdos call.
+	LD	E,A		;setup bdos call.
 	LD	C,2
 	JP	ENTRY
 ;
 ;   Routine to print (A) on the console and to save (BC).
 ;
 PRINTB:
-		PUSH	BC
+	PUSH	BC
 	CALL	PRINT
 	POP	BC
 	RET	
@@ -83,7 +84,7 @@ PRINTB:
 ; to the console.
 ;
 CRLF:
-		LD	A,CR
+	LD	A,CR
 	CALL	PRINTB
 	LD	A,LF
 	JP	PRINTB
@@ -707,7 +708,7 @@ COMMAND:
 ;   Entry point to get a command line from the console.
 ;
 CMMND1:
-		LD	SP,CCPSTACK	;set stack straight.
+	LD	SP,CCPSTACK	;set stack straight.
 	CALL	CRLF		;start a new line on the screen.
 	CALL	GETDSK		;get current drive.
 	ADD	A,'a'
@@ -4174,45 +4175,31 @@ CKSUMTBL:
 ;*
 ;**************************************************************
 ;
-BOOT:
-		JP	bios_boot
-WBOOT:
-		JP	bios_wboot
-CONST:
-		JP	bios_const
-CONIN:
-		JP	bios_conin
-CONOUT:
-		JP	bios_conout
-LIST:
-		JP	bios_list
-PUNCH:
-		JP	bios_punch
-READER:
-		JP	bios_reader
-HOME:
-		JP	bios_home
-SELDSK:
-		JP	bios_seldsk
-SETTRK:
-		JP	bios_settrk
-SETSEC:
-		JP	bios_setsec
-SETDMA:
-		JP	bios_setdma
-READ:
-		JP	bios_read
-WRITE:
-		JP	bios_write
-PRSTAT:
-		JP	0
-SECTRN:
-		JP	bios_sectran
+
+	DS 0FA00h - $, 0
+	ASSERT $==0FA00h, "Jump table in the wrong place"
+	
+BOOT: JP	bios_boot
+WBOOT: JP	bios_wboot
+CONST: JP	bios_const
+CONIN: JP	bios_conin
+CONOUT: JP	bios_conout
+LIST: JP	bios_list
+PUNCH: JP	bios_punch
+READER: JP	bios_reader
+HOME: JP	bios_home
+SELDSK: JP	bios_seldsk
+SETTRK: JP  bios_settrk
+SETSEC: JP	bios_setsec
+SETDMA: JP	bios_setdma
+READ: JP	bios_read
+WRITE: JP	bios_write
+PRSTAT: JP	0
+SECTRN: JP	bios_sectran
 ;
 ;*
 ;******************   E N D   O F   C P / M   *****************
 ;*
 
- include "PS2.ASM"
- include "TM.ASM"
+; the BIOS
  include "BIOS.Z80"

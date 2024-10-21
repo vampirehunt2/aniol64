@@ -6,7 +6,5 @@ test.fnt
 test_c.fnt
 rogue.fnt
 rogue_c.fnt
-rogue.fnt
-rogue_c.fnt
 eightbb.fnt
 eighbb_c.fnt
