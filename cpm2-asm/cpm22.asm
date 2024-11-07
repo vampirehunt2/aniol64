@@ -12,7 +12,7 @@
 ;   Set memory limit here. This is the amount of contigeous
 ; ram starting from 0000. CP/M will reside at the end of this space.
 ;
-MEM	EQU	64			;for a 64k system 
+MEM	EQU	62			;for a 62k system 
 ;
 IOBYTE	EQU	3		;i/o definition byte.
 TDRIVE	EQU	4		;current drive name and user number.
@@ -40,7 +40,7 @@ DEL	EQU	7FH		;rubout
 ;
 ;   Set origin for CP/M
 ;
-	ORG	(MEM-7)*1024
+	ORG	(MEM - 7) * 1024
 ;
 CBASE:
 	JP	COMMAND		;execute command processor (ccp).
@@ -103,7 +103,7 @@ PLINE:
 	CALL	CRLF
 	POP	HL
 PLINE2:
-		LD	A,(HL)
+	LD	A,(HL)
 	OR	A
 	RET	Z
 	INC	HL
@@ -115,7 +115,7 @@ PLINE2:
 ;   Routine to reset the disk system.
 ;
 RESDSK:
-		LD	C,13
+	LD	C, 13
 	JP	ENTRY
 ;
 ;   Routine to select disk (A).
@@ -229,7 +229,7 @@ GETUSR:
 ; If (E) is FF then this is a GET, else it is a SET.
 ;
 GETSETUC:
-	 LD	C,32
+	LD	C,32
 	JP	ENTRY
 ;
 ;   Routine to set the current drive byte at (TDRIVE).
@@ -3819,13 +3819,13 @@ AUTOSL1:
 ;   Function to return the current cp/m version number.
 ;
 GETVER:
-		LD	A,022H		;version 2.2
+	LD	A,022H		;version 2.2
 	JP	SETSTAT
 ;
 ;   Function to reset the disk system.
 ;
 RSTDSK:
-		LD	HL,0		;clear write protect status and log
+	LD	HL,0		;clear write protect status and log
 	LD	(WRTPRT),HL	;in vector.
 	LD	(LOGIN),HL
 	XOR	A		;select drive 'A'.
@@ -4176,8 +4176,8 @@ CKSUMTBL:
 ;**************************************************************
 ;
 
-	DS 0FA00h - $, 0
-	ASSERT $==0FA00h, "Jump table in the wrong place"
+	DS 0F200h - $, 0
+	ASSERT $==0F200h, "Jump table in the wrong place"
 	
 BOOT: JP	bios_boot
 WBOOT: JP	bios_wboot
@@ -4202,4 +4202,4 @@ SECTRN: JP	bios_sectran
 ;*
 
 ; the BIOS
- include "BIOS.Z80"
+ include "BIOS.asm"

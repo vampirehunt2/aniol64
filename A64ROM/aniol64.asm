@@ -187,6 +187,7 @@ resetNmiHandler:
  include onp.asm
  include edit.asm
  include tar.asm
+ include cpm.asm
 
 ; high ROM code
   ds HIGHROM - $, 0

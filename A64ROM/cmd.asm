@@ -28,6 +28,7 @@ Snake:		defb "snake", 0
 Vh:			defb "vh", 0
 Onp:		defb "onp", 0
 Edit:		defb "edit", 0
+Cpm: 		defb "cpm", 0
 ; DOS commands
 Pwd:		defb "pwd", 0
 Ls:			defb "ls", 0
@@ -138,6 +139,10 @@ cmd_main:
 		LD IY, Edit
 		CALL str_cmp
 		JP Z, .edit
+		; execute CP/M
+		LD IY, Cpm
+		CALL str_cmp
+		JP Z, .cpm
 		; pwd command
 		LD IY, Pwd
 		CALL str_cmp
@@ -250,6 +255,9 @@ cmd_main:
 		JP cmd_main
 .edit:
 		CALL ed_main
+		JP cmd_main
+.cpm:
+		CALL cpm_main
 		JP cmd_main
 .pwd:
 		CALL dos_pwd

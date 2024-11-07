@@ -143,22 +143,14 @@ mon_setAddress:
         CALL mon_refresh
         JP mon_main_loop
 
+; transfers control of the program to the value of (MonCurrAddress)
+; we are assuming whatever program we call will
+; either continue running until system reset or jump back to a known location, such as mon_main
+; so there is no return from this routine
 mon_run:
-        PUSH HL
-        POP IX  ; setting IX to point to the argument of the adr command
-        CALL parseDByte
-        CP 0
-        JR NZ, .parseError
-        JP (HL)  ; we are assuming whatever program we call will
-                ;either continue running until system reset or jump back to a known location, such as mon_main
-.parseError:
-        CALL mon_gotoStatusLine
-        LD IX, InvAddr
-        CALL writeStr
-        CALL readKey
-        CALL mon_refresh
-        JP mon_main_loop
-        RET
+        LD HL, (MonCurrAddr)
+        JP (HL)  
+
 
 mon_setValue:
         PUSH HL
@@ -244,24 +236,28 @@ mon_fill:
 ; command format:
 ; c <target16>, <size16>
 ; copies from (monCurrAddr)
-; doesn't change (monCurrAddr)
+; sets (monCurrAddr) to the target address after the copy
 mon_copy:
-        PUSH HL
-        POP IX                  ; put the arguments of the copy command in IX
+        CALL str_shift          ; put the arguments of the copy command in IX
         CALL str_tok            ; target address now in a string pointed to by IX
                                 ; number of bytes now in a string pointed to by HL
+        PUSH HL                 ; save the number of bytes string on stack
         CALL parseDByte
         CP 0
         JP NZ, .invalidAddress
-        PUSH BC                 ; saving the parsed number in BC
+        PUSH HL                 ; saving the parsed number
         POP DE                  ; target address now in DE 
-        PUSH HL
         POP IX                  ; number of bytes now in a string pointed to by IX
-        CALL parseDByte         ; now parsing the value into BC
+        CALL parseDByte         ; now parsing the value into HL
+        PUSH HL
+        POP BC                  ; number of bytes now in BC
         CP 0
         JP NZ, .invalidValue
+        PUSH DE                 ; store target address
         LD HL, (MonCurrAddr)
         LDIR                    ; perform the copy
+        POP HL                  ; restore target address to HL
+        LD (MonCurrAddr), HL    ; set the current address to be the target address
         CALL mon_dsp
         JP mon_main_loop
 .invalidValue:
