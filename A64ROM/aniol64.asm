@@ -13,12 +13,12 @@
 
 	LD SP, RAMTOP   ; initialise stack pointer to the top of available RAM
 	IM 2			; set interupt mode to 2
-	LD A, 01h	   ; higher byte of the interrupt vector table
-	LD I, A		 ; set the vector table address
+	LD A, 01h	   	; higher byte of the interrupt vector table
+	LD I, A		 	; set the vector table address
 	;CALL copyRom2Ram
 	EI				; enable interrupts
 	CALL resetNmiHandler
-	JP boot		 ; jump over the interrupt handlers for NMI and mode 1 INT
+	JP boot		 	; jump over the interrupt handlers for NMI and mode 1 INT
 
  ds 0020h - $, 0
 Version: defb 0, 0, 0, 0
