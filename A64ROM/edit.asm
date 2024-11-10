@@ -519,9 +519,8 @@ ed_home:
 	RET
 
 ed_newFile:					; TODO, perhaps this should be part of DOS
-	LD A, 0
-	LD (TotalLines), A
 	LD HL, 0000h
+	LD (TotalLines), HL
 	LD (CurrentFileSize), HL
 	LD (StartLine), HL
 	RET
