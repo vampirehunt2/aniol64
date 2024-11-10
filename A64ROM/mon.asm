@@ -16,9 +16,9 @@ PrevLine: 	defb "u", 0
 Fill: 		defb "f", 0
 Copy: 		defb "c", 0
 Run: 		defb "r", 0
-
-Bye: 		defb "bye", 			0
-Exit: 		defb "Exiting...", 		0
+Disk:           defb "k", 0
+Bye: 		defb "x", 0
+Exit: 		defb "Exiting...", 	0
 ParseErr: 	defb "Parse error", 	0
 InvAddr: 	defb "Invalid address", 0
 InvVal: 	defb "Invalid value", 	0 
@@ -89,6 +89,11 @@ mon_main_loop:
         LD IY, Run
         CALL str_cmp
         JP Z, mon_run
+        ; disk inspection command
+        LD IX, LineBuff
+        LD IY, Disk
+        CALL str_cmp
+        JP Z, mon_disk
         ; bye command
         LD IX, LineBuff
         LD IY, Bye
@@ -231,6 +236,37 @@ mon_fill:
         CALL mon_refresh
         JP mon_main_loop
 
+
+; command format:
+; k <sector8:track8>
+; loads the specified sector to SectorBuffer
+; sets (monCurrAddr) to SectorBuffer
+mon_disk:
+        CALL str_shift
+        CALL str_tok
+        CALL parseDByte  
+        CP 0
+        JP NZ, .invalidValue
+        LD A, H
+        LD B, L
+        LD C, 0
+        CALL cf_setSector
+        LD HL, SectorBuffer
+        CALL cf_readSector
+        LD HL, SectorBuffer
+        LD (MonCurrAddr), HL
+        CALL mon_dsp
+        JP mon_main_loop
+.invalidValue:
+        CALL mon_gotoStatusLine
+        LD IX, InvVal
+        CALL writeStr
+        CALL readKey
+        CALL mon_refresh
+        JP mon_main_loop
+        RET
+
+        
 
 
 ; command format:
@@ -395,14 +431,14 @@ mon_printVals:
 
 
 mon_printChar:
-		CP 32
-		JR C, .special
-		JR .print
+	CP 32
+	JR C, .special
+	JR .print
 .special:
-		LD A, ' '
+	LD A, ' '
 .print:
-		CALL putChar
-		RET
+	CALL putChar
+	RET
 
 
 mon_printByte:
@@ -459,7 +495,7 @@ mon_nextAddrs:
         INC HL
         INC HL
         INC HL
-		INC HL
+	INC HL
         INC HL
         INC HL
         INC HL
@@ -471,7 +507,7 @@ mon_prevAddrs:
         DEC HL
         DEC HL
         DEC HL
-		DEC HL
+	DEC HL
         DEC HL
         DEC HL
         DEC HL
@@ -511,7 +547,7 @@ mon_peek:
 
 
 mon_poke:
-		CALL str_shift
+	CALL str_shift
         CALL str_tok        ; address now in a string pointed to by IX, value in a string pointed to by HL
         PUSH HL             ; copying the value string
         POP IY              ; to IY for safekeeping
@@ -536,7 +572,7 @@ mon_poke:
         RET
 
 mon_put:
-		CALL str_shift
+	CALL str_shift
         CALL str_tok        ; port number now in a string pointed to by IX, value in a string pointed to by HL
         PUSH HL             ; copying the value string
         POP IY              ; to IY for safekeeping
@@ -547,17 +583,17 @@ mon_put:
         PUSH IY             ; transferring the value string
         POP IX              ; to IX
 .loop:
-		CALL str_tok
-		CALL str_len
-		CP 0
-		RET Z
+	CALL str_tok
+	CALL str_len
+	CP 0
+	RET Z
         CALL parseByte      ; assuming parsing is OK, value is now in B
         CP 0
         JR NZ, .valError
         LD A, B             ; load the value to A
         OUT (C), A          ; output the value to the port with the given number
-		CALL str_shift
-		JR .loop
+	CALL str_shift
+	JR .loop
         RET
 .addrError:
         LD IX, InvAddr
@@ -572,15 +608,15 @@ mon_put:
 
 mon_get:
         CALL str_shift
-		CALL parseByte
-		CP 0
-		JR NZ, .addrError
-		LD C, B
-		IN A, (C)
-		CALL mon_printByteA
-		RET
+	CALL parseByte
+	CP 0
+	JR NZ, .addrError
+	LD C, B
+	IN A, (C)
+	CALL mon_printByteA
+	RET
 .addrError:
-		LD IX, InvAddr
+	LD IX, InvAddr
         CALL writeStr
         RET
 
