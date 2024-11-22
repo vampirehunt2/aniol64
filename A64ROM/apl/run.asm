@@ -347,7 +347,7 @@ run_evalFunction:
     CP ASSIGNMENT_B
     JR Z, .end
     CP SYSCALL_B
-    JR NZ, .end        
+    JR NZ, .next        
     INC HL  
     INC HL              ; move to the operand            
     LD A, (HL)          ; load the operand bytecode to A
@@ -383,11 +383,6 @@ run_evalFunction:
     POP HL
     RET
 
-; TODO consider not copying the entire string to the Expression
-; but instead evaluating the string upon creating the Expression
-run_evalString:
-
-    RET
 
 run_evalUnary:
     LD HL, Expression
@@ -1201,8 +1196,6 @@ run_execSyscall:
     JP Z, sys_upper
     CP SYS_LOWER_B
     JP Z, sys_lower
-    CP SYS_OPEN_B
-    JP Z, sys_open
     CP SYS_SAVE_B
     JP Z, sys_save
     CP SYS_RESET_B
@@ -1211,6 +1204,8 @@ run_execSyscall:
     JP Z, sys_seek
     CP SYS_FREAD_B
     JP Z, sys_fread
+    CP SYS_FWRITE_B
+    JP Z, sys_fwrite
     RET
 
 ; executes a system function
@@ -1232,6 +1227,8 @@ run_execFunction:
     JP Z, sys_get
     CP SYS_READKEY_B
     JP Z, sys_readKey
+    CP SYS_OPEN_B
+    JP Z, sys_open
     RET
 
 
