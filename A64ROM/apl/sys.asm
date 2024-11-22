@@ -3,7 +3,9 @@
 ParseError:     defb "Parse error", 0
 
 
-; Write
+; Writes a decimal number to screen
+; procedure
+; syntax: Write <Expression>
 sys_write:
     CALL run_evaluate
     CP 0
@@ -19,6 +21,9 @@ sys_write:
     RET
 
 ; TODO: add a second argument for max string length
+; reads a line of text from the keyboard into a variable
+; procedure
+; syntax: ReadS <Variable>
 sys_readString:
     CALL cursorOn
     CALL readLine
@@ -35,11 +40,17 @@ sys_readString:
     LD HL, Vars         
     ADD HL, BC          ; get the variable address
     ; 
-    PUSH HL             ; copy HL...
+    LD C, (HL)          ; put the value of the variable...
+    INC HL              ; ... (i.e. address of the string)...            
+    LD B, (HL)          ; ...in BC  
+    PUSH BC             ; copy BC...
     POP IY              ; ... to IY
     CALL str_copy       ; copy the string that was read in to the memory area pointed to by IY (and therefore HL)
     RET
 
+; reads a 16-bit number from the keyboard into a variable
+; procedure
+; syntax: Read <Variable>
 sys_read:
     CALL cursorOn
     PUSH HL             ; store the pointer into the statement bytecode on the stack
@@ -77,26 +88,46 @@ sys_read:
     CALL writeLn
     JR sys_read
 
+
+; Makes a beep sound on the system speaker
+; procedure
+; syntax: Beep
 sys_beep:
     CALL bzr_beep
     RET
 
+; Makes a click sound on the system speaker
+; procedure
+; syntax: Click
 sys_click:
     CALL bzr_click
     RET
 
+; Moves the cursor to the beggining of next line on the screen
+; procedure
+; syntax: NewLn
 sys_nextLn:
     CALL nextLine
     RET
 
+; Returns absolute value of an expression
+; function
+; syntax: Abs(<Expression>)
 sys_abs:
     CALL i16_abs
     RET
 
+; Returns a random 8-bit number from 0 to (argument - 1)
+; function
+; syntax: Rnd(<Expression>)
 sys_rnd:
+    LD C, L
     CALL rndMod
     RET
 
+; Stops the program execution for approximately (argument * 10ms)
+; procedue
+; syntax: Delay <Expression>
 sys_delay:
     CALL run_evaluate
     CP 0
@@ -108,7 +139,10 @@ sys_delay:
     ; TODO
     RET
 
-; 8-bit peek
+; 8-bit peek of a memory location pointed to by the argument
+; function
+; syntax: Peek(<Expression>)
+; argument1: Address (16bit)
 sys_peek:
     PUSH IX
     PUSH HL
@@ -120,6 +154,10 @@ sys_peek:
 
 
 ; 8-bit poke
+; procedure
+; syntax: Poke <Expression>, <Expression>
+; argument1: Address (16bit)
+; argument2: Value  (8bit)
 sys_poke:
     CALL run_evaluate
     CP 0
@@ -135,6 +173,11 @@ sys_poke:
     ; TODO
     RET
 
+; moves the cursor to the given screen coordinates
+; procedure
+; syntax: GotoXY <Expression>, <Expression>
+; argument1: Column (8bit)
+; argument2: Row (8bit)
 sys_gotoxy:
     CALL run_evaluate           ; evaluate the X coefficient
     CP 0                        ; check if a valid expression
@@ -152,6 +195,10 @@ sys_gotoxy:
     ; TODO
     RET
 
+; puts a character on the screen
+; procedure
+; syntax: PutChar <Expression>
+; argument1: character to print (8bit)
 sys_putChar:
     CALL run_evaluate           ; evaluate the character
     CP 0                        ; check if a valid expression
@@ -277,6 +324,8 @@ sys_readKey:
     LD H, 0
     RET
 
+; one-byte get
+; port number is one byte, passed in L
 sys_get:
     LD C, L
     IN A, (C)
@@ -284,6 +333,8 @@ sys_get:
     LD H, 0
     RET
 
+; clear the screen
+; syntax: ClrScr
 sys_clrScr:
     CALL clrScr
     CALL home
@@ -292,6 +343,7 @@ sys_clrScr:
 ; #################### DOS functions ########################
 
 ; Open a file from disk and load it to the file buffer
+; syntax: Open <Expression>
 sys_open:
     CALL run_evaluate
     CP 0
@@ -347,3 +399,15 @@ sys_seek:
 
 sys_fread:
     RET
+
+sys_fwrite:
+    CALL run_evaluate       ; evaluate the expression to be written
+    CP 0
+    JR NZ, .syntaxErr 
+    LD A, L
+    CALL dos_fWrite
+    RET
+.syntaxErr:
+    ; TODO  
+    RET
+
