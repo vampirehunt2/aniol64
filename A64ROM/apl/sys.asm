@@ -123,6 +123,8 @@ sys_abs:
 sys_rnd:
     LD C, L
     CALL rndMod
+    LD H, 0
+    LD L, A
     RET
 
 ; Stops the program execution for approximately (argument * 10ms)
