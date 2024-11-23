@@ -675,6 +675,7 @@ dos_cdRoot:
 	LD (CurrentDir), A
 	RET
 	
+; changes the current directory
 dos_cd:
 	CALL str_shift	; transfer folder name from HL to IX
 	; check if user wants to go to the root folder
@@ -690,15 +691,13 @@ dos_cd:
 	LD (CurrentDir), A
 	LD IY, CurrentPath
 	CALL str_copy
-	JR .end
+	RET
 .noDir:
 	LD IX, ErrNoSuchDir
 	CALL writeLn
-	JR .end
+	RET
 .root:
 	CALL dos_cdRoot
-.end:
-	RET
 
 dos_ls:
 	LD A, (CurrentDir)
@@ -709,44 +708,79 @@ dos_ls:
 	CALL dos_listFiles
 	RET
 
+; shell command to create an empty file
+cmd_touch:
+	CALL str_shift
+	CALL dos_touch
+	CP DOS_OK
+	RET Z
+	CALL dos_printError
+	RET	
+
 
 ; creates an empty file
 ; IX: file name
-
+; writes the status of the operation to (DosErr)
+; and also returns it in A
 dos_touch:
-	CALL str_shift
 	CALL dos_validateFilename	; first, check if the given file name is valid...
-	CP FALSE			; ...as this doesn't require reding any data from disk 
+	CP FALSE					; ...as this doesn't require reding any data from disk 
 	JR Z, .invName
-	CALL dos_fileExists		; check if file already exists in the current directory
+	CALL dos_fileExists			; check if file already exists in the current directory
 	CP FALSE
 	JR NZ, .fileExists
 	CALL dos_findFreeFileSlot
-	CP FALSE			; check if a free slot exists
+	CP FALSE					; check if a free slot exists
 	JR Z, .diskFull
-	PUSH AF			; save file table sector number on stack
-	CALL str_copy		; copy the file name from the command line to the file record
+	PUSH AF						; save file table sector number on stack
+	CALL str_copy				; copy the file name from the command line to the file record
 	LD A, (CurrentDir)
-	LD (IY + FileDir), A	; copy the current directory to the file record
+	LD (IY + FileDir), A		; copy the current directory to the file record
 	LD A, 0
-	LD (IY + FileLen), A	; set the file to zero length
+	LD (IY + FileLen), A		; set the file to zero length
 	LD (IY + FileLen + 1), A
-	POP AF			; restore file table sector number from stack
+	POP AF						; restore file table sector number from stack
 	CALL dos_saveFileTabSector
+	LD A, DOS_OK
 	JR .end
 .diskFull:	
+	LD A, DISK_FULL
+	JR .end
+.fileExists:
+	LD A, FILE_EXISTS
+	JR .end
+.invName:
+	LD A, INVALID_FILENAME
+; 	JR .end
+.end:
+	LD (DosErr), A
+	RET
+
+; prints out an error message to the screen
+; error code in A
+dos_printError:
+	CP DISK_FULL
+	JR Z, .diskFull
+	CP FILE_EXISTS
+	JR Z, .fileExists
+	CP INVALID_FILENAME
+	JR Z, .invFilename
+	CP INVALID_DIRNAME
+	JR Z, .invDirname
+.diskFull:
 	LD IX, ErrDiskFull
-	CALL writeLn
 	JR .end
 .fileExists:
 	LD IX, ErrFileExists
-	CALL writeLn
 	JR .end
-.invName:
+.invFilename:
 	LD IX, ErrInvFileName
-	CALL writeLn
 	JR .end
+.invDirname:
+	LD IX, ErrInvDirName
+; 	JR .end
 .end:
+	CALL writeLn
 	RET
 
 
