@@ -1229,6 +1229,10 @@ run_execFunction:
     JP Z, sys_readKey
     CP SYS_OPEN_B
     JP Z, sys_open
+    CP SYS_DOSERR_B
+    JP Z, sys_dosError
+    CP SYS_EXISTS_B
+    JP Z, sys_exists
     RET
 
 

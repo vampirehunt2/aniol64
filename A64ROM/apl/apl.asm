@@ -142,6 +142,8 @@ SYS_RESET_B		equ 1Ah
 SYS_SEEK_B		equ 1Bh
 SYS_FREAD_B		equ 1Ch
 SYS_FWRITE_B	equ 1Dh
+SYS_DOSERR_B	equ 1Eh
+SYS_EXISTS_B	equ 1Fh
 
 BuiltInFunctions:
 
@@ -151,7 +153,7 @@ BuiltInFunctions:
  defb "Get",		0, SYS_GET_B
  defb "Put",		0, SYS_PUT_B
  defb "Delay",		0, SYS_DELAY_B
- 
+
 ; Console functions
  defb "Read", 		0, SYS_READ_B
  defb "Write", 		0, SYS_WRITE_B
@@ -190,10 +192,11 @@ BuiltInFunctions:
 ; defb "Size", 	0, SYS_SIZE_B	
 ; defb "MkDir", 	0, SYS_MKDIR_B
 ; defb "RmDir", 	0, SYS_RMDIR_B
-; defb "DosErr", 	0, SYS_DOSERR_B
+ defb "DosErr", 	0, SYS_DOSERR_B
 ; defb "Delete", 	0, SYS_DELETE_B
 ; defb "Pwd", 	0, SYS_PWD_B
 ; defb "Touch", 	0, SYS_TOUCH_B
+ defb "Exists", 	0, SYS_EXISTS_B
  defb 0
 
 ; 128 variables with names of up to 8 characters, 
