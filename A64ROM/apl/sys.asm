@@ -477,6 +477,21 @@ sys_exists:
     RET
 
 
+sys_touch:
+    PUSH HL
+    POP IX              ; transfer file name pointer to IX
+    CALL dos_touch
+    CP DOS_OK
+    JR NZ, .err
+    LD H, TRUE
+    LD L, TRUE
+    RET
+.err:
+    LD H, FALSE
+    LD L, FALSE
+    RET
+
+
 
 sys_chdir:  // TODO incomplete
     CALL dos_cd

@@ -144,6 +144,7 @@ SYS_FREAD_B		equ 1Ch
 SYS_FWRITE_B	equ 1Dh
 SYS_DOSERR_B	equ 1Eh
 SYS_EXISTS_B	equ 1Fh
+SYS_TOUCH_B		equ 20h
 
 BuiltInFunctions:
 
@@ -195,7 +196,7 @@ BuiltInFunctions:
  defb "DosErr", 	0, SYS_DOSERR_B
 ; defb "Delete", 	0, SYS_DELETE_B
 ; defb "Pwd", 	0, SYS_PWD_B
-; defb "Touch", 	0, SYS_TOUCH_B
+ defb "Touch", 	0, SYS_TOUCH_B
  defb "Exists", 	0, SYS_EXISTS_B
  defb 0
 

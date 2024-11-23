@@ -361,7 +361,9 @@ run_evalFunction:
     LD L, (IX + 1)      ; lower byte of the first operand
     LD H, (IX + 2)      ; higher byte of the first operand
     LD A, (IX - 1)      ; syscall index
-    CALL run_execFunction
+    PUSH IX             ; store pointer into the expression...
+    CALL run_execFunction ;...in case the function messes with it
+    POP IX              ; restore pointer into the expression
 .cont:
     LD (IX - 2), NUM_B
     LD (IX - 1), L      ; store lower byte of result
@@ -1233,6 +1235,8 @@ run_execFunction:
     JP Z, sys_dosError
     CP SYS_EXISTS_B
     JP Z, sys_exists
+    CP SYS_TOUCH_B
+    JP Z, sys_touch
     RET
 
 
