@@ -12,6 +12,7 @@ BZR_PORT equ 10000000b  ; 80h
 bzr_beep:
 		PUSH AF
 		PUSH BC
+        LD B, 0
         LD C, BZR_PORT
         LD A, 0FFh
         OUT (C), A
@@ -26,6 +27,7 @@ bzr_beep:
 bzr_click:
 		PUSH AF
 		PUSH BC
+        LD B, 0
         LD C, BZR_PORT
         LD A, 0FFh
         OUT (C), A
