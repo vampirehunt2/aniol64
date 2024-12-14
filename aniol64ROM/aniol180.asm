@@ -32,8 +32,8 @@ Build: defw 0000h
  ds 0100h - $, 0					; interrupt vector table
 KeyClickHandler: defb 80, 10		; INT1 interrupt vector (least significant byte first)
 
- ds 0180h - $, 0						; interrupt handler table
-	JP ps2_shiftIn
+ ds 0180h - $, 0					; interrupt handler table
+	RETI
 
 
 
@@ -66,7 +66,6 @@ PROGRAM_DATA 		equ 8200h
 
 
 Ready: defb	 "Ready", 0
-Hello: defb	 "Hello", 0
 
 boot:
 	; init the memory map
@@ -107,7 +106,7 @@ boot:
 	CALL dspInit
 
 	; initialise the keyboard
-	;CALL keyInit
+	CALL keyInit
 
 	; greetings
 	CALL nextLine
@@ -164,13 +163,9 @@ resetNmiHandler:
 
 ; device drivers
  include dev/bzr.asm
- ;include dev/pal.asm
- ;include dev/vga.asm
  include dev/tm.asm
  include dev/cf.asm
- ;include dev/kbd.asm
- include dev/ps2.asm
- ;include dev/cas.asm
+ include dev/ser.asm
 
 ; libraries
  include lib/util.asm
