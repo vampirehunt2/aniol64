@@ -186,6 +186,15 @@ isUppercaseLetter:
 	LD A, 0
 	RET
 
+toUpper:
+	CP 'a'
+	JR C, .end
+	CP 'z' + 1
+	JR NC, .end
+	ADD a, 'A' - 'a'
+.end:
+	RET
+
 
 
 isLowercaseLetter:
@@ -384,38 +393,29 @@ delay:
 	CALL delay10ms
 	JP delay
 
-; waits for 37us * 8MHz = 296 clock cycles
-delay37us:			; 17 cycles
-	PUSH BC			; 11 cycles
-	LD B, 18		; 11 cycles
-.loop:				; 13 cycles / per loop
-	DJNZ .loop		; 8 cycles to exit loop
-	POP BC			; 10 cycles
-	RET				; 10 cycles
-
-	; waits for 37us * 2.5MHz = 92 clock cycles
+; waits for 37us * 2.5MHz = 92 clock cycles
 ; which is just 16 NOPs, 4 cycles each
 ; plus 10 cycles for the RET
 ; plus 17 cycles to CALL this routine
-;delay37us:
-;	NOP
-;	NOP
-;	NOP
-;	NOP
-;	NOP
-;	NOP
-;	NOP
-;	NOP
-;	NOP
-;	NOP
-;	NOP
-;	NOP
-;	NOP
-;	NOP
-;	NOP
-;	NOP
-;	RET
-;
+delay37us:
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	RET
+
 
 ; waits for 1520us,
 ; which is 41 calls to delay37us

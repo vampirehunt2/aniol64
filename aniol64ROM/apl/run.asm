@@ -182,6 +182,10 @@ run_evaluate:
     JR Z, .eval         ; if yes, proceed to evaluating
     CP ASSIGNMENT_B     
     JR Z, .eval
+    CP COMMA_B
+    JR Z, .eval
+    CP QUOTE_B          ; check if the bytecode is a string constant
+    JR Z, .string       ; if yes, evaluate the string
     AND 10000000b       ; check if the bytecode is a variable
     CP 0
     JR NZ, .var         ; if yes, evaluate the variable
@@ -193,6 +197,22 @@ run_evaluate:
     CP USERCALL_B
     JR Z, .call          ; ...as are user-defined procedures
     JR .other
+.string:
+    LD A, NUM_B
+    LD (IX), A          ; store the number indicator
+    INC IX
+    INC HL              ; move to the first character of the string
+    LD (IX), L          ; store lower byte of string address
+    INC IX
+    LD (IX), H          ; store higher byte of string address
+    INC IX
+.strSkip:               ; skip to the end of the string
+    INC HL
+    LD A, (HL)
+    CP 0                ; look for null terminator
+    JR NZ, .strSkip
+    INC HL              ; move HL past the null terminator to the next bytecode
+    JR .loop
 .var:
     LD A, (HL)
     AND 01111111b       ; get the variable index
@@ -232,7 +252,8 @@ run_evaluate:
     JR .loop
 ; the expression is now copied to Expression.
 ; evaluate the expression
-.eval:      
+.eval:   
+    PUSH HL             ; save pointer to the end of current expression for later 
     CP SEPARATOR_B
     JR Z, .store
     LD A, SEPARATOR_B    
@@ -244,6 +265,7 @@ run_evaluate:
     CALL run_sanitiseParens
     CALL run_evalFunction
     CALL run_evalIndex
+    CALL run_evalStrIndex
     CALL run_evalUnary
     CALL run_evalMul
     CALL run_evalAdd
@@ -260,9 +282,11 @@ run_evaluate:
     CP SEPARATOR_B
     JR NZ, .syntaxErr
     LD A, 0
+    POP HL              ; restore the end of the current expression to HL
     RET                 ; success
 .syntaxErr:             ; TODO: handle the syntax error
-    LD A, 1
+    LD A, 1             
+    POP HL
     RET
 
 
@@ -323,7 +347,7 @@ run_evalFunction:
     CP ASSIGNMENT_B
     JR Z, .end
     CP SYSCALL_B
-    JR NZ, .end        
+    JR NZ, .next        
     INC HL  
     INC HL              ; move to the operand            
     LD A, (HL)          ; load the operand bytecode to A
@@ -337,7 +361,9 @@ run_evalFunction:
     LD L, (IX + 1)      ; lower byte of the first operand
     LD H, (IX + 2)      ; higher byte of the first operand
     LD A, (IX - 1)      ; syscall index
-    CALL run_execFunction
+    PUSH IX             ; store pointer into the expression...
+    CALL run_execFunction ;...in case the function messes with it
+    POP IX              ; restore pointer into the expression
 .cont:
     LD (IX - 2), NUM_B
     LD (IX - 1), L      ; store lower byte of result
@@ -358,6 +384,7 @@ run_evalFunction:
 .end:
     POP HL
     RET
+
 
 run_evalUnary:
     LD HL, Expression
@@ -427,6 +454,65 @@ run_evalUnary:
     POP HL
     RET
 
+
+; computes and processes the result of a string indexing operation
+run_evalStrIndex:
+    LD HL, Expression
+.loop:
+    PUSH HL             ; save the current pointer into the expression
+    LD A, (HL)
+    CP SEPARATOR_B      ; checking for end of expression
+    JR Z, .end          ; if end of expression reached, return
+    CP ASSIGNMENT_B
+    JR Z, .end
+    CP NUM_B            ; check if we have a numerical value
+    JR NZ, .next        ; if no, move to the next bytecode
+    INC HL              ; if yes, skip over the numerical value
+    INC HL
+    INC HL  
+    LD A, (HL)          ; load the next bytecode after the numerical value to A
+    CP STRINDEX_B
+    JR Z, .do
+    JR .next            ; if no index operator is found, move to the next bytecode
+.do:
+    INC HL
+    LD A, (HL)
+    CP NUM_B            ; check if the second operand is a value
+    JR NZ, .next        ; if not, skip
+    LD A, TRUE
+    LD (EvalProgress), A; indicate that there was an action performed to reduce the expression
+; prepare operands      ; TODO: extract subroutine
+    PUSH HL
+    POP IX              ; IX now pointing to NUM_B bytecode of the second operand
+    LD L, (IX - 3)      ; lower byte of the first operand
+    LD H, (IX - 2)      ; higher byte of the first operand
+    LD C, (IX + 1)      ; lower byte of the second operand
+    LD B, (IX + 2)      ; higher byte of the second operand
+; perform indexing operation
+    ADD HL, BC          ; address of the value now in HL
+    LD C, (HL)          ; load lower byte of result to C
+    LD B, 0             ; load higher value of result to B
+    LD H, B             ; transfer the result from BC to HL
+    LD L, C
+; store result          ; TODO: extract subroutine
+    LD (IX - 3), L      ; store lower byte of result
+    LD (IX - 2), H      ; store higher byte of result
+.loop1:                 ; copy everything to the end of the expression back
+    LD A, (IX + 3)
+    LD (IX - 1), A
+    CP SEPARATOR_B      ; check for end of expression
+    JR Z, .next
+    INC IX              ; move to the next byte of the expression
+    JR .loop1
+    POP HL
+    JR .loop
+.next:
+    POP HL              ; restore the current pointer into the expression
+    CALL run_nextBC     ; move to the next bytecode 
+    JR .loop
+.end:
+    POP HL
+    RET
 
 ; computes and processes the result of an indexing operation (base addr + offset)
 ; on two numerical operands
@@ -818,6 +904,8 @@ run_execAssignment:
     JR Z, .eval
     CP INDEX_B
     JP Z, run_execArrAssignment
+    CP STRINDEX_B
+    JP Z, run_execStrAssignment
     JR .syntaxError
 .eval:
     CALL run_evaluate
@@ -881,6 +969,50 @@ run_execArrAssignment:
     LD IX, (ArrAddr)
     LD (IX), L
     LD (IX+1), H
+    RET
+.syntaxErr:
+    ; TODO
+    RET
+
+; performs an assignment to a string element
+; TODO much of this code is duplicated from run_execArrAssignment
+run_execStrAssignment:
+    PUSH HL
+    DEC HL                  ; point HL to the string variable
+    ; get the value of the string variable (the address of the variable)
+    LD A, (HL)  
+    AND 01111111b           ; get the variable index
+    SLA A                   ; multiply it by 2, as numeric variables are 2 bytes long
+    LD C, A
+    LD B, 0
+    LD HL, Vars         
+    ADD HL, BC  
+    LD C, (HL)
+    INC HL
+    LD B, (HL)      
+    LD (ArrAddr), BC        ; store the value of the string variable, reusing the ArrAddr vzariable here
+    ;
+    POP HL
+    PUSH HL
+    CALL run_evaluate       ; evaluate the expression within the index
+    LD HL, (Expression +1)  ; load evaluate result to HL, skipping the NUM_B bytecode
+    LD BC, (ArrAddr)        ; TODO, this doesn't allow for array operators within array operators. ArrAddr should be stored on stack instead
+    ADD HL, BC              ; array element address now in HL
+    LD (ArrAddr), HL        ; store the element address
+    POP HL
+.loop:                      ; loops to the assignment operator
+    LD A, (HL)
+    CP ASSIGNMENT_B
+    JR Z, .break
+    CP SEPARATOR_B
+    JR Z, .syntaxErr
+    INC HL
+    JR .loop
+.break:
+    CALL run_evaluate
+    LD HL, (Expression +1)  ; load evaluate result to HL, skipping the NUM_B bytecode
+    LD IX, (ArrAddr)
+    LD (IX), L
     RET
 .syntaxErr:
     ; TODO
@@ -1042,6 +1174,40 @@ run_execSyscall:
     JP Z, sys_nextLn
     CP SYS_READ_B
     JP Z, sys_read
+    CP SYS_READS_B
+    JP Z, sys_readString
+    CP SYS_WRITES_B
+    JP Z, sys_writeString
+    CP SYS_CLRSCR_B
+    JP Z, sys_clrScr
+    CP SYS_POKE_B
+    JP Z, sys_poke
+    CP SYS_PUT_B
+    JP Z, sys_put
+    CP SYS_CMP_B
+    JP Z, sys_cmp
+    CP SYS_COPY_B
+    JP Z, sys_copy
+    CP SYS_DELAY_B
+    JP Z, sys_delay
+    CP SYS_PUTCHAR_B
+    JP Z, sys_putChar
+    CP SYS_GOTOXY_B
+    JP Z, sys_gotoxy
+    CP SYS_UPPER_B
+    JP Z, sys_upper
+    CP SYS_LOWER_B
+    JP Z, sys_lower
+    CP SYS_SAVE_B
+    JP Z, sys_save
+    CP SYS_RESET_B
+    JP Z, sys_reset
+    CP SYS_SEEK_B
+    JP Z, sys_seek
+    CP SYS_FREAD_B
+    JP Z, sys_fread
+    CP SYS_FWRITE_B
+    JP Z, sys_fwrite
     RET
 
 ; executes a system function
@@ -1055,6 +1221,22 @@ run_execFunction:
     JP Z, sys_rnd
     CP SYS_PEEK_B
     JP Z, sys_peek
+    CP SYS_LEN_B
+    JP Z, sys_len
+    CP SYS_GETCHAR_B
+    JP Z, sys_getChar
+    CP SYS_GET_B
+    JP Z, sys_get
+    CP SYS_READKEY_B
+    JP Z, sys_readKey
+    CP SYS_OPEN_B
+    JP Z, sys_open
+    CP SYS_DOSERR_B
+    JP Z, sys_dosError
+    CP SYS_EXISTS_B
+    JP Z, sys_exists
+    CP SYS_TOUCH_B
+    JP Z, sys_touch
     RET
 
 

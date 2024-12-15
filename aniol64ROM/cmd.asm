@@ -28,6 +28,7 @@ Snake:		defb "snake", 0
 Vh:			defb "vh", 0
 Onp:		defb "onp", 0
 Edit:		defb "edit", 0
+Cpm: 		defb "cpm", 0
 ; DOS commands
 Pwd:		defb "pwd", 0
 Ls:			defb "ls", 0
@@ -107,9 +108,10 @@ cmd_main:
         CALL str_cmp
         JP Z, .beep
 		; term program
-		;LD IY, Term
-		;CALL str_cmp
-		;JP Z, term_main
+		LD IY, Term
+		CALL str_cmp
+		;TODO JP Z, term_main
+		JP Z, cmd_main
 		; disk info
 		LD IY, DiskInfo
 		CALL str_cmp
@@ -138,6 +140,10 @@ cmd_main:
 		LD IY, Edit
 		CALL str_cmp
 		JP Z, .edit
+		; execute CP/M
+		LD IY, Cpm
+		CALL str_cmp
+		JP Z, .cpm
 		; pwd command
 		LD IY, Pwd
 		CALL str_cmp
@@ -251,6 +257,9 @@ cmd_main:
 .edit:
 		CALL ed_main
 		JP cmd_main
+.cpm:
+		;TODO CALL cpm_main
+		JP cmd_main
 .pwd:
 		CALL dos_pwd
 		JP cmd_main
@@ -267,7 +276,7 @@ cmd_main:
 		CALL dos_cd
 		JP cmd_main
 .touch:
-		CALL dos_touch
+		CALL cmd_touch
 		JP cmd_main
 .rm:
 		CALL dos_rm
@@ -276,7 +285,7 @@ cmd_main:
 		CALL dos_format
 		JP cmd_main
 .tar:
-		;CALL tar_main
+		; TODO CALL tar_main
 		JP cmd_main
 .apl:
 		CALL apl_main
@@ -323,5 +332,3 @@ cmd_echo:
 	CALL str_copy				; copy the file contents TODO add a newline at the end
 	CALL cmd_saveFile
 	RET
-
-

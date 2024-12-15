@@ -478,6 +478,38 @@ u16_parseDec:
         POP BC
         RET
 
+; trims leading zeroes from a string
+; argument in IX
+; result in IX
+trimDec:
+        PUSH BC
+        LD C, FALSE     ; store information whether the number is negative
+        LD A, (IX)
+        CP '-'          ; check for negative number
+        JR NZ, .cont
+        INC IX          ; skip the leading minus character
+        LD C, TRUE      ; is negative
+.cont:
+        CALL str_len
+        LD B, A         ; save length on the string in B
+        DEC B           ; make sure at least one character will be printed out, even if it's a zero
+.loop:
+        LD A, (IX)
+        CP '0'          ; check for leading zeroes
+        JR NZ, .chkneg  ; if character other than zero found, end processing
+        INC IX
+        DJNZ .loop
+.chkneg:
+        LD A, C
+        CP TRUE         ; check if number is negative
+        JR NZ, .end
+        DEC IX
+        LD (IX), '-'
+.end:
+        POP BC
+        RET
+
+
 
 ; formats a 16-bit unsigned number as string
 ; result is a null-terminated string with leading zeroes
@@ -657,4 +689,3 @@ u16_formatBin:
         CALL u8_formatBin
         LD (IX - 9), '-'     ; put a divider between higher and lower byte to enhance readability
         RET
-

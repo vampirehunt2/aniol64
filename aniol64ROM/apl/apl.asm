@@ -1,11 +1,11 @@
 ; apl tokenizer
 
-SpecialChars: defb ".~+-*/\\:=[]()<>&|!@^,;\n\r", 0
+SpecialChars: defb ".~+-*/\\:=[]()<>{}#&|!@^,;\n\r", 0
 
 
 ;
-;	# 	array index
-;	{}	also array index
+;	# 	string index
+;	{}	also string index
 ;	%	comment
 ;	;	same as ENDIF
 ;
@@ -19,7 +19,7 @@ DIV_T: 			defb "/", 	0
 MOD_T: 			defb "\\", 	0
 EQUAL_T:		defb "=", 	0
 NOT_EQUAL_T:	defb "<>", 	0
-QUOTE_T:		defb "'", 	0
+QUOTE_T:		defb "\"", 	0
 LEFT_PAREN_T:	defb "(", 	0
 RIGHT_PAREN_T: 	defb ")", 	0
 LEFT_BRACKET_T:	defb "[", 	0
@@ -35,6 +35,7 @@ NOT_T: 			defb "!", 	0
 ADDR_T: 		defb "@", 	0
 DEREFERENCE_T: 	defb "^", 	0
 INDEX_T:		defb ".", 	0
+STRINDEX_T:		defb "#", 	0
 COMMA_T:		defb ",", 	0
 TERMINATOR_T:	defb ";", 	0
 SEPARATOR_T:	defb ":", 	0
@@ -48,11 +49,13 @@ DIV_B 			equ '/'
 MOD_B 			equ '\' 		
 EQUAL_B			equ '=' 	
 NOT_EQUAL_B		equ 'n' 	
-QUOTE_B			equ '''' 	
+QUOTE_B			equ '"' 	
 LEFT_PAREN_B	equ '(' 	
 RIGHT_PAREN_B 	equ ')' 	
 LEFT_BRACKET_B	equ '[' 	
-RIGHT_BRACKET_B	equ ']' 	
+RIGHT_BRACKET_B	equ ']' 
+LEFT_CURLY_B	equ '{'
+RIGHT_CURLY_B	equ '}'	
 GREATER_B 		equ '>' 	
 LESSER_B 		equ '<' 	
 GREATER_EQUAL_B	equ 'g' 	
@@ -63,6 +66,7 @@ NOT_B 			equ '!'
 ADDR_B 			equ '@' 	
 DEREFERENCE_B 	equ '^' 	
 INDEX_B			equ '.' 
+STRINDEX_B		equ '#'
 SEPARATOR_B		equ ':'
 TERMINATOR_B	equ ';'
 COMMA_B			equ ','
@@ -73,7 +77,7 @@ VAR_B			equ 'v'
 USERCALL_B		equ 'u'
 SYSCALL_B		equ 's'
 NUM_B			equ 'm'	
-COMMENT_B		equ '#'
+COMMENT_B		equ '%'
 IF_B			equ 'I'
 ELSE_B			equ "E"
 ENDIF_B			equ 'e'
@@ -108,24 +112,92 @@ STOP_T: 	defb "STOP", 	0, STOP_B
  defb 0
 
 ; Built-In Functions
-SYS_READ_B	equ 00h
-SYS_WRITE_B equ 01h
-SYS_BEEP_B	equ 02h
-SYS_CLICK_B	equ 03h
-SYS_NEWLN_B	equ 04h
-SYS_ABS_B	equ 05h
-SYS_RND_B	equ	06h
-SYS_PEEK_B	equ 07h
+SYS_READ_B		equ 00h
+SYS_WRITE_B 	equ 01h
+SYS_BEEP_B		equ 02h
+SYS_CLICK_B		equ 03h
+SYS_NEWLN_B		equ 04h
+SYS_ABS_B		equ 05h
+SYS_RND_B		equ	06h
+SYS_PEEK_B		equ 07h
+SYS_READS_B		equ 08h
+SYS_WRITES_B 	equ 09h
+SYS_LEN_B 		equ 0Ah
+SYS_GETCHAR_B	equ 0Bh
+SYS_GET_B		equ 0Ch
+SYS_CLRSCR_B	equ 0Dh
+SYS_POKE_B		equ 0Eh
+SYS_PUT_B		equ 0Fh
+SYS_CMP_B		equ 10h
+SYS_COPY_B		equ 11h
+SYS_DELAY_B		equ 12h
+SYS_PUTCHAR_B	equ 13h
+SYS_GOTOXY_B	equ 14h
+SYS_READKEY_B	equ 15h
+SYS_UPPER_B		equ 16h
+SYS_LOWER_B		equ 17h
+SYS_OPEN_B		equ 18h
+SYS_SAVE_B		equ 19h
+SYS_RESET_B		equ 1Ah
+SYS_SEEK_B		equ 1Bh
+SYS_FREAD_B		equ 1Ch
+SYS_FWRITE_B	equ 1Dh
+SYS_DOSERR_B	equ 1Eh
+SYS_EXISTS_B	equ 1Fh
+SYS_TOUCH_B		equ 20h
 
 BuiltInFunctions:
-READ_T:		defb "Read", 	0, SYS_READ_B
-WRITE_T:	defb "Write", 	0, SYS_WRITE_B
-BEEP_T:		defb "Beep",	0, SYS_BEEP_B
-CLICK_T:	defb "Click",	0, SYS_CLICK_B
-NEWLN_T:	defb "NewLn", 	0, SYS_NEWLN_B
-ABS_T:		defb "Abs", 	0, SYS_ABS_B
-RND_T:		defb "Rnd",		0, SYS_RND_B
-PEEK_T:		defb "Peek", 	0, SYS_PEEK_B
+
+; Miscallenous functions 
+ defb "Peek", 		0, SYS_PEEK_B
+ defb "Poke",		0, SYS_POKE_B
+ defb "Get",		0, SYS_GET_B
+ defb "Put",		0, SYS_PUT_B
+ defb "Delay",		0, SYS_DELAY_B
+
+; Console functions
+ defb "Read", 		0, SYS_READ_B
+ defb "Write", 		0, SYS_WRITE_B
+ defb "Beep",		0, SYS_BEEP_B
+ defb "Click",		0, SYS_CLICK_B
+ defb "NewLn", 		0, SYS_NEWLN_B
+ defb "ReadS",		0, SYS_READS_B
+ defb "WriteS",		0, SYS_WRITES_B
+ defb "GetChar", 	0, SYS_GETCHAR_B
+ defb "PutChar",	0, SYS_PUTCHAR_B
+ defb "GotoXY",		0, SYS_GOTOXY_B
+ defb "ClrScr",		0, SYS_CLRSCR_B
+ defb "ReadKey",	0, SYS_READKEY_B
+
+; Math functions:
+ defb "Abs", 		0, SYS_ABS_B
+ defb "Rnd",		0, SYS_RND_B
+
+; String functions
+ defb "Len", 		0, SYS_LEN_B
+ defb "Cmp",		0, SYS_CMP_B
+ defb "Copy",		0, SYS_COPY_B
+ defb "Upper",		0, SYS_UPPER_B
+ defb "Lower",		0, SYS_LOWER_B
+
+; DOS functions:
+ defb "Open", 		0, SYS_OPEN_B
+ defb "Save", 		0, SYS_SAVE_B
+ defb "Reset", 		0, SYS_RESET_B
+ defb "Seek", 		0, SYS_SEEK_B
+ defb "FRead",		0, SYS_FREAD_B
+ defb "FWrite", 	0, SYS_FWRITE_B
+; defb "ChDir", 	0, SYS_CHDIR_B
+; defb "NextFile",0, SYS_NEXTFILE_B
+; defb "NextDir", 0, SYS_NEXTDIR_B
+; defb "Size", 	0, SYS_SIZE_B	
+; defb "MkDir", 	0, SYS_MKDIR_B
+; defb "RmDir", 	0, SYS_RMDIR_B
+ defb "DosErr", 	0, SYS_DOSERR_B
+; defb "Delete", 	0, SYS_DELETE_B
+; defb "Pwd", 	0, SYS_PWD_B
+ defb "Touch", 	0, SYS_TOUCH_B
+ defb "Exists", 	0, SYS_EXISTS_B
  defb 0
 
 ; 128 variables with names of up to 8 characters, 
@@ -138,6 +210,7 @@ FUNNAMES_SIZE equ 128 * 8
 VarnamePtr	equ PROGRAM_DATA + 00h	; 2 byte pointer into the variable name table
 ProgramPtr 	equ PROGRAM_DATA + 02h 	; 2 bytes
 IsOperator	equ PROGRAM_DATA + 04h
+IfOrWhile	equ PROGRAM_DATA + 05h
 Token 		equ PROGRAM_DATA + 08h	; 256 bytes for current token
 Varnames 	equ PROGRAM_DATA + 108h	; need to be aligned to 8 byte boundary
 Funnames    equ PROGRAM_DATA + 108h + VARNAMES_SIZE
@@ -229,11 +302,11 @@ apl_nextToken:
 	JP Z, apl_tokenizeHex
 	;
 	LD A, B
-	CP ''''
+	CP '"'
 	JP Z, apl_tokenizeString
 	;
 	LD A, B
-	CP '#'
+	CP COMMENT_B
 	JP Z, apl_tokenizeComment
 	RET
 
@@ -547,10 +620,38 @@ apl_processOperator:
 	LD (HL), A
 	INC HL
 	LD A, LEFT_PAREN_B
+	JR .cont2
 .cont1:
+	CP LEFT_CURLY_B
+	JR NZ, .cont2
+	LD A, STRINDEX_B
+	LD (HL), A
+	INC HL
+	LD A, LEFT_PAREN_B
+	JR .cont2
+.cont2:
+	CP ';'
+	JR NZ, .cont3
+	LD A, SEPARATOR_B
+	LD (HL), A
+	INC HL
+	LD A, (IfOrWhile)
+	CP IF_B
+	JR Z, .if
+	CP WHILE_B
+	JR Z, .while
+	JR .syntaxErr
+.if:
+	LD A, ENDIF_B
+	JR .cont3
+.while
+	LD A, LOOP_B
+.cont3:
 	LD (HL), A
 	INC HL
 	LD (ProgramPtr), HL
+	RET
+.syntaxErr: ; TODO
 	RET
 
 apl_processFunction:
@@ -575,6 +676,15 @@ apl_processVar:
 ; assumes the keyword bytecode is in B
 ; i.e. apl_isKeyword was called and returned TRUE
 apl_processKeyword:
+	LD A, B
+	CP WHILE_B
+	JR Z, .ifOrwhile
+	CP IF_B
+	JR Z, .ifOrwhile
+	JR .cont
+.ifOrwhile:
+	LD (IfOrWhile), A
+.cont:
 	LD HL, (ProgramPtr)
 	LD (HL), B
 	INC HL
@@ -593,37 +703,60 @@ apl_processBuiltInFunction:
 	LD (ProgramPtr), HL
 	RET
 
+; tokenizes the comment
+; since comments are not present in the compiled bytecode
+; the comment is not processed and is discarded after tokenization
 apl_tokenizeComment:
 	LD HL, Token
 .loop:
 	CALL dos_fRead
-	CP 13
+	CP LF
+	JR Z, .end
+	CP CR
 	JR Z, .end
 	LD (HL), A
 	INC HL
 	JR .loop
 .end:
+	PUSH HL
+	LD HL, (ProgramPtr)
+	LD (HL), SEPARATOR_B
+	INC HL
+	LD (ProgramPtr), HL
+	POP HL
 	LD (HL), 0
 	INC HL
 	RET 
 
 apl_tokenizeString
-	LD HL, Token
+	LD HL, (ProgramPtr)
 	CALL dos_fRead	; read the opening quote
 	LD (HL), A
 	INC HL
 .loop:
 	CALL dos_fRead
-	CP ''''
-	JR Z, .end
+	CP '"'
+	JR Z, .endQuote
+	CP SEPARATOR_B 
+	JR Z, .nl
+	CP LF
+	JR Z, .nl
+	CP CR
+	JR Z, .nl
 	LD (HL), A
 	INC HL
 	JR .loop
-.end:
-	LD (HL), ''''
-	INC HL
+.endQuote:
 	LD (HL), 0
 	INC HL
+	JR .end
+.nl:
+	LD (HL), 0
+	INC HL
+	LD (HL), SEPARATOR_B
+	INC HL
+.end:
+	LD (ProgramPtr), HL
 	RET 
 
 ; checks whether the character in B is an lowercaseletter
@@ -906,9 +1039,14 @@ apl_getOperatorCode:
 	LD A, (IY)
 	CP CR
 	JR Z, .sep
+	CP RIGHT_CURLY_B
+	JR Z, .paren
 	CP RIGHT_BRACKET_B
-	RET NZ
+	JR Z, .paren
+	JR .end
+.paren:
 	LD A, RIGHT_PAREN_B
+.end:
 	RET
 .sep:
 	LD A, SEPARATOR_B
@@ -963,8 +1101,3 @@ apl_keywordCmp:
 	RET Z
 	LD A, (IX - 1)
 	RET
-
-
-
-
-

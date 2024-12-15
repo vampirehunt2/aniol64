@@ -16,9 +16,9 @@ PrevLine: 	defb "u", 0
 Fill: 		defb "f", 0
 Copy: 		defb "c", 0
 Run: 		defb "r", 0
-
-Bye: 		defb "bye", 			0
-Exit: 		defb "Exiting...", 		0
+Disk:           defb "k", 0
+Bye: 		defb "x", 0
+Exit: 		defb "Exiting...", 	0
 ParseErr: 	defb "Parse error", 	0
 InvAddr: 	defb "Invalid address", 0
 InvVal: 	defb "Invalid value", 	0 
@@ -89,6 +89,11 @@ mon_main_loop:
         LD IY, Run
         CALL str_cmp
         JP Z, mon_run
+        ; disk inspection command
+        LD IX, LineBuff
+        LD IY, Disk
+        CALL str_cmp
+        JP Z, mon_disk
         ; bye command
         LD IX, LineBuff
         LD IY, Bye
@@ -143,22 +148,14 @@ mon_setAddress:
         CALL mon_refresh
         JP mon_main_loop
 
+; transfers control of the program to the value of (MonCurrAddress)
+; we are assuming whatever program we call will
+; either continue running until system reset or jump back to a known location, such as mon_main
+; so there is no return from this routine
 mon_run:
-        PUSH HL
-        POP IX  ; setting IX to point to the argument of the adr command
-        CALL parseDByte
-        CP 0
-        JR NZ, .parseError
-        JP (HL)  ; we are assuming whatever program we call will
-                ;either continue running until system reset or jump back to a known location, such as mon_main
-.parseError:
-        CALL mon_gotoStatusLine
-        LD IX, InvAddr
-        CALL writeStr
-        CALL readKey
-        CALL mon_refresh
-        JP mon_main_loop
-        RET
+        LD HL, (MonCurrAddr)
+        JP (HL)  
+
 
 mon_setValue:
         PUSH HL
@@ -240,32 +237,63 @@ mon_fill:
         JP mon_main_loop
 
 
-
-mon_copy:
-        PUSH HL
-        POP IX                  ; put the arguments of the copy command in IX
-        CALL str_tok            ; number of bytes now in a string pointed to by IX
-                                ; source address is now in a string pointed to by HL
-        CALL parseByte
+; command format:
+; k <sector8:track8>
+; loads the specified sector to SectorBuffer
+; sets (monCurrAddr) to SectorBuffer
+mon_disk:
+        CALL str_shift
+        CALL str_tok
+        CALL parseDByte  
         CP 0
         JP NZ, .invalidValue
-        PUSH BC                 ; saving the parsed number in B
-        PUSH HL
-        POP IX                  ; source address is now in a string pointed to by IX
-        CALL parseDByte         ; now parsing the value
+        LD A, H
+        LD B, L
+        LD C, 0
+        CALL cf_setSector
+        LD HL, SectorBuffer
+        CALL cf_readSector
+        LD HL, SectorBuffer
+        LD (MonCurrAddr), HL
+        CALL mon_dsp
+        JP mon_main_loop
+.invalidValue:
+        CALL mon_gotoStatusLine
+        LD IX, InvVal
+        CALL writeStr
+        CALL readKey
+        CALL mon_refresh
+        JP mon_main_loop
+        RET
+
+        
+
+
+; command format:
+; c <target16>, <size16>
+; copies from (monCurrAddr)
+; sets (monCurrAddr) to the target address after the copy
+mon_copy:
+        CALL str_shift          ; put the arguments of the copy command in IX
+        CALL str_tok            ; target address now in a string pointed to by IX
+                                ; number of bytes now in a string pointed to by HL
+        PUSH HL                 ; save the number of bytes string on stack
+        CALL parseDByte
         CP 0
         JP NZ, .invalidAddress
+        PUSH HL                 ; saving the parsed number
+        POP DE                  ; target address now in DE 
+        POP IX                  ; number of bytes now in a string pointed to by IX
+        CALL parseDByte         ; now parsing the value into HL
         PUSH HL
-        POP IX
-        POP BC
-.loop:
-        LD A, (IX + 0)
+        POP BC                  ; number of bytes now in BC
+        CP 0
+        JP NZ, .invalidValue
+        PUSH DE                 ; store target address
         LD HL, (MonCurrAddr)
-        LD (HL), A
-        INC HL
-        LD (MonCurrAddr), HL    ; moving to the next address
-        INC IX
-        DJNZ .loop              ; if B is not zero, repeat
+        LDIR                    ; perform the copy
+        POP HL                  ; restore target address to HL
+        LD (MonCurrAddr), HL    ; set the current address to be the target address
         CALL mon_dsp
         JP mon_main_loop
 .invalidValue:
@@ -332,19 +360,19 @@ mon_dsp:
         LD HL, (MonCurrAddr) 
         LD A, L 
         AND 11111000b    ; make sure the address from which you start displaying is at an 8 byte alignement   
-		LD L, A
-		CALL home
-		LD B, LINE_NUM
+	LD L, A
+	CALL home
+	LD B, LINE_NUM
 .loop:
-		PUSH BC
+	PUSH BC
         CALL mon_printAddrs
         CALL mon_printVals
         CALL nextLine
-		CALL mon_nextAddrs
-		POP BC
-		DJNZ .loop
-		CALL cursorOn
-		POP BC
+	CALL mon_nextAddrs
+	POP BC
+	DJNZ .loop
+	CALL cursorOn
+	POP BC
         RET
 
 
@@ -403,14 +431,14 @@ mon_printVals:
 
 
 mon_printChar:
-		CP 32
-		JR C, .special
-		JR .print
+	CP 32
+	JR C, .special
+	JR .print
 .special:
-		LD A, ' '
+	LD A, ' '
 .print:
-		CALL putChar
-		RET
+	CALL putChar
+	RET
 
 
 mon_printByte:
@@ -467,7 +495,7 @@ mon_nextAddrs:
         INC HL
         INC HL
         INC HL
-		INC HL
+	INC HL
         INC HL
         INC HL
         INC HL
@@ -479,7 +507,7 @@ mon_prevAddrs:
         DEC HL
         DEC HL
         DEC HL
-		DEC HL
+	DEC HL
         DEC HL
         DEC HL
         DEC HL
@@ -519,7 +547,7 @@ mon_peek:
 
 
 mon_poke:
-		CALL str_shift
+	CALL str_shift
         CALL str_tok        ; address now in a string pointed to by IX, value in a string pointed to by HL
         PUSH HL             ; copying the value string
         POP IY              ; to IY for safekeeping
@@ -544,7 +572,7 @@ mon_poke:
         RET
 
 mon_put:
-		CALL str_shift
+	CALL str_shift
         CALL str_tok        ; port number now in a string pointed to by IX, value in a string pointed to by HL
         PUSH HL             ; copying the value string
         POP IY              ; to IY for safekeeping
@@ -555,17 +583,17 @@ mon_put:
         PUSH IY             ; transferring the value string
         POP IX              ; to IX
 .loop:
-		CALL str_tok
-		CALL str_len
-		CP 0
-		RET Z
+	CALL str_tok
+	CALL str_len
+	CP 0
+	RET Z
         CALL parseByte      ; assuming parsing is OK, value is now in B
         CP 0
         JR NZ, .valError
         LD A, B             ; load the value to A
         OUT (C), A          ; output the value to the port with the given number
-		CALL str_shift
-		JR .loop
+	CALL str_shift
+	JR .loop
         RET
 .addrError:
         LD IX, InvAddr
@@ -580,15 +608,14 @@ mon_put:
 
 mon_get:
         CALL str_shift
-		CALL parseByte
-		CP 0
-		JR NZ, .addrError
-		LD C, B
-		IN A, (C)
-		CALL mon_printByteA
-		RET
+	CALL parseByte
+	CP 0
+	JR NZ, .addrError
+	LD C, B
+	IN A, (C)
+	CALL mon_printByteA
+	RET
 .addrError:
-		LD IX, InvAddr
+	LD IX, InvAddr
         CALL writeStr
         RET
-
