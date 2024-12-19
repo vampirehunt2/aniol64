@@ -1254,6 +1254,8 @@ run_execFunction:
     JP Z, sys_rm
     CP SYS_PWD_B
     JP Z, sys_pwd
+    CP SYS_EOF_B
+    JP Z, sys_eof
     RET
 
 

@@ -332,6 +332,10 @@ sys_readKey:
 
 ; one-byte get
 ; port number is one byte, passed in L
+; function
+; syntax Get(<Expression>)
+; argument1: port number
+; returns: a byte read from the port
 sys_get:
     LD C, L
     IN A, (C)
@@ -391,7 +395,6 @@ sys_dosError:
     LD (DosErr), A
     RET
 
-
 ; Save a file to disk
 ; procedure
 ; syntax: Save
@@ -436,7 +439,6 @@ sys_fread:
     INC HL
     LD (HL), 0          ; zero-out the higher byte of the variable
     RET
-
 
 ; Writes a byte to a file
 ; and advances the file pointer
@@ -548,3 +550,17 @@ sys_pwd:
     LD HL, CurrentPath
     RET
 
+sys_eof:
+    ; ignore the parameter
+    LD HL, (CurrentFileSize)
+    LD BC, (FilePtr)
+    CALL i16_cmp
+    CP -1
+    JR Z, .yes
+    LD H, FALSE
+    LD L, FALSE
+    RET
+.yes:
+    LD H, TRUE
+    LD L, TRUE
+    RET
