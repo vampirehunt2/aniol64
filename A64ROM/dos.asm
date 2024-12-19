@@ -507,13 +507,17 @@ dos_rmDir:
 	RET
 
 
-
+cmd_mkDir:
+	CALL str_shift
+	CALL dos_mkDir
+	CP DOS_OK
+	JP NZ, dos_printError
+	RET
 
 dos_mkDir:
 	PUSH BC		; save register state
 	PUSH DE
 	; check if dir name is valid
-	CALL str_shift
 	CALL dos_validateDirname
 	CP TRUE
 	JP NZ, .invName
@@ -540,17 +544,14 @@ dos_mkDir:
 	CALL dos_saveDirs
 	JP .end
 .invName:
-	LD IX, ErrInvDirName
-	CALL writeLn
+	LD A, INVALID_DIRNAME
 	JR .end
 .exists:
-	LD IX, ErrDirExists
-	CALL writeLn
+	LD A, DIR_EXISTS
 	JR .end
 .tooMany:
-	LD IX, ErrTooManyDirs
-	CALL writeLn
-	JR .end
+	LD A, TOO_MANY_DIRS
+;	JR .end
 .end:
 	POP DE		; restore register state	
 	POP BC

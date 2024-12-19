@@ -266,7 +266,7 @@ cmd_main:
 		CALL dos_ls
 		JP cmd_main
 .mkdir:
-		CALL dos_mkDir
+		CALL cmd_mkDir
 		JP cmd_main
 .rmdir:
 		CALL dos_rmDir

@@ -147,6 +147,7 @@ SYS_EXISTS_B	equ 1Fh
 SYS_TOUCH_B		equ 20h
 SYS_CHDIR_B		equ 21h
 SYS_SIZE_B		equ 22h
+SYS_MKDIR_B		equ 23h
 
 BuiltInFunctions:
 
@@ -194,7 +195,7 @@ BuiltInFunctions:
  defb "DosErr", 	0, SYS_DOSERR_B
  defb "Touch", 		0, SYS_TOUCH_B
  defb "Exists", 	0, SYS_EXISTS_B
-; defb "MkDir", 	0, SYS_MKDIR_B
+ defb "MkDir", 		0, SYS_MKDIR_B
 ; defb "RmDir", 	0, SYS_RMDIR_B
 ; defb "Delete", 	0, SYS_DELETE_B
 ; defb "Pwd", 		0, SYS_PWD_B

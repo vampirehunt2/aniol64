@@ -484,6 +484,17 @@ sys_size:
     LD HL, (CurrentFileSize)
     RET
 
+; creates a new directory
+; function
+; syntax: MkDir(<Expression>)
+; argument1: directory name
+; returns DosErr
+sys_mkdir:
+    PUSH HL
+    POP IX
+    CALL dos_mkDir
+    JP sys_return
+
 sys_touch:
     PUSH HL
     POP IX              ; transfer file name pointer to IX
@@ -496,6 +507,5 @@ sys_chdir:
     CALL dos_cd
     JP sys_return
 
-sys_mkdir:
-    RET
+
 

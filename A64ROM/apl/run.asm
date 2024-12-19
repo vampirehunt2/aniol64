@@ -1241,6 +1241,8 @@ run_execFunction:
     JP Z, sys_chdir
     CP SYS_SIZE_B
     JP Z, sys_size
+    CP SYS_MKDIR_B
+    JP Z, sys_mkdir
     RET
 
 
