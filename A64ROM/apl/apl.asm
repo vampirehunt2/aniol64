@@ -145,6 +145,8 @@ SYS_FWRITE_B	equ 1Dh
 SYS_DOSERR_B	equ 1Eh
 SYS_EXISTS_B	equ 1Fh
 SYS_TOUCH_B		equ 20h
+SYS_CHDIR_B		equ 21h
+SYS_SIZE_B		equ 22h
 
 BuiltInFunctions:
 
@@ -187,17 +189,17 @@ BuiltInFunctions:
  defb "Seek", 		0, SYS_SEEK_B
  defb "FRead",		0, SYS_FREAD_B
  defb "FWrite", 	0, SYS_FWRITE_B
-; defb "ChDir", 	0, SYS_CHDIR_B
-; defb "NextFile",0, SYS_NEXTFILE_B
-; defb "NextDir", 0, SYS_NEXTDIR_B
-; defb "Size", 	0, SYS_SIZE_B	
+ defb "ChDir", 		0, SYS_CHDIR_B
+ defb "Size", 		0, SYS_SIZE_B	
+ defb "DosErr", 	0, SYS_DOSERR_B
+ defb "Touch", 		0, SYS_TOUCH_B
+ defb "Exists", 	0, SYS_EXISTS_B
 ; defb "MkDir", 	0, SYS_MKDIR_B
 ; defb "RmDir", 	0, SYS_RMDIR_B
- defb "DosErr", 	0, SYS_DOSERR_B
 ; defb "Delete", 	0, SYS_DELETE_B
-; defb "Pwd", 	0, SYS_PWD_B
- defb "Touch", 	0, SYS_TOUCH_B
- defb "Exists", 	0, SYS_EXISTS_B
+; defb "Pwd", 		0, SYS_PWD_B
+; defb "NextFile",	0, SYS_NEXTFILE_B
+; defb "NextDir", 	0, SYS_NEXTDIR_B
  defb 0
 
 ; 128 variables with names of up to 8 characters, 

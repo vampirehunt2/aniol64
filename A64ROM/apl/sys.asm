@@ -349,17 +349,12 @@ sys_clrScr:
 
 ; #################### DOS functions ########################
 
-; Open a file from disk and load it to the file buffer
-; function
-; syntax: Open(<Expression>)
-; argument1: filename
-; returns: 0000h in case of error, FFFFh in case of success
-sys_open:  
-    PUSH HL                     
-    POP IX                      ; transfer file name pointer to IX
-	CALL dos_loadFile           ; load the file
-	LD A, (DosErr)             ; check if loading was successful
-    CP 0
+; return the status of the last I/O operation in HL
+; true if the operation was successful
+; false is the operation was not successful
+; input: DOS error code in A
+sys_return:
+    CP DOS_OK
     JR NZ, .err
     LD H, TRUE
     LD L, TRUE
@@ -369,6 +364,19 @@ sys_open:
     LD L, FALSE
     RET
 
+
+; Open a file from disk and load it to the file buffer
+; function
+; syntax: Open(<Expression>)
+; argument1: filename
+; returns: 0000h in case of error, FFFFh in case of success
+sys_open:  
+    PUSH HL                     
+    POP IX                      ; transfer file name pointer to IX
+	CALL dos_loadFile           ; load the file
+	JP sys_return
+
+    
 ; Returns the DOS error status
 ; Error code or 0 for no error
 ; function
@@ -391,15 +399,7 @@ sys_dosError:
 sys_save:
     LD IX, Filename             ; transfer file name pointer to IX
     CALL dos_saveFile
-    LD A, (DosErr)              ; check if loading was successful
-	CP DOS_OK
-	RET Z
-.ioErr:
-    ; TODO I/O error handling
-    RET                         ; otherwise drop through to the IO error handling
-.syntaxErr:
-    ; TODO
-    RET
+    JP sys_return
 
 ; Restart reading/writing the file from the first byte
 ; procedure
@@ -476,26 +476,25 @@ sys_exists:
     LD L, FALSE
     RET
 
+; returns the size of the currently opened file
+; function
+; syntax: Size()
+sys_size:
+    ; ignore the parameter
+    LD HL, (CurrentFileSize)
+    RET
 
 sys_touch:
     PUSH HL
     POP IX              ; transfer file name pointer to IX
     CALL dos_touch
-    CP DOS_OK
-    JR NZ, .err
-    LD H, TRUE
-    LD L, TRUE
-    RET
-.err:
-    LD H, FALSE
-    LD L, FALSE
-    RET
+    JP sys_return
 
-
-
-sys_chdir:  // TODO incomplete
+sys_chdir:
+    PUSH HL
+    POP IX
     CALL dos_cd
-    RET
+    JP sys_return
 
 sys_mkdir:
     RET

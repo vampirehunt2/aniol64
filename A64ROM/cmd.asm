@@ -272,7 +272,7 @@ cmd_main:
 		CALL dos_rmDir
 		JP cmd_main
 .cd:
-		CALL dos_cd
+		CALL cmd_cd
 		JP cmd_main
 .touch:
 		CALL cmd_touch

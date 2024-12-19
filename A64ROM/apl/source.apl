@@ -1,5 +1,2 @@
-ClrScr
-s<-"TestUpper"
-Lower s
-WriteS s
+x<-Size()
 END

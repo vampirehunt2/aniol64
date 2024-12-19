@@ -675,9 +675,18 @@ dos_cdRoot:
 	LD (CurrentDir), A
 	RET
 	
-; changes the current directory
-dos_cd:
+
+cmd_cd:
 	CALL str_shift	; transfer folder name from HL to IX
+	CALL dos_cd
+	CP DOS_OK
+	RET Z
+	CALL dos_printError
+	RET	
+
+; changes the current directory
+; directory name pointed to by IX
+dos_cd:
 	; check if user wants to go to the root folder
 	LD IY, RootFolder
 	CALL str_cmp
@@ -691,13 +700,13 @@ dos_cd:
 	LD (CurrentDir), A
 	LD IY, CurrentPath
 	CALL str_copy
+	LD A, DOS_OK
 	RET
 .noDir:
-	LD IX, ErrNoSuchDir
-	CALL writeLn
+	LD A, NO_SUCH_DIR
 	RET
 .root:
-	CALL dos_cdRoot
+	JP dos_cdRoot
 
 dos_ls:
 	LD A, (CurrentDir)

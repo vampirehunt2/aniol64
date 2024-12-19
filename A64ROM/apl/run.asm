@@ -1237,6 +1237,10 @@ run_execFunction:
     JP Z, sys_exists
     CP SYS_TOUCH_B
     JP Z, sys_touch
+    CP SYS_CHDIR_B
+    JP Z, sys_chdir
+    CP SYS_SIZE_B
+    JP Z, sys_size
     RET
 
 
