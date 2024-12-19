@@ -278,7 +278,7 @@ cmd_main:
 		CALL cmd_touch
 		JP cmd_main
 .rm:
-		CALL dos_rm
+		CALL cmd_rm
 		JP cmd_main
 .format:
 		CALL dos_format

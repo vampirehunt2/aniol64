@@ -495,11 +495,28 @@ sys_mkdir:
     CALL dos_mkDir
     JP sys_return
 
+; deletes a directory
+; function
+; syntax: RmDir(<Expression>)
+; argument1: directory name
+; returns DosErr
 sys_rmdir:
     PUSH HL
     POP IX
     CALL dos_rmDir
     JP sys_return
+
+; deletes a file
+; function
+; syntax: Delete(<Expression>)
+; argument1: file name
+; returns DosErr
+sys_rm:
+    PUSH HL
+    POP IX
+    CALL dos_rm
+    JP sys_return
+
 
 sys_touch:
     PUSH HL

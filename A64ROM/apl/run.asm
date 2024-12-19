@@ -1250,6 +1250,8 @@ run_execFunction:
     JP Z, sys_mkdir
     CP SYS_RMDIR_B
     JP Z, sys_rmdir
+    CP SYS_DELETE_B
+    JP Z, sys_rm
     RET
 
 

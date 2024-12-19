@@ -461,10 +461,14 @@ dos_tabFileName:
 	RET
 
 
-
+cmd_rm:
+	CALL str_shift
+	CALL dos_rm
+	CP DOS_OK
+	JP NZ, dos_printError
+	RET
 
 dos_rm:
-	CALL str_shift
 	CALL dos_fileExists
 	CP 0
 	JR Z, .notFound
@@ -473,10 +477,10 @@ dos_rm:
 	LD (IY + FileExists), A
 	POP AF
 	CALL dos_saveFileTabSector
+	LD A, DOS_OK
 	RET
 .notFound:
-	LD IX, ErrFileNotFound
-	CALL writeLn
+	LD A, FILE_NOT_FOUND
 	RET
 
 cmd_rmDir:
@@ -499,7 +503,6 @@ dos_rmDir:
 	CALL dos_nextDir
 	DEC E
 	JR NZ, .loop
-	LD A, 0
 	LD A, NO_SUCH_DIR
 	RET
 .rm:
@@ -507,6 +510,7 @@ dos_rmDir:
 	LD (IX), A
 	CALL dos_saveDirs
 .end:
+	LD A, DOS_OK
 	RET
 
 
