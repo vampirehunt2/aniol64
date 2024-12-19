@@ -479,10 +479,14 @@ dos_rm:
 	CALL writeLn
 	RET
 
-
+cmd_rmDir:
+	CALL str_shift
+	CALL dos_rmDir
+	CP DOS_OK
+	JP NZ, dos_printError
+	RET
 
 dos_rmDir:
-	CALL str_shift
 	CALL dos_loadDirs
 	LD E, MAX_DIRS
 	PUSH IX
@@ -496,9 +500,8 @@ dos_rmDir:
 	DEC E
 	JR NZ, .loop
 	LD A, 0
-	LD IX, ErrNoSuchDir
-	CALL writeLn
-	JR .end
+	LD A, NO_SUCH_DIR
+	RET
 .rm:
 	LD A, 0
 	LD (IX), A

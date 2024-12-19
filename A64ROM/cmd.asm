@@ -269,7 +269,7 @@ cmd_main:
 		CALL cmd_mkDir
 		JP cmd_main
 .rmdir:
-		CALL dos_rmDir
+		CALL cmd_rmDir
 		JP cmd_main
 .cd:
 		CALL cmd_cd

@@ -495,6 +495,12 @@ sys_mkdir:
     CALL dos_mkDir
     JP sys_return
 
+sys_rmdir:
+    PUSH HL
+    POP IX
+    CALL dos_rmDir
+    JP sys_return
+
 sys_touch:
     PUSH HL
     POP IX              ; transfer file name pointer to IX
