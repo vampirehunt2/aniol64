@@ -1252,6 +1252,8 @@ run_execFunction:
     JP Z, sys_rmdir
     CP SYS_DELETE_B
     JP Z, sys_rm
+    CP SYS_PWD_B
+    JP Z, sys_pwd
     RET
 
 

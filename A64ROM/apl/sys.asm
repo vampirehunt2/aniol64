@@ -323,7 +323,6 @@ sys_getChar:
     LD H, 0
     RET
 
-// TODO: idea - make the parameter specify if this call is supposed to bt sycnhronous
 sys_readKey:
     ; ignores the parameter
     CALL readKey
@@ -341,6 +340,7 @@ sys_get:
     RET
 
 ; clear the screen
+; procedure
 ; syntax: ClrScr
 sys_clrScr:
     CALL clrScr
@@ -363,7 +363,6 @@ sys_return:
     LD H, FALSE
     LD L, FALSE
     RET
-
 
 ; Open a file from disk and load it to the file buffer
 ; function
@@ -513,22 +512,39 @@ sys_rmdir:
 ; returns DosErr
 sys_rm:
     PUSH HL
-    POP IX
+    POP IX              ; transfer file name pointer to IX
     CALL dos_rm
     JP sys_return
 
-
+; creates an empty file
+; function
+; syntax: Touch(<Expression>)
+; argument1: file name
+; returns DosErr
 sys_touch:
     PUSH HL
     POP IX              ; transfer file name pointer to IX
     CALL dos_touch
     JP sys_return
 
+; changes the current directory
+; function
+; syntax: ChDir(<Expression>)
+; argument1: directory name
+; returns DosErr
 sys_chdir:
     PUSH HL
     POP IX
     CALL dos_cd
     JP sys_return
 
-
+; returns the current directory
+; note, the value is only valid until the next I/O operation
+; if it's supposed to be persisted, it needs to be copied over to a safe buffer
+; function
+; syntax: Pwd()
+sys_pwd:
+    ; ignore the parameter
+    LD HL, CurrentPath
+    RET
 

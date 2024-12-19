@@ -150,6 +150,7 @@ SYS_SIZE_B		equ 22h
 SYS_MKDIR_B		equ 23h
 SYS_RMDIR_B		equ 24h
 SYS_DELETE_B	equ 25h
+SYS_PWD_B		equ 26h
 
 BuiltInFunctions:
 
@@ -200,7 +201,7 @@ BuiltInFunctions:
  defb "MkDir", 		0, SYS_MKDIR_B
  defb "RmDir", 		0, SYS_RMDIR_B
  defb "Delete", 	0, SYS_DELETE_B
-; defb "Pwd", 		0, SYS_PWD_B
+ defb "Pwd", 		0, SYS_PWD_B
 ; defb "NextFile",	0, SYS_NEXTFILE_B
 ; defb "NextDir", 	0, SYS_NEXTDIR_B
  defb 0
