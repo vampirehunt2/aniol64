@@ -1208,7 +1208,12 @@ run_execSyscall:
     JP Z, sys_fread
     CP SYS_FWRITE_B
     JP Z, sys_fwrite
-    RET
+    
+    PUSH AF             ; store the function bytecode on stack
+    CALL run_evaluate   ; evaluate the expression that's the function's argument
+    LD HL, (Expression + 1)
+    POP AF              ; restore the function bytecode from stack
+    ; fall through to allow to call a function like a procedure
 
 ; executes a system function
 ; syscall index in A
