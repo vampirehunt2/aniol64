@@ -290,14 +290,14 @@ apl_nextToken:
 	CP FALSE
 	JP Z, apl_tokenizeMinus
 	JP NZ, apl_tokenizeDec
-.cont:	
+.cont:
+	CALL apl_isParen
+	CP TRUE
+	JP Z, apl_tokenizeParen
+	;	
 	CALL apl_isSpecialChar
 	CP TRUE
 	JP Z, apl_tokenizeOperator
-	;
-	CALL apl_isBracket
-	CP TRUE
-	JP Z, apl_tokenizeBracket
 	;
 	LD A, B
 	CP '$'
@@ -531,19 +531,43 @@ apl_processNumber:
 	LD (ProgramPtr), IX
 	RET
 
-apl_tokenizeBracket:
+apl_tokenizeParen:
 	LD HL, Token
 	CALL dos_fRead
 	LD (HL), A
 	INC HL
 	LD (HL), 0
 	INC HL
-	CALL apl_processBracket
+	CALL apl_processParen
 	LD A, FALSE
 	LD (IsOperator), A
 	RET
 
-apl_processBracket:
+apl_processParen:
+	CP RIGHT_PAREN_B
+	JR Z, .right
+	JR .cont
+.right:
+	LD HL, (ProgramPtr)
+	DEC HL
+	LD A, (HL)
+	CP LEFT_PAREN_B
+	JR Z, .empty
+	LD A, RIGHT_PAREN_B
+	JR .cont
+.empty:
+	LD HL, (ProgramPtr)
+	LD A, NUM_B
+	LD (HL), A
+	INC HL
+	LD A, 0
+	LD (HL), A
+	INC HL
+	LD (HL), A
+	INC HL
+	LD (ProgramPtr), HL
+	LD A, RIGHT_PAREN_B
+.cont:
 	LD HL, (ProgramPtr)
 	LD (HL), A
 	INC HL
@@ -874,7 +898,7 @@ apl_isHexDigit:
 
 ; checks whether the character in B is a bracket
 ; result in A
-apl_isBracket:
+apl_isParen:
 	LD A, B
 	CP '('
 	JR Z, .true
