@@ -1208,6 +1208,8 @@ run_execSyscall:
     JP Z, sys_fread
     CP SYS_FWRITE_B
     JP Z, sys_fwrite
+    CP SYS_STARTS_B
+    JP Z, sys_startsWith
     
     PUSH AF             ; store the function bytecode on stack
     CALL run_evaluate   ; evaluate the expression that's the function's argument

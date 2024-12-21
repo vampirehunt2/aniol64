@@ -29,8 +29,7 @@ sys_readString:
     CALL readLine
     LD IX, LineBuff
     CALL nextLine
-    INC HL              ; move to the variable bytecode
-    CALL run_getVar     ; get variable to which to read the string 
+    CALL _run_getVar     ; get variable to which to read the string 
     LD C, (HL)          ; put the value of the variable...
     INC HL              ; ... (i.e. address of the string)...            
     LD B, (HL)          ; ...in BC  
@@ -63,8 +62,7 @@ sys_read:
     LD D, H             ; store the read value in DE for safekeeping
     LD E, L
     POP HL              ; restore the pointer into the statement bytecode from the stack
-    INC HL              ; move to the variable 
-    CALL run_getVar
+    CALL _run_getVar
     LD (HL), DE
     RET
 .parseErr:
@@ -72,19 +70,6 @@ sys_read:
     LD IX, ParseError
     CALL writeLn
     JR sys_read
-
-; gets the variable address from variable bytecode
-; HL points to the bytecode of the variable
-; returns the address of the variable in memory in HL
-run_getVar:
-    LD A, (HL)          ; load the variable bytecode
-    AND 01111111b       ; get the variable index
-    SLA A               ; multiply it by 2, as numeric variables are 2 bytes long
-    LD C, A
-    LD B, 0
-    LD HL, Vars         
-    ADD HL, BC          ; get the variable address
-    RET
 
 ; Makes a beep sound on the system speaker
 ; procedure
@@ -235,17 +220,18 @@ sys_startsWith:
     CALL run_evaluate
     CP 0
     JR NZ, .syntaxErr
-    LD IX, (Expression + 1)      
+    LD IY, (Expression + 1)      
     CALL run_evaluate
     CP 0
     JR NZ, .syntaxErr
-    LD IY, (Expression + 1)      
+    LD IX, (Expression + 1)      
     CALL str_startsWith
-    CP TRUE
-    JR .true
-.true:
-    ; TODO
-    RET
+    PUSH AF
+    CALL _run_getVar
+    POP AF
+    LD (HL), A
+    INC HL
+    LD (HL), A
 .syntaxErr:
     ; TODO
     RET
@@ -288,6 +274,10 @@ sys_lower:
     RET
 
 ; returns the length of a string
+; function
+; syntax Len(<Expression>)
+; argument1: the string
+; returns the length of the string, not including the terminating zero
 sys_len:
     PUSH IX
     PUSH HL
@@ -298,6 +288,13 @@ sys_len:
     POP IX
     RET
 
+; compares two strings
+; procedure
+; syntax: Cmp <Expression>, <Expression>, <Variable>
+; argument1: first string to compare
+; argument2: second string to compare
+; argument3: a variable in which the result is stored
+; the result is a boolean value
 sys_cmp:
     CALL run_evaluate
     CP 0
@@ -309,8 +306,7 @@ sys_cmp:
     LD IX, (Expression + 1)
     CALL str_cmp
     PUSH AF
-    INC HL              ; move HL to the variable bytecode
-    CALL run_getVar
+    CALL _run_getVar
     POP AF
     CP 0
     JR Z, .equal
@@ -459,8 +455,7 @@ sys_seek:
 ; L will contain the value read
 ; H is 0
 sys_fread:
-    INC HL              ; move to the variable bytecode
-    CALL run_getVar     ; get the address of the variable in memory
+    CALL _run_getVar     ; get the address of the variable in memory
     CALL dos_fRead      ; read from the file
     LD (HL), A          ; transfer the result of the read into the lower byte of the variable
     INC HL
@@ -594,4 +589,20 @@ sys_eof:
 .yes:
     LD H, TRUE
     LD L, TRUE
+    RET
+
+; ####################### Private routines #####################################
+
+; gets the variable address from variable bytecode
+; HL points to the bytecode of the variable
+; returns the address of the variable in memory in HL
+_run_getVar:
+    INC HL              ; move to the variable bytecode
+    LD A, (HL)          ; load the variable bytecode
+    AND 01111111b       ; get the variable index
+    SLA A               ; multiply it by 2, as numeric variables are 2 bytes long
+    LD C, A
+    LD B, 0
+    LD HL, Vars         
+    ADD HL, BC          ; get the variable address
     RET

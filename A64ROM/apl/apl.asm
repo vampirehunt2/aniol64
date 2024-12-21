@@ -152,6 +152,7 @@ SYS_RMDIR_B		equ 24h
 SYS_DELETE_B	equ 25h
 SYS_PWD_B		equ 26h
 SYS_EOF_B		equ 27h
+SYS_STARTS_B	equ 28h
 
 BuiltInFunctions:
 
@@ -186,6 +187,7 @@ BuiltInFunctions:
  defb "Copy",		0, SYS_COPY_B
  defb "Upper",		0, SYS_UPPER_B
  defb "Lower",		0, SYS_LOWER_B
+ defb "Starts",		0, SYS_STARTS_B
 
 ; DOS functions:
  defb "Open", 		0, SYS_OPEN_B

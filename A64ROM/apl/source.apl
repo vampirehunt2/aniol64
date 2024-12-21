@@ -1,5 +1,3 @@
-STR s1 10
-s1<-"Test"
-Cmp s1, "Test", x
+Starts "Test", "Test1", x
 Write x
 END
