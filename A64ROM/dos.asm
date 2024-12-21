@@ -393,7 +393,6 @@ dos_listDirs:
 
 
 ; lists on the screen all the files in the current directory
-
 dos_listFiles:
 	LD A, 01h		; the first sector of the file table. Counting sectors in A
 .loop:

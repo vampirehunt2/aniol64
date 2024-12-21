@@ -299,7 +299,34 @@ sys_len:
     RET
 
 sys_cmp:
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD IY, (Expression + 1)      
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD IX, (Expression + 1)
+    CALL str_cmp
+    PUSH AF
+    INC HL              ; move HL to the variable bytecode
+    CALL run_getVar
+    POP AF
+    CP 0
+    JR Z, .equal
+    LD (HL), FALSE
+    INC HL
+    LD (HL), FALSE
     RET
+.equal:
+    LD (HL), TRUE
+    INC HL
+    LD (HL), TRUE
+.end:
+    RET
+.syntaxErr:
+    ; TODO
+    
 
 sys_copy:
     CALL run_evaluate
@@ -550,6 +577,10 @@ sys_pwd:
     LD HL, CurrentPath
     RET
 
+; indicates whether end of file has been reached
+; function
+; syntax: Eof()
+; returns a boolean value
 sys_eof:
     ; ignore the parameter
     LD HL, (CurrentFileSize)
