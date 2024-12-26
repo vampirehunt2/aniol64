@@ -73,22 +73,44 @@ str_cmpMem:
 ; copies a null-terminated string
 ; IX: source string address
 ; IY: target address
-
 str_copy:
-		PUSH IX
-		PUSH IY
+	PUSH IX
+	PUSH IY
 .loop:
-        LD A, (IX)
-        LD (IY), A
-        CP 0
-        JR Z, .end
-        INC IX
-        INC IY
-        JR .loop
+    LD A, (IX)
+    LD (IY), A
+    CP 0
+    JR Z, .end
+    INC IX
+    INC IY
+    JR .loop
 .end:
-		POP IY
-		POP IX
-		RET
+	POP IY
+	POP IX
+	RET
+
+; copies a number of characters of a null-terminated string
+; IX: source string address
+; IY: target address
+; B: maximum number of characters to copy
+str_ncpy:
+	PUSH IX		; store register values
+	PUSH IY
+.loop:
+	LD A, (IX)	; load a character from the source string
+	CP 0		; check if end of source string reached
+	JR Z, .end	; if yes, store the terminating zero in the target string
+	LD (IY), A	; if not, load the character into the target string
+	INC IX		; increment both string indices
+	INC IY
+	DJNZ .loop	; if B charcters not copied yet, copy another charatcter
+	LD A, 0		; if B characters copied, load the terminting zero
+.end:
+	LD (IY), A	; store the terminating zero in the target string
+	POP IY		; restore register values
+	POP IX 
+	RET
+
 
 
 ; finds the length of a null-terminated string
@@ -116,7 +138,6 @@ str_len:
 ; IX: address of the string
 ; result in IX
 ; rest of string in HL
-
 str_tok:
         PUSH IX
 .loop:
@@ -137,7 +158,6 @@ str_tok:
         POP IX
         RET
 
-
 ; shifts to the beginning of next token after calling str_tok
 str_shift:
 		PUSH HL
@@ -151,7 +171,6 @@ str_shift:
 ; B - number of bytes (length of the string)
 ; result in IX
 ; destroys IY
-
 str_2str:
 		PUSH IY
 .loop:
@@ -168,52 +187,52 @@ str_2str:
 
 
 str_2mem:
-		PUSH IX
-		PUSH IY
+	PUSH IX
+	PUSH IY
 .loop:
-		LD A, (IX)
-		CP 0
-		JR Z, .end
-		LD (IY), A
-		INC IX
-		INC IY
-		JR .loop
+	LD A, (IX)
+	CP 0
+	JR Z, .end
+	LD (IY), A
+	INC IX
+	INC IY
+	JR .loop
 .end:
-		POP IY
-		POP IX
-
+	POP IY
+	POP IX
+	RET
 
 ; skips leading spaces in a string
 ; IX - string to trim
 ; result in IX
-
 str_ltrim:
-        LD A, (IX+0)
-        CP 20h
-        JR Z, .loop
-        RET
+    LD A, (IX+0)
+	CP 20h
+    JR Z, .loop
+    RET
 .loop:
-        INC IX
-        JR str_ltrim
+    INC IX
+    JR str_ltrim
 
 
 
 str_rtrim:
-		PUSH IX
+	PUSH IX
 .loop:
-		LD A, (IX)
-		INC IX
-		CP 0
-		JR NZ, .loop
+	LD A, (IX)
+	CP 0
+	INC IX
+	JR NZ, .loop
+	DEC IX
 .loop1:
-		LD A, (IX)
-		CP ' '
-		DEC IX
-		JR Z, .loop1
-		LD A, 0
-		LD (IX + 1), A
-		POP IX
-		RET
+	DEC IX
+	LD A, (IX)
+	CP ' '
+	JR Z, .loop1
+	LD A, 0
+	LD (IX + 1), A
+	POP IX
+	RET
 
 
 

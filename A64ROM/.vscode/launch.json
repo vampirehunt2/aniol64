@@ -14,7 +14,7 @@
                 "path": "C:/8bit/git/A64ROM/aniol64.sld"
             }
         ],
-        "commandsAfterLaunch": ["-mv 8b08h 100"],
+        //"commandsAfterLaunch": ["-mv 8b08h 100"],
         "history": {
             "reverseDebugInstructionCount": 1000000,
             "spotCount": 10,

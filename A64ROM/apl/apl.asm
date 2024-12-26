@@ -153,6 +153,12 @@ SYS_DELETE_B	equ 25h
 SYS_PWD_B		equ 26h
 SYS_EOF_B		equ 27h
 SYS_STARTS_B	equ 28h
+SYS_LIST_B		equ 29h
+SYS_NEXTFILE_B	equ 2Ah
+SYS_LISTDIRS_B	equ 2Bh
+SYS_NEXTDIR_B	equ 2Ch
+SYS_TRIM_B		equ 2Dh
+SYS_TOK_B		equ 2Eh
 
 BuiltInFunctions:
 
@@ -188,6 +194,8 @@ BuiltInFunctions:
  defb "Upper",		0, SYS_UPPER_B
  defb "Lower",		0, SYS_LOWER_B
  defb "Starts",		0, SYS_STARTS_B
+ defb "Trim", 		0, SYS_TRIM_B
+ defb "Tok",		0, SYS_TOK_B
 
 ; DOS functions:
  defb "Open", 		0, SYS_OPEN_B
@@ -206,8 +214,10 @@ BuiltInFunctions:
  defb "Delete", 	0, SYS_DELETE_B
  defb "Pwd", 		0, SYS_PWD_B
  defb "Eof",		0, SYS_EOF_B
-; defb "NextFile",	0, SYS_NEXTFILE_B
-; defb "NextDir", 	0, SYS_NEXTDIR_B
+ defb "ListFiles",	0, SYS_LIST_B
+ defb "NextFile",	0, SYS_NEXTFILE_B
+ defb "ListDirs", 	0, SYS_LISTDIRS_B
+ defb "NextDir",	0, SYS_NEXTDIR_B
  defb 0
 
 ; 128 variables with names of up to 8 characters, 
@@ -221,10 +231,13 @@ VarnamePtr	equ PROGRAM_DATA + 00h	; 2 byte pointer into the variable name table
 ProgramPtr 	equ PROGRAM_DATA + 02h 	; 2 bytes
 IsOperator	equ PROGRAM_DATA + 04h
 IfOrWhile	equ PROGRAM_DATA + 05h
-Token 		equ PROGRAM_DATA + 08h	; 256 bytes for current token
-Varnames 	equ PROGRAM_DATA + 108h	; need to be aligned to 8 byte boundary
-Funnames    equ PROGRAM_DATA + 108h + VARNAMES_SIZE
-Bytecodes 	equ PROGRAM_DATA + 108h + VARNAMES_SIZE + FUNNAMES_SIZE
+FileSector 	equ PROGRAM_DATA + 06h
+FileIndex   equ PROGRAM_DATA + 07h
+FileSecPtr	equ PROGRAM_DATA + 09h	; 2 byte pointer into the file list sector
+Token 		equ PROGRAM_DATA + 0Bh	; 256 bytes for current token
+Varnames 	equ PROGRAM_DATA + 10Bh	; need to be aligned to 8 byte boundary
+Funnames    equ PROGRAM_DATA + 10Bh + VARNAMES_SIZE
+Bytecodes 	equ PROGRAM_DATA + 10Bh + VARNAMES_SIZE + FUNNAMES_SIZE
 
 
 apl_main:
@@ -234,7 +247,6 @@ apl_main:
 	LD HL, Bytecodes
 	LD (ProgramPtr), HL
 	CALL apl_tokenize
-	; CALL run_main DEBUG ONLY
 	RET
 
 ; fills the identifier tables with all zeroes

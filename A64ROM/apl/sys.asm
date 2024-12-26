@@ -29,7 +29,7 @@ sys_readString:
     CALL readLine
     LD IX, LineBuff
     CALL nextLine
-    CALL _run_getVar     ; get variable to which to read the string 
+    CALL _run_getVar    ; get variable to which to read the string 
     LD C, (HL)          ; put the value of the variable...
     INC HL              ; ... (i.e. address of the string)...            
     LD B, (HL)          ; ...in BC  
@@ -286,6 +286,27 @@ sys_len:
     LD L, A
     LD H, 0
     POP IX
+    RET
+
+; removes trailing spaces from a string
+; does not change the string address
+; procedure
+; syntax: Trim <Expression>
+; argument1: string to trim
+sys_trim:
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD IX, (Expression + 1)
+    CALL str_rtrim
+    RET
+.syntaxErr:
+    ; TODO
+
+sys_tok:
+    PUSH HL
+    POP IX
+    CALL str_tok
     RET
 
 ; compares two strings
@@ -590,6 +611,99 @@ sys_eof:
     LD H, TRUE
     LD L, TRUE
     RET
+
+; resets the file listig process
+; procedure
+; syntax: List
+sys_list:
+    LD A, 01h		    ; the first sector of the file table. Counting sectors in A
+    LD (FileSector), A
+    LD A, 00h
+    LD (FileIndex), A
+    CALL dos_loadFileTabSector
+    LD HL, SectorBuffer
+    LD (FileSecPtr), HL
+    RET
+
+; resets the directory listig process
+; procedure
+; syntax: ListDirs
+sys_listDirs:
+    LD A, 00h
+    LD (FileIndex), A
+    LD HL, SectorBuffer
+    LD (FileSecPtr), HL
+    CALL dos_loadDirs
+    RET
+
+; returns the name of the next file from the filesystem
+; if the last available file has been reached, returns a null string
+; note, the value is only valid until the next I/O operation
+; if it's supposed to be persisted, it needs to be copied over to a safe buffer
+; function
+; syntax NextFile()
+sys_nextFile:
+    ; ignore the parameter
+	LD A, (FileIndex)           ; load the current index into the file table sector
+    INC A
+    LD (FileIndex), A
+    CP FILE_RECORDS_PER_SECTOR  ; check if this is the last file record in the sector
+    JR NZ, .cont                ; if not, move on...
+    ;                           ... if yes, try load the next sector of the file table
+    LD A, (FileSector)          ; load the current file table sector number
+    INC A                       ; increment the file table sector number
+    LD (FileSector), A
+    CP FILE_TABLE_SECTORS       ; check if last file table sector reached
+    JR NZ, .load                ; if not,load the next sector
+    LD HL, 0                    ; if yes, return an null string to indicate end of file table
+    RET
+.load:   
+    CALL dos_loadFileTabSector
+    LD A, 0
+    LD (FileIndex), A
+    LD HL, SectorBuffer
+    LD (FileSecPtr), HL
+.cont:
+    LD HL, (FileSecPtr)
+    PUSH HL
+    LD B, 0
+    LD C, FILE_RECORD_SIZE
+    ADD HL, BC
+    LD (FileSecPtr), HL
+    POP HL
+    LD A, (HL)                  ; check if there is a non-empty file name 
+    CP 0                        ; at the beginning of the file record
+    RET NZ                      ; if there is, return it in HL
+    JR sys_nextFile             ; if not, try with the next file record
+	RET
+
+; returns the name of the next directory from the filesystem
+; if the last available directory has been reached, returns a null string
+; note, the value is only valid until the next I/O operation
+; if it's supposed to be persisted, it needs to be copied over to a safe buffer
+; function
+; syntax NextDir()
+sys_nextDir:
+    LD A, (FileIndex)
+    INC A
+    CP MAX_DIRS
+    JR Z, .end
+    LD (FileIndex), A
+    LD HL, (FileSecPtr)
+    PUSH HL
+    LD C, 0
+    LD B, MAX_DIRNAME_LEN
+    ADD HL, BC
+    LD (FileSecPtr), HL
+    POP HL
+    LD A, (HL)
+    CP 0
+    JR Z, sys_nextDir
+    RET
+.end:
+    LD HL, 0
+    RET
+
 
 ; ####################### Private routines #####################################
 

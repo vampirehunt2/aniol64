@@ -1210,6 +1210,12 @@ run_execSyscall:
     JP Z, sys_fwrite
     CP SYS_STARTS_B
     JP Z, sys_startsWith
+    CP SYS_LIST_B
+    JP Z, sys_list
+    CP SYS_LISTDIRS_B
+    JP Z, sys_listDirs
+    CP SYS_TRIM_B
+    JP Z, sys_trim
     
     PUSH AF             ; store the function bytecode on stack
     CALL run_evaluate   ; evaluate the expression that's the function's argument
@@ -1258,6 +1264,12 @@ run_execFunction:
     JP Z, sys_pwd
     CP SYS_EOF_B
     JP Z, sys_eof
+    CP SYS_NEXTFILE_B
+    JP Z, sys_nextFile
+    CP SYS_NEXTDIR_B
+    JP Z, sys_nextDir
+    CP SYS_TOK_B
+    JP Z, sys_tok
     RET
 
 

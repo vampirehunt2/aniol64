@@ -87,7 +87,7 @@ SECTOR_SIZE				equ 512
 Filename 	equ 00h	; null-terminated string, 
 		; 12 (8+3) characters with a dot, plus the terminating zero
 		; contains a zero-length string if the file record is empty
-FileExists  equ 00h	; first charatcter of the file name is 0 if the file record is empty
+FileExists  equ 00h	; first character of the file name is 0 if the file record is empty
 FileDir 	equ 0Dh	; 1 byte directory index
 FileLen 	equ 0Eh	; 2 byte actual file length
 
