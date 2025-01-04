@@ -158,6 +158,44 @@ str_tok:
         POP IX
         RET
 
+
+; reutrns a substring of a string
+; IX - input string
+; B - start index
+; C - maximum length of the substring
+; result in IX
+str_sub:
+	LD A, B
+.loop:			; this loop skips the first B characters of the input string
+	CP 0
+	JR Z, .cont
+	LD D, A		; save loop counter in D
+	LD A, (IX)	; check the character at the current string pointer
+	CP 0		; if it's a null character, we've reached the end of the input string
+	RET Z		; so we return an empty string immediately
+	INC IX
+	LD A, D		; restore loop counter
+	DEC A
+	JR .loop
+.cont:
+	PUSH IX
+	LD A, C
+.loop1:			; this loop iterates through the first C characters of the substring
+	CP 0		
+	JR Z, .end
+	LD D, A		; save loop counter in D
+	LD A, (IX)	; check the character at the current string pointer
+	CP 0		; if it's a null character, we've reached the end of the input string
+	JR Z, .end	; so we return immediately
+	INC IX
+	LD A, D		; restore loop counter
+	DEC A
+	JR .loop1
+.end:
+	LD (IX), A
+	POP IX
+	RET
+
 ; shifts to the beginning of next token after calling str_tok
 str_shift:
 		PUSH HL
@@ -295,39 +333,6 @@ str_charAt:
 	CP 0
 	JR Z, .end
 	DJNZ .loop
-.end:
-	POP IX
-	RET
-
-
-
-; returns a substring of a string
-; stops at the end of the source string 
-; or C places after B, whichever is first
-; IX - input string
-; B - starting index
-; C - length
-; result in IY
-str_sub:
-	PUSH IX
-.start:
-	LD A, B
-	CP 0
-	JR Z, .sub
-	DEC B
-	INC IX
-	JR .start
-.sub:
-	LD A, C
-	CP 0
-	JR Z, .end
-	LD A, (IX)
-	LD (IY), A
-	CP 0
-	JR Z, .end
-	DEC C
-	INC IX
-	INC IY
 .end:
 	POP IX
 	RET

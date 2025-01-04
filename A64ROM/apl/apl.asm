@@ -159,6 +159,7 @@ SYS_LISTDIRS_B	equ 2Bh
 SYS_NEXTDIR_B	equ 2Ch
 SYS_TRIM_B		equ 2Dh
 SYS_TOK_B		equ 2Eh
+SYS_SUBSTR_B	equ 2Fh
 
 BuiltInFunctions:
 
@@ -196,6 +197,7 @@ BuiltInFunctions:
  defb "Starts",		0, SYS_STARTS_B
  defb "Trim", 		0, SYS_TRIM_B
  defb "Tok",		0, SYS_TOK_B
+ defb "SubStr",		0, SYS_SUBSTR_B
 
 ; DOS functions:
  defb "Open", 		0, SYS_OPEN_B

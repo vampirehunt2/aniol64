@@ -1216,6 +1216,8 @@ run_execSyscall:
     JP Z, sys_listDirs
     CP SYS_TRIM_B
     JP Z, sys_trim
+    CP SYS_SUBSTR_B
+    JP Z, sys_subStr
     
     PUSH AF             ; store the function bytecode on stack
     CALL run_evaluate   ; evaluate the expression that's the function's argument

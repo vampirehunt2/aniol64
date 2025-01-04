@@ -1,7 +1,4 @@
 s<-"Test1 Test2"
-tok<-s
-s<-Tok(s)
-WriteS tok
-NewLn
-WriteS s
+SubStr s, 22, 15, s1
+WriteS s1
 END

@@ -303,11 +303,55 @@ sys_trim:
 .syntaxErr:
     ; TODO
 
+; tokenizes a string
+; modifies the input string to end at the end of the first token 
+; function
+; syntax: Tok(<Expression>)
+; argument1: string to tokenise
+; returns: a pointer to the beginning of the second token of the input string
 sys_tok:
     PUSH HL
     POP IX
     CALL str_tok
     RET
+
+; produces a substring from a string.
+; note that the input string gets modified.
+; procedure
+; syntax: SubStr <Expression>, <Expression>, <Expression>, <Variable>
+; argument1: input string
+; argument2: starting index. If larger than the length of the input string, an empty string is returned
+; argument3: maximum length of the substring. If starting index + maximum length 
+;            are larger than the length of the input string
+;            the output string is truncated at the end of the input string
+; argument4: output variable 
+sys_subStr:
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD IX, (Expression + 1)
+    PUSH IX
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD A, (Expression + 1)
+    LD B, A
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD A, (Expression + 1)
+    LD C, A
+    POP IX
+    CALL str_sub
+    PUSH IX
+    CALL _run_getVar
+    POP BC
+    LD (HL), C          
+    INC HL                      
+    LD (HL), B          
+    RET
+.syntaxErr:
+    ; TODO
 
 ; compares two strings
 ; procedure
