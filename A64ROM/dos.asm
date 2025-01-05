@@ -153,7 +153,7 @@ dos_printRecord:
 
 
 dos_checkNvram:
-	CALL memTest
+	CALL mem_test
 	CP 0
 	JR Z, .memTestOk
 	LD IX, NvRamNok

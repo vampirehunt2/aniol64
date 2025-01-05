@@ -160,6 +160,7 @@ SYS_NEXTDIR_B	equ 2Ch
 SYS_TRIM_B		equ 2Dh
 SYS_TOK_B		equ 2Eh
 SYS_SUBSTR_B	equ 2Fh
+SYS_BANK_B		equ 30h
 
 BuiltInFunctions:
 
@@ -169,6 +170,7 @@ BuiltInFunctions:
  defb "Get",		0, SYS_GET_B
  defb "Put",		0, SYS_PUT_B
  defb "Delay",		0, SYS_DELAY_B
+ defb "Bank",		0, SYS_BANK_B
 
 ; Console functions
  defb "Read", 		0, SYS_READ_B

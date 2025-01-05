@@ -123,6 +123,21 @@ sys_delay:
     ; TODO
     RET
 
+; switches the memory bank in the top 16k of memory
+; procedure
+; syntax: Bank <Expression>
+; argument1: number of the bank to switch in
+sys_switchBank:
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD A, L
+    CALL mem_switchBank
+    RET
+.syntaxErr:
+    ; TODO
+    RET
+
 ; 8-bit peek of a memory location pointed to by the argument
 ; function
 ; syntax: Peek(<Expression>)
