@@ -1,0 +1,233 @@
+@ -0,0 +1,233 @@
+<h1>APL Syntax</h1>
+
+The syntax of the Aniol Programming Language for the Aniol 64/640 line of computers
+
+<h2>Comments</h2>
+Comments start with the '%' character and continue until the end of line. <br/>
+Comments are ignored by the parser, and are not present in the tokenized file. 
+
+
+<h2>Types</h2>
+Data is represented as a conjunction of 16-byte values. <br/>
+Values may represent numerical data in the form of 16-bit signed integers or 16-bit pointers to arbitrary data structures. <br/>
+In certain contexts, described in the documentation, only the lower 8-bits of a value may be significant, and the higher 8-bits are ignored. <br/>
+<h3>Values</h3>
+Numerical values are represented as 16-bit signed integer numbers or 16-bit pointers. <br/>
+Numerical constants have the same format for both numbers and pointers, and can be either of the following:
+<ul>
+<li>Decimal numbers with a possible leading minus sign to indicate negative numbers, for example: 10, -1, 0, 35000</li>
+<li>Hexadecimal numbers. Number format is '$' and exactly 4 hexadecimal digits from 0 to f. Only lowercase letters are allowed for digits a-f. Examples:
+$0000, $ffff, $abcd</li>
+</ul>
+
+Records are pointers to data structures in memory. Each element of a record is 2 bytes long. <br/>
+Records are declared with the keyword REC, followed by the variable name and number of 2-byte elements, for example:
+<pre>
+REC x 10
+</pre>
+Record declaration statically allocates memory for that record. <br/>
+Record elements can be accessed with a dot operator, for example:
+<pre>
+x.5
+x.(a+b)
+</pre>
+
+Arrays are pointers to continuous areas of memory. Each element of an array is 2 bytes long. <br/>
+Arrays are declared with the keyword ARR, followed by the variable name and number of 2-byte elements, for example:
+<pre>
+ARR a 10
+</pre>
+Array declaration statically allocates memory for that array.
+Array elements can be accessed with a square bracket operator, for example:
+<pre>
+a[10]
+a[i+j]
+</pre>
+Nested array indices are not supported.
+<pre>
+a[b[i]]	%wrong
+%use this instead:
+j<-b[i]
+a[j]
+</pre>
+
+Note, arrays and records are internally identical. The ARR and REC keywords resolve to the same bytecode. Dot operator and square brackets can be used interchangeably.
+<p>
+String values are pointers to null-terminated strings in memory. <br/>
+Each element (character) of a string is one byte long. <br/>
+Strings are declared with the keyword STR, followed by the variable name and number of characters, not counting the terminating null, for example:
+<pre>
+STR s 10
+</pre>
+String declaration statically allocates memory for that string.
+String elements can be accessed with a hash operator or a curly bracket operator, for example:
+<pre>
+s#10
+s{i+j}
+</pre>
+Reading a string element yields a 16-bit value, where only the lower 8 bits are significant and the higher 8 bits are zero
+Assigning a value to a string element requires a 16-bit value, where only the lower 8 bits are significant and the higher 8 bits are ignored and discarded.
+String constants are enclosed in double quotes:
+<pre>
+"test string"
+</pre>
+
+<h2>Variables</h2>
+Up to 128 named variables can be defined in any APL program. <br/>
+Variable names begin with a lowercase letter. <br/>
+Variable names may consist of upper or lowercase letters, decimal digits and the underscore '_' character. <br/>
+Maximum length of a variable name is 8 characters. <br/>
+Numerical variables are defined with first use. <br/>
+All variables are global. <br/>
+
+<h2>Statements</h2>
+An APL program is a sequence of statements. <br/>
+Statements are separated by newlines or the ':' statement separator character. <br/>
+The following statements are supported:
+<ul>
+<li>Variable declaration</li>
+<li>Variable assignment</li>
+<li>Conditional statements</li>
+<li>Loop statements</li>
+<li>Procedure declarations</li>
+<li>Procedure/function calls</li>
+<li>Procedure return statement</li>
+<li>STOP statement</li>
+<li>END statement</li>
+</ul>
+
+<h2>Variable assignment</h2>
+Assignment uses the variable name, followed by the assignment operator, followed by an expression.
+Assignment operator is '<-'
+Examples:
+<pre>
+x<-0
+s<-"test"
+a<-Abs(b)+1
+</pre>
+
+<h2>Expressions</h2>
+The following are allowed in expressions, listed in order of priority:
+<ol>
+<li>Parentesis '(' and ')'</li>
+<li>Function calls. Functions are considered unary prefix operators.</li>
+<li>Record and Array index operator</li>
+<li>String index operator</li>
+<li>Unary operators: arithmetic negation '-' and logical negation '!'</li>
+<li>Multiplication-type operators: multiplication '*', division '/', modulo '\', conjuction '&'</li>
+<li>Addition-type operators: addition '+', subtraction '-', alternative '|'</li>
+<li>Comparison operators: equal '=', not equal '<>', greater or equal '>=', smaller or equal '<='</li>
+</ol>
+
+Note, the minus sign has three distinct meanings:
+<ol>
+<li>In front of a numerical constant it forms part of the constant, for example -10</li>
+<li>In front of a variable it's a unary prefix operator for the arithmetic negation operation, for example -a</li>
+<li>Between two values (either constants or variables) it's a binary infix subtraction operator, for example 12-b</li>
+</ol>
+
+<h2>Function calls</h2>
+All functions have exactly one parameter. <br/>
+For some functions, the parameter is ignored. <br/>
+The parameter can be placed in parenthesis, the parenthesis are optional if not otherwise required to establish operator priority. <br/>
+Built-in functions can be called and their result used as part of an expression. <br/>
+Alternatively, functions can be called like procedures, where the call is a complete statement and the result is discarded, for example:
+<pre>
+a<-Rnd(10)
+a<-Rnd 10
+ioresult<-Open("file.txt")
+Open("file.txt")
+</pre>
+
+<h2>Built-in functions</h2>
+<p>
+Miscallenous functions:  <br/>
+<ul>
+<li>Peek: returns a value from the memory address passed as parameter. Lower 8-bits are significant, upper 8-bits are 0. <br/>
+<li>Get: reads a value from the input port, the number of which is passed as parameter. For the parameter, lower 8-bits are significant, upper 8-bits are  ignored. For the return value, Lower 8-bits are significant, upper 8-bits are 0. <br/>
+</ul>
+Math functions: <br/>
+<ul>
+<li>Abs: absolute value of the parameter. <br/>
+<li>Rnd: pseudorandom value from 0 to parameter-1 <br/>
+</ul>
+<p>
+String functions: <br/>
+Len: length of string, not including the terminating null character <br/>
+<p>
+DOS functions: <br/>
+Open: Loads a file from current directory on disk starting from address $c000. Returns I/O result <br/>
+Save: Saves a file to current directory on disk. Returns I/O result <br/>
+ChDir: Changes the current directory. Returns I/O result <br/>
+Size: Returns the size, in bytes, of the currently opened file. The parameter is ignored. <br/>
+MkDir: Creates a directory. Returns I/O result <br/>
+RmDir: Removes a directory. Returns I/O result <br/>
+DosErr: Returns the status of the last I/O operation. 0 indicates success. Parameter indicates whether any error should be cleared. <br/>
+Delete: Deletes a file. Returns I/O result <br/>
+Touch: Creates an empty file. Returns I/O result <br/>
+Exists: Returns a value indicating whether the specified file exists in the current directory.  <br/>
+<p>
+All the DOS functions that return I/O status of the operation also they set an internal variable to the same status. The value of the variable is accessible by using the DosErr function. This means that the following two snippets of code are functionally equivalent:
+<pre>
+ioresult<-Open("test.txt")
+%is equivalent to
+Open("test.txt")
+ioresult<-DosErr(0)
+</pre>
+
+<h2>Procedure declarations</h2>
+User-defined procedures are declared with a header consisting of the PROC keyword, followed by procedure name. <br/>
+Procedure names start with an uppercase letter. <br/>
+Procedure names  may consist of upper or lowercase letters, decimal digits and the underscore '_' character. <br/>
+Keywords can't be used as procedure names. </br>
+Maximum length of a procedure name is 8 characters. <br/>
+Following the procedure header, any statements are allowed. They form the procedure body. 
+The procedure terminates with the RET statement.
+
+<h2>Procedure calls</h2>
+Procedures are called by stating their names. <br/>
+Built-in procedures can be called with a defined number of parameters. Parameters are separated by commas. <br/>
+User-defined procedures cannot have parameters. Use global variables to pass values instead. <br/>
+Examples:
+<pre>
+GotoXy x, y+1
+MyProc
+</pre>
+
+<h2>Keywords</h2>
+Note, PROG, FOR, NEXT and FUN keywords are reserved, but not used. <br/>
+Other keywords are:  <br/>
+<ul>
+<li>PROC: user-defined procedure declaration
+<li>END: indicates to the parser that processing of the source file should be stopped. Mandatory at the end of the program. File content beyond END is ignored.
+<li>RET: returns from a user-defined procedure
+<li>IF: conditional statement
+<li>ELSE: conditional statement
+<li>ENDIF: conditional statement
+<li>WHILE: begins loop statement
+<li>LOOP: ends a loop statement
+<li>ARR: array declaration
+<li>REC: record declaration
+<li>STR: string variable declaration
+<li>STOP: indicates to the interpreter to stop the execution. Causes the "Program terminated" message to be printed out, then the interpreter exists to the OS. If user-defined procedures are defined, place the procedures below the STOP statement. If no user-defined procedures are defined, the STOP statement is optional.
+</ul>
+Additionally, the character ';' replaces the keyword ENDIF in case the last used keyword out of (IF, WHILE) was IF. Similarly, it replaces the keyword loop, if the last used keyword out of (IF, WHILE) was WHILE. So the following two snippets of code are equivalent:
+<pre>
+IF Cond 
+	DoSth
+ENDIF
+%is equivalent to
+IF Cond: DoSth;
+</pre>
+Similarly, the following two snippets of code are equivalent:
+<pre>
+WHILE Cond
+	DoSth
+LOOP
+%is equivalent to
+WHILE Cond: DoSth;
+</pre>
+
+
+
