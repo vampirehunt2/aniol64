@@ -133,6 +133,7 @@ i16_neg:
 ; returns the logical negation of a 16-bit value
 ; argument in HL
 ; result in HL
+; destroys A
 i16_not:
         LD A, H    ; inverting all the bits
         XOR 0FFh
@@ -413,7 +414,9 @@ i16_parseDec:
 	JR NZ, .pos
 	INC IX		; move past the minus sign
 	CALL u16_parseDec ; parse the absolute value of the number
+        PUSH AF
 	CALL i16_neg
+        POP AF
 	RET
 .pos:
 	CALL u16_parseDec  

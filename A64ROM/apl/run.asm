@@ -1223,6 +1223,8 @@ run_execSyscall:
     
     PUSH AF             ; store the function bytecode on stack
     CALL run_evaluate   ; evaluate the expression that's the function's argument
+    CP 0
+    ; JR NZ, .syntaxErr TODO
     LD HL, (Expression + 1)
     POP AF              ; restore the function bytecode from stack
     ; fall through to allow to call a function like a procedure
@@ -1314,7 +1316,7 @@ run_ret:
     LD (StmtEnd), BC        ; so that the next run_nextStmt call goes to the next statement after the user call
     RET
 
-run_stop:
+run_stop: //TODO END should invoke HALT?
     LD IX, Terminated
     CALL writeLn
     LD SP, (Trap)
