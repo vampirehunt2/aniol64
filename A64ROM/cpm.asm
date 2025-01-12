@@ -50,21 +50,14 @@ cpm_install:
     LD (CpmSectorCounter), A
 .loop:
     PUSH BC                             ; save the loop counter
-    PUSH HL                             ; save the pointer into the CP/M ROM image
     LD A, (CpmSectorCounter)            ; load the current value of sector counter to be used for LBA 0:7 
     LD B, 0                             ; zero out the LBA 8:15
     LD C, 0                             ; zero out the LBA 16:23
     CALL cf_setSector                   ; Select the CF sector.
-    CALL cf_writeSector                 ; We will write 512 bytes, which is the size of the CF sector...
-                                        ;...but we only care about the first 128 bytes,...
-                                        ;... which is the size of CP/M sector
+    CALL cpm_writeSector 
     LD A, (CpmSectorCounter)        
     INC A                               ; increase the sector counter
     LD (CpmSectorCounter), A            ; store the increased counter
-    LD C, CpmSectorSize
-    LD B, 0
-    POP HL                              ; advancing HL by 128 bytes, even though we already wrote 512 bytes...
-    ADD HL, BC                          ; ...the remaining 384 bytes of the CF sector are ignored
     POP BC                              ; restore the loop counter
     DJNZ .loop                      
     RET
@@ -107,3 +100,30 @@ cpm_version:
     LD IX, cpm_Version
     CALL writeLn
     RET
+
+; writes a CP/M sector to a cf card
+; moves HL to the next CP/M sector (128 bytes) in memory
+; only writes the first out of every 4 bytes of the CF sector
+; CF sectors are 512 bytes, while CP/M sectors are 128 bytes
+; so we only need to use every fourth byte
+; this also circumvents the issue that the fourth out of every four bytes
+; does not write successfully to some CF cards
+; buffer address in HL
+cpm_writeSector:
+    CALL cf_waitCmd			; wait till the cf card is ready for command
+	LD A, CF_WRITE			; prepare the write command
+	OUT	(CF_CMD), A			; send the write command
+	LD B, 128				; write 128 bytes
+.loop:
+	CALL cf_wait	
+	LD A, (HL)
+	OUT (CF_DAT), A			; write a byte of data	
+	INC HL
+	CALL cf_wait	
+	OUT (CF_DAT), A			; write and ignore a byte of data	
+	CALL cf_wait	
+	OUT (CF_DAT), A			; write and ignore  a byte of data	
+	CALL cf_wait	
+	OUT (CF_DAT), A			; write and ignore  a byte of data	
+	DJNZ .loop
+	RET

@@ -207,7 +207,6 @@ i16_cmp:
 ; division result in DE
 ; mod result in HL
 ; errors reported in A
-
 u16_div:
         LD A, B    ; checking if it's not a division by zero
         CP 0

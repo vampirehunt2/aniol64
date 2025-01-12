@@ -82,7 +82,6 @@ parseByteDec:
 ; IX: null-terminated string containing the double byte digits
 ; result in HL
 ; parse errors reported in A
-
 parseDByte:
 	CALL isDByteStr
 	CP 0

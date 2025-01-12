@@ -29,11 +29,12 @@ bios_wboot:
     LD C, 0             ; pass current disk number to CCP in C
     JP COMMAND
 
+
 ;CONSOLE STATUS, RETURN 0FFH IF CHARACTER READY, 00H IF NOT
 bios_const:
-    LD A, (lastChar)        ; checking what the previous character read was
-    CP 13                   ; if it was a CR, another character, an LF, is available
-    JR Z, .yes
+    ;LD A, (lastChar)        ; checking what the previous character read was
+    ;CP 10                   ; if it was a LF, another character, an CR, is available
+    ;JR Z, .yes
     CALL keyPressed
     JR Z, .no
 .yes:
@@ -44,17 +45,17 @@ bios_const:
     RET
 
 ;CONSOLE CHARACTER INTO REGISTER A
-lastChar: db 0
+;lastChar: db 0
 bios_conin:
-    LD A, (lastChar)        ; checking what the previous character read was
-    CP 13                   ; if it was a CR, just return an LF
-    JR NZ, .cont
-    LD A, 10                ; load LF into A
-    LD (lastChar), A
-    RET
-.cont:
+    ;LD A, (lastChar)        ; checking what the previous character read was
+    ;CP 10                   ; if it was an LF, just return an CR
+    ;JR NZ, .cont
+    ;LD A, 13                ; load CR into A
+    ;LD (lastChar), A
+    ;RET                     ; return CR in A
+;.cont:
     CALL readKey
-    LD (lastChar), A        ; saving the character read, in case it's a CR
+    ;LD (lastChar), A        ; saving the character read, in case it's an LF
     RET
 
 ;CONSOLE CHARACTER OUTPUT FROM REGISTER C
@@ -105,6 +106,7 @@ bios_settrk:
 
 ;30: Set sector number
 bios_setsec:
+    LD A, C
     LD (Sector), A
     RET
 

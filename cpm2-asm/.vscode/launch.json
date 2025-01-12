@@ -11,14 +11,18 @@
             "remoteType": "zsim",
             "zsim": {
                 "visualMemory": true,
-                "memoryModel": "RAM"
+                "memoryModel": "RAM",
+                "customCode": {
+		            "debug": true,
+		            "jsPath": "dev/io.js",
+	            }
             },
             "sjasmplus": [
                 {
                     "path": "C:/8bit/git/cpm2-asm/cpm.sld"
                 }
             ],
-            "commandsAfterLaunch": ["-mv 0e400h 100"],
+            "commandsAfterLaunch": ["-mv 0f200h 100"],
             "history": {
                 "reverseDebugInstructionCount": 1000000,
                 "spotCount": 10,
@@ -27,8 +31,8 @@
             "startAutomatically": false,
             "rootFolder": "${workspaceFolder}",
             "loadObjs": [
-                { "path": "C:/8bit/git/cpm2-asm/cpm22.bin", "start": "0xE400" }
-        ],
+                { "path": "C:/8bit/git/cpm2-asm/cpm22.bin", "start": "0xDC00" }
+            ],
             "execAddress": "BOOT",
             "topOfStack": "0xFFFF"
         }

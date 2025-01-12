@@ -1,26 +1,72 @@
 ; compact flah driver
 
-;CF_BASE 		equ 01111000b			; 78h CF card is on the expansion port, activated by A7, with A0:A2 free
+; F0h CF card is activated by A3, with A0:A2 free
+CF_BASE 		equ 11110000b	
 
-CF_BASE 		equ 11110000b			; 78h CF card is activated by A3, with A0:A2 free
-CF_DAT 			equ	CF_BASE + 00h		; 78h Data (R/W)
-CF_ERR 			equ CF_BASE + 01h		; 79h Error register (R)
-CF_FEAT 		equ CF_BASE + 01h		; 79h Features (W)
-CF_SECT_COUNT 	equ CF_BASE + 02h		; 7Ah Sector count (R/W)
-CF_LBA0			equ CF_BASE + 03h		; 7Bh LBA bits 0-7 (R/W, LBA mode)
-CF_LBA1			equ CF_BASE + 04h		; 7Ch LBA bits 8-15 (R/W, LBA mode)
-CF_LBA2			equ CF_BASE + 05h		; 7Dh LBA bits 16-23 (R/W, LBA mode)
-CF_LBA3			equ CF_BASE + 06h		; 7Eh LBA bits 24-27 (R/W, LBA mode)
-CF_STATUS		equ CF_BASE + 07h		; 7Fh Status (R)
-CF_CMD 			equ CF_BASE + 07h		; 7Fh Command (W)	
+; F0h Data (R/W)
+CF_DAT 			equ	CF_BASE + 00h
 
+; F1h Error register (R)
+CF_ERR 			equ CF_BASE + 01h
+
+; F1h Features (W)
+CF_FEAT 		equ CF_BASE + 01h	
+
+; F2h Sector count (R/W)
+CF_SECT_COUNT 	equ CF_BASE + 02h	
+
+; F3h LBA bits 0-7 (R/W, LBA mode)
+CF_LBA0			equ CF_BASE + 03h	
+
+; F4h LBA bits 8-15 (R/W, LBA mode)
+CF_LBA1			equ CF_BASE + 04h
+
+; F5h LBA bits 16-23 (R/W, LBA mode)
+CF_LBA2			equ CF_BASE + 05h	
+
+; F6h LBA bits 24-27 (R/W, LBA mode)
+CF_LBA3			equ CF_BASE + 06h	
+
+; F7h Status (R)	
+CF_STATUS		equ CF_BASE + 07h		
+
+; F7h Command (W)
+CF_CMD 			equ CF_BASE + 07h			
+
+; 01h enable 8-bit mode
 CF_8BIT_MODE	equ 01h
+
+; E0h enable LBA mode
 CF_LBA_MODE		equ 0E0h
+
+; 02h enable cache feature
+CF_CACHE_ENABLE	equ 02h
+
+; 82h disable cache feature
+CF_CACHE_DISABLE equ 82h
+
+; EFh Set Feature command
 CF_SET_FEAT		equ 0EFh
+
+; 20h Read Sector command
 CF_READ			equ 20h
+
+; 30h Write Sector command
 CF_WRITE		equ 30h
+
+; E8h write to CF onboard cache
+CF_WRITE_BUFFER equ 0E8h
+
+; E7 flush CF onboard cache
+CF_FLUSH_CACHE	equ 0E7h
+
+; 90h Disk Diagnosis command
 CF_DIAG			equ 90h
+
+; ECh Disk ID command
 CF_ID			equ 0ECh
+
+; 00h Disk Status OK
 CF_OK			equ 00h
 
 
@@ -70,7 +116,6 @@ cf_waitCmd:
 	JR Z, .loop			; drvrdy (D6) should be 1 
 	POP AF
 	RET
-
 
 
 cf_waitDat:
@@ -138,10 +183,9 @@ cf_readSector:
 	CALL cf_waitCmd			; wait till the cf card is ready for command
 	LD A, CF_READ			; prepare read command
 	OUT	(CF_CMD), A			; send read command
-	CALL cf_waitDat			; wait until data is ready to be read 
 	LD B, 0					; read 512 bytes, 2 bytes per loop iteration
 .loop:
-	CALL cf_wait	
+	CALL cf_wait
 	IN A, (CF_DAT)			; get a byte of data	
 	LD (HL),A
 	INC HL
@@ -165,10 +209,9 @@ cf_writeSector:
 	CALL cf_waitCmd			; wait till the cf card is ready for command
 	LD A, CF_WRITE			; prepare the write command
 	OUT	(CF_CMD), A			; send the write command
-	CALL cf_waitDat			; wait until data is ready to be written 
 	LD B, 0					; write 512 bytes, 2 bytes per loop iteration
 .loop:
-	CALL cf_wait	
+	CALL cf_wait
 	LD A, (HL)
 	OUT (CF_DAT), A			; write a byte of data	
 	INC HL

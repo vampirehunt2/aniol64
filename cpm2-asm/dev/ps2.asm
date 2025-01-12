@@ -55,120 +55,76 @@ delay1520us:
 	POP BC
 	RET
 
-; A - delay x10ms
-delay:
-	CP 0
-	RET Z
-	DEC A
-	CALL delay10ms
-	JP delay
-
-delay10ms:
-	CALL delay1520us
-	CALL delay1520us
-	CALL delay1520us
-	CALL delay1520us
-	CALL delay1520us
-	CALL delay1520us
-	CALL delay1520us
-	CALL delay1520us
-	RET
-
-
-ps2_initSeq:
-		defb 0, 00011000b	; channel reset
-		defb 4, 00000111b	; x1 clock, 1 stop bit, odd parity 
-		defb 3, 11000001b	; Rx 8 bits enable Rx
-		defb 5, TXA
-		defb 1, 10000000b	; disable interrupts, enable WAIT
-
-keyInit:
-		LD HL, ps2_initSeq
-		LD B, 10
-		LD C, DART_A_CMD
-		OTIR
-		CALL ps2_readScancode
-		LD A, 0FFh				; reset command
-		CALL ps2_transmit		
-		CALL ps2_wait4Tx		; wait for transmission to complete
-		CALL ps2_readScancode	; consume BAT codes
-		CALL ps2_readScancode
-		CALL ps2_readScancode
-		CALL ps2_readScancode
-		LD A, FALSE
-		LD (Ps2Shift), A
-        RET
-
 keyPressed:
-		IN A, (DART_A_CMD)
-		AND 00000001b
-		RET
+	IN A, (DART_A_CMD)
+	AND 00000001b
+	RET
 		
 ; synchronously reads a scancode from the serial port
 ; when the scancode is available, it's code is in A
 ps2_readScancode:
-		IN A, (DART_A_CMD)
-		BIT 0, A
-		JR Z, ps2_readScancode
-		IN A, (DART_A_DAT)
-		RET
+	IN A, (DART_A_CMD)
+	BIT 0, A
+	JR Z, ps2_readScancode
+	IN A, (DART_A_DAT)
+	RET
 		
 ; converts a scancode to the corresponding ascii character
 
 
 ps2_scancode2asc:
-		PUSH BC
-		PUSH HL
-		LD C, A
-		LD B, 0
-		LD A, (Ps2Shift)
-		CP TRUE
-		JR Z, .shift
-		LD HL, ps2Scancodes
-		JR .continue
+	PUSH BC
+	PUSH HL
+	LD C, A
+	LD B, 0
+	LD A, (Ps2Shift)
+	CP TRUE
+	JR Z, .shift
+	LD HL, ps2Scancodes
+	JR .continue
 .shift:
-		LD HL, ps2ShiftScancodes
+	LD HL, ps2ShiftScancodes
 .continue:
-		ADD HL, BC
-		LD A, (HL)
-		POP HL
-		POP BC
-		RET
+	ADD HL, BC
+	LD A, (HL)
+	POP HL
+	POP BC
+	RET
 
 readKey:
-		CALL ps2_readScancode
-		CP KEY_UP
-		JR Z, .keyUp
-		CP EXT_KEY
-		JR Z, .extKey
-		CP LSHIFT
-		JR Z, .shiftDn
-		CP RSHIFT
-		JR Z, .shiftDn
-		CALL ps2_scancode2asc
-		CP 'a'					; if it's a letter, make sure it's uppercase
-		RET C
-		CP 'z' + 1
-		RET NC
-		ADD a, 'A' - 'a'
-		RET
+	CALL ps2_readScancode
+	CP KEY_UP
+	JR Z, .keyUp
+	CP EXT_KEY
+	JR Z, .extKey
+	CP LSHIFT
+	JR Z, .shiftDn
+	CP RSHIFT
+	JR Z, .shiftDn
+	CALL ps2_scancode2asc
+	CP 'a'					; if it's a letter, make sure it's uppercase
+	RET C
+	CP 'z' + 1
+	RET NC
+	ADD a, 'A' - 'a'
+	RET
 .shiftDn:
-		LD A, TRUE
-		LD (Ps2Shift), A
-		JR readKey
+	LD A, TRUE
+	LD (Ps2Shift), A
+	JR readKey
 .shiftUp:
-		LD A, FALSE
-		LD (Ps2Shift), A
-		JR readKey
+	LD A, FALSE
+	LD (Ps2Shift), A
+	JR readKey
 .keyUp:
 .extKey:
-		CALL ps2_readScancode ; ignore the next scancode, it's the code of the key that's going up
-		JR Z, .extKey
-		CP LSHIFT
-		JR Z, .shiftUp
-		CP RSHIFT
-		JR Z, .shiftUp
-		JR readKey
+	CALL ps2_readScancode ; ignore the next scancode, it's the code of the key that's going up
+	JR Z, .extKey
+	CP LSHIFT
+	JR Z, .shiftUp
+	CP RSHIFT
+	JR Z, .shiftUp
+	JR readKey
 		
 ;1)   Bring the Clock line low for at least 100 microseconds.
 ;2)   Bring the Data line low.
@@ -183,66 +139,66 @@ readKey:
 ;11) Wait for the device to bring Clock  low.
 ;12) Wait for the device to release Data and Clock
 ps2_transmit:
-		CALL ps2_wait4Tx
-		CALL ps2_clockInhibit
-		CALL delay1520us
-		CALL ps2_dataInhibit
-		CALL ps2_clockRelease
-		OUT (DART_A_DAT), A
-		CALL ps2_dataRelease
-		RET
+	CALL ps2_wait4Tx
+	CALL ps2_clockInhibit
+	CALL delay1520us
+	CALL ps2_dataInhibit
+	CALL ps2_clockRelease
+	OUT (DART_A_DAT), A
+	CALL ps2_dataRelease
+	RET
 		
 
 ps2_wait4Tx:
-		PUSH AF
+	PUSH AF
 .loop:
-		IN A, (DART_A_CMD)
-		AND 00000100b
-		CP 0
-		JR Z, .loop
-		POP AF
-		RET
+	IN A, (DART_A_CMD)
+	AND 00000100b
+	CP 0
+	JR Z, .loop
+	POP AF
+	RET
 
 
 ps2_clockInhibit:
-		PUSH AF
-		LD A, 5				; writing to WR5
-		OUT (DART_A_CMD), A
-		LD A, TXA		; get previous value of WR5
-		OR 10000000b		; set  DTR (D7)	
-		OUT (DART_A_CMD), A
-		POP AF
-		RET
+	PUSH AF
+	LD A, 5				; writing to WR5
+	OUT (DART_A_CMD), A
+	LD A, TXA		; get previous value of WR5
+	OR 10000000b		; set  DTR (D7)	
+	OUT (DART_A_CMD), A
+	POP AF
+	RET
 	
 ps2_clockRelease:
-		PUSH AF				
-		LD A, 5				; writing to WR5
-		OUT (DART_A_CMD), A
-		LD A, TXA
-		AND 01111111b		; clear  DTR (D7)
-		OUT (DART_A_CMD), A	
-		POP AF
-		RET
+	PUSH AF				
+	LD A, 5				; writing to WR5
+	OUT (DART_A_CMD), A
+	LD A, TXA
+	AND 01111111b		; clear  DTR (D7)
+	OUT (DART_A_CMD), A	
+	POP AF
+	RET
 	
 ps2_dataInhibit:
-		PUSH AF
-		LD A, 5				; writing to WR5
-		OUT (DART_A_CMD), A
-		LD A, TXA
-		OR 00010000b		; send break (D4)
-		OUT (DART_A_CMD), A
-		POP AF
-		RET
+	PUSH AF
+	LD A, 5				; writing to WR5
+	OUT (DART_A_CMD), A
+	LD A, TXA
+	OR 00010000b		; send break (D4)
+	OUT (DART_A_CMD), A
+	POP AF
+	RET
 	
 ps2_dataRelease:
-		PUSH AF				
-		LD A, 5				; writing to WR5
-		OUT (DART_A_CMD), A
-		LD A, TXA
-		AND 11101111b		; clear break (D4)
-		OUT (DART_A_CMD), A	
-		POP AF
-		RET	
+	PUSH AF				
+	LD A, 5				; writing to WR5
+	OUT (DART_A_CMD), A
+	LD A, TXA
+	AND 11101111b		; clear break (D4)
+	OUT (DART_A_CMD), A	
+	POP AF
+	RET	
 
 
 
@@ -337,7 +293,7 @@ ps2Scancodes:
 		defb 00		; scancode 57		
 		defb 00		; scancode 58
 		defb 00		; scancode 59
-		defb 13		; scancode 5A
+		defb 10		; scancode 5A
 		defb ']'	; scancode 5B	
 		defb 00		; scancode 5C
 		defb '\\'	; scancode 5D

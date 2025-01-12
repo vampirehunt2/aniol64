@@ -79,25 +79,23 @@ cf_readSector:
 	OUT	(CF_CMD), A			; send read command
 	CALL cf_waitDat			; wait until data is ready to be read 
 	LD HL, (DmaAddr)
-	LD B, 128				; read 128 bytes
-.loop:						; in this loop
+	LD B, 128				
+.loop:						; in this loop read a byte of data into the buffer, then read and discard the next 3 bytes
 	CALL cf_wait	
 	IN A, (CF_DAT)			; get a byte of data	
 	LD (HL), A
 	INC HL
+	CALL cf_wait	
+	IN A, (CF_DAT)			; get and ignore a byte of data	
+	CALL cf_wait	
+	IN A, (CF_DAT)			; get and ignore a byte of data
+	CALL cf_wait	
+	IN A, (CF_DAT)			; get and ignore a byte of data
 	DJNZ .loop
-	;
-	LD B, 384 / 2
-.loop2:						; read, and ignore, the remaining 384 bytes
-	CALL cf_wait	
-	IN A, (CF_DAT)			; get a byte of data	
-	CALL cf_wait	
-	IN A, (CF_DAT)			; get a byte of data
-	DJNZ .loop2
 	RET
 	
 
-; writes a sector from a cf card
+; writes a sector to a cf card
 ; moves HL to the next sector in memory
 ; buffer address in HL
 cf_writeSector:
@@ -112,15 +110,13 @@ cf_writeSector:
 	LD A, (HL)
 	OUT (CF_DAT), A			; write a byte of data	
 	INC HL
+	CALL cf_wait	
+	OUT (CF_DAT), A			; write and ignore a byte of data	
+	CALL cf_wait	
+	OUT (CF_DAT), A			; write and ignore  a byte of data	
+	CALL cf_wait	
+	OUT (CF_DAT), A			; write and ignore  a byte of data	
 	DJNZ .loop
-	;				
-	LD B, 384 / 2			; write, and ignore, the remaining 384 bytes
-.loop2:	
-	CALL cf_wait	
-	OUT (CF_DAT), A			; write a byte of data	
-	CALL cf_wait	
-	OUT (CF_DAT), A			; write a byte of data
-	DJNZ .loop2	
 	RET
 
 ; sets the sector number for the next IO operation
