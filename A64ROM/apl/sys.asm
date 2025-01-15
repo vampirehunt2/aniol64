@@ -682,6 +682,7 @@ sys_pwd:
 sys_eof:
     ; ignore the parameter
     LD HL, (CurrentFileSize)
+    DEC HL
     LD BC, (FilePtr)
     CALL i16_cmp
     CP -1
