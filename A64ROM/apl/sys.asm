@@ -607,6 +607,7 @@ sys_exists:
 sys_size:
     ; ignore the parameter
     LD HL, (CurrentFileSize)
+    DEC HL
     RET
 
 ; creates a new directory
