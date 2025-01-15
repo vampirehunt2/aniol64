@@ -111,6 +111,10 @@ STRING_T:	defb "STR", 	0, STRING_B
 STOP_T: 	defb "STOP", 	0, STOP_B
  defb 0
 
+; miscellanous string:
+TRUE_STR: defb "True", 0
+FALSE_STR: defb "False", 0
+
 ; Built-In Functions
 SYS_READ_B		equ 00h
 SYS_WRITE_B 	equ 01h
@@ -163,6 +167,9 @@ SYS_SUBSTR_B	equ 2Fh
 SYS_BANK_B		equ 30h
 SYS_MAXX_B		equ 31h
 SYS_MAXY_B		equ 32h
+SYS_WRITEC_B	equ 33h
+SYS_WRITEH_B	equ 34h
+SYS_WRITEB_B	equ 35h
 
 BuiltInFunctions:
 
@@ -189,6 +196,9 @@ BuiltInFunctions:
  defb "ReadKey",	0, SYS_READKEY_B
  defb "MaxX",		0, SYS_MAXX_B
  defb "MaxY", 		0, SYS_MAXY_B
+ defb "WriteC",		0, SYS_WRITEC_B
+ defb "WriteH",		0, SYS_WRITEH_B
+ defb "WriteB",		0, SYS_WRITEB_B
 
 ; Math functions:
  defb "Abs", 		0, SYS_ABS_B

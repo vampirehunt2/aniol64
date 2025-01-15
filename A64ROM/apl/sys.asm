@@ -20,6 +20,53 @@ sys_write:
     ; TODO
     RET
 
+sys_writeh:
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD HL, (Expression + 1)
+    LD IX, LineBuff 
+    CALL u16_formatHex
+    CALL writeStr
+    RET
+.syntaxErr:
+    ; TODO
+    RET
+
+sys_writeb:
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD A, (Expression + 1)
+    CP 0
+    JR NZ, .true
+    LD A, (Expression + 2)
+    CP 0
+    JR NZ, .true
+    LD IX, FALSE_STR
+    JR .cont
+.true:
+    LD IX, TRUE_STR
+.cont:
+    CALL writeStr
+.syntaxErr:
+    ; TODO
+    RET
+
+; Writes a character to the screen
+; procedure
+; syntax: WriteC <Expression>
+; argument1: ASCII code of the character to print
+sys_writec:
+    CALL run_evaluate
+    CP 0
+    JR NZ, .syntaxErr
+    LD A, (Expression + 1)
+    CALL putChar
+.syntaxErr:
+    ; TODO
+    RET
+
 ; TODO: add a second argument for max string length
 ; reads a line of text from the keyboard into a variable
 ; procedure

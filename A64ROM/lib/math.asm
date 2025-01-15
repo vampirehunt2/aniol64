@@ -567,19 +567,19 @@ i16_formatDec:
 
 
 u16_formatHex:
-		LD (IX), '$'
-		LD A, H
-		CALL byte2asc
-		LD (IX + 2), A
-		LD A, B
-		LD (IX + 1), A
-		LD A, L
-		CALL byte2asc
-		LD (IX + 4), A
-		LD A, B
-		LD (IX + 3), A
-		LD A, 0
-		LD (IX + 5), A
+	LD (IX), '$'
+	LD A, H
+	CALL byte2asc
+	LD (IX + 2), A
+	LD A, B
+	LD (IX + 1), A
+	LD A, L
+	CALL byte2asc
+	LD (IX + 4), A
+	LD A, B
+	LD (IX + 3), A
+	LD A, 0
+	LD (IX + 5), A
         RET
 
 
