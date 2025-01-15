@@ -776,25 +776,55 @@ dos_touch:
 ; prints out an error message to the screen
 ; error code in A
 dos_printError:
-	CP DISK_FULL
-	JR Z, .diskFull
-	CP FILE_EXISTS
-	JR Z, .fileExists
-	CP INVALID_FILENAME
-	JR Z, .invFilename
+	CP INVALID_SECTOR
+	JR Z, .invalidSector
 	CP INVALID_DIRNAME
 	JR Z, .invDirname
-.diskFull:
-	LD IX, ErrDiskFull
+	CP INVALID_FILENAME
+	JR Z, .invFilename
+	CP DIR_EXISTS
+	JR Z, .dirExists
+	CP FILE_EXISTS
+	JR Z, .fileExists
+	CP FILE_NOT_FOUND
+	JR Z, .fileNotFound
+	CP TOO_MANY_DIRS
+	JR Z, .tooManyDirs
+	CP NO_SUCH_DIR
+	JR Z, .noSuchDir
+	CP DISK_FULL
+	JR Z, .diskFull
+	CP NO_DISK
+	JR Z, .noDisk
+.invalidSector
+	LD IX, ErrInvalidSector
+	JR .end
+.invDirname:
+	LD IX, ErrInvDirName
+ 	JR .end
+.invFilename:
+	LD IX, ErrInvFileName
+	JR .end
+.dirExists:
+	LD IX, ErrDirExists
 	JR .end
 .fileExists:
 	LD IX, ErrFileExists
 	JR .end
-.invFilename:
-	LD IX, ErrInvFileName
+.fileNotFound:
+	LD IX, ErrFileNotFound
 	JR .end
-.invDirname:
-	LD IX, ErrInvDirName
+.tooManyDirs:
+	LD IX, ErrTooManyDirs
+	JR .end
+.noSuchDir:
+	LD IX, ErrNoSuchDir
+	JR .end
+.diskFull:
+	LD IX, ErrDiskFull
+	JR .end
+.noDisk:
+	LD IX, ErrNoDisk
 ; 	JR .end
 .end:
 	CALL writeLn
