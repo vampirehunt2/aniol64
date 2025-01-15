@@ -540,7 +540,9 @@ sys_reset:
 sys_seek:
     CALL run_evaluate       ; evaluate the new file pointer
     CP 0
-    JR NZ, .syntaxErr 
+    JR NZ, .syntaxErr       
+    LD BC, FileBuffer       ; file offset now in HL
+    ADD HL, BC              ; add the FileBuffer base address
     CALL dos_seek
     RET
 .syntaxErr:
