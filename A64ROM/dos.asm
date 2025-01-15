@@ -703,6 +703,7 @@ dos_cd:
 	JR Z, .root
 	; if user isn't going to the root folder, find the appropriate folder
 	CALL dos_dirExists
+	CP 0
 	JR Z, .noDir
 	LD (CurrentDir), A
 	LD IY, CurrentPath
