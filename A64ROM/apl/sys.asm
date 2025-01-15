@@ -92,6 +92,22 @@ sys_nextLn:
     CALL nextLine
     RET
 
+; Returns the maximum horizontal position of a character on screen (Screen width minus 1)
+; function
+; syntax: MaxX()
+sys_maxX:
+    LD L, MAX_X
+    LD H, 0
+    RET
+
+; Returns the maximum vertical position of a character on screen (Screen height minus 1)
+; function
+; syntax: MaxY()
+sys_maxY:
+    LD L, MAX_Y
+    LD H, 0
+    RET
+
 ; Returns absolute value of an expression
 ; function
 ; syntax: Abs(<Expression>)
@@ -403,7 +419,11 @@ sys_cmp:
 .syntaxErr:
     ; TODO
     
-
+; copies a string to a buffer
+; procedure
+; syntax: Copy <Expression>, <Expression>
+; argument1: target buffer address
+; argument2: source string
 sys_copy:
     CALL run_evaluate
     CP 0

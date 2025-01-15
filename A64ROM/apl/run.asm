@@ -1276,6 +1276,10 @@ run_execFunction:
     JP Z, sys_nextDir
     CP SYS_TOK_B
     JP Z, sys_tok
+    CP SYS_MAXX_B
+    JP sys_maxX
+    CP SYS_MAXY_B
+    JP sys_maxY
     RET
 
 

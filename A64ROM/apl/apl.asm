@@ -161,6 +161,8 @@ SYS_TRIM_B		equ 2Dh
 SYS_TOK_B		equ 2Eh
 SYS_SUBSTR_B	equ 2Fh
 SYS_BANK_B		equ 30h
+SYS_MAXX_B		equ 31h
+SYS_MAXY_B		equ 32h
 
 BuiltInFunctions:
 
@@ -185,6 +187,8 @@ BuiltInFunctions:
  defb "GotoXY",		0, SYS_GOTOXY_B
  defb "ClrScr",		0, SYS_CLRSCR_B
  defb "ReadKey",	0, SYS_READKEY_B
+ defb "MaxX",		0, SYS_MAXX_B
+ defb "MaxY", 		0, SYS_MAXY_B
 
 ; Math functions:
  defb "Abs", 		0, SYS_ABS_B
