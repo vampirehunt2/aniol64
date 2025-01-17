@@ -12,7 +12,7 @@
 ; - maximum of 64 directories per logical drive, 32MB each
 ; - maximum of 256 logical drives per physical disk
 ; - maximum of 63 * 32 = 2016 files per logical drive
-; - up to 8 characters for a directory name
+; - up to 7 characters for a directory name (plus the terminating 0)
 ; - file names following the 8+3 convention
 ; - single level directory structure. 
 
@@ -73,7 +73,7 @@ DosErr			equ DOS_AREA + 24h	; status of the last disk I/O operation,
 DiskPresent		equ DOS_AREA + 25h
  
 ; filesystem constants:
-MAX_DIRNAME_LEN 		equ 8
+MAX_DIRNAME_LEN 		equ 7
 MAX_FILENAME_LEN		equ 12
 FS_INFO_LEN 			equ 8
 MAX_DIRS 				equ 63 
@@ -546,7 +546,7 @@ dos_mkDir:
 	POP IY		; transfer buffer address from IX to IY
 	PUSH HL
 	POP IX		; transfer name of directory from HL to IX
-	CALL str_2mem
+	CALL str_copy
 	CALL dos_saveDirs
 	JP .end
 .invName:

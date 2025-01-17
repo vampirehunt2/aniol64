@@ -223,23 +223,6 @@ str_2str:
 		RET
 
 
-
-str_2mem:
-	PUSH IX
-	PUSH IY
-.loop:
-	LD A, (IX)
-	CP 0
-	JR Z, .end
-	LD (IY), A
-	INC IX
-	INC IY
-	JR .loop
-.end:
-	POP IY
-	POP IX
-	RET
-
 ; skips leading spaces in a string
 ; IX - string to trim
 ; result in IX
