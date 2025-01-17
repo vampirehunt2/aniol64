@@ -341,6 +341,9 @@ apl_nextToken:
 	CP '$'
 	JP Z, apl_tokenizeHex
 	;
+	CP 39 ; apostrophe
+	JP Z, apl_tokenizeChar
+	;
 	LD A, B
 	CP '"'
 	JP Z, apl_tokenizeString
@@ -524,6 +527,20 @@ apl_processDec:
 	CALL apl_processNumber
 	RET
 
+apl_tokenizeChar:
+	LD HL, Token
+	CALL dos_fRead	; reading in the '$' symbol
+	LD (HL), A		; store it in the token
+	INC HL
+	CALL dos_fRead 	; read in the character
+	LD (HL), A		; store it in the token
+	INC HL
+	LD (HL), 0		; store the terminating null-character
+	CALL apl_processChar
+	LD A, FALSE
+	LD (IsOperator), A
+	RET 
+
 apl_tokenizeHex:
 	LD HL, Token
 	CALL dos_fRead	; reading in the '$' symbol
@@ -553,6 +570,20 @@ apl_processHex:
 	LD IX, Token
 	CALL u16_parseHex
 	CALL apl_processNumber
+	RET
+
+apl_processChar:
+	LD A, NUM_B
+	LD IX, (ProgramPtr)
+	LD (IX), A
+	INC IX
+	LD A, (Token + 1)
+	LD (IX), A
+	INC IX
+	LD A, 0
+	LD (IX), A
+	INC IX
+	LD (ProgramPtr), IX
 	RET
 
 apl_processNumber:
