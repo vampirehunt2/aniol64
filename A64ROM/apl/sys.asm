@@ -587,9 +587,8 @@ sys_reset:
 sys_seek:
     CALL run_evaluate       ; evaluate the new file pointer
     CP 0
-    JR NZ, .syntaxErr       
-    LD BC, FileBuffer       ; file offset now in HL
-    ADD HL, BC              ; add the FileBuffer base address
+    JR NZ, .syntaxErr    
+    LD HL, (Expression + 1)   
     CALL dos_seek
     RET
 .syntaxErr:
@@ -654,7 +653,6 @@ sys_exists:
 sys_size:
     ; ignore the parameter
     LD HL, (CurrentFileSize)
-    DEC HL
     RET
 
 ; creates a new directory
