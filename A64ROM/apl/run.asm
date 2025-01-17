@@ -1284,9 +1284,9 @@ run_execFunction:
     CP SYS_TOK_B
     JP Z, sys_tok
     CP SYS_MAXX_B
-    JP sys_maxX
+    JP Z, sys_maxX
     CP SYS_MAXY_B
-    JP sys_maxY
+    JP Z, sys_maxY
     RET
 
 
