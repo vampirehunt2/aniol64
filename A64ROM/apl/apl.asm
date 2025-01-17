@@ -1,6 +1,6 @@
 ; apl tokenizer
 
-SpecialChars: defb ".~+-*/\\:=[]()<>{}#&|!@^,;\n\r", 0
+SpecialChars: defb ".~+-*/\\:=[]()<>{}#&|!?@^,;\n\r", 0
 
 
 ;
@@ -33,6 +33,7 @@ CONJUNCTION_T: 	defb "&", 	0
 ALTERNATIVE_T: 	defb "|", 	0
 NOT_T: 			defb "!", 	0
 ADDR_T: 		defb "@", 	0
+INTERROGATION_T defb "?", 	0
 DEREFERENCE_T: 	defb "^", 	0
 INDEX_T:		defb ".", 	0
 STRINDEX_T:		defb "#", 	0
@@ -64,6 +65,7 @@ CONJUNCTION_B 	equ '&'
 ALTERNATIVE_B 	equ '|' 	
 NOT_B 			equ '!' 			
 ADDR_B 			equ '@' 	
+INTERROGATION_B	equ '?'
 DEREFERENCE_B 	equ '^' 	
 INDEX_B			equ '.' 
 STRINDEX_B		equ '#'

@@ -418,6 +418,8 @@ run_evalUnary:
     JR Z, .addr
     CP DEREFERENCE_B
     JR Z, .der
+    CP INTERROGATION_B
+    JR Z, .int
 .not:                   ; perform bitwise negation
     CALL i16_not
     JR .cont
@@ -426,6 +428,9 @@ run_evalUnary:
     JR .cont
 .addr:                   
    ; TODO
+    JR .cont
+.int:
+    CALL u16_boolenise
     JR .cont
 .der:                   ; perform dereference
     LD C, (HL)
@@ -854,6 +859,8 @@ run_isUnaryOperator:
     CP DEREFERENCE_B
     JR Z, .true
     CP MINUS_B
+    JR Z, .true
+    CP INTERROGATION_B
     JR Z, .true
     LD A, FALSE
     RET 

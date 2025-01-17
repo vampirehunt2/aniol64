@@ -395,17 +395,28 @@ u8_mul:
 ; result in C
 ; rest in A
 u8_div:
-		LD C, 0
+	LD C, 0
 .loop:
-		CP B
-		JR C, .end
-		SUB B
-		INC C
-		JP .loop
+	CP B
+	JR C, .end
+	SUB B
+	INC C
+	JP .loop
 .end:
-		RET
+	RET
 
-
+u16_boolenise:
+        LD A, H
+        CP 0
+        JR NZ, .true
+        LD A, L
+        CP 0
+        JR NZ, .true
+        RET
+.true:
+        LD H, 0FFh
+        LD L, 0FFh
+        RET
 
 i16_parseDec:
 	LD A, (IX)
