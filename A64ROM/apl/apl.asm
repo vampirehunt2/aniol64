@@ -251,13 +251,10 @@ VarnamePtr	equ PROGRAM_DATA + 00h	; 2 byte pointer into the variable name table
 ProgramPtr 	equ PROGRAM_DATA + 02h 	; 2 bytes
 IsOperator	equ PROGRAM_DATA + 04h
 IfOrWhile	equ PROGRAM_DATA + 05h
-FileSector 	equ PROGRAM_DATA + 06h
-FileIndex   equ PROGRAM_DATA + 07h
-FileSecPtr	equ PROGRAM_DATA + 09h	; 2 byte pointer into the file list sector
-Token 		equ PROGRAM_DATA + 0Bh	; 256 bytes for current token
-Varnames 	equ PROGRAM_DATA + 10Bh	; need to be aligned to 8 byte boundary
-Funnames    equ PROGRAM_DATA + 10Bh + VARNAMES_SIZE
-Bytecodes 	equ PROGRAM_DATA + 10Bh + VARNAMES_SIZE + FUNNAMES_SIZE
+Token 		equ PROGRAM_DATA + 08h	; 256 bytes for current token
+Varnames 	equ PROGRAM_DATA + 108h	; need to be aligned to 8 byte boundary
+Funnames    equ PROGRAM_DATA + 108h + VARNAMES_SIZE
+Bytecodes 	equ PROGRAM_DATA + 108h + VARNAMES_SIZE + FUNNAMES_SIZE
 
 
 apl_main:
@@ -345,6 +342,9 @@ apl_nextToken:
 	;
 	CP 39 ; apostrophe
 	JP Z, apl_tokenizeChar
+	;
+	CP '@'
+	JP Z, apl_tokenizeVarAddr
 	;
 	LD A, B
 	CP '"'
@@ -527,6 +527,16 @@ apl_processDec:
 	LD IX, Token
 	CALL i16_parseDec
 	CALL apl_processNumber
+	RET
+
+apl_tokenizeVarAddr:
+	LD HL, Token
+	CALL dos_fRead	; reading in the '@' symbol
+	LD (HL), A		; store it in the token
+	INC HL
+	CALL dos_fRead 	; read in the variable
+	LD (HL), A		; store it in the token
+	; TODO incomplete
 	RET
 
 apl_tokenizeChar:
@@ -1200,6 +1210,20 @@ apl_keywordCmp:
 	RET
 
 
+; ####################### Private routines #####################################
 
+; gets the variable address from variable bytecode
+; HL points to the bytecode of the variable
+; returns the address of the variable in memory in HL
+_apl_getVar:
+    INC HL              ; move to the variable bytecode
+    LD A, (HL)          ; load the variable bytecode
+    AND 01111111b       ; get the variable index
+    SLA A               ; multiply it by 2, as numeric variables are 2 bytes long
+    LD C, A
+    LD B, 0
+    LD HL, Vars         
+    ADD HL, BC          ; get the variable address
+    RET
 
 

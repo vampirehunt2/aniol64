@@ -73,8 +73,8 @@ DosErr			equ DOS_AREA + 24h	; status of the last disk I/O operation,
 DiskPresent		equ DOS_AREA + 25h
  
 ; filesystem constants:
-MAX_DIRNAME_LEN 		equ 7
-MAX_FILENAME_LEN		equ 12
+MAX_DIRNAME_LEN 		equ 8	; includes terminating zero
+MAX_FILENAME_LEN		equ 12	; does not include terminating zero
 FS_INFO_LEN 			equ 8
 MAX_DIRS 				equ 63 
 MAX_FILES 				equ 4087	; 4096 -8 for the file table and -1 for the directory table
@@ -571,7 +571,7 @@ dos_validateDirname:
 	CALL str_len
 	CP 0
 	JR Z, .false
-	CP MAX_DIRNAME_LEN		
+	CP MAX_DIRNAME_LEN - 1	; subtracting one to account for the temrinating zero	
 	JR NC, .false
 .loop:
 	LD A, (IX)

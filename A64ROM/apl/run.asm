@@ -19,6 +19,9 @@ DataSeg         equ PROGRAM_DATA + 14h
 ProcAddr        equ PROGRAM_DATA + 16h
 ArrIndex        equ PROGRAM_DATA + 18h
 ArrAddr         equ PROGRAM_DATA + 1Ah
+FileSector 	    equ PROGRAM_DATA + 1Ch
+FileIndex       equ PROGRAM_DATA + 1Dh
+FileSecPtr	    equ PROGRAM_DATA + 1Eh	; 2 byte pointer into the file list sector
 RunStack        equ 8240h   
 Expression      equ 8280h
 Vars            equ 8300h
@@ -1218,7 +1221,7 @@ run_execSyscall:
     CP SYS_STARTS_B
     JP Z, sys_startsWith
     CP SYS_LIST_B
-    JP Z, sys_list
+    JP Z, sys_listFiles
     CP SYS_LISTDIRS_B
     JP Z, sys_listDirs
     CP SYS_TRIM_B

@@ -2,6 +2,8 @@
 
 ParseError:     defb "Parse error", 0
 
+; #################### Console functions ########################
+
 
 ; Writes a decimal number to screen
 ; procedure
@@ -76,7 +78,7 @@ sys_readString:
     CALL readLine
     LD IX, LineBuff
     CALL nextLine
-    CALL _run_getVar    ; get variable to which to read the string 
+    CALL _apl_getVar    ; get variable to which to read the string 
     LD C, (HL)          ; put the value of the variable...
     INC HL              ; ... (i.e. address of the string)...            
     LD B, (HL)          ; ...in BC  
@@ -109,7 +111,7 @@ sys_read:
     LD D, H             ; store the read value in DE for safekeeping
     LD E, L
     POP HL              ; restore the pointer into the statement bytecode from the stack
-    CALL _run_getVar
+    CALL _apl_getVar
     LD (HL), DE
     RET
 .parseErr:
@@ -155,6 +157,68 @@ sys_maxY:
     LD H, 0
     RET
 
+; moves the cursor to the given screen coordinates
+; procedure
+; syntax: GotoXY <Expression>, <Expression>
+; argument1: Column (8bit)
+; argument2: Row (8bit)
+sys_gotoxy:
+    CALL run_evaluate           ; evaluate the X coefficient
+    CP 0                        ; check if a valid expression
+    JR NZ, .syntaxErr           ; if not, report error
+    LD A, (Expression + 1)      ; load the X coefficient to B...
+    LD B, A                     ; ...ignoring the higher byte
+    CALL run_evaluate           ; evaluate the Y coefficient
+    CP 0                        ; check if a valid expression
+    JR NZ, .syntaxErr           ; if not, report error
+    LD A, (Expression + 1)      ; load the Y coefficient to C...
+    LD C, A                     ; ...ignoring the higher byte
+    call gotoXY
+    RET
+.syntaxErr:
+    ; TODO
+    RET
+
+; puts a character on the screen
+; procedure
+; syntax: PutChar <Expression>
+; argument1: character to print (8bit)
+sys_putChar:
+    CALL run_evaluate           ; evaluate the character
+    CP 0                        ; check if a valid expression
+    JR NZ, .syntaxErr           ; if not, report error
+    LD A, (Expression + 1)      ; load the character ASCII code to A
+    call putChar
+    RET
+.syntaxErr:
+    ; TODO
+    RET
+
+sys_getChar:
+    ; ignores the parameter
+    CALL getChar
+    LD L, A
+    LD H, 0
+    RET
+
+sys_readKey:
+    ; ignores the parameter
+    CALL readKey
+    LD L, A
+    LD H, 0
+    RET
+
+; clear the screen
+; procedure
+; syntax: ClrScr
+sys_clrScr:
+    CALL clrScr
+    CALL home
+    RET
+
+
+; #################### Math functions ########################
+
 ; Returns absolute value of an expression
 ; function
 ; syntax: Abs(<Expression>)
@@ -171,6 +235,9 @@ sys_rnd:
     LD H, 0
     LD L, A
     RET
+
+
+; #################### Miscallenous functions ########################
 
 ; Stops the program execution for approximately (argument * 10ms)
 ; procedue
@@ -214,7 +281,6 @@ sys_peek:
     POP IX
     RET
 
-
 ; 8-bit poke
 ; procedure
 ; syntax: Poke <Expression>, <Expression>
@@ -235,41 +301,17 @@ sys_poke:
     ; TODO
     RET
 
-; moves the cursor to the given screen coordinates
-; procedure
-; syntax: GotoXY <Expression>, <Expression>
-; argument1: Column (8bit)
-; argument2: Row (8bit)
-sys_gotoxy:
-    CALL run_evaluate           ; evaluate the X coefficient
-    CP 0                        ; check if a valid expression
-    JR NZ, .syntaxErr           ; if not, report error
-    LD A, (Expression + 1)      ; load the X coefficient to B...
-    LD B, A                     ; ...ignoring the higher byte
-    CALL run_evaluate           ; evaluate the Y coefficient
-    CP 0                        ; check if a valid expression
-    JR NZ, .syntaxErr           ; if not, report error
-    LD A, (Expression + 1)      ; load the Y coefficient to C...
-    LD C, A                     ; ...ignoring the higher byte
-    call gotoXY
-    RET
-.syntaxErr:
-    ; TODO
-    RET
-
-; puts a character on the screen
-; procedure
-; syntax: PutChar <Expression>
-; argument1: character to print (8bit)
-sys_putChar:
-    CALL run_evaluate           ; evaluate the character
-    CP 0                        ; check if a valid expression
-    JR NZ, .syntaxErr           ; if not, report error
-    LD A, (Expression + 1)      ; load the character ASCII code to A
-    call putChar
-    RET
-.syntaxErr:
-    ; TODO
+; one-byte get
+; port number is one byte, passed in L
+; function
+; syntax Get(<Expression>)
+; argument1: port number
+; returns: a byte read from the port
+sys_get:
+    LD C, L
+    IN A, (C)
+    LD L, A
+    LD H, 0
     RET
 
 ; Writes a byte to a port
@@ -293,6 +335,9 @@ sys_put:
     ; TODO
     RET
 
+
+; #################### String functions ########################
+
 ; TODO incomplete
 sys_startsWith:
     CALL run_evaluate
@@ -305,7 +350,7 @@ sys_startsWith:
     LD IX, (Expression + 1)      
     CALL str_startsWith
     PUSH AF
-    CALL _run_getVar
+    CALL _apl_getVar
     POP AF
     LD (HL), A
     INC HL
@@ -422,7 +467,7 @@ sys_subStr:
     POP IX
     CALL str_sub
     PUSH IX
-    CALL _run_getVar
+    CALL _apl_getVar
     POP BC
     LD (HL), C          
     INC HL                      
@@ -449,7 +494,7 @@ sys_cmp:
     LD IX, (Expression + 1)
     CALL str_cmp
     PUSH AF
-    CALL _run_getVar
+    CALL _apl_getVar
     POP AF
     CP 0
     JR Z, .equal
@@ -486,68 +531,20 @@ sys_copy:
     ; TODO
     RET
 
-sys_getChar:
-    ; ignores the parameter
-    CALL getChar
-    LD L, A
-    LD H, 0
-    RET
-
-sys_readKey:
-    ; ignores the parameter
-    CALL readKey
-    LD L, A
-    LD H, 0
-    RET
-
-; one-byte get
-; port number is one byte, passed in L
-; function
-; syntax Get(<Expression>)
-; argument1: port number
-; returns: a byte read from the port
-sys_get:
-    LD C, L
-    IN A, (C)
-    LD L, A
-    LD H, 0
-    RET
-
-; clear the screen
-; procedure
-; syntax: ClrScr
-sys_clrScr:
-    CALL clrScr
-    CALL home
-    RET
 
 ; #################### DOS functions ########################
-
-; return the status of the last I/O operation in HL
-; true if the operation was successful
-; false is the operation was not successful
-; input: DOS error code in A
-sys_return:
-    CP DOS_OK
-    JR NZ, .err
-    LD H, TRUE
-    LD L, TRUE
-    RET
-.err:
-    LD H, FALSE
-    LD L, FALSE
-    RET
 
 ; Open a file from disk and load it to the file buffer
 ; function
 ; syntax: Open(<Expression>)
 ; argument1: filename
-; returns: 0000h in case of error, FFFFh in case of success
+; returns True if the operation is successful and False when there's an error.
+; in the latter case, it sets DosErr
 sys_open:  
     PUSH HL                     
     POP IX                      ; transfer file name pointer to IX
 	CALL dos_loadFile           ; load the file
-	JP sys_return
+	JP _sys_return
 
     
 ; Returns the DOS error status
@@ -571,7 +568,7 @@ sys_dosError:
 sys_save:
     LD IX, Filename             ; transfer file name pointer to IX
     CALL dos_saveFile
-    JP sys_return
+    JP _sys_return
 
 ; Restart reading/writing the file from the first byte
 ; procedure
@@ -603,7 +600,7 @@ sys_seek:
 ; L will contain the value read
 ; H is 0
 sys_fread:
-    CALL _run_getVar     ; get the address of the variable in memory
+    CALL _apl_getVar     ; get the address of the variable in memory
     CALL dos_fRead      ; read from the file
     LD (HL), A          ; transfer the result of the read into the lower byte of the variable
     INC HL
@@ -659,56 +656,61 @@ sys_size:
 ; function
 ; syntax: MkDir(<Expression>)
 ; argument1: directory name
-; returns DosErr
+; returns True if the operation is successful and False when there's an error.
+; in the latter case, it sets DosErr
 sys_mkdir:
     PUSH HL
     POP IX
     CALL dos_mkDir
-    JP sys_return
+    JP _sys_return
 
 ; deletes a directory
 ; function
 ; syntax: RmDir(<Expression>)
 ; argument1: directory name
-; returns DosErr
+; returns True if the operation is successful and False when there's an error.
+; in the latter case, it sets DosErr
 sys_rmdir:
     PUSH HL
     POP IX
     CALL dos_rmDir
-    JP sys_return
+    JP _sys_return
 
 ; deletes a file
 ; function
 ; syntax: Delete(<Expression>)
 ; argument1: file name
-; returns DosErr
+; returns True if the operation is successful and False when there's an error.
+; in the latter case, it sets DosErr
 sys_rm:
     PUSH HL
     POP IX              ; transfer file name pointer to IX
     CALL dos_rm
-    JP sys_return
+    JP _sys_return
 
 ; creates an empty file
 ; function
 ; syntax: Touch(<Expression>)
 ; argument1: file name
-; returns DosErr
+; returns True if the operation is successful and False when there's an error.
+; in the latter case, it sets DosErr
 sys_touch:
     PUSH HL
     POP IX              ; transfer file name pointer to IX
     CALL dos_touch
-    JP sys_return
+    JP _sys_return
 
 ; changes the current directory
 ; function
 ; syntax: ChDir(<Expression>)
 ; argument1: directory name
-; returns DosErr
+; returns True if the operation is successful and False when there's an error.
+; in the latter case, it sets DosErr
 sys_chdir:
     PUSH HL
     POP IX
     CALL dos_cd
-    JP sys_return
+    JP _sys_return
 
 ; returns the current directory
 ; note, the value is only valid until the next I/O operation
@@ -743,7 +745,7 @@ sys_eof:
 ; resets the file listig process
 ; procedure
 ; syntax: List
-sys_list:
+sys_listFiles:
     LD A, 01h		    ; the first sector of the file table. Counting sectors in A
     LD (FileSector), A
     LD A, 00h
@@ -818,12 +820,10 @@ sys_nextDir:
     JR Z, .end
     LD (FileIndex), A
     LD HL, (FileSecPtr)
-    PUSH HL
-    LD C, 0
-    LD B, MAX_DIRNAME_LEN
+    LD C, MAX_DIRNAME_LEN
+    LD B, 0
     ADD HL, BC
     LD (FileSecPtr), HL
-    POP HL
     LD A, (HL)
     CP 0
     JR Z, sys_nextDir
@@ -835,16 +835,17 @@ sys_nextDir:
 
 ; ####################### Private routines #####################################
 
-; gets the variable address from variable bytecode
-; HL points to the bytecode of the variable
-; returns the address of the variable in memory in HL
-_run_getVar:
-    INC HL              ; move to the variable bytecode
-    LD A, (HL)          ; load the variable bytecode
-    AND 01111111b       ; get the variable index
-    SLA A               ; multiply it by 2, as numeric variables are 2 bytes long
-    LD C, A
-    LD B, 0
-    LD HL, Vars         
-    ADD HL, BC          ; get the variable address
+; return the status of the last I/O operation in HL
+; true if the operation was successful
+; false is the operation was not successful
+; input: DOS error code in A
+_sys_return:
+    CP DOS_OK
+    JR NZ, .err
+    LD H, TRUE
+    LD L, TRUE
+    RET
+.err:
+    LD H, FALSE
+    LD L, FALSE
     RET
