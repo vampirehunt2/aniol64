@@ -53,7 +53,7 @@ readKey:
 	JR Z, .noEcho
 	LD A, B
     CALL putChar		; echo the character to screen, but don't remove it from the keyboard buffer
-	;CALL bzr_click
+	CALL bzr_click
 .noEcho:
 	LD A, B
 	POP BC
