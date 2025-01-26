@@ -1,18 +1,37 @@
 ; compact flah driver
 
-;CF_BASE 		equ 01111000b			; 78h CF card is on the expansion port, activated by A7, with A0:A2 free
+; D0h
+CF_BASE 		equ 11010000b	
 
-CF_BASE 		equ 11110000b			; 78h CF card is activated by A3, with A0:A2 free
-CF_DAT 			equ	CF_BASE + 00h		; 78h Data (R/W)
-CF_ERR 			equ CF_BASE + 01h		; 79h Error register (R)
-CF_FEAT 		equ CF_BASE + 01h		; 79h Features (W)
-CF_SECT_COUNT 	equ CF_BASE + 02h		; 7Ah Sector count (R/W)
-CF_LBA0			equ CF_BASE + 03h		; 7Bh LBA bits 0-7 (R/W, LBA mode)
-CF_LBA1			equ CF_BASE + 04h		; 7Ch LBA bits 8-15 (R/W, LBA mode)
-CF_LBA2			equ CF_BASE + 05h		; 7Dh LBA bits 16-23 (R/W, LBA mode)
-CF_LBA3			equ CF_BASE + 06h		; 7Eh LBA bits 24-27 (R/W, LBA mode)
-CF_STATUS		equ CF_BASE + 07h		; 7Fh Status (R)
-CF_CMD 			equ CF_BASE + 07h		; 7Fh Command (W)	
+; D0h Data (R/W)		
+CF_DAT 			equ	CF_BASE + 00h		
+
+; D1h Error register (R)
+CF_ERR 			equ CF_BASE + 01h		
+
+; D1h Features (W)
+CF_FEAT 		equ CF_BASE + 01h		
+
+; D2h Sector count (R/W)
+CF_SECT_COUNT 	equ CF_BASE + 02h		
+
+; D3h LBA bits 0-7 (R/W, LBA mode)
+CF_LBA0			equ CF_BASE + 03h		
+; D4h LBA bits 8-15 (R/W, LBA mode)
+
+CF_LBA1			equ CF_BASE + 04h	
+; D5h LBA bits 16-23 (R/W, LBA mode)
+
+CF_LBA2			equ CF_BASE + 05h		
+
+; D6h LBA bits 24-27 (R/W, LBA mode)
+CF_LBA3			equ CF_BASE + 06h		
+
+; D7h Status (R)
+CF_STATUS		equ CF_BASE + 07h		
+
+; D7h Command (W)
+CF_CMD 			equ CF_BASE + 07h			
 
 CF_8BIT_MODE	equ 01h
 CF_LBA_MODE		equ 0E0h
