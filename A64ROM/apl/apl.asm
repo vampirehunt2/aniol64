@@ -173,6 +173,8 @@ SYS_WRITEC_B	equ 33h
 SYS_WRITEH_B	equ 34h
 SYS_WRITEB_B	equ 35h
 SYS_CALL_B		equ 36h
+SYS_SHOWCUR_B 	equ 37h
+SYS_HIDECUR_B 	equ 38h
 
 BuiltInFunctions:
 
@@ -203,6 +205,8 @@ BuiltInFunctions:
  defb "WriteC",		0, SYS_WRITEC_B
  defb "WriteH",		0, SYS_WRITEH_B
  defb "WriteB",		0, SYS_WRITEB_B
+ defb "ShowCursor", 0, SYS_SHOWCUR_B
+ defb "HideCursor",	0, SYS_HIDECUR_B
 
 ; Math functions:
  defb "Abs", 		0, SYS_ABS_B

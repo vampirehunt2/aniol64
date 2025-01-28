@@ -1236,6 +1236,10 @@ run_execSyscall:
     JP Z, sys_writeb
     CP SYS_WRITEH_B
     JP Z, sys_writeh
+    CP SYS_SHOWCUR_B
+    JP Z, sys_showCursor
+    CP SYS_HIDECUR_B
+    JP Z, sys_hideCursor
 
     
     PUSH AF             ; store the function bytecode on stack

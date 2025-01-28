@@ -216,6 +216,20 @@ sys_clrScr:
     CALL home
     RET
 
+; show the cursor
+; procedure
+; syntax: ShowCursor
+sys_showCursor:
+    CALL cursorOn
+    RET
+
+; hide the cursor
+; procedure
+; syntax: HideCursor
+sys_hideCursor:
+    CALL cursorOff
+    RET
+
 
 ; #################### Math functions ########################
 
