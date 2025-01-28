@@ -14,7 +14,7 @@
                 "path": "C:/8bit/git/A64ROM/aniol64.sld"
             }
         ],
-        //"commandsAfterLaunch": ["-mv 8b08h 100"],
+        "commandsAfterLaunch": ["-mv 8b08h 100"],
         "history": {
             "reverseDebugInstructionCount": 1000000,
             "spotCount": 10,
@@ -24,11 +24,9 @@
         "rootFolder": "${workspaceFolder}",
         "loadObjs": [
             { "path": "C:/8bit/git/A64ROM/aniol64.bin", "start": "0x0000" },
-            { "path": "apl/source.apl", "start": "0xC000" },
-            { "path": "C:/8bit/dirTable.bin", "start": "0x8400" }
-            { "path": "C:/8bit/listDirs.btc", "start": "0x8B0B" }
+            { "path": "apl/source.apl", "start": "0xC000" }
         ],
-        "execAddress": "run_main", 
+        "execAddress": "run_debug", 
         "topOfStack": "0xBFFF"
     }
     ]

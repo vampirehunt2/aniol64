@@ -1297,6 +1297,8 @@ run_execFunction:
     JP Z, sys_maxX
     CP SYS_MAXY_B
     JP Z, sys_maxY
+    CP SYS_CALL_B
+    JP Z, sys_call
     RET
 
 

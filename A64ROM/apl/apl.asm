@@ -172,6 +172,7 @@ SYS_MAXY_B		equ 32h
 SYS_WRITEC_B	equ 33h
 SYS_WRITEH_B	equ 34h
 SYS_WRITEB_B	equ 35h
+SYS_CALL_B		equ 36h
 
 BuiltInFunctions:
 
@@ -182,6 +183,7 @@ BuiltInFunctions:
  defb "Put",		0, SYS_PUT_B
  defb "Delay",		0, SYS_DELAY_B
  defb "Bank",		0, SYS_BANK_B
+ defb "Call",		0, SYS_CALL_B
 
 ; Console functions
  defb "Read", 		0, SYS_READ_B

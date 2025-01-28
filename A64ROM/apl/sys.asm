@@ -268,6 +268,15 @@ sys_switchBank:
     ; TODO
     RET
 
+; Calls a machine code procedure
+; function
+; syntax: Call(<Expression>)
+; argument1: the address of the procedure
+; returns whatever value the machine code procedure left in the HL register.
+sys_call:
+    CALL _sys_jumpTo
+    RET
+
 ; 8-bit peek of a memory location pointed to by the argument
 ; function
 ; syntax: Peek(<Expression>)
@@ -746,10 +755,10 @@ sys_eof:
 ; procedure
 ; syntax: List
 sys_listFiles:
-    LD A, 01h		    ; the first sector of the file table. Counting sectors in A
-    LD (FileSector), A
     LD A, 00h
     LD (FileIndex), A
+    LD A, 01h		    ; the first sector of the file table. Counting sectors in A
+    LD (FileSector), A
     CALL dos_loadFileTabSector
     LD HL, SectorBuffer
     LD (FileSecPtr), HL
@@ -849,3 +858,6 @@ _sys_return:
     LD H, FALSE
     LD L, FALSE
     RET
+
+_sys_jumpTo:
+    JP (HL)
