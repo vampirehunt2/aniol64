@@ -114,7 +114,7 @@ boot:
 	CALL writeLn
 	
 	; set up permanent storage
-	;CALL dos_setUpCf
+	CALL dos_setUpCf
 	;CALL dos_checkNvram
 	
 	LD IX, Ready
