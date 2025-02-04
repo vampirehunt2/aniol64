@@ -1,7 +1,7 @@
 ; compact flah driver
 
 ; D0h
-CF_BASE 		equ 11010000b	
+CF_BASE 		equ 10100000b	
 
 ; D0h Data (R/W)		
 CF_DAT 			equ	CF_BASE + 00h		
