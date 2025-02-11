@@ -18,7 +18,8 @@ MOVE_NE equ 'o'
 MOVE_SE equ 'm'
 MOVE_NW equ 'u'
 MOVE_SW equ 'b'
-
+
+
 handleInt:
         LD A, (KbdBuff)
         CP 0            	; checking if keyboard buffer is empty
@@ -42,7 +43,8 @@ handleInt:
         LD A, ' '
         CALL putChar
         CALL cursorLShift
-        JR .noEcho
+        JR .noEcho
+
 
 
 ; Converts keyboard code to ASCII code
@@ -55,6 +57,13 @@ kbd_keycode2ascii:
         ADD HL, BC
         LD A, (HL)
         RET
+
+; checks if a key has been pressed and a character is available
+; returns the NZ flag if key was pressed, Z flag if no key was pressed
+keyPressed:
+	LD A, (KbdBuff)
+	CP 0
+	RET
 
 ; reads a keycode from the keyboard and converts to an ascii character
 ; then stores it in the keyboard buffer.
@@ -91,7 +100,8 @@ readKey:
 ; result in LineBuff
 ; result is only valid until next call of readLine
 ; if the result needs to persist, it needs to be copied to elswhere in memory
-; TODO: check for max line length (buffer overflow)
+; TODO: check for max line length (buffer overflow)
+
 readLine:
 		PUSH BC
         LD BC, LineBuff       ; point BC to the beginning of the keyboard buffer
@@ -116,7 +126,8 @@ readLine:
         LD A, 0                ; store end of line
         LD (BC), A
 		POP BC
-        RET
+        RET
+
 
 KeyCodes:
     defb 71h	; 00-00-000b	q

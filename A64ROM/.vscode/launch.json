@@ -24,9 +24,10 @@
         "rootFolder": "${workspaceFolder}",
         "loadObjs": [
             { "path": "C:/8bit/git/A64ROM/aniol64.bin", "start": "0x0000" },
+            { "path": "C:/8bit/git/A64ROM/line.buf", "start": "0x8100" },
             { "path": "apl/source.apl", "start": "0xC000" }
         ],
-        "execAddress": "run_debug", 
+        "execAddress": "cmd_main", 
         "topOfStack": "0xBFFF"
     }
     ]

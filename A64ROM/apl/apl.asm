@@ -175,6 +175,7 @@ SYS_WRITEB_B	equ 35h
 SYS_CALL_B		equ 36h
 SYS_SHOWCUR_B 	equ 37h
 SYS_HIDECUR_B 	equ 38h
+SYS_KEYPRESSED_B equ 39h
 
 BuiltInFunctions:
 
@@ -207,6 +208,7 @@ BuiltInFunctions:
  defb "WriteB",		0, SYS_WRITEB_B
  defb "ShowCursor", 0, SYS_SHOWCUR_B
  defb "HideCursor",	0, SYS_HIDECUR_B
+ defb "KeyPressed",	0, SYS_KEYPRESSED_B
 
 ; Math functions:
  defb "Abs", 		0, SYS_ABS_B

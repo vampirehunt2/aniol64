@@ -230,6 +230,17 @@ sys_hideCursor:
     CALL cursorOff
     RET
 
+sys_keyPressed:
+    CALL keyPressed
+    JR Z, .no
+    LD H, TRUE
+    LD L, TRUE
+    RET
+.no:
+    LD H, FALSE
+    LD L, FALSE
+    RET
+
 
 ; #################### Math functions ########################
 

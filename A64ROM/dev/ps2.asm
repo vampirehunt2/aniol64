@@ -24,8 +24,7 @@ ps2_initSeq:
 		defb 5, TXA
 		defb 1, 10000000b	; disable interrupts, enable WAIT
 		
-handleInt:
-	RET
+
 
 keyInit:
         LD A, 0
@@ -50,6 +49,125 @@ keyInit:
 		CALL ps2_readScancode
 		CALL ps2_readScancode
         RET
+
+
+handleInt:
+	RET
+
+keyInput:
+		CALL ps2_readScancode
+		CP KEY_UP
+		JR Z, .keyUp
+		CP EXT_KEY
+		JR Z, .extKey
+		CP LSHIFT
+		JR Z, .shiftDn
+		CP RSHIFT
+		JR Z, .shiftDn
+		CALL ps2_scancode2asc
+		RET
+.shiftDn:
+		LD A, TRUE
+		LD (Ps2Shift), A
+		JR keyInput
+.shiftUp:
+		LD A, FALSE
+		LD (Ps2Shift), A
+		JR keyInput
+.keyUp:
+.extKey:
+		CALL ps2_readScancode ; ignore the next scancode, it's the code of the key that's going up
+		JR Z, .extKey
+		CP LSHIFT
+		JR Z, .shiftUp
+		CP RSHIFT
+		JR Z, .shiftUp
+		JR keyInput
+
+
+readKey:
+		PUSH BC
+		CALL keyInput
+		LD B, A
+        CP 08            	; check if BACKSPACE was pressed
+        JR Z, .bkspc		
+		CP 09				; check if TAB was pressed
+		JR Z, .tab
+        CP 20h              ; checks if the key corresponds to a control character
+        JR C, .noEcho   	; skip echo if less	
+		LD A, (Echo)
+		CP FALSE
+		JR Z, .noEcho
+		LD A, B
+        CALL putChar		; echo the character to screen, but don't remove it from the keyboard buffer
+		CALL bzr_click
+.noEcho:
+		LD A, B
+		POP BC
+        RET
+.bkspc:
+        CALL cursorLShift  	; TODO: check if you're already in the beginning of line
+        LD A, ' '
+        CALL putChar
+        CALL cursorLShift
+        JR .noEcho
+.tab:
+		LD A, ' '
+        CALL putChar
+		LD A, ' '
+        CALL putChar
+		JR .noEcho
+
+
+; checks if a key has been pressed and a character is available
+; returns the NZ flag if key was pressed, Z flag if no key was pressed
+keyPressed:
+	IN A, (DART_A_CMD)
+	BIT 0, A
+	RET
+
+; reads a line from keyboard
+; result in LineBuff
+; result is only valid until next call of readLine
+; if the result needs to persist, it needs to be copied to elswhere in memory
+; TODO: check for max line length (buffer overflow)
+readLine:
+		PUSH BC
+        LD BC, LineBuff       ; point BC to the beginning of the keyboard buffer
+.loop:
+        CALL readKey     	 ; wait for a key to be pressed
+        CP 13                ; check if RETURN key was pressed
+        JR Z, .return
+        CP 08                 ; check if BACKSPACE was pressed
+        JR Z, .bkspc
+		CP 09					; check if TAB was pressed
+		JR Z, .tab
+        CP 20h                ; checks if the key corresponds to a control character
+        JR C, .loop           ; skip if less
+        LD (BC), A            ; store the character in the keyboard buffer
+        INC C                 ; point BC to the new position of keyboard buffer
+        JR .loop
+.bkspc:
+        LD A, C                ; check if line buffer not empty
+        CP 0
+        JR Z, .loop             ; TODO: beep if buffer is empty
+        DEC C                   ; go back one character
+        JR .loop
+.tab:							; TAB was pressed
+		LD A, ' '				; replace it with two spaces
+		LD (BC), A				; first space
+		INC C
+		LD (BC), A				; second space 
+		INC C
+		JR .loop
+.return:
+        LD A, 0                ; store end of line
+        LD (BC), A
+		POP BC
+        RET
+
+; ####################### Private routines #####################################
+
 		
 ; synchronously reads a scancode from the serial port
 ; when the scancode is available, it's code is in A
@@ -87,115 +205,6 @@ ps2_scancode2asc:
 readKeyAsync:
 		RET
 
-
-
-keyInput:
-		CALL ps2_readScancode
-		CP KEY_UP
-		JR Z, .keyUp
-		CP EXT_KEY
-		JR Z, .extKey
-		CP LSHIFT
-		JR Z, .shiftDn
-		CP RSHIFT
-		JR Z, .shiftDn
-		CALL ps2_scancode2asc
-		RET
-.shiftDn:
-		LD A, TRUE
-		LD (Ps2Shift), A
-		JR keyInput
-.shiftUp:
-		LD A, FALSE
-		LD (Ps2Shift), A
-		JR keyInput
-.keyUp:
-.extKey:
-		CALL ps2_readScancode ; ignore the next scancode, it's the code of the key that's going up
-		JR Z, .extKey
-		CP LSHIFT
-		JR Z, .shiftUp
-		CP RSHIFT
-		JR Z, .shiftUp
-		JR keyInput
-
-
-
-readKey:
-		PUSH BC
-		CALL keyInput
-		LD B, A
-        CP 08            	; check if BACKSPACE was pressed
-        JR Z, .bkspc		
-		CP 09				; check if TAB was pressed
-		JR Z, .tab
-        CP 20h              ; checks if the key corresponds to a control character
-        JR C, .noEcho   	; skip echo if less	
-		LD A, (Echo)
-		CP FALSE
-		JR Z, .noEcho
-		LD A, B
-        CALL putChar		; echo the character to screen, but don't remove it from the keyboard buffer
-		CALL bzr_click
-.noEcho:
-		LD A, B
-		POP BC
-        RET
-.bkspc:
-        CALL cursorLShift  	; TODO: check if you're already in the beginning of line
-        LD A, ' '
-        CALL putChar
-        CALL cursorLShift
-        JR .noEcho
-.tab:
-		LD A, ' '
-        CALL putChar
-		LD A, ' '
-        CALL putChar
-		JR .noEcho
-
-
-
-; reads a line from keyboard
-; result in LineBuff
-; result is only valid until next call of readLine
-; if the result needs to persist, it needs to be copied to elswhere in memory
-; TODO: check for max line length (buffer overflow)
-
-readLine:
-		PUSH BC
-        LD BC, LineBuff       ; point BC to the beginning of the keyboard buffer
-.loop:
-        CALL readKey     	 ; wait for a key to be pressed
-        CP 13                ; check if RETURN key was pressed
-        JR Z, .return
-        CP 08                 ; check if BACKSPACE was pressed
-        JR Z, .bkspc
-		CP 09					; check if TAB was pressed
-		JR Z, .tab
-        CP 20h                ; checks if the key corresponds to a control character
-        JR C, .loop           ; skip if less
-        LD (BC), A            ; store the character in the keyboard buffer
-        INC C                 ; point BC to the new position of keyboard buffer
-        JR .loop
-.bkspc:
-        LD A, C                ; check if line buffer not empty
-        CP 0
-        JR Z, .loop             ; TODO: beep if buffer is empty
-        DEC C                   ; go back one character
-        JR .loop
-.tab:							; TAB was pressed
-		LD A, ' '				; replace it with two spaces
-		LD (BC), A				; first space
-		INC C
-		LD (BC), A				; second space 
-		INC C
-		JR .loop
-.return:
-        LD A, 0                ; store end of line
-        LD (BC), A
-		POP BC
-        RET
 
 
 ;1)   Bring the Clock line low for at least 100 microseconds.

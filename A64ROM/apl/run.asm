@@ -177,6 +177,7 @@ run_nextBC:
 ; evaluates an expression
 ; assuming HL is pointing to the byte before the expression
 run_evaluate:   
+    PUSH BC
     LD IX, Expression
     INC HL              ; assuming HL is pointing to the byte before the expression
 .loop:                  ; this loop copies the expression to Expression, evaluating all the variables in the process
@@ -286,10 +287,12 @@ run_evaluate:
     JR NZ, .syntaxErr
     LD A, 0
     POP HL              ; restore the end of the current expression to HL
+    POP BC
     RET                 ; success
 .syntaxErr:             ; TODO: handle the syntax error
     LD A, 1             
     POP HL
+    POP BC
     RET
 
 
@@ -1303,6 +1306,8 @@ run_execFunction:
     JP Z, sys_maxY
     CP SYS_CALL_B
     JP Z, sys_call
+    CP SYS_KEYPRESSED_B
+    JP Z, sys_keyPressed
     RET
 
 
