@@ -1,5 +1,9 @@
-y<-12
-GotoXY 18,y
-
+UserCall(x<-1, y<-2)
+WriteS "success"
 HALT
+
+PROC UserCall
+    Write x+y
+RET
+
 END

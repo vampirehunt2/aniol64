@@ -69,7 +69,6 @@ ROOMMAXW	equ CELL_W - 2
 ROOMMAXH	equ CELL_H - 2
 
 
- defb "rog_main"
 rog_main:
 	CALL rog_init
 	CALL rog_initLevel

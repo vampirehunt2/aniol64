@@ -489,7 +489,7 @@ cmd_rmDir:
 	JP NZ, dos_printError
 	RET
 
-dos_rmDir:
+dos_rmDir: ; TODO remove all files in the folder
 	CALL dos_loadDirs
 	LD E, MAX_DIRS
 	PUSH IX
