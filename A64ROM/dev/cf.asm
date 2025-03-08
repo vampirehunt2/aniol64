@@ -183,17 +183,17 @@ cf_readSector:
 	CALL cf_waitCmd			; wait till the cf card is ready for command
 	LD A, CF_READ			; prepare read command
 	OUT	(CF_CMD), A			; send read command
-	LD B, 0					; read 512 bytes, 2 bytes per loop iteration
-.loop:
 	CALL cf_wait
+	LD B, 0					; read 256 bytes
+.loop:
 	IN A, (CF_DAT)			; get a byte of data	
 	LD (HL),A
 	INC HL
-	CALL cf_wait
-	IN A, (CF_DAT)			;get a byte of data	
-	LD (HL), A
-	INC HL
 	DJNZ .loop
+	LD B, 0
+.loop2:						; read - and ignore - 256 more bytes of any value - workaround for the card issue where 2 last bytes of a sector are not written properly 
+	IN A, (CF_DAT)			; get a byte of data	
+	DJNZ .loop2
 	POP BC
 	POP AF
 	RET
@@ -209,17 +209,17 @@ cf_writeSector:
 	CALL cf_waitCmd			; wait till the cf card is ready for command
 	LD A, CF_WRITE			; prepare the write command
 	OUT	(CF_CMD), A			; send the write command
-	LD B, 0					; write 512 bytes, 2 bytes per loop iteration
+	CALL cf_wait
+	LD B, 0					; write 256 bytes
 .loop:
-	CALL cf_wait
-	LD A, (HL)
-	OUT (CF_DAT), A			; write a byte of data	
-	INC HL
-	CALL cf_wait
 	LD A, (HL)
 	OUT (CF_DAT), A			; write a byte of data	
 	INC HL
 	DJNZ .loop
+	LD B, 0
+.loop2:						; write 256 more bytes of any value - workaround for the card issue where 2 last bytes of a sector are not written properly 
+	OUT (CF_DAT), A			; write a byte of data	
+	DJNZ .loop2
 	POP BC
 	POP AF
 	RET

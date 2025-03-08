@@ -9,7 +9,8 @@
 
 ; dos supports the following:
 ; - 16kB files
-; - maximum of 64 directories per logical drive, 32MB each
+; - maximum of 31 directories per logical drive
+; - 64MB per logical drive
 ; - maximum of 256 logical drives per physical disk
 ; - maximum of 63 * 32 = 2016 files per logical drive
 ; - up to 7 characters for a directory name (plus the terminating 0)
@@ -73,15 +74,16 @@ DosErr			equ DOS_AREA + 24h	; status of the last disk I/O operation,
 DiskPresent		equ DOS_AREA + 25h
  
 ; filesystem constants:
+SECTOR_SIZE				equ 256
 MAX_DIRNAME_LEN 		equ 8	; includes terminating zero
 MAX_FILENAME_LEN		equ 12	; does not include terminating zero
 FS_INFO_LEN 			equ 8
-MAX_DIRS 				equ 63 
-MAX_FILES 				equ 4087	; 4096 -8 for the file table and -1 for the directory table
-FILE_RECORDS_PER_SECTOR equ 32
+MAX_DIRS 				equ 31 
+FILE_RECORDS_PER_SECTOR equ 16
 FILE_RECORD_SIZE		equ 16
 FILE_TABLE_SECTORS 		equ 63
-SECTOR_SIZE				equ 512
+MAX_FILES 				equ FILE_RECORDS_PER_SECTOR * FILE_TABLE_SECTORS
+
 
 ; file record structure:
 Filename 	equ 00h	; null-terminated string, 
@@ -339,7 +341,7 @@ dos_loadDirs:
 	LD C, 0
 	CALL cf_setSector	; set sector zero, where the directory table is
 	LD HL, SectorBuffer
-	CALL cf_readSector	; read the directory table - 64 8-byte directory names
+	CALL cf_readSector	; read the directory table - 32 8-byte directory names
 	POP HL
 	POP DE
 	POP BC
@@ -997,7 +999,7 @@ dos_requiredSectors:
 	PUSH AF
 	PUSH BC
 	LD A, 0
-	LD B, 9
+	LD B, 8
 .div:			; divides the number of bytes by sector size
 	SRL D
 	RR E
@@ -1019,9 +1021,9 @@ dos_requiredSectors:
 dos_computeSector:
 	PUSH DE
 	DEC A 		; decreasing A by one to account for the directory table sector
-	LD B, 5
+	LD B, 4
 	LD D, 0
-.mul:			; multiply AD by 32, as in 32 file records per sector
+.mul:			; multiply AD by 16, as in 16 file records per sector
 	AND A 		; clear carry
 	RLA			; multiply A by 2
 	RL D		; multiply D by 2
@@ -1031,8 +1033,8 @@ dos_computeSector:
 	JR NC, .skip
 	INC D
 .skip:
-	LD B, 5
-.mul2:			; multiply AD by 32, as in 32 sectors per file
+	LD B, 6
+.mul2:			; multiply AD by 64, as in 64 sectors per file
 	AND A 		; clear carry
 	RLA			; multiply A by 2
 	RL D		; multiply D by 2

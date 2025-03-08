@@ -31,7 +31,7 @@
             { "path": "C:/8bit/git/A64ROM/line.buf", "start": "0x8100" },
             { "path": "apl/source.apl", "start": "0xC000" }
         ],
-        "execAddress": "cf_readSector", 
+        "execAddress": "run_debug", 
         "topOfStack": "0xBFFF"
     }
     ]
