@@ -14,8 +14,7 @@ StmtEnd         equ PROGRAM_DATA + 0Ch
 EvalProgress    equ PROGRAM_DATA + 0Eh
 NestingLevel    equ PROGRAM_DATA + 0Fh
 StackPtr        equ PROGRAM_DATA + 10h  ; 2 bytes
-Trap            equ PROGRAM_DATA + 12h  ; stack pointer at the beggining of the run, to fall back onto in case of a syntax error
-DataSeg         equ PROGRAM_DATA + 14h
+Trap            equ PROGRAM_DATA + 12h  ; stack pointer at the beggining of the run, to fall back onto in case of a syntax error         equ PROGRAM_DATA + 14h
 ProcAddr        equ PROGRAM_DATA + 16h
 ArrIndex        equ PROGRAM_DATA + 18h
 ArrAddr         equ PROGRAM_DATA + 1Ah
@@ -82,6 +81,13 @@ run_findProcedures:
 
 run_syntaxError:
     LD SP, (Trap)
+    LD IX, SyntaxError
+    CALL writeStr
+    CALL nextLine
+    LD HL, (StmtStart)      ; print the beginning of the current statement
+    LD IX, LineBuff 
+    CALL u16_formatHex
+    CALL writeStr            
     RET
 
 run_main:
@@ -289,10 +295,11 @@ run_evaluate:
     POP HL              ; restore the end of the current expression to HL
     POP BC
     RET                 ; success
-.syntaxErr:             ; TODO: handle the syntax error
+.syntaxErr:             
     LD A, 1             
     POP HL
     POP BC
+    JP run_syntaxError
     RET
 
 
@@ -939,7 +946,7 @@ run_execAssignment:
     LD (HL), A
     RET
 .syntaxError:
-    ; TODO raise syntax error
+    JP run_syntaxError
     RET
 
 run_execArrAssignment:
@@ -984,7 +991,7 @@ run_execArrAssignment:
     LD (IX+1), H
     RET
 .syntaxErr:
-    ; TODO
+    JP run_syntaxError
     RET
 
 ; performs an assignment to a string element
@@ -1028,7 +1035,7 @@ run_execStrAssignment:
     LD (IX), L
     RET
 .syntaxErr:
-    ; TODO
+    JP run_syntaxError
     RET
 
 
@@ -1064,7 +1071,7 @@ run_else:
 .end:
     RET
 .syntaxErr:
-    ; TODO handle syntax error
+    JP run_syntaxError
     RET
 
 ; executes a loop (end of while) statement
@@ -1124,7 +1131,7 @@ run_while:
 .end:
     RET
 .syntaxErr:
-    ; TODO handle syntax error
+    JP run_syntaxError
     RET
     
 ; executes a conditional statement
@@ -1170,7 +1177,7 @@ run_if:
 .end:
     RET
 .syntaxErr:
-    ; TODO handle syntax error
+    JP run_syntaxError
     RET
 
 ; executes a system procedure

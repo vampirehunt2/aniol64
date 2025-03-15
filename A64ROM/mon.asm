@@ -454,7 +454,7 @@ mon_printByteA:
         POP BC
         RET
 
-; prints the value of a double byte stored in IX to the lcd screen
+; prints the value of a double byte stored in IX
 ; IX - the value of the double byte to print
 mon_printDByte:
         PUSH IX
@@ -475,7 +475,7 @@ mon_printDByte:
         CALL putChar
         RET
 
-; prints the value the lower byte of IX to the lcd screen
+; prints the value the lower byte of IX
 ; IX - the value of the double byte to print
 mon_printLByte:
         PUSH IX

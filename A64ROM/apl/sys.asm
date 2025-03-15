@@ -11,34 +11,29 @@ ParseError:     defb "Parse error", 0
 sys_write:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD HL, (Expression + 1)
     LD IX, LineBuff 
     CALL i16_formatDec
     CALL trimDec
     CALL writeStr
     RET
-.syntaxErr:
-    ; TODO
-    RET
+
 
 sys_writeh:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD HL, (Expression + 1)
     LD IX, LineBuff 
     CALL u16_formatHex
     CALL writeStr
     RET
-.syntaxErr:
-    ; TODO
-    RET
 
 sys_writeb:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD A, (Expression + 1)
     CP 0
     JR NZ, .true
@@ -51,8 +46,6 @@ sys_writeb:
     LD IX, TRUE_STR
 .cont:
     CALL writeStr
-.syntaxErr:
-    ; TODO
     RET
 
 ; Writes a character to the screen
@@ -62,11 +55,9 @@ sys_writeb:
 sys_writec:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD A, (Expression + 1)
     CALL putChar
-.syntaxErr:
-    ; TODO
     RET
 
 ; TODO: add a second argument for max string length
@@ -165,18 +156,15 @@ sys_maxY:
 sys_gotoxy:
     CALL run_evaluate           ; evaluate the X coefficient
     CP 0                        ; check if a valid expression
-    JR NZ, .syntaxErr           ; if not, report error
+    JP NZ, run_syntaxError      ; if not, report error
     LD A, (Expression + 1)      ; load the X coefficient to B...
     LD B, A                     ; ...ignoring the higher byte
     CALL run_evaluate           ; evaluate the Y coefficient
     CP 0                        ; check if a valid expression
-    JR NZ, .syntaxErr           ; if not, report error
+    JP NZ, run_syntaxError      ; if not, report error
     LD A, (Expression + 1)      ; load the Y coefficient to C...
     LD C, A                     ; ...ignoring the higher byte
     call gotoXY
-    RET
-.syntaxErr:
-    ; TODO
     RET
 
 ; puts a character on the screen
@@ -186,12 +174,9 @@ sys_gotoxy:
 sys_putChar:
     CALL run_evaluate           ; evaluate the character
     CP 0                        ; check if a valid expression
-    JR NZ, .syntaxErr           ; if not, report error
+    JP NZ, run_syntaxError      ; if not, report error
     LD A, (Expression + 1)      ; load the character ASCII code to A
     call putChar
-    RET
-.syntaxErr:
-    ; TODO
     RET
 
 sys_getChar:
@@ -270,13 +255,11 @@ sys_rnd:
 sys_delay:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD A, (Expression + 1)  ; only use the lower bit of the argument
     CALL delay
     RET
-.syntaxErr:
-    ; TODO
-    RET
+
 
 ; switches the memory bank in the top 16k of memory
 ; procedure
@@ -285,12 +268,9 @@ sys_delay:
 sys_switchBank:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD A, L
     CALL mem_switchBank
-    RET
-.syntaxErr:
-    ; TODO
     RET
 
 ; Calls a machine code procedure
@@ -323,16 +303,13 @@ sys_peek:
 sys_poke:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD IY, (Expression + 1)
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD A, (Expression + 1)      ; load lower byte of the expression, ignore the higher byte
     LD (IY), A
-    RET
-.syntaxErr:
-    ; TODO
     RET
 
 ; one-byte get
@@ -356,17 +333,14 @@ sys_get:
 sys_put:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD A, (Expression + 1)      ; load lower byte of the expression, ignore the higher byte
     LD C, A
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD A, (Expression + 1)      ; load lower byte of the expression, ignore the higher byte
     OUT (C), A
-    RET
-.syntaxErr:
-    ; TODO
     RET
 
 
@@ -376,11 +350,11 @@ sys_put:
 sys_startsWith:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD IY, (Expression + 1)      
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD IX, (Expression + 1)      
     CALL str_startsWith
     PUSH AF
@@ -389,8 +363,6 @@ sys_startsWith:
     LD (HL), A
     INC HL
     LD (HL), A
-.syntaxErr:
-    ; TODO
     RET
     
 ; Writes a string to the screen
@@ -400,34 +372,25 @@ sys_startsWith:
 sys_writeString:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD IX, (Expression + 1)
     CALL writeStr
-    RET
-.syntaxErr:
-    ; TODO
     RET
 
 sys_upper:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD IX, (Expression + 1)
     CALL str_toUpper
-    RET
-.syntaxErr:
-    ; TODO
     RET
 
 sys_lower:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD IX, (Expression + 1)
     CALL str_toLower
-    RET
-.syntaxErr:
-    ; TODO
     RET
 
 ; returns the length of a string
@@ -453,12 +416,11 @@ sys_len:
 sys_trim:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD IX, (Expression + 1)
     CALL str_rtrim
     RET
-.syntaxErr:
-    ; TODO
+
 
 ; tokenizes a string
 ; modifies the input string to end at the end of the first token 
@@ -485,17 +447,17 @@ sys_tok:
 sys_subStr:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD IX, (Expression + 1)
     PUSH IX
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD A, (Expression + 1)
     LD B, A
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD A, (Expression + 1)
     LD C, A
     POP IX
@@ -507,8 +469,6 @@ sys_subStr:
     INC HL                      
     LD (HL), B          
     RET
-.syntaxErr:
-    ; TODO
 
 ; compares two strings
 ; procedure
@@ -520,11 +480,11 @@ sys_subStr:
 sys_cmp:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD IY, (Expression + 1)      
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD IX, (Expression + 1)
     CALL str_cmp
     PUSH AF
@@ -542,8 +502,7 @@ sys_cmp:
     LD (HL), TRUE
 .end:
     RET
-.syntaxErr:
-    ; TODO
+
     
 ; copies a string to a buffer
 ; procedure
@@ -553,17 +512,15 @@ sys_cmp:
 sys_copy:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD IY, (Expression + 1)      
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD IX, (Expression + 1)
     CALL str_copy
     RET
-.syntaxErr:
-    ; TODO
-    RET
+
 
 
 ; #################### DOS functions ########################
@@ -618,13 +575,11 @@ sys_reset:
 sys_seek:
     CALL run_evaluate       ; evaluate the new file pointer
     CP 0
-    JR NZ, .syntaxErr    
+    JP NZ, run_syntaxError    
     LD HL, (Expression + 1)   
     CALL dos_seek
     RET
-.syntaxErr:
-    ; TODO  
-    RET
+
 
 ; Reads a byte from file
 ; and advances the file pointer
@@ -651,13 +606,11 @@ sys_fread:
 sys_fwrite:
     CALL run_evaluate       ; evaluate the expression to be written
     CP 0
-    JR NZ, .syntaxErr 
+    JP NZ, run_syntaxError 
     LD A, L
     CALL dos_fWrite
     RET
-.syntaxErr:
-    ; TODO  
-    RET
+
 
 ; Indicates whether a file exists
 ; function

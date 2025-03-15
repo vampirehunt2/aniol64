@@ -93,7 +93,7 @@ boot:
 	LD (Random), A
 	LD (Random + 1), A
 
-	CALL mem_copyRom2Ram
+	;CALL mem_copyRom2Ram
 	
 	; init the display
 	CALL dspInit
