@@ -14,7 +14,8 @@ StmtEnd         equ PROGRAM_DATA + 0Ch
 EvalProgress    equ PROGRAM_DATA + 0Eh
 NestingLevel    equ PROGRAM_DATA + 0Fh
 StackPtr        equ PROGRAM_DATA + 10h  ; 2 bytes
-Trap            equ PROGRAM_DATA + 12h  ; stack pointer at the beggining of the run, to fall back onto in case of a syntax error         equ PROGRAM_DATA + 14h
+Trap            equ PROGRAM_DATA + 12h  ; stack pointer at the beggining of the run, to fall back onto in case of a syntax error
+DataSeg         equ PROGRAM_DATA + 14h
 ProcAddr        equ PROGRAM_DATA + 16h
 ArrIndex        equ PROGRAM_DATA + 18h
 ArrAddr         equ PROGRAM_DATA + 1Ah
@@ -108,6 +109,11 @@ run_main:
 ; FALSE returned in A if end of program is reached
 run_findStmtEnd:
     LD HL, (StmtStart)
+    LD A, (HL)
+    CP SEPARATOR_B      ; check if statement starts with a stray separator
+    JR NZ, .loop        ; if not, just proceed as normal
+    INC HL
+    LD (StmtStart), HL  ; if yes, skip over the stray separator
 .loop:
     INC HL 
     LD A, (HL)
@@ -159,7 +165,7 @@ run_execStmt:
     JP Z, run_declareArray
     CP STRING_B
     JP Z, run_declareString
-    ; TODO: handle unrecognised token
+    JP run_syntaxError
 
 ; moves HL to the next bytecode
 run_nextBC:
@@ -1240,8 +1246,6 @@ run_execSyscall:
     JP Z, sys_subStr
     CP SYS_BANK_B
     JP Z, sys_switchBank
-    CP SYS_WRITEC_B
-    JP Z, sys_writec
     CP SYS_WRITEB_B
     JP Z, sys_writeb
     CP SYS_WRITEH_B

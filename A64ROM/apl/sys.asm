@@ -48,19 +48,6 @@ sys_writeb:
     CALL writeStr
     RET
 
-; Writes a character to the screen
-; procedure
-; syntax: WriteC <Expression>
-; argument1: ASCII code of the character to print
-sys_writec:
-    CALL run_evaluate
-    CP 0
-    JP NZ, run_syntaxError
-    LD A, (Expression + 1)
-    CALL putChar
-    RET
-
-; TODO: add a second argument for max string length
 ; reads a line of text from the keyboard into a variable
 ; procedure
 ; syntax: ReadS <Variable>

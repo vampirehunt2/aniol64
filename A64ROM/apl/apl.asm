@@ -203,7 +203,6 @@ BuiltInFunctions:
  defb "ReadKey",	0, SYS_READKEY_B
  defb "MaxX",		0, SYS_MAXX_B
  defb "MaxY", 		0, SYS_MAXY_B
- defb "WriteC",		0, SYS_WRITEC_B
  defb "WriteH",		0, SYS_WRITEH_B
  defb "WriteB",		0, SYS_WRITEB_B
  defb "ShowCursor", 0, SYS_SHOWCUR_B
@@ -834,10 +833,20 @@ apl_tokenizeComment:
 	JR .loop
 .end:
 	PUSH HL
+	LD HL, (ProgramPtr) 	; check the previous bytecode
+	LD BC, Bytecodes
+	CALL u16_cmp
+	CP 0
+	JR Z, .skip				; avoid leading separators
+	DEC HL
+	LD A, (HL)
+	CP SEPARATOR_B
+	JR Z, .skip				; avoid double separators
 	LD HL, (ProgramPtr)
 	LD (HL), SEPARATOR_B
 	INC HL
 	LD (ProgramPtr), HL
+.skip:
 	POP HL
 	LD (HL), 0
 	INC HL
