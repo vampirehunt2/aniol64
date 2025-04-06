@@ -44,12 +44,13 @@ jmp handlint
 
 main:
 ; init code goes here
+    mov	SP, #pattern + 32
     mov P1, #00000011b     ; disable all button buffers and LED latches         
     mov IE, #10000001b     ; enable external interrupt INT0
     mov TCON, #00000001b   ; set INT0 to be edge-triggerred
     mov currnote, #0       ; sets the note counter to the beginning of the pattern
     call clrpatt
-    
+    ; fall through to mainloop
     
 
     
@@ -73,7 +74,8 @@ mainloop:
     jmp mainloop       ; loop
     
     
-
+; clears both the instruments pattern and the note pattern 
+; by filling it with zeroes
 clrpatt:
     mov r0, #pattern
     mov r1, #32
@@ -84,6 +86,7 @@ cploop:
     ret
     
 
+; lights leds 0-7
 leds07:
     mov a, #pattern
     add a, currinst
@@ -96,7 +99,7 @@ leds07:
     ret
     
     
-    
+; lights leds 8-15   
 leds815:
     mov a, #pattern + 8
     add a, currinst
@@ -171,7 +174,7 @@ eiloop:
     inc r1
     clr c
     mov a, r2
-    rlc a
+    rrc a
     mov r2, a
     jmp eiloop
 eiend:
@@ -230,6 +233,7 @@ handlint:
     mov r0, a
     pop acc
     pop psw
+    reti
       
      
 ; play a note from the pattern
