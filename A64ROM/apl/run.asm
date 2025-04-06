@@ -1319,6 +1319,8 @@ run_execFunction:
     JP Z, sys_call
     CP SYS_KEYPRESSED_B
     JP Z, sys_keyPressed
+    CP SYS_MOVE_B
+    JP Z, sys_move
     RET
 
 

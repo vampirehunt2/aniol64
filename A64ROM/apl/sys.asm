@@ -548,6 +548,18 @@ sys_save:
     CALL dos_saveFile
     JP _sys_return
 
+sys_move:
+    CALL run_evaluate           ; evaluate the file name
+    CP 0
+    JP NZ, run_syntaxError
+    LD IY, (Expression + 1)      
+    CALL run_evaluate           ; evaluate the directory name
+    CP 0
+    JP NZ, run_syntaxError
+    LD IX, (Expression + 1)
+    CALL dos_mv
+    JP _sys_return
+
 ; Restart reading/writing the file from the first byte
 ; procedure
 ; syntax: Reset

@@ -39,6 +39,8 @@ Touch:		defb "touch", 0
 Rm:			defb "rm", 0
 Format:		defb "format", 0
 Tar:		defb "tar", 0
+Mv:			defb "mv", 0
+Cp:			defb "cp", 0
 
 ; APL commands
 Apl:		defb "apl", 0
@@ -179,6 +181,14 @@ cmd_main:
 		LD IY, Tar
 		CALL str_cmp
 		JP Z, .tar
+		; mv command
+		LD IY, Mv
+		CALL str_cmp
+		JP Z, .mv
+		; cp command
+		LD IY, Cp
+		CALL str_cmp
+		JP Z, .cp
 		; APL command
 		LD IY, Apl
 		CALL str_cmp
@@ -285,6 +295,12 @@ cmd_main:
 		JP cmd_main
 .tar:
 		CALL tar_main
+		JP cmd_main
+.mv:	
+		CALL cmd_mv
+		JP cmd_main
+.cp:
+		CALL cmd_cp
 		JP cmd_main
 .apl:
 		CALL apl_main

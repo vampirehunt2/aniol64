@@ -169,7 +169,7 @@ SYS_SUBSTR_B	equ 2Fh
 SYS_BANK_B		equ 30h
 SYS_MAXX_B		equ 31h
 SYS_MAXY_B		equ 32h
-SYS_WRITEC_B	equ 33h
+SYS_MOVE_B		equ 33h
 SYS_WRITEH_B	equ 34h
 SYS_WRITEB_B	equ 35h
 SYS_CALL_B		equ 36h
@@ -241,6 +241,7 @@ BuiltInFunctions:
  defb "Delete", 	0, SYS_DELETE_B
  defb "Pwd", 		0, SYS_PWD_B
  defb "Eof",		0, SYS_EOF_B
+ defb "Move",		0, SYS_MOVE_B
  defb "ListFiles",	0, SYS_LIST_B
  defb "NextFile",	0, SYS_NEXTFILE_B
  defb "ListDirs", 	0, SYS_LISTDIRS_B

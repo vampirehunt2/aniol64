@@ -693,6 +693,89 @@ cmd_cd:
 	CALL dos_printError
 	RET	
 
+cmd_cp:
+	CALL str_shift
+	PUSH IX				; push the file name
+	CALL str_tok		; tokenize the directory name
+	POP IY				; pop the file name to IY
+	CALL dos_cp
+	CP DOS_OK
+	RET Z
+	CALL dos_printError
+	RET	
+
+; copies a file to a different folder
+; and changes the current folder to that folder
+; IX - folder name
+; IY - file name
+dos_cp:
+	PUSH IX					; save dir name on stack
+	PUSH IY					; transfer file name to IX
+	POP IX					
+	CALL dos_loadFile		; load the file from the current directory
+	CP 0					; check if loaded correctly
+	JR NZ, .err				; return error code if not
+	POP IX					; return dir name from stack
+	CALL dos_cd				; change directory
+	CALL dos_saveFile		; save the file to a new directory
+	RET						; returns the error code from dos_saveFile
+.err:
+	POP IY					; need to pop this to be able to return
+	RET
+
+cmd_mv:
+	CALL str_shift
+	PUSH IX				; push the file name
+	CALL str_tok		; tokenize the directory name
+	POP IY				; pop the file name to IY
+	CALL dos_mv
+	CP DOS_OK
+	RET Z
+	CALL dos_printError
+	RET	
+
+; moves a file to a different folder
+; IX - folder name
+; IY - file name
+dos_mv:
+	PUSH IY	; save file name on stack
+	LD IY, RootFolder		; check if user wants to move to the root folder
+	CALL str_cmp
+	JR Z, .root
+	LD IY, ParentFolder
+	CALL str_cmp
+	JR Z, .root
+	JR .cont
+.root:
+	LD E, 0			
+	JP .move				; if user isn't moving  to the root folder, find the appropriate folder
+.cont:
+	CALL dos_dirExists
+	CP 0
+	JR Z, .noDir
+	LD E, A
+.move:						; directory index in E
+	POP IX					; restore file name from stack to IX
+	CALL dos_fileExists
+	CP 0
+	JR Z, .fileNotFound
+	LD (IY + FileDir), E	; set the directory index in the file record
+	LD B, 0
+	LD C, 0
+	LD HL, SectorBuffer
+	CALL cf_setSector		; sector number already in A from calling dos_fileExists
+	CALL cf_writeSector		; TODO check for write errors?
+	LD A, DOS_OK
+	RET
+.fileNotFound:
+	LD A, FILE_NOT_FOUND
+	RET
+.noDir:
+	POP IY					; need to pop this to be able to return
+	LD A, NO_SUCH_DIR
+	RET
+
+
 ; changes the current directory
 ; directory name pointed to by IX
 dos_cd:
@@ -1131,12 +1214,10 @@ dos_saveFile:
 cmd_loadFile:
 	CALL str_shift
 	CALL dos_loadFile
-	LD A, (DosErr)
 	CP DOS_OK
 	RET Z
-	CALL dos_getStatusMsg
-	CALL writeLn
-	RET
+	CALL dos_printError
+	RET	
 
 dos_loadFile:
 	LD A, (DiskPresent)
