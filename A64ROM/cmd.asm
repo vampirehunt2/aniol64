@@ -55,8 +55,20 @@ cmd_main:
 		CALL writeStr
 		CALL cursorOn
         CALL cmd_readLn
+cmd_debug:
+		LD IX, LineBuff 		; redundant, used for debugging only
         CALL str_tok
-        LD IX, LineBuff
+		LD A, (IX)
+		CP '.'
+		JR NZ, .cont
+		LD A, (IX + 1)
+		CP '/'
+		JR NZ, .cont
+		LD A, ' '				; hack :)
+		LD (IX + 1), A
+		CALL str_tok
+		JP .run
+.cont:
 		; clear screen command
         LD IY, Clr
         CALL str_cmp

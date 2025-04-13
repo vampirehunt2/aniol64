@@ -18,7 +18,7 @@
                 "path": "C:/8bit/git/A64ROM/aniol64.sld"
             }
         ],
-        "commandsAfterLaunch": ["-mv 8b08h 100"],
+        "commandsAfterLaunch": ["-mv 8100h 20"],
         "history": {
             "reverseDebugInstructionCount": 1000000,
             "spotCount": 10,
@@ -31,7 +31,7 @@
             { "path": "C:/8bit/git/A64ROM/line.buf", "start": "0x8100" },
             { "path": "apl/source.apl", "start": "0xC000" }
         ],
-        "execAddress": "run_debug", 
+        "execAddress": "cmd_debug", 
         "topOfStack": "0xBFFF"
     }
     ]

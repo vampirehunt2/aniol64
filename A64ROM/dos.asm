@@ -697,6 +697,7 @@ cmd_cp:
 	CALL str_shift
 	PUSH IX				; push the file name
 	CALL str_tok		; tokenize the directory name
+	CALL str_shift
 	POP IY				; pop the file name to IY
 	CALL dos_cp
 	CP DOS_OK
@@ -727,6 +728,7 @@ cmd_mv:
 	CALL str_shift
 	PUSH IX				; push the file name
 	CALL str_tok		; tokenize the directory name
+	CALL str_shift
 	POP IY				; pop the file name to IY
 	CALL dos_mv
 	CP DOS_OK
@@ -1219,6 +1221,9 @@ cmd_loadFile:
 	CALL dos_printError
 	RET	
 
+; loads a file from disk
+; file name in IX
+; returns status in A
 dos_loadFile:
 	LD A, (DiskPresent)
 	CP TRUE

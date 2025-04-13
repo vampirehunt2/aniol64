@@ -266,12 +266,33 @@ Bytecodes 	equ PROGRAM_DATA + 108h + VARNAMES_SIZE + FUNNAMES_SIZE
 
 
 apl_main:
+	CALL str_shift				; check for parameter of the apl command
+	CALL str_len				; find out if the parameter exists TODO: check for .apl file extension
+	CP 0
+	JR Z, .cont					; if not, proceed to compiling the already-loaded file in the file buffer
+	CALL dos_loadFile			; if yes, load the file from disk
+	CP 0						; check return code to confirm the file was loaded successfully
+	JR Z, .cont					; if yes, proceed to to compiling the just-loaded file in the file buffer
+	CALL dos_printError			; otherwise print error and quit
+	RET
+; compile the loaded .apl file
+.cont:							
 	LD A, FALSE
 	LD (IsOperator), A
 	CALL apl_initIdentifierTabs
 	LD HL, Bytecodes
 	LD (ProgramPtr), HL
 	CALL apl_tokenize
+; save resulting compiled file
+	CALL apl_moveFile			; move the bytecodes to the file buffer
+	CALL apl_btcFilename		; change the filename from .apl to .btc
+	LD IX, CurrentFileName		
+	CALL dos_fileExists			; check if the .btc file already exists
+	CP 0
+	JR Z, .save					; if no, just save it
+	CALL dos_rm					; if yes, remove the previous version before saving the new one
+.save:
+	CALL dos_saveFile			; save the .btc file
 	RET
 
 ; fills the identifier tables with all zeroes
@@ -287,7 +308,7 @@ apl_initIdentifierTabs:
 ; moves the tokenised program file from Bytecodes to FilBuffer
 ; and sets the file length
 apl_moveFile:
-	LD HL, ProgramPtr
+	LD HL, (ProgramPtr)
 	LD BC, Bytecodes
 	SUB HL, BC			; output file length in HL
 	PUSH HL
@@ -297,6 +318,31 @@ apl_moveFile:
 	LD DE, FileBuffer
 	LDIR				; transfer the output file to the file buffer
 	RET
+
+
+apl_findExtension:
+	LD IX, CurrentFileName
+.loop:
+	LD A, (IX)
+	INC IX
+	CP '.'				; search for the beginning of the
+	JR NZ, .loop
+	RET
+
+apl_btcFilename:
+	CALL apl_findExtension
+	LD (IX + 0), 'b'
+	LD (IX + 1), 't'
+	LD (IX + 2), 'c'
+	RET
+
+apl_symFilename:
+	CALL apl_findExtension
+	LD (IX + 0), 's'
+	LD (IX + 1), 'y'
+	LD (IX + 2), 'm'
+	RET
+
 
 ; reads the next token from the input source code file
 ; and processes it
