@@ -64,6 +64,7 @@ main:
 ; LEDs 0-7 are latched with P1.2
 ; LEDs 8-15 are latched with P1.3
 ; gate latch is written to with P1.4
+; first step indicator is connected to P1.5
 ; instrument selector is connected to P2
 mainloop:
     call getinst        ; first, check the currently selected instrument
@@ -226,6 +227,7 @@ rtcont:
 handlint:
     push psw
     push acc
+    push r1
     mov a, r0
     push acc
     call play
@@ -238,6 +240,7 @@ handlint:
      
 ; play a note from the pattern
 play:
+    clr P1.5            ; clear the led indicating first step
     mov a, #pattern + 16; load the beginning of the rotated pattern to a
     add a, currnote     ; point a to the current note in the pattern
     mov r0, a           ; point r0 to the current note in the pattern
@@ -256,6 +259,7 @@ play:
     ret
 pattend:
     mov currnote, #0    ; reset current note to the beginning of the pattern
+    setb P1.5           ; light the led indicating first step
     ret
     
 END
