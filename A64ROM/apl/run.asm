@@ -29,8 +29,8 @@ Procedures      equ 8400h
 
 
 run_debug:
-    CALL apl_main
-    CALL run_main
+    CALL apl_compile
+    CALL run_execute
     RET
 
 ; initialises the apl interpreter
@@ -95,7 +95,7 @@ run_main:
 	CALL str_shift				; check for parameter of the run command
 	CALL str_len				; find out if the parameter exists TODO: check for .btc file extension
 	CP 0
-	JR Z, .cont					; if not, proceed to running the already-loaded file at the Bytecodes address
+	JR Z, run_execute			; if not, proceed to running the already-loaded file at the Bytecodes address
 	CALL dos_loadFile			; if yes, load the file from disk
 	CP 0						; check return code to confirm the file was loaded successfully
 	JR Z, .copy					; if yes, proceed to to running the just-loaded file at the Bytecodes address
@@ -106,7 +106,7 @@ run_main:
     LD DE, Bytecodes
     LD BC, (CurrentFileSize)
     LDIR
-.cont:
+run_execute:
     CALL run_init
     LD (Trap), SP
 .loop:
@@ -180,6 +180,10 @@ run_execStmt:
     JP Z, run_declareArray
     CP STRING_B
     JP Z, run_declareString
+    CP ENDIF_B
+    RET Z
+    CP SEPARATOR_B
+    RET Z
     JP run_syntaxError
 
 ; moves HL to the next bytecode
@@ -1180,7 +1184,7 @@ run_if:
     JR .loop
 .else:
     LD A, (NestingLevel)
-    CP 0                    ; check if we're in a nexted IF statement
+    CP 0                    ; check if we're in a nested IF statement
     JR Z, .end              ; if no, end the loop
     JR .loop
 .endif:
@@ -1336,6 +1340,8 @@ run_execFunction:
     JP Z, sys_keyPressed
     CP SYS_MOVE_B
     JP Z, sys_move
+    CP SYS_ARGS_B
+    JP Z, sys_args
     RET
 
 
@@ -1377,8 +1383,8 @@ run_ret:
     RET
 
 run_stop: //TODO END should invoke HALT?
-    LD IX, Terminated
-    CALL writeLn
+    ;LD IX, Terminated
+    ;CALL writeLn
     LD SP, (Trap)
     RET
 

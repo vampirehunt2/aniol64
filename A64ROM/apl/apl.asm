@@ -176,6 +176,7 @@ SYS_CALL_B		equ 36h
 SYS_SHOWCUR_B 	equ 37h
 SYS_HIDECUR_B 	equ 38h
 SYS_KEYPRESSED_B equ 39h
+SYS_ARGS_B		equ 3Ah
 
 BuiltInFunctions:
 
@@ -246,6 +247,7 @@ BuiltInFunctions:
  defb "NextFile",	0, SYS_NEXTFILE_B
  defb "ListDirs", 	0, SYS_LISTDIRS_B
  defb "NextDir",	0, SYS_NEXTDIR_B
+ defb "Args", 		0, SYS_ARGS_B
  defb 0
 
 ; 128 variables with names of up to 8 characters, 
@@ -255,7 +257,7 @@ FUNNAMES_SIZE equ 128 * 8
 ; bytecode types
 ; TODO
 
-VarnamePtr	equ PROGRAM_DATA + 00h	; 2 byte pointer into the variable name table
+Placeholder	equ PROGRAM_DATA + 00h	; command line argument address
 ProgramPtr 	equ PROGRAM_DATA + 02h 	; 2 bytes
 IsOperator	equ PROGRAM_DATA + 04h
 IfOrWhile	equ PROGRAM_DATA + 05h
@@ -269,21 +271,24 @@ apl_main:
 	CALL str_shift				; check for parameter of the apl command
 	CALL str_len				; find out if the parameter exists TODO: check for .apl file extension
 	CP 0
-	JR Z, .cont					; if not, proceed to compiling the already-loaded file in the file buffer
+	JR Z, apl_compile			; if not, proceed to compiling the already-loaded file in the file buffer
 	CALL dos_loadFile			; if yes, load the file from disk
 	CP 0						; check return code to confirm the file was loaded successfully
-	JR Z, .cont					; if yes, proceed to to compiling the just-loaded file in the file buffer
+	JR Z, apl_compile			; if yes, proceed to to compiling the just-loaded file in the file buffer
 	CALL dos_printError			; otherwise print error and quit
 	RET
 ; compile the loaded .apl file
-.cont:							
+apl_compile:						
 	LD A, FALSE
 	LD (IsOperator), A
 	CALL apl_initIdentifierTabs
 	LD HL, Bytecodes
 	LD (ProgramPtr), HL
 	CALL apl_tokenize
-; save resulting compiled file
+; save resulting compiled file	  
+	LD A, (DiskPresent)			; check if disk is present
+	CP TRUE						
+	RET NZ						; if not, do nothing
 	CALL apl_moveFile			; move the bytecodes to the file buffer
 	CALL apl_btcFilename		; change the filename from .apl to .btc
 	LD IX, CurrentFileName		
@@ -674,7 +679,13 @@ apl_tokenizeParen:
 	LD (HL), 0
 	INC HL
 	CALL apl_processParen
+	CP RIGHT_PAREN_B
+	JR NZ, .oper
 	LD A, FALSE
+	LD (IsOperator), A
+	RET
+.oper:
+	LD A, TRUE
 	LD (IsOperator), A
 	RET
 
@@ -751,6 +762,12 @@ apl_tokenizeOperator:
 	LD (HL), 0
 	INC HL
 	CALL apl_processOperator
+	CP RIGHT_PAREN_B
+	JR NZ, .oper
+	LD A, FALSE
+	LD (IsOperator), A
+	RET
+.oper:
 	LD A, TRUE
 	LD (IsOperator), A
 	RET
