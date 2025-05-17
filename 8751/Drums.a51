@@ -58,7 +58,7 @@ main:
 ; this routine scans all the rythm input buttons
 ; buttons are connected to P0
 ; LEDs are also connected to P0
-; gate latch is also connected to P0
+; gate latch is also connected to P0  
 ; buttons 0-7 are scanned with P1.0
 ; buttons 8-15 are scanned with P1.1
 ; LEDs 0-7 are latched with P1.2
@@ -141,6 +141,10 @@ scan:
     mov a, P0               ; read in the state of the buttons
     jz scanend              ; check if any buttons pressed, inf not, end routine
     mov r1, a               ; save pressed buttons in r1
+    call delay              ; debouncing
+    mov a, P0               ; read the state of the buttons again, after a pause
+    subb a, r1              ; check if current and prior state of the buttons is the same
+    jnz scanend             ; abort if not
 scanloop:
     mov a, P0               ; wait until the button is depressed (for debouncing)
     jnz scanloop
@@ -153,19 +157,26 @@ scanend:
     setb P1.1
     ret  
     
-; returns the leds for the current instrument in a
-getleds:
-    mov a, #pattern
-    add a, pattoffs
-    add a, currinst
-    mov r0, a
-    mov a, @r0
+  
+; delays execution  
+delay:
+    mov r2, #255
+delay2:
+    mov r3, #32
+delay3:
+    djnz r3, delay3
+    djnz r2, delay2    
     ret
+    
     
 ; encode instrument
 ; instrument selector is connected to P2    
 getinst:
+    mov P2, #11111111b
     mov a, P2
+    cpl a
+    jz eiret
+    ;
     mov r2, a
     mov r0, #00000001b
     mov r1, #0
@@ -180,6 +191,7 @@ eiloop:
     jmp eiloop
 eiend:
     mov currinst, r1
+eiret:
     ret
     
     
@@ -227,7 +239,6 @@ rtcont:
 handlint:
     push psw
     push acc
-    push r1
     mov a, r0
     push acc
     call play
