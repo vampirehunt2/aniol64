@@ -10,12 +10,15 @@ ARR roomC 6 % whether the room is connected.
 HideCursor
 Poke $8013,0 %echo off
 
+Rnd(10) % rotate the RNG
+Rnd(10) % rotate the RNG
+
 InitCls
 ClrScr
-
 InitRms
 DrawRms
 Connect
+PutDoor
 
 
 STOP
@@ -37,8 +40,7 @@ PROC InitCls
 RET
   
 PROC InitRms
-  i<-0
-  WHILE i<6
+  FOR i<-0, i<6
     roomW[i]<-Rnd(MaxX()/3-4)+4
     roomX[i]<-Rnd(MaxX()/3-roomW[i])
     roomH[i]<-Rnd(MaxY()/2-4)+4
@@ -46,16 +48,13 @@ PROC InitRms
     roomX[i]<-roomX[i]+cellX[i]
     roomY[i]<-roomY[i]+cellY[i]
     roomC[i]<-0
-    i<-i+1
-  LOOP
+  NEXT i
 RET
   
 PROC DrawRms
-  i<-0
-  WHILE i<6
+  FOR i<-0, i<6
     DrawRm
-    i<-i+1
-  LOOP
+  NEXT i
 RET
   
 %draw the room with index i
@@ -132,6 +131,13 @@ PROC ConnRms
     PutChar c
     y<-y+sy
   LOOP
+RET
+
+PROC PutDoor
+  i<-Rnd(6)
+  PtInRm
+  GotoXY x,y
+  PutChar '>
 RET
 
 

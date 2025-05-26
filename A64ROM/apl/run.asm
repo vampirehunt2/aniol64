@@ -297,7 +297,7 @@ run_evaluate:
 .evalloop:
     LD A, FALSE
     LD (EvalProgress), A
-    CALL run_sanitiseParens
+    CALL run_sanitiseParens ; the order of these lines controls the order of operations when evaluating an expression 
     CALL run_evalFunction
     CALL run_evalIndex
     CALL run_evalStrIndex
@@ -325,7 +325,6 @@ run_evaluate:
     POP HL
     POP BC
     JP run_syntaxError
-    RET
 
 
 ; removes redundant parenthesis from Expression

@@ -85,6 +85,8 @@ ELSE_B			equ "E"
 ENDIF_B			equ 'e'
 LOOP_B			equ 'L'
 WHILE_B			equ 'W'
+FOR_B			equ 'f'
+NEXT_B 			equ 'N'
 END_B			equ 'D'
 PROC_B			equ 'p'
 RET_B			equ 'R'
@@ -105,8 +107,8 @@ ELSE_T:		defb "ELSE", 	0, ELSE_B
 ENDIF_T:	defb "ENDIF", 	0, ENDIF_B
 WHILE_T:	defb "WHILE", 	0, WHILE_B
 LOOP_T:		defb "LOOP", 	0, LOOP_B
-FOR_T:		defb "FOR", 	0, 'f'
-NEXT_T:		defb "NEXT", 	0, 'N'
+FOR_T:		defb "FOR", 	0, FOR_B
+NEXT_T:		defb "NEXT", 	0, NEXT_B
 ARRAY_T:	defb "ARR", 	0, ARRAY_B
 RECORD_T:	defb "REC", 	0, ARRAY_B	; records are internally represented identically to arrays.
 STRING_T:	defb "STR", 	0, STRING_B
@@ -859,6 +861,10 @@ apl_processKeyword:
 	JR Z, .ifOrwhile
 	CP IF_B
 	JR Z, .ifOrwhile
+	CP FOR_B
+	JP Z, apl_for
+	CP NEXT_B
+	JP Z, apl_next
 	JR .cont
 .ifOrwhile:
 	LD (IfOrWhile), A
@@ -868,6 +874,70 @@ apl_processKeyword:
 	INC HL
 	LD (ProgramPtr), HL
 	RET
+
+
+apl_next:
+	CALL apl_nextToken
+	DEC HL
+	LD D, (HL)
+	LD HL, (ProgramPtr)
+	LD A, ASSIGNMENT_B
+	LD (HL), A
+	INC HL
+	LD (HL), D
+	INC HL
+	LD A, ADD_B
+	LD (HL), A
+	INC HL
+	LD A, NUM_B
+	LD (HL), A
+	INC HL
+	LD A, 1
+	LD (HL), A
+	INC HL
+	LD A, 0
+	LD (HL), A
+	INC HL
+	LD A, SEPARATOR_B
+	LD (HL), A
+	INC HL
+	LD A, LOOP_B
+	LD (HL), A
+	INC HL
+	LD A, SEPARATOR_B
+	LD (HL), A
+	INC HL
+	LD (ProgramPtr), HL
+	RET
+
+apl_for:
+.forloop1:
+	CALL dos_fPeek
+	CP COMMA_B
+	JR Z, .forcont
+	CALL apl_nextToken
+	JR .forloop1
+.forcont:
+	LD HL, (ProgramPtr)
+	LD A, SEPARATOR_B
+	LD (HL), A
+	INC HL
+	LD A, WHILE_B
+	LD (HL), A
+	INC HL
+	LD (ProgramPtr), HL
+	CALL dos_fRead
+	CP COMMA_B
+	JP NZ, .syntaxErr
+.forloop2:
+	CALL dos_fPeek
+	CP SEPARATOR_B
+	RET Z
+	CP CR
+	RET Z
+	CALL apl_nextToken
+	JR .forloop2
+.syntaxErr:
 
 ; adds built-in function bytecodes to the output file 
 ; assumes the built-in function bytecodes are in BC

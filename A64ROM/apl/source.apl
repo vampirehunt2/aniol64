@@ -1,3 +1,7 @@
-WriteS "Hello World!"
-NewLn
+FOR i<-0, i<10
+NEXT i
+
+
+
+STOP
 END
