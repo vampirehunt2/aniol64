@@ -263,7 +263,10 @@ Placeholder	equ PROGRAM_DATA + 00h	; command line argument address
 ProgramPtr 	equ PROGRAM_DATA + 02h 	; 2 bytes
 IsOperator	equ PROGRAM_DATA + 04h
 IfOrWhile	equ PROGRAM_DATA + 05h
-Token 		equ PROGRAM_DATA + 08h	; 256 bytes for current token
+Token 		equ PROGRAM_DATA + 08h	; 128 bytes for current token. Most tokens are 8 character max, but string literals can be up to 128 bytes
+ForStackPtr	equ PROGRAM_DATA + 88h
+ForStack	equ PROGRAM_DATA + 8Ah
+
 Varnames 	equ PROGRAM_DATA + 108h	; need to be aligned to 8 byte boundary
 Funnames    equ PROGRAM_DATA + 108h + VARNAMES_SIZE
 Bytecodes 	equ PROGRAM_DATA + 108h + VARNAMES_SIZE + FUNNAMES_SIZE
@@ -283,6 +286,8 @@ apl_main:
 apl_compile:						
 	LD A, FALSE
 	LD (IsOperator), A
+	LD HL, ForStack
+	LD (ForStackPtr), HL	
 	CALL apl_initIdentifierTabs
 	LD HL, Bytecodes
 	LD (ProgramPtr), HL
@@ -467,8 +472,9 @@ apl_tokenizeLiteral:
 	CALL apl_processBuiltInFunction
 	JR .end
 .var:
-	CALL apl_processVar		; TODO add checking for keywords, constants, system calls, users calls
+	CALL apl_processVar		
 .end:
+	LD B, A				; save the variable bytecode in B, just in case
 	LD A, FALSE
 	LD (IsOperator), A
 	RET
@@ -876,11 +882,21 @@ apl_processKeyword:
 	RET
 
 
+; takes the FOR loop index variable from the dedicated stack
+; and constructs a loop incrementation statement
+; i<-i+1
 apl_next:
-	CALL apl_nextToken
+	LD HL, (ForStackPtr)
 	DEC HL
+	LD BC, ForStack
+	CALL u16_cmp
+	CP -1
+	JR Z, .syntaxErr	; FOR stack underflow, i.e. one NEXT too many
 	LD D, (HL)
+	LD (ForStackPtr), HL
 	LD HL, (ProgramPtr)
+	LD (HL), D
+	INC HL
 	LD A, ASSIGNMENT_B
 	LD (HL), A
 	INC HL
@@ -909,14 +925,22 @@ apl_next:
 	INC HL
 	LD (ProgramPtr), HL
 	RET
+.syntaxErr:
+	; TODO
+	RET
 
 apl_for:
-.forloop1:
-	CALL dos_fPeek
-	CP COMMA_B
-	JR Z, .forcont
-	CALL apl_nextToken
-	JR .forloop1
+	CALL apl_nextToken		; process the variable used as the FOR loop counter, returns it in B
+	LD HL, (ForStackPtr)	; load the For Stack pointer to HL
+	LD (HL), B				; save the variable bytecode
+	INC HL
+	LD (ForStackPtr), HL
+.forloop1:					; processes the FOR loop initialisation statement
+	CALL dos_fPeek			; peek the next character
+	CP COMMA_B				; check if it's a comma
+	JR Z, .forcont			; if so, end of initialisation statement, move on
+	CALL apl_nextToken		; otherwise, process the next token
+	JR .forloop1			; and repeat
 .forcont:
 	LD HL, (ProgramPtr)
 	LD A, SEPARATOR_B
@@ -938,6 +962,8 @@ apl_for:
 	CALL apl_nextToken
 	JR .forloop2
 .syntaxErr:
+	; TODO
+	RET
 
 ; adds built-in function bytecodes to the output file 
 ; assumes the built-in function bytecodes are in BC

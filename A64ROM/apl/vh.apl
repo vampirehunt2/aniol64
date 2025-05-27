@@ -23,6 +23,7 @@ PutDoor
 
 STOP
 
+% initialise cells
 PROC InitCls
   cellX[0]<-0
   cellX[1]<-MaxX()/3
@@ -39,6 +40,7 @@ PROC InitCls
   skipCell<-Rnd(8)
 RET
   
+% initialise rooms
 PROC InitRms
   FOR i<-0, i<6
     roomW[i]<-Rnd(MaxX()/3-4)+4
@@ -48,13 +50,14 @@ PROC InitRms
     roomX[i]<-roomX[i]+cellX[i]
     roomY[i]<-roomY[i]+cellY[i]
     roomC[i]<-0
-  NEXT i
+  NEXT
 RET
   
+% draw rooms
 PROC DrawRms
   FOR i<-0, i<6
     DrawRm
-  NEXT i
+  NEXT
 RET
   
 %draw the room with index i
@@ -142,6 +145,7 @@ RET
 
 
 % random point in room i
+% result in x, y
 PROC PtInRm
   x<-Rnd(roomW[i]-2)+roomX[i]+1
   y<-Rnd(roomH[i]-2)+roomY[i]+1 
