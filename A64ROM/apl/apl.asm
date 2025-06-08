@@ -93,6 +93,7 @@ RET_B			equ 'R'
 STOP_B			equ 'T'
 ARRAY_B			equ 'A'
 STRING_B		equ 'S'
+SOURCELINE_B	equ 'i'
 NL_B			equ 00h
 
 ; keyword tokens and their corresponding bytecodes
@@ -259,7 +260,7 @@ FUNNAMES_SIZE equ 128 * 8
 ; bytecode types
 ; TODO
 
-Placeholder	equ PROGRAM_DATA + 00h	; command line argument address
+SourceLine	equ PROGRAM_DATA + 00h	
 ProgramPtr 	equ PROGRAM_DATA + 02h 	; 2 bytes
 IsOperator	equ PROGRAM_DATA + 04h
 IfOrWhile	equ PROGRAM_DATA + 05h
@@ -283,11 +284,14 @@ apl_main:
 	CALL dos_printError			; otherwise print error and quit
 	RET
 ; compile the loaded .apl file
-apl_compile:						
+apl_compile:	
+; init the compiler:					
 	LD A, FALSE
 	LD (IsOperator), A
 	LD HL, ForStack
 	LD (ForStackPtr), HL	
+	LD HL, 1
+	LD (SourceLine), HL
 	CALL apl_initIdentifierTabs
 	LD HL, Bytecodes
 	LD (ProgramPtr), HL
@@ -355,6 +359,22 @@ apl_symFilename:
 	LD (IX + 2), 'm'
 	RET
 
+apl_nextStatement:
+.loop:
+	CALL apl_nextToken
+	LD IX, Token
+	LD A, (IX)
+	CP SEPARATOR_B
+	RET Z
+	CP CR
+	RET Z
+	CP LF
+	RET Z
+	LD IY, END_T
+	CALL str_cmp
+	CP 0
+	RET Z
+	JR .loop
 
 ; reads the next token from the input source code file
 ; and processes it
@@ -425,7 +445,7 @@ apl_nextToken:
 apl_tokenize:
 	CALL dos_reset
 .loop:
-	CALL apl_nextToken
+	CALL apl_nextStatement
 	LD IX, Token
 	LD IY, END_T		; TODO: check for end of file
 	CALL str_cmp
@@ -959,7 +979,9 @@ apl_for:
 	RET Z
 	CP CR
 	RET Z
-	CALL apl_nextToken
+	CP LF
+	RET Z
+	CALL apl_nextStatement
 	JR .forloop2
 .syntaxErr:
 	; TODO
