@@ -367,14 +367,21 @@ apl_nextStatement:
 	CP SEPARATOR_B
 	RET Z
 	CP CR
-	RET Z
+	JR Z, .nl
 	CP LF
-	RET Z
+	JR Z, .nl
+	CP COMMENT_B
+	JR Z, .nl
 	LD IY, END_T
 	CALL str_cmp
 	CP 0
 	RET Z
 	JR .loop
+.nl:
+	LD HL, (SourceLine)
+	INC HL
+	LD (SourceLine), HL
+	RET
 
 ; reads the next token from the input source code file
 ; and processes it
@@ -973,6 +980,9 @@ apl_for:
 	CALL dos_fRead
 	CP COMMA_B
 	JP NZ, .syntaxErr
+	LD HL, (SourceLine)
+	DEC HL
+	LD (SourceLine), HL 	; technically, a FOR comprises of two statements, but it's one line
 .forloop2:
 	CALL dos_fPeek
 	CP SEPARATOR_B
