@@ -7,11 +7,12 @@ ARR roomW 6
 ARR roomH 6
 ARR roomC 6 % whether the room is connected.
 
-HideCursor
+HideCursor 
 Poke $8013,0 %echo off
 
-Rnd(10) % rotate the RNG
-Rnd(10) % rotate the RNG
+FOR i<-0,i<3
+  Rnd(10) % rotate the RNG
+NEXT
 
 InitCls
 ClrScr
@@ -102,6 +103,7 @@ RET
 
 % connects two rooms, r0 and r1
 PROC ConnRms
+  prev<-0
   i<-r0
   PtInRm
   x0<-x
@@ -119,19 +121,33 @@ PROC ConnRms
   WHILE x<>x1
     GotoXY x,y
     c<-GetChar()
-    IF c='#: c<-'+;
+    IF c='#
+      IF (prev='+)|(prev='.)
+        c<-'.
+      ELSE 
+        c<-'+
+      ENDIF
+    ENDIF
     IF c=0: c<-'%;
     GotoXY x,y
     PutChar c
+    prev<-c
     x<-x+sx
   LOOP
   WHILE y<>y1
     GotoXY x,y
     c<-GetChar()
-    IF c='#: c<-'+;
+    IF c='#
+      IF (prev='+)|(prev='.)
+        c<-'.
+      ELSE 
+        c<-'+
+      ENDIF
+    ENDIF
     IF c=0: c<-'%;
     GotoXY x,y
     PutChar c
+    prev<-c
     y<-y+sy
   LOOP
 RET

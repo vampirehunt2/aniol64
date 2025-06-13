@@ -126,15 +126,19 @@ run_findStmtEnd:
     LD HL, (StmtStart)
     LD A, (HL)
     CP SEPARATOR_B      ; check if statement starts with a stray separator
-    JR NZ, .loop        ; if not, just proceed as normal
+    JR NZ, .cont:       ; if not, just proceed as normal
     INC HL
     LD (StmtStart), HL  ; if yes, skip over the stray separator
+.cont:
+    LD A, (HL) 
+    CP END_B          ; END bytecode
+    JR Z, .notFound
 .loop:
-    INC HL 
-    LD A, (HL)
+    INC HL
+    LD A, (HL) 
     CP SEPARATOR_B
     JR Z, .found:
-    CP 'D'          ; END token
+    CP END_B          ; END bytecode
     JR Z, .notFound
     JR .loop
 .found:
