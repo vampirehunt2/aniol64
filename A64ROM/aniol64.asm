@@ -64,6 +64,7 @@ Echo 				equ 8013h
 Cursor				equ 8014h
 TxChA				equ 8015h
 TxChB				equ 8016h
+Args		    	equ 8017h		; 2 byte command line argument address
 NmiCount 			equ 8035h		; 2 byte number
 Random 				equ 8037h		; 2 byte number
 Banks 				equ 8039h
@@ -110,6 +111,7 @@ boot:
 	; set up permanent storage
 	CALL dos_setUpCf
 	CALL dos_checkNvram
+	CALL dos_autoExec
 	
 	LD IX, Ready
 	CALL writeLn
@@ -158,8 +160,8 @@ resetNmiHandler:
 ; device drivers
  include dev/bzr.asm
  ;include dev/pal.asm
- ;include dev/vga.asm
- include dev/tm.asm
+ include dev/vga.asm
+ ;include dev/tm.asm
  include dev/dart.asm
  include dev/cf.asm
  ;include dev/kbd.asm

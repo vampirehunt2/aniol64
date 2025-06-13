@@ -27,7 +27,8 @@ SerialNum: 		defb "Serial: ", 0
 Model: 			defb "Model: ", 0
 FirmwareRev: 	defb "Firmware Rev: ", 0
 LbaSectors: 	defb "LBA Sectors: ", 0
-Bytes			defb " bytes", 0
+Bytes:			defb " bytes", 0
+Autoexec:		defb "autoexec.apl", 0
 
 ; status messages
 DosOk:				defb "I/O success", 0
@@ -92,6 +93,19 @@ Filename 	equ 00h	; null-terminated string,
 FileExists  equ 00h	; first character of the file name is 0 if the file record is empty
 FileDir 	equ 0Dh	; 1 byte directory index
 FileLen 	equ 0Eh	; 2 byte actual file length
+
+
+dos_autoExec:
+	LD A, (DiskPresent)
+	CP TRUE
+	RET NZ
+	LD IX, Autoexec
+	CALL dos_loadFile
+	CP DOS_OK
+	RET NZ
+	CALL apl_compile
+	CALL run_execute
+	RET
 
 dos_setUpCf:
 	CALL cf_exists
