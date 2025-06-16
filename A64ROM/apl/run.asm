@@ -22,6 +22,7 @@ ArrAddr         equ PROGRAM_DATA + 1Ah
 FileSector 	    equ PROGRAM_DATA + 1Ch
 FileIndex       equ PROGRAM_DATA + 1Dh
 FileSecPtr	    equ PROGRAM_DATA + 1Eh	; 2 byte pointer into the file list sector
+CurrSourceLine  equ PROGRAM_DATA + 20
 RunStack        equ 8240h   
 Expression      equ 8280h
 Vars            equ 8300h
@@ -37,7 +38,8 @@ run_debug:
 run_init:
     CALL run_findProcedures
     LD HL, Bytecodes
-    LD (StmtStart), HL      ; initilise the line pointer to the beginning of the program
+    LD (StmtStart), HL          ; initilise the line pointer to the beginning of the program
+    CALL run_skipLineMarker
     LD HL, RunStack            ; initialise the soft stack
     LD (StackPtr), HL
     LD HL, (ProgramPtr)
@@ -85,9 +87,12 @@ run_syntaxError:
     LD IX, SyntaxError
     CALL writeStr
     CALL nextLine
-    LD HL, (StmtStart)      ; print the beginning of the current statement
+    LD HL, (StmtStart)          ; print the line address
     LD IX, LineBuff 
     CALL u16_formatHex
+    LD HL, (CurrSourceLine)     ; print the line number
+    LD IX, LineBuff 
+    CALL u16_formatDec
     CALL writeStr            
     RET
 
@@ -153,7 +158,24 @@ run_nextStmt:
     LD HL, (StmtEnd)
     INC HL
     LD (StmtStart), HL
+    CALL run_skipLineMarker
+.cont:
     CALL run_findStmtEnd
+    RET
+
+
+run_skipLineMarker:
+    LD A, (HL)
+    CP SOURCELINE_B         ; is it a line number marker?
+    RET NZ                  ; if not, carry on
+    INC HL                  ; if yes, skip it
+    LD A, (HL)
+    LD (CurrSourceLine), A
+    INC HL                  ; and skip the line number itself
+    LD A, (HL)
+    LD (CurrSourceLine + 1), A
+    INC HL
+    LD (StmtStart), HL      ; set the new statement start
     RET
 
 ; executes the current statement

@@ -360,6 +360,24 @@ apl_symFilename:
 	RET
 
 apl_nextStatement:
+	CALL dos_fPeek
+	CP COMMENT_B
+	JR Z, .loop
+	CP CR
+	JR Z, .loop
+	CP LF
+	JR Z, .loop
+	LD HL, (ProgramPtr)
+	LD A, SOURCELINE_B
+	LD (HL), A
+	INC HL
+	LD A, (SourceLine)
+	LD (HL), A
+	INC HL
+	LD A, (SourceLine + 1)
+	LD (HL), A
+	INC HL
+	LD (ProgramPtr), HL
 .loop:
 	CALL apl_nextToken
 	LD IX, Token
@@ -944,6 +962,15 @@ apl_next:
 	LD A, SEPARATOR_B
 	LD (HL), A
 	INC HL
+	LD A, SOURCELINE_B		
+	LD (HL), A				; store the source line marker
+	INC HL
+	LD A, (SourceLine)
+	LD (HL), A				; and the line number itself, LSB first
+	INC HL
+	LD A, (SourceLine + 1)
+	LD (HL), A				; MSB second
+	INC HL
 	LD A, LOOP_B
 	LD (HL), A
 	INC HL
@@ -970,8 +997,17 @@ apl_for:
 	JR .forloop1			; and repeat
 .forcont:
 	LD HL, (ProgramPtr)
-	LD A, SEPARATOR_B
+	LD A, SEPARATOR_B		
 	LD (HL), A
+	INC HL
+	LD A, SOURCELINE_B		
+	LD (HL), A				; store the source line marker
+	INC HL
+	LD A, (SourceLine)
+	LD (HL), A				; and the line number itself, LSB first
+	INC HL
+	LD A, (SourceLine + 1)
+	LD (HL), A				; MSB second
 	INC HL
 	LD A, WHILE_B
 	LD (HL), A
@@ -980,9 +1016,6 @@ apl_for:
 	CALL dos_fRead
 	CP COMMA_B
 	JP NZ, .syntaxErr
-	LD HL, (SourceLine)
-	DEC HL
-	LD (SourceLine), HL 	; technically, a FOR comprises of two statements, but it's one line
 .forloop2:
 	CALL dos_fPeek
 	CP SEPARATOR_B
@@ -991,7 +1024,7 @@ apl_for:
 	RET Z
 	CP LF
 	RET Z
-	CALL apl_nextStatement
+	CALL apl_nextToken
 	JR .forloop2
 .syntaxErr:
 	; TODO

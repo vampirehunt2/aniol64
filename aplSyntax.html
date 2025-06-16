@@ -18,6 +18,8 @@ Numerical constants have the same format for both numbers and pointers, and can 
 <li>Decimal numbers with a possible leading minus sign to indicate negative numbers, for example: 10, -1, 0, 35000</li>
 <li>Hexadecimal numbers. Number format is '$' and exactly 4 hexadecimal digits from 0 to f. Only lowercase letters are allowed for digits a-f. Examples:
 $0000, $ffff, $abcd</li>
+<li>Character literals are expressed using an apostrophe, for example: 'c, '#, '$. These are effectively 16-bit integers with the most significant byte equal to zero
+and the least significant byte equal to the given character's ASCII code.</li>
 </ul>
 
 Records are pointers to data structures in memory. Each element of a record is 2 bytes long. <br/>
@@ -47,16 +49,17 @@ Nested array indices are not supported.
 <pre>
 a[b[i]]	%wrong
 %use this instead:
-j<-b[i]
+j&lt;-b[i]
 a[j]
 </pre>
 
 Note, arrays and records are internally identical. The ARR and REC keywords resolve to the same bytecode. Dot operator and square brackets can be used interchangeably.
 <p>
 String values are pointers to null-terminated strings in memory. <br/>
-Each element (character) of a string is one byte long. <br/>
+Each element (character) of a string is stored as one byte long. <br/>
 Strings are declared with the keyword STR, followed by the variable name and number of characters, not counting the terminating null, for example:
 <pre>
+% allocates 11 bytes
 STR s 10
 </pre>
 String declaration statically allocates memory for that string.
@@ -71,6 +74,8 @@ String constants are enclosed in double quotes:
 <pre>
 "test string"
 </pre>
+Maximum length of string variables is 255 characters. <br/>
+Maximum length of string literals is 127 characters.
 
 <h2>Variables</h2>
 Up to 128 named variables can be defined in any APL program. <br/>
@@ -98,12 +103,12 @@ The following statements are supported:
 
 <h2>Variable assignment</h2>
 Assignment uses the variable name, followed by the assignment operator, followed by an expression.
-Assignment operator is '<-'
+Assignment operator is '&lt;-'
 Examples:
 <pre>
-x<-0
-s<-"test"
-a<-Abs(b)+1
+x&lt;-0
+s&lt;-"test"
+a&lt;-Abs(b)+1
 </pre>
 
 <h2>Expressions</h2>
@@ -126,16 +131,71 @@ Note, the minus sign has three distinct meanings:
 <li>Between two values (either constants or variables) it's a binary infix subtraction operator, for example 12-b</li>
 </ol>
 
+<h2>Keywords</h2>
+Note: PROG and FUN keywords are reserved, but not used. <br/>
+Other keywords are:  <br/>
+<ul>
+<li>PROC: user-defined procedure declaration
+<li>END: indicates to the parser that processing of the source file should be stopped. Mandatory at the end of the program. File content beyond END is ignored.
+<li>RET: returns from a user-defined procedure
+<li>IF: conditional statement
+<li>ELSE: conditional statement
+<li>ENDIF: conditional statement
+<li>WHILE: begins loop statement
+<li>LOOP: ends a loop statement
+<li>FOR: begins loop statement
+<li>NEXT: ends a loop statement
+<li>ARR: array declaration
+<li>REC: record declaration
+<li>STR: string variable declaration
+<li>STOP: indicates to the interpreter to stop the execution. Causes the "Program terminated" message to be printed out, then the interpreter exists to the OS. If user-defined procedures are defined, place the procedures below the STOP statement. If no user-defined procedures are defined, the STOP statement is optional.
+</ul>
+Additionally, the character ';' replaces the keyword ENDIF in case the last used keyword out of (IF, WHILE) was IF. Similarly, it replaces the keyword LOOP, if the last used keyword out of (IF, WHILE) was WHILE. So the following two snippets of code are equivalent:
+<pre>
+IF Cond 
+	DoSth
+ENDIF
+
+%is equivalent to
+
+IF Cond: DoSth;
+</pre>
+Similarly, the following two snippets of code are equivalent:
+<pre>
+WHILE Cond
+	DoSth
+LOOP
+
+%is equivalent to
+
+WHILE Cond: DoSth;
+</pre>
+
+FOR/NEXT loops are converted to WHILE/LOOP loops by the compiler. For example:
+<pre>
+FOR i&lt;-0,i&lt;10
+NEXT
+
+%is compiled to the same bytecode as: 
+
+i&lt;-0
+WHILE i&lt;10
+	i&lt;-i+1
+NEXT
+</pre>
+
 <h2>Function calls</h2>
 All functions have exactly one parameter. <br/>
+The parameter can be ommitted, in which case a zero is passed to the function. In this case the parentheses following the function call are mandatory</br>
 For some functions, the parameter is ignored. <br/>
 The parameter can be placed in parenthesis, the parenthesis are optional if not otherwise required to establish operator priority. <br/>
 Built-in functions can be called and their result used as part of an expression. <br/>
 Alternatively, functions can be called like procedures, where the call is a complete statement and the result is discarded, for example:
 <pre>
-a<-Rnd(10)
-a<-Rnd 10
-ioresult<-Open("file.txt")
+a&lt;-Rnd(10)
+a&lt;-Rnd 10
+c&lt;-GetChar()
+ioresult&lt;-Open("file.txt")
 Open("file.txt")
 </pre>
 
@@ -169,10 +229,10 @@ Exists: Returns a value indicating whether the specified file exists in the curr
 <p>
 All the DOS functions that return I/O status of the operation also they set an internal variable to the same status. The value of the variable is accessible by using the DosErr function. This means that the following two snippets of code are functionally equivalent:
 <pre>
-ioresult<-Open("test.txt")
+ioresult&lt;-Open("test.txt")
 %is equivalent to
 Open("test.txt")
-ioresult<-DosErr(0)
+ioresult&lt;-DosErr()
 </pre>
 
 <h2>Procedure declarations</h2>
@@ -181,8 +241,8 @@ Procedure names start with an uppercase letter. <br/>
 Procedure names  may consist of upper or lowercase letters, decimal digits and the underscore '_' character. <br/>
 Keywords can't be used as procedure names. </br>
 Maximum length of a procedure name is 8 characters. <br/>
-Following the procedure header, any statements are allowed. They form the procedure body. 
-The procedure terminates with the RET statement.
+Following the procedure header, any statements are allowed. They form the procedure body.  <br/>
+The procedure terminates with the RET statement. <br/>
 
 <h2>Procedure calls</h2>
 Procedures are called by stating their names. <br/>
@@ -190,42 +250,8 @@ Built-in procedures can be called with a defined number of parameters. Parameter
 User-defined procedures cannot have parameters. Use global variables to pass values instead. <br/>
 Examples:
 <pre>
-GotoXy x, y+1
+GotoXY x, y+1
 MyProc
-</pre>
-
-<h2>Keywords</h2>
-Note, PROG, FOR, NEXT and FUN keywords are reserved, but not used. <br/>
-Other keywords are:  <br/>
-<ul>
-<li>PROC: user-defined procedure declaration
-<li>END: indicates to the parser that processing of the source file should be stopped. Mandatory at the end of the program. File content beyond END is ignored.
-<li>RET: returns from a user-defined procedure
-<li>IF: conditional statement
-<li>ELSE: conditional statement
-<li>ENDIF: conditional statement
-<li>WHILE: begins loop statement
-<li>LOOP: ends a loop statement
-<li>ARR: array declaration
-<li>REC: record declaration
-<li>STR: string variable declaration
-<li>STOP: indicates to the interpreter to stop the execution. Causes the "Program terminated" message to be printed out, then the interpreter exists to the OS. If user-defined procedures are defined, place the procedures below the STOP statement. If no user-defined procedures are defined, the STOP statement is optional.
-</ul>
-Additionally, the character ';' replaces the keyword ENDIF in case the last used keyword out of (IF, WHILE) was IF. Similarly, it replaces the keyword loop, if the last used keyword out of (IF, WHILE) was WHILE. So the following two snippets of code are equivalent:
-<pre>
-IF Cond 
-	DoSth
-ENDIF
-%is equivalent to
-IF Cond: DoSth;
-</pre>
-Similarly, the following two snippets of code are equivalent:
-<pre>
-WHILE Cond
-	DoSth
-LOOP
-%is equivalent to
-WHILE Cond: DoSth;
 </pre>
 
 
