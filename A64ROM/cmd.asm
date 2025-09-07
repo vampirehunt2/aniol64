@@ -58,6 +58,7 @@ cmd_main:
 cmd_debug:
 		LD IX, LineBuff 		; redundant, used for debugging only
         CALL str_tok
+		LD (Args), HL
 		LD A, (IX)
 		CP '.'
 		JR NZ, .cont

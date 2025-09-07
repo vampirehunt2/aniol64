@@ -267,6 +267,7 @@ IfOrWhile	equ PROGRAM_DATA + 05h
 Token 		equ PROGRAM_DATA + 08h	; 128 bytes for current token. Most tokens are 8 character max, but string literals can be up to 128 bytes
 ForStackPtr	equ PROGRAM_DATA + 88h
 ForStack	equ PROGRAM_DATA + 8Ah
+DebugMode 	equ PROGRAM_DATA + 107h 
 
 Varnames 	equ PROGRAM_DATA + 108h	; need to be aligned to 8 byte boundary
 Funnames    equ PROGRAM_DATA + 108h + VARNAMES_SIZE
@@ -275,6 +276,20 @@ Bytecodes 	equ PROGRAM_DATA + 108h + VARNAMES_SIZE + FUNNAMES_SIZE
 
 apl_main:
 	CALL str_shift				; check for parameter of the apl command
+	; check for command line switches:
+	LD A, FALSE
+	LD (DebugMode), A
+	LD A, (IX)
+	CP '-'
+	JR NZ, .cont
+	LD A, (IX + 1)
+	CP 'd'
+	JR NZ, .cont
+	LD A, TRUE
+	LD (DebugMode), A
+	CALL str_tok				; move to the next argument
+	CALL str_shift				; presumably, that's the source file name
+.cont:
 	CALL str_len				; find out if the parameter exists TODO: check for .apl file extension
 	CP 0
 	JR Z, apl_compile			; if not, proceed to compiling the already-loaded file in the file buffer
@@ -359,6 +374,26 @@ apl_symFilename:
 	LD (IX + 2), 'm'
 	RET
 
+
+; stores a source line number at (ProgramPtr) and advances the ProgramPtr
+; does noting if source lines are not enabled.
+apl_storeSourceLineNum:
+	LD A, (DebugMode)		; check if source lines are enabled
+	CP TRUE
+	RET NZ					; if not, do nothing
+	LD HL, (ProgramPtr)		; get current program pointer
+	LD A, SOURCELINE_B	
+	LD (HL), A				; store the source line marker
+	INC HL
+	LD A, (SourceLine)
+	LD (HL), A				; and the line number, first the LSB
+	INC HL
+	LD A, (SourceLine + 1)
+	LD (HL), A				; then the MSB
+	INC HL
+	LD (ProgramPtr), HL
+	RET
+
 apl_nextStatement:
 	CALL dos_fPeek
 	CP COMMENT_B
@@ -367,17 +402,7 @@ apl_nextStatement:
 	JR Z, .loop
 	CP LF
 	JR Z, .loop
-	LD HL, (ProgramPtr)
-	LD A, SOURCELINE_B
-	LD (HL), A
-	INC HL
-	LD A, (SourceLine)
-	LD (HL), A
-	INC HL
-	LD A, (SourceLine + 1)
-	LD (HL), A
-	INC HL
-	LD (ProgramPtr), HL
+	CALL apl_storeSourceLineNum
 .loop:
 	CALL apl_nextToken
 	LD IX, Token
@@ -962,15 +987,9 @@ apl_next:
 	LD A, SEPARATOR_B
 	LD (HL), A
 	INC HL
-	LD A, SOURCELINE_B		
-	LD (HL), A				; store the source line marker
-	INC HL
-	LD A, (SourceLine)
-	LD (HL), A				; and the line number itself, LSB first
-	INC HL
-	LD A, (SourceLine + 1)
-	LD (HL), A				; MSB second
-	INC HL
+	LD (ProgramPtr), HL
+	CALL apl_storeSourceLineNum
+.skip:
 	LD A, LOOP_B
 	LD (HL), A
 	INC HL
@@ -1000,14 +1019,9 @@ apl_for:
 	LD A, SEPARATOR_B		
 	LD (HL), A
 	INC HL
-	LD A, SOURCELINE_B		
-	LD (HL), A				; store the source line marker
-	INC HL
-	LD A, (SourceLine)
-	LD (HL), A				; and the line number itself, LSB first
-	INC HL
-	LD A, (SourceLine + 1)
-	LD (HL), A				; MSB second
+	LD (ProgramPtr), HL
+	CALL apl_storeSourceLineNum
+.skip:
 	INC HL
 	LD A, WHILE_B
 	LD (HL), A

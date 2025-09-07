@@ -8,8 +8,8 @@ Comments are ignored by the parser, and are not present in the tokenized file.
 
 
 <h2>Types</h2>
-Data is represented as a conjunction of 16-byte values. <br/>
-Values may represent numerical data in the form of 16-bit signed integers or 16-bit pointers to arbitrary data structures. <br/>
+Data is represented as 16-bit values. <br/>
+Values may represent numerical data in the form of 16-bit signed integers, or 16-bit pointers to arbitrary data structures. <br/>
 In certain contexts, described in the documentation, only the lower 8-bits of a value may be significant, and the higher 8-bits are ignored. <br/>
 <h3>Values</h3>
 Numerical values are represented as 16-bit signed integer numbers or 16-bit pointers. <br/>
@@ -112,13 +112,14 @@ a&lt;-Abs(b)+1
 </pre>
 
 <h2>Expressions</h2>
-The following are allowed in expressions, listed in order of priority:
+The following operators are allowed in expressions, listed in order of priority:
 <ol>
+<li>variable address operator '@'</li>
 <li>Parentesis '(' and ')'</li>
 <li>Function calls. Functions are considered unary prefix operators.</li>
 <li>Record and Array index operator</li>
 <li>String index operator</li>
-<li>Unary operators: arithmetic negation '-' and logical negation '!'</li>
+<li>Unary operators: arithmetic negation '-', logical negation '!', and boolean normalization '?'</li>
 <li>Multiplication-type operators: multiplication '*', division '/', modulo '\', conjuction '&'</li>
 <li>Addition-type operators: addition '+', subtraction '-', alternative '|'</li>
 <li>Comparison operators: equal '=', not equal '<>', greater or equal '>=', smaller or equal '<='</li>
@@ -130,6 +131,36 @@ Note, the minus sign has three distinct meanings:
 <li>In front of a variable it's a unary prefix operator for the arithmetic negation operation, for example -a</li>
 <li>Between two values (either constants or variables) it's a binary infix subtraction operator, for example 12-b</li>
 </ol>
+
+The variable address operator is a unary operator that can be used only in front of a variable. It returns the address of the variable. It is evaluated at compile time, so technically, it has the highest priority
+<pre>
+a&lt;-@array[x] 	% equivalent to a&lt;-(@array)[x]
+</pre>
+
+The boolean normalization operator is a unary operator that returns 0 for an argument of 0, and the value $ffff for all other arument value.
+<pre>
+Write ?0	% writes 0
+WriteH ?1	% writes $ffff
+</pre>
+
+Logical operators are all bitwise operators. Boolean normalization may be required. For example:
+<pre>
+a&lt;-$0001
+IF a: DoA;		% a evaluates to a non-zero value, which is considered to be TRUE for the purpose of the IF condition. DoA will be executed.
+b&lt;-$0010
+IF b: DoB;		% b evaluates to a non-zero value, which is considered to be TRUE for the purpose of the IF condition. DoB will be executed.
+c&lt;-a&amp;b
+IF c: DoC;		% c evaluates to zero, which is FALSE, even though it's a conjuction of two variables that have the effective boolean value of TRUE
+c&lt;-?a&amp;?b
+IF c: DoC;		% use this instead to effectively convert the conjuction from a bitwise AND to a logical AND
+</pre>
+
+Because some logical operators have a higher or equal priority than some arithmetic operators, parenthesis may be required. It is a good practise to use parethesis every time the logical meaning of an operator is used in a condition, rather than the bitwise meaning
+<pre>
+% check if at least one of the sums are zero
+IF a+b|c+d		% wrong, c+d will not be evaluated. Instead the order of operations is ((a+b)|c)+d
+IF (a+b)|(c+d)	% use this instead
+</pre>
 
 <h2>Keywords</h2>
 Note: PROG and FUN keywords are reserved, but not used. <br/>
@@ -181,7 +212,7 @@ NEXT
 i&lt;-0
 WHILE i&lt;10
 	i&lt;-i+1
-NEXT
+LOOP
 </pre>
 
 <h2>Function calls</h2>
@@ -203,30 +234,61 @@ Open("file.txt")
 <p>
 Miscallenous functions:  <br/>
 <ul>
-<li>Peek: returns a value from the memory address passed as parameter. Lower 8-bits are significant, upper 8-bits are 0. <br/>
-<li>Get: reads a value from the input port, the number of which is passed as parameter. For the parameter, lower 8-bits are significant, upper 8-bits are  ignored. For the return value, Lower 8-bits are significant, upper 8-bits are 0. <br/>
+<li>Peek <br/>
+8-bit peek of a memory location pointed to by the argument <br/>
+syntax: Peek(&lt;Expression>) <br/>
+argument1: Address (16bit) <br/>
+returns a value from the memory address passed as parameter. Lower 8-bits are significant, upper 8-bits are 0. 
+</li>
+<li>Get <br/>
+reads a value from the input port, the number of which is passed as parameter. For the parameter, lower 8-bits are significant, upper 8-bits are  ignored. <br/>
+syntax Get(&lt;Expression>) <br/>
+argument1: port number <br/>
+returns a byte read from the port, lower 8-bits are significant, upper 8-bits are 0. </li>
+<li>Call<br/>
+Calls a machine code procedure <br/>
+syntax: Call(&lt;Expression>) <br/>
+argument1: the address of the procedure <br/>
+returns whatever value the machine code procedure left in the HL register. <br/>
+</li>
 </ul>
 Math functions: <br/>
 <ul>
-<li>Abs: absolute value of the parameter. <br/>
-<li>Rnd: pseudorandom value from 0 to parameter-1 <br/>
+<li>Abs: absolute value of the parameter. </li>
+<li>Rnd: pseudorandom value from 0 to parameter-1 </li>
 </ul>
-<p>
+
 String functions: <br/>
-Len: length of string, not including the terminating null character <br/>
-<p>
+<ul>
+<li>Len <br/>
+returns the length of a string <br/>
+syntax Len(&lt;Expression>) <br/>
+argument1: the string <br/>
+returns the length of the string, not including the terminating null character <br/>
+</li>
+<li>Tok <br/>
+tokenizes a string <br/>
+modifies the input string to end at the end of the first token <br/>
+syntax: Tok(&lt;Expression>) <br/>
+argument1: string to tokenise <br/>
+returns a pointer to the beginning of the second token of the input string <br/>
+</li>
+</ul>
+
 DOS functions: <br/>
-Open: Loads a file from current directory on disk starting from address $c000. Returns I/O result <br/>
-Save: Saves a file to current directory on disk. Returns I/O result <br/>
-ChDir: Changes the current directory. Returns I/O result <br/>
-Size: Returns the size, in bytes, of the currently opened file. The parameter is ignored. <br/>
-MkDir: Creates a directory. Returns I/O result <br/>
-RmDir: Removes a directory. Returns I/O result <br/>
-DosErr: Returns the status of the last I/O operation. 0 indicates success. Parameter indicates whether any error should be cleared. <br/>
-Delete: Deletes a file. Returns I/O result <br/>
-Touch: Creates an empty file. Returns I/O result <br/>
-Exists: Returns a value indicating whether the specified file exists in the current directory.  <br/>
-<p>
+<ul>
+<li>Open: Loads a file from current directory on disk starting from address $c000. Returns I/O result </li>
+<li>Save: Saves a file to current directory on disk. Returns I/O result </li>
+<li>ChDir: Changes the current directory. Returns I/O result </li>
+<li>Size: Returns the size, in bytes, of the currently opened file. The parameter is ignored. </li>
+<li>MkDir: Creates a directory. Returns I/O result </li>
+<li>RmDir: Removes a directory. Returns I/O result </li>
+<li>DosErr: Returns the status of the last I/O operation. 0 indicates success. Parameter indicates whether any error should be cleared. </li>
+<li>Delete: Deletes a file. Returns I/O result </li>
+<li>Touch: Creates an empty file. Returns I/O result </li>
+<li>Exists: Returns a value indicating whether the specified file exists in the current directory.  </li>
+</ul>
+
 All the DOS functions that return I/O status of the operation also they set an internal variable to the same status. The value of the variable is accessible by using the DosErr function. This means that the following two snippets of code are functionally equivalent:
 <pre>
 ioresult&lt;-Open("test.txt")

@@ -213,6 +213,13 @@ sys_keyPressed:
     LD L, FALSE
     RET
 
+; Returns a string correspomding to the command line arguments of the program
+; the string is only valid until the first call of ReadLine
+; function
+; syntax: Args()
+sys_args:
+    LD HL, (Args)
+    RET
 
 ; #################### Math functions ########################
 
@@ -273,6 +280,7 @@ sys_call:
 ; function
 ; syntax: Peek(<Expression>)
 ; argument1: Address (16bit)
+; returns a value from the memory address passed as parameter. Lower 8-bits are significant, upper 8-bits are 0. 
 sys_peek:
     PUSH IX
     PUSH HL

@@ -265,7 +265,7 @@ procedure number;
 var n: byte;
 begin
 printMenu('Enter ASCII code');
-gotoxy(10, 15);
+gotoxy(2, 21);
 readln(n);
 currChar := char(n);
 paintRaster;

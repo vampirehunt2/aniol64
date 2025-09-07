@@ -37,6 +37,8 @@ run_debug:
 ; initialises the apl interpreter
 run_init:
     CALL run_findProcedures
+    LD HL, 0
+    LD (CurrSourceLine), HL
     LD HL, Bytecodes
     LD (StmtStart), HL          ; initilise the line pointer to the beginning of the program
     CALL run_skipLineMarker
@@ -87,13 +89,19 @@ run_syntaxError:
     LD IX, SyntaxError
     CALL writeStr
     CALL nextLine
-    LD HL, (StmtStart)          ; print the line address
-    LD IX, LineBuff 
-    CALL u16_formatHex
-    LD HL, (CurrSourceLine)     ; print the line number
-    LD IX, LineBuff 
+    LD HL, (CurrSourceLine)      ; check if source lines are included in the executable
+    LD A, H
+    OR A, L
+    CP 0
+    JR Z, .addr                 ; if not, print the address of the statement
+    LD IX, LineBuff             ; print the source line number
     CALL u16_formatDec
-    CALL writeStr            
+    CALL writeStr
+    RET
+.addr:
+    LD HL, (StmtStart)          ; print the statement address
+    LD IX, LineBuff 
+    CALL u16_formatHex            
     RET
 
 run_main:
