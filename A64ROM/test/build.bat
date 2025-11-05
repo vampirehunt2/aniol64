@@ -1,5 +1,4 @@
-cd C:\8bit\GitHub\aniol64\aniol64ROM\test
-C:\8bit\pasmo-0.6.0\pasmo\mingw\pasmo.exe -v --err --bin --alocal test.asm test.bin
-
-rem C:\Users\PiotrAniola\Documents\8bit\zDevStudio-0.6-source\zDevStudio\bin\pasmo53 -v --err --bin --alocal lib\list.asm lib\list.bin
-pause
+echo %ANIOL_HOME%
+del %ANIOL_HOME%\test\test.bin
+del %ANIOL_HOME%\test\test.sld
+c:\8bit\sjasmplus-1.20.2.win\sjasmplus.exe --sym=symbols.txt  --raw=%ANIOL_HOME%\test\test.bin --sld=%ANIOL_HOME%\test\test.sld --fullpath %ANIOL_HOME%\test\testclrvga.asm

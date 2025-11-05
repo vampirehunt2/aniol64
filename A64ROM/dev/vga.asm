@@ -146,33 +146,33 @@ getChar:
 ; writes a string to the display at current cursor position
 ; IX - null-terminated string to write
 writeStr:
-        PUSH HL           ; store register state
+    PUSH HL           ; store register state
 	PUSH IX
-        CALL vga_XY2addr  ; loads current VRAM address into HL
+    CALL vga_XY2addr  ; loads current VRAM address into HL
 .loop:
-        LD A, (IX)    ; loads the current character in the string to A
-        CP 0          ; check if it's an EOL
-        JR Z, .end    ; if so, end the procedure
-        AND 01111111b ; make sure cursor data is not stored
-        LD (HL), A    ; store the character into VRAM
-        INC IX        ; move to the next character in the string
-        INC HL        ; move to the next VRAM location
-        LD A, L
-        AND 00111111b ; get X position of the current character
-        CP MAX_X      ; if we're at the end of the line, we should wrap around
-        JR Z, .wrap
-        JR NC, .wrap   ; if we happen to be beyond the end of line, best we wrap as well
-        JP .loop
+    LD A, (IX)    ; loads the current character in the string to A
+    CP 0          ; check if it's an EOL
+    JR Z, .end    ; if so, end the procedure
+    AND 01111111b ; make sure cursor data is not stored
+    LD (HL), A    ; store the character into VRAM
+    INC IX        ; move to the next character in the string
+    INC HL        ; move to the next VRAM location
+    LD A, L
+    AND 00111111b ; get X position of the current character
+    CP MAX_X      ; if we're at the end of the line, we should wrap around
+    JR Z, .wrap
+    JR NC, .wrap   ; if we happen to be beyond the end of line, best we wrap as well
+    JP .loop
 .wrap:
-        CALL vga_addr2XY      ; store the current X and Y position in memory
-        CALL nextLine  	  ; move to the next line, either down or by scrolling
-        CALL vga_XY2addr      ; calculate the new VRAM address and load it to HL
-        JP .loop
+    CALL vga_addr2XY      ; store the current X and Y position in memory
+    CALL nextLine  	  ; move to the next line, either down or by scrolling
+    CALL vga_XY2addr      ; calculate the new VRAM address and load it to HL
+    JP .loop
 .end:
-        CALL vga_addr2XY      ; store the final X and Y position in memory
+    CALL vga_addr2XY      ; store the final X and Y position in memory
 	POP IX
-        POP HL                ; restore register state
-        RET
+    POP HL                ; restore register state
+    RET
 
 
 
@@ -180,21 +180,21 @@ writeStr:
 ; if there are free lines below the current ones, goes to the next one
 ; if we're already in the last line, the whole display is scrolled up
 nextLine:
-        CALL cursorOff
-        XOR A           ; LD A, 0
-        LD (CurX), A ; move the cursor to the beginning of line
-        LD A, (CurY) ; load current cursor Y position (line number)
-        CP MAX_Y        ; if already at the bottom of the screen
-        JR NC, .scroll   ; then scroll the screen
-        JR Z, .scroll
-        INC A           ; else move to the next line down
-        LD (CurY), A
-        JR .end
+    CALL cursorOff
+    XOR A           ; LD A, 0
+    LD (CurX), A ; move the cursor to the beginning of line
+    LD A, (CurY) ; load current cursor Y position (line number)
+    CP MAX_Y        ; if already at the bottom of the screen
+    JR NC, .scroll   ; then scroll the screen
+    JR Z, .scroll
+    INC A           ; else move to the next line down
+    LD (CurY), A
+    JR .end
 .scroll:
-        CALL scroll
+    CALL scroll
 .end:
-        CALL cursorOn
-        RET
+    CALL cursorOn
+    RET
 
 scroll:
        ; store register values

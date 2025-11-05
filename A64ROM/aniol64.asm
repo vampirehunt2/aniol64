@@ -64,7 +64,8 @@ Echo 				equ 8013h
 Cursor				equ 8014h
 TxChA				equ 8015h
 TxChB				equ 8016h
-Args		    	equ 8017h		; 2 byte command line argument address
+Scroll		    	equ 8017h	
+Colour              equ 8018h
 NmiCount 			equ 8035h		; 2 byte number
 Random 				equ 8037h		; 2 byte number
 Banks 				equ 8039h
@@ -78,7 +79,7 @@ PROGRAM_DATA 		equ 8200h
 
 
 Ready: defb	 "Ready", 0
-Hello: defb	 "Hello", 0
+
 
 boot:
 	CALL bzr_beep	
@@ -112,10 +113,10 @@ boot:
 	CALL dos_setUpCf
 	CALL dos_checkNvram
 	CALL dos_autoExec
-	
-	LD IX, Ready
-	CALL writeLn
 
+    LD IX, Ready
+	CALL writeLn
+	
 	; wait for user input from here on in
 	CALL cmd_main
 loop:
@@ -160,12 +161,14 @@ resetNmiHandler:
 ; device drivers
  include dev/bzr.asm
  ;include dev/pal.asm
- include dev/vga.asm
+ include dev/colourvga.asm
  ;include dev/tm.asm
+ ;include dev/vga.asm
+
  include dev/dart.asm
  include dev/cf.asm
- ;include dev/kbd.asm
- include dev/ps2.asm
+ include dev/kbd.asm
+ ;include dev/ps2.asm
  include dev/cas.asm
 
 ; libraries

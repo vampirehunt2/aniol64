@@ -1373,8 +1373,8 @@ run_execFunction:
     JP Z, sys_keyPressed
     CP SYS_MOVE_B
     JP Z, sys_move
-    CP SYS_ARGS_B
-    JP Z, sys_args
+    ;CP SYS_ARGS_B
+    ;JP Z, sys_args
     RET
 
 

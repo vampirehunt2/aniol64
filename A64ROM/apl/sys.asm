@@ -217,9 +217,9 @@ sys_keyPressed:
 ; the string is only valid until the first call of ReadLine
 ; function
 ; syntax: Args()
-sys_args:
-    LD HL, (Args)
-    RET
+;sys_args:
+    ;LD HL, (Args)
+;    RET
 
 ; #################### Math functions ########################
 
