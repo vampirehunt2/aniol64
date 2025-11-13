@@ -1,0 +1,1 @@
+..\..\..\asmx\asmx20.exe -C 8085 -b -e -w -l 8k.lst 8k.a85
