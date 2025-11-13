@@ -1,1 +1,0 @@
-..\asmx\asmx20.exe -C 8085 -b -e -w -l test.lst 8080_8085\Tiny_Basic\test.asm
