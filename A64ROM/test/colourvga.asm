@@ -196,7 +196,6 @@ getChar:
 ; IX - null-terminated string to write
 writeStr:
     PUSH IX
-    CALL cursorOff
 .loop:
     LD A, (IX)
     CP 0   ; eol?
@@ -206,7 +205,6 @@ writeStr:
     CALL vga_advanceCur
     JR .loop
 .end:
-    CALL cursorOn
     POP IX
     RET
 

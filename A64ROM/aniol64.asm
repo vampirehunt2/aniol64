@@ -66,6 +66,7 @@ TxChA				equ 8015h
 TxChB				equ 8016h
 Scroll		    	equ 8017h	
 Colour              equ 8018h
+FontAddr            equ 8019h       ; 2 byte font address
 NmiCount 			equ 8035h		; 2 byte number
 Random 				equ 8037h		; 2 byte number
 Banks 				equ 8039h

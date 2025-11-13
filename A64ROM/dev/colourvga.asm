@@ -1,3 +1,18 @@
+; The driver for the colour VGA card
+; See card schematic at https://forum-trioda.pl/download/file.php?id=112365
+; Native VGA signal is 640x480x60Hz, but logical pixels are 2x2 phyical pixels.
+; Therefore the effective resolution is therefore 320x240.
+;
+; The below driver implements a text mode with 40x30 8x8 characters, which is a subset of the card's capabilities.
+; A font is included, but own font can be supplied by storing it in the RAM and pointing (FontAddr) to it.
+; There are 4 bits per colour, but only 12 colours available. The remaining 4 are repeats.
+; A foreground and a background colour can be specified for each character.
+;
+; Cursor is handled programmaticaly by the driver. 
+; Scrolling is done by utilising the hardware scrolling feature of the card.
+; Currently, getChar is not implemented.
+
+
 ; Colour codes:
 BLACK equ 00h
 BLUE equ 01h
@@ -12,9 +27,13 @@ ORANGE equ 0Ch
 PINK equ 0Dh
 WHITE equ 0Fh
 
+; Image memory addresses.
+; These overlap the system ROM.
+; ROM is accessed on read operations, and image memory on writes.
 PixelData equ 4000h
 ColourData equ 0000h
 
+; Constants
 MAX_X equ 39
 MAX_Y equ 29
 LF    equ 10
@@ -25,13 +44,17 @@ SCROLL_PORT equ 11011111b   ; scroll register activated by A5
 Blank:		defb "                                      ", 0
 
 Font: 
- incbin dev/ATARI.fnt
+ incbin dev/eightbb.fnt
 
 dspInit:
+    LD HL, Font         ; load predefined font address
+    LD (FontAddr), HL   ; put it in the FontAddr, so that it can be redefined later
     LD A, 0
     CALL vga_setScroll
     LD A, 0F0h
     LD (Colour), A
+    LD A, TRUE
+    LD (Cursor), A
     CALL clrScr
     RET
 
@@ -53,61 +76,37 @@ clrScr:
     ; store register values
     PUSH HL
     PUSH BC
-    ; clear pixel data
-    LD HL, PixelData
-    LD BC, 4000h 
-.loop:
-    XOR A           ;LD A, 0
+    ; clear colour and pixel data
+    LD HL, ColourData
+    LD BC, 8000h    ; total size of colour and pixel data
+.loop:              ; iterates through both colour and pixel data
+    XOR A           ; LD A, 0
     LD (HL), A
     INC HL
     DEC BC
     LD A, B
     OR C
     JR NZ, .loop
-    ; initialise colour data with white on black
-    LD HL, ColourData
-    LD BC, 4000h 
-.loop1:
-    LD A, 00h
-    LD (HL), A
-    INC HL
-    DEC BC
-    LD A, B
-    OR C
-    JR NZ, .loop1
-
+    ; 
     CALL home       ; move the cursor to 0,0   
-
     ; restore register values
     POP BC
     POP HL
     RET
 
 ; turns off the cursor for the character at the current cursor position
-cursorOff: ; TODO: protect against calling cursorOff twice working like cursorOn
+cursorOff:
+    LD A, FALSE
+    LD (Cursor), A
+    CALL vga_toggleCursor
+    RET
+
 ; turns on the cursor for the character at the current cursor position
 cursorOn:
+    LD A, TRUE
+    LD (Cursor), A
+    CALL vga_toggleCursor
     RET
-    PUSH BC
-    PUSH DE
-    PUSH HL
-    CALL vga_XY2addr
-    LD BC, 64   ; number of bytes in a physical screen line
-    LD D, 8     ; number of physical screen lines in a character line
-.loop:
-    LD A, (HL)  ; get the colour data at that position
-    RLC A       ; rotate 4 times to swap around the foregroung with the background colour
-    RLC A
-    RLC A
-    RLC A
-    LD (HL), A
-    ADD HL, BC  ; move to the next screen line
-    DEC D
-    JR NZ, .loop; repeat 8 times
-    POP HL
-    POP DE
-    POP BC
-	RET
 
 
 writeLn:
@@ -144,13 +143,13 @@ cursorLShift:
 ; and moves the cursor over by one
 ; A - character to be written
 putChar:
-    ; save register values
+; save register values
     PUSH HL
     PUSH BC
     PUSH DE
     PUSH IX
 ; find the font data for the specific character
-    LD HL, Font
+    LD HL, (FontAddr)
     LD B, 0
     LD C, A             ; move character ASCII code to BC
     SLA C               ; multiply BC by 8, for 8 bytes per character font data
@@ -204,7 +203,6 @@ getChar:
 ; IX - null-terminated string to write
 writeStr:
     PUSH IX
-    CALL cursorOff
 .loop:
     LD A, (IX)
     CP 0   ; eol?
@@ -213,7 +211,6 @@ writeStr:
     INC IX
     JR .loop
 .end:
-    CALL cursorOn
     POP IX
     RET
 
@@ -223,10 +220,10 @@ writeStr:
 nextLine:
     CALL cursorOff
     XOR A           ; LD A, 0
-    LD (CurX), A ; move the cursor to the beginning of line
-    LD A, (CurY) ; load current cursor Y position (line number)
+    LD (CurX), A    ; move the cursor to the beginning of line
+    LD A, (CurY)    ; load current cursor Y position (line number)
     CP MAX_Y        ; if already at the bottom of the screen
-    JR NC, .scroll   ; then scroll the screen
+    JR NC, .scroll  ; then scroll the screen
     JR Z, .scroll
     INC A           ; else move to the next line down
     LD (CurY), A
@@ -238,30 +235,45 @@ nextLine:
     RET
 
 scroll: 
+    ; store register values
+    PUSH HL
+    PUSH BC
+    ; scroll the display using hardware scrolling
     LD A, (Scroll)
     ADD A, 4    ; scroll by 4 doublelines, i.e. one character line
     LD (Scroll), A
     CALL vga_setScroll
+    ; clear the last line's colour data
+    LD HL, MAX_Y * 64 * 8
+    LD BC, 8 * 64   ; 8 lines per character times 64 characters
+.loop:
+    XOR A           ; LD A, 0
+    LD (HL), A
+    INC HL
+    DEC BC
+    LD A, B 
+    OR C
+    JR NZ, .loop
+    ; clear the last line's pixel data
+    LD HL, 4000h + MAX_Y * 64 * 8
+    LD BC, 8 * 64 ; beginning of the last chracter line of pixel data
+.loop1:
+    XOR A           ; LD A, 0
+    LD (HL), A
+    INC HL
+    DEC BC
+    LD A, B 
+    OR C
+    JR NZ, .loop1  
+    ; restore register values
+    POP BC
+    POP HL
     RET
 
 ; ###################################################################################
 ; ########## private functions ######################################################
 ; ###################################################################################
 
-vga_wrapLine:
-	CALL cursorOff
-    XOR A           ; LD A, 0
-    LD (CurX), A ; move the cursor to the beginning of line
-    LD A, (CurY) ; load current cursor Y position (line number)
-    CP MAX_Y        ; if already at the bottom of the screen
-	JR Z, .wrapScreen   
-    INC A           ; else move to the next line down
-	JR .end
-.wrapScreen:
-	LD A, 0
-.end:
-    LD (CurY), A
-	RET
 
 vga_advanceCur:
 	PUSH AF
@@ -281,11 +293,11 @@ vga_advanceCur:
     INC C         ; move cursor to next line
     LD A, MAX_Y   ; if we are over the end of screen
     CP C          ; then wrap back to 0,0
-    JR C, .wrapScreen
+    JR C, .scroll
     JR .end
-.wrapScreen:
-    LD B, 0       ; wrapping back to 0,0
-    LD C, 0
+.scroll:
+    DEC C         ; move the cursor back to last line
+    ;CALL scroll
 .end:
     LD A, B        ; store new cursor location
     LD (CurX), A
@@ -343,3 +355,22 @@ vga_setScroll:
     LD (Scroll), A
     OUT (SCROLL_PORT), A
     RET
+
+vga_toggleCursor:
+    PUSH BC
+    PUSH HL
+    CALL vga_XY2addr
+    LD BC, 7 * 64   ; only draw the cursor in the last line
+    ADD HL, BC
+    LD A, (Cursor)  ; check if cursor is supposed to be drawn
+    CP TRUE            
+    LD A, (Colour)  ; load the current colour
+    JR Z, .on       
+    JR .cont
+.on:
+    CPL             ; invert it
+.cont:
+    LD (HL), A
+    POP HL
+    POP BC
+	RET
