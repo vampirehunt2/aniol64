@@ -108,9 +108,13 @@ boot:
 	; greetings
 	CALL nextLine
 	LD IX, Aniol
+    LD A, CYAN * 16
+    LD (Colour), A
 	CALL writeLn
 	
 	; set up permanent storage
+    LD A, GREEN * 16
+    LD (Colour), A
 	CALL dos_setUpCf
 	CALL dos_checkNvram
 	CALL dos_autoExec

@@ -324,8 +324,12 @@ cmd_debug:
 
 
 cmd_readLn:
+        LD A, WHITE  * 16
+        LD (Colour), A
         CALL readLine
         CALL nextLine
+        LD A, GREEN  * 16
+        LD (Colour), A
         LD IX, LineBuff
         RET
 
