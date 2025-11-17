@@ -13,6 +13,21 @@ MAX_Y equ 29
 LF    equ 10
 CR	  equ 13
 
+
+; Colour codes (this card is b&w, but colour codes are needed for compatibility):
+BLACK equ 00h
+BLUE equ 01h
+GREEN equ 02h
+CYAN equ 03h
+OLIVE equ 04h
+SAPPHIRE equ 05h
+RED equ 08h
+PURPLE equ 09h
+YELLOW equ 0Ah
+ORANGE equ 0Ch
+PINK equ 0Dh
+WHITE equ 0Fh
+
 Blank:		defb "                                      ", 0
 
 dspInit:
@@ -225,27 +240,28 @@ scroll:
 ; result in HL
 ; destroys A
 vga_XY2addr:
-        PUSH BC         ; store register values
-        PUSH DE
+    PUSH BC         ; store register values
+    PUSH DE
 
-        LD A, (CurY) ; read in the Y position
-        LD E, A
-        LD D, 0         ; clear D
-        AND A           ; clear carry
-        LD B, 6         ; init the loop counter
+    LD A, (CurY) ; read in the Y position
+    LD E, A
+    LD D, 0         ; clear D
+    AND A           ; clear carry
+    LD B, 6         ; init the loop counter
 .loop:
-        SLA E           ; multiply the line number by 64...
-        RL D            ; ... as there are 64 bytes per line
-        DJNZ .loop      ; end multiply by 64
-        LD A, (CurX)
-        ADD A, E           ; add X position
-        LD E, A
-        LD HL, VRAM     ; load the base VRAM address
-        ADD HL, DE      ; add base VRAM address to the calculated offset
+    SLA E           ; multiply the line number by 64...
+    RL D            ; ... as there are 64 bytes per line
+    DJNZ .loop      ; end multiply by 64
+    LD A, (CurX)
+    INC A           ; skip the first byte in every line
+    ADD A, E        ; add X position
+    LD E, A
+    LD HL, VRAM     ; load the base VRAM address
+    ADD HL, DE      ; add base VRAM address to the calculated offset
 
-        POP DE
-        POP BC          ; restore register values
-        RET
+    POP DE
+    POP BC          ; restore register values
+    RET
 
 
 
@@ -256,58 +272,59 @@ vga_XY2addr:
 ; - VgaCurY - Y position
 ; destroys A
 vga_addr2XY:
-        PUSH BC			; store register state
-		PUSH HL
-        AND A           ; clear carry
-        LD BC, VRAM		; reading in the VRAM base address to BC
-        SBC HL, BC		; subtracting the base VRAM address from HL
-        LD A, L
-        AND 00111111b	; extract column number (X position of the cursor)
-        LD (CurX), A ; store column number
-        AND A           ; clear carry
-        LD B, 6         ; init loop conter
+    PUSH BC			; store register state
+	PUSH HL
+    AND A           ; clear carry
+    LD BC, VRAM		; reading in the VRAM base address to BC
+    SBC HL, BC		; subtracting the base VRAM address from HL
+    LD A, L
+    AND 00111111b	; extract column number (X position of the cursor)
+    DEC A           ; skip the first byte in every line
+    LD (CurX), A    ; store column number
+    AND A           ; clear carry
+    LD B, 6         ; init loop conter
 .loop:
-        SRL H           ; divide HL by 64
-        RR L
-        DJNZ .loop
-        LD A, L         ; line number now in L
-        LD (CurY), A ; store line number
-		POP HL			; restore re
-        POP BC
-        RET
+    SRL H           ; divide HL by 64
+    RR L
+    DJNZ .loop
+    LD A, L         ; line number now in L
+    LD (CurY), A ; store line number
+	POP HL			; restore re
+    POP BC
+    RET
 
 vga_advanceCur:
 	PUSH AF
-        PUSH BC
-        CALL cursorOff
-        LD A, (CurX)
-        LD B, A         ; read in the X position
-        LD A, (CurY)
-        LD C, A         ; read in the Y position
-        INC B           ; move the cursor to the next charatcter
-        LD A, MAX_X     ; if we are over the line end
-        CP B             ; then wrap line
-        JR C, .wrapLine
-        JR .end
+    PUSH BC
+    CALL cursorOff
+    LD A, (CurX)
+    LD B, A         ; read in the X position
+    LD A, (CurY)
+    LD C, A         ; read in the Y position
+    INC B           ; move the cursor to the next charatcter
+    LD A, MAX_X     ; if we are over the line end
+    CP B             ; then wrap line
+    JR C, .wrapLine
+    JR .end
 .wrapLine:
-        LD B, 0       ; move cursor to beginning of line
-        INC C         ; move cursor to next line
-        LD A, MAX_Y   ; if we are over the end of screen
-        CP C          ; then wrap back to 0,0
-        JR C, .wrapScreen
-        JR .end
+    LD B, 0       ; move cursor to beginning of line
+    INC C         ; move cursor to next line
+    LD A, MAX_Y   ; if we are over the end of screen
+    CP C          ; then wrap back to 0,0
+    JR C, .wrapScreen
+    JR .end
 .wrapScreen:
-        LD B, 0       ; wrapping back to 0,0
-        LD C, 0
+    LD B, 0       ; wrapping back to 0,0
+    LD C, 0
 .end:
-        LD A, B        ; store new cursor location
-        LD (CurX), A
-        LD A, C
-        LD (CurY), A
-        CALL cursorOn
-        POP BC
-		POP AF
-        RET
+    LD A, B        ; store new cursor location
+    LD (CurX), A
+    LD A, C
+    LD (CurY), A
+    CALL cursorOn
+    POP BC
+	POP AF
+    RET
 
 
 
