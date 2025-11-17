@@ -166,9 +166,9 @@ resetNmiHandler:
 ; device drivers
  include dev/bzr.asm
  ;include dev/pal.asm
- include dev/colourvga.asm
+ ;include dev/colourvga.asm
  ;include dev/tm.asm
- ;include dev/vga.asm
+ include dev/vga.asm
 
  include dev/dart.asm
  include dev/cf.asm
@@ -187,17 +187,20 @@ resetNmiHandler:
 ; test routines
 ;include test/test.asm
 
-; programs
+; OS components
  include cmd.asm
- include mon.asm
- include term.asm
  include dos.asm
- include snake.asm
- include rogue.asm
- include onp.asm
- include edit.asm
- include tar.asm
  include cpm.asm
+
+; built-in programs
+ include prg/mon.asm
+ include prg/term.asm
+ include prg/snake.asm
+ include prg/rogue.asm
+ include prg/onp.asm
+ include prg/edit.asm
+ include prg/tar.asm
+
 
 ; high ROM code
   ds HIGHROM - $, 0
