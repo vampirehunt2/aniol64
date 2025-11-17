@@ -222,20 +222,6 @@ scroll:
 ; ###################################################################################
 
 
-; checks whether screen coordinates are within the visible area [0..39, 0..29]
-; D - X position
-; E - Y position
-; result in HL
-; errors reported in A
-vga_validAddr:
-	LD A, MAX_X
-	CP D
-	RET C ; if X position is more than 39, return non zero code in A
-	LD A, MAX_Y
-	CP E
-	RET C ; if Y position is more than 29, return non zero code in A
-	LD A, 0
-	RET
 
 ; returns the VRAM address for current cursor position
 ; VgaCurX - X position
