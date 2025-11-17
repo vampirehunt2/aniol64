@@ -30,8 +30,8 @@ WHITE equ 0Fh
 ; Image memory addresses.
 ; These overlap the system ROM.
 ; ROM is accessed on read operations, and image memory on writes.
-PixelData equ 4000h
-ColourData equ 0000h
+PixelData equ 4000h + 128   ; + 128 is for skipping the first 2 lines of display that are skewed.
+ColourData equ 0000h + 128
 
 ; Constants
 MAX_X equ 39
@@ -78,7 +78,7 @@ clrScr:
     PUSH BC
     ; clear colour and pixel data
     LD HL, ColourData
-    LD BC, 8000h    ; total size of colour and pixel data
+    LD BC, 8000h - 128   ; total size of colour and pixel data
 .loop:              ; iterates through both colour and pixel data
     XOR A           ; LD A, 0
     LD (HL), A
@@ -148,6 +148,7 @@ putChar:
     PUSH BC
     PUSH DE
     PUSH IX
+    LD E, A
 ; find the font data for the specific character
     LD HL, (FontAddr)
     LD B, 0
@@ -187,6 +188,7 @@ putChar:
     JR NZ, .pixloop
 ; restore register values
     CALL vga_advanceCur
+    LD A, E
     POP IX
     POP DE
     POP BC
@@ -244,7 +246,7 @@ scroll:
     LD (Scroll), A
     CALL vga_setScroll
     ; clear the last line's colour data
-    LD HL, MAX_Y * 64 * 8
+    LD HL, ColourData + MAX_Y * 64 * 8
     LD BC, 8 * 64   ; 8 lines per character times 64 characters
 .loop:
     XOR A           ; LD A, 0
@@ -255,7 +257,7 @@ scroll:
     OR C
     JR NZ, .loop
     ; clear the last line's pixel data
-    LD HL, 4000h + MAX_Y * 64 * 8
+    LD HL, PixelData + MAX_Y * 64 * 8
     LD BC, 8 * 64 ; beginning of the last chracter line of pixel data
 .loop1:
     XOR A           ; LD A, 0
