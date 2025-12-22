@@ -1,48 +1,45 @@
 ;
-; Page 1
-;
-
-;
-;
-;  SYSTEM INTERFACE
-;
 ;	file	'8k Basic'
 
+
+ DEVICE NOSLOT64K
+
 BASIC:				; FULL RESTART INITIALIZATION
+; copy ROM to RAM:
+	LD HL, 00h
+	LD DE, 00h
+	LD BC, 8000h
+	LDIR
+	LD A, 00
+	OUT (0DFh), A
+;init stack
+    LD SP, 0FFFFh
+;init devices
+    CALL keyInit
+    CALL dspInit
 SYSINITJ:
 	JP	INITIALZ
-REENTERBASIC:
-				; REENTER AFTER PAUSE
-	JP	CMNDRSTR
 
-;
-;  Monitor Routines
-;
-;co	equ	406h	;c -> screen
-;cinb	equ	409h	;keyboard -> ac, carry set if any
-;dclr	equ	538h	;clear screen
-;xco	equ	4f4h	;c -> printer (blocking)
+ ds 0038h - $, 0
+	; respond to mode 1 interrupt
+	RETI
 
-;
-; I don't know which monitor was used here. So instead the i/o functions
-; are added for the Altair 88-SIO2.
-;
-; July 2014, Udo Munk
-;
+ ds 0066h - $, 0
+ 	; NMI handler
+	RETN
 
-CO:	IN	A,(10H)		; Read console status
-	AND	2		; If not ready
-	JP	Z,CO		; Keep waiting
-	LD	A,C		; Get character
-	OUT	(11H),A		; And print it
+ include tm.asm
+ include ps2.asm
+
+CO:	
+    LD	A, C		; Get character
+    CALL putChar
 	RET
 
-CINB:	IN	A,(10H)		; Read console status
-	AND	1		; Check if character available
-	RET	Z		; Return if not with carry clear
-	IN	A,(11H)		; Get character
-	SCF			; And set carry flag
+CINB:
+    CALL readKey
 	RET
+
 
 DCLR:				; Not implemented yet
 	RET
@@ -132,8 +129,8 @@ SYSQUIT:
 ;  Page 3
 ;
 
-CR	EQU	0DH
-LF	EQU	0AH
+; CR	EQU	0DH
+; LF	EQU	0AH
 BEL	EQU	07H
 BS	EQU	08H
 TAB	EQU	09H
@@ -143,7 +140,7 @@ DEL	EQU	7FH
 SI	EQU	0FH
 ETX	EQU	03H
 FF	EQU	0CH
-ESC	EQU	18H
+; ESC	EQU	18H
 
 ;
 ;  Page 4
