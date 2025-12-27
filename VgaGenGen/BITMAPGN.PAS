@@ -1,4 +1,6 @@
-{creating bitmapped text image for ROM}
+{creating bitmapped text image for ROM }
+{jjj just in case}
+{$M $4000,0,0 }   { 16K stack, no heap }
 program BitMapGenerator;
 
 uses crt,
@@ -23,9 +25,16 @@ else min := b;
 end;
 
 begin
+if (ParamCount <> 2) or
+   (ParamStr(1) = '-h') or
+   (ParamStr(1) = '?' ) then
+   begin
+   writeLn('bitmapgn <input file> <fontfile>');
+   exit;
+   end;
 {initializing files}
-inputFn := 'rogue.txt'; { ParamStr(1);}
-fontFn := 'test.fnt'; {ParamStr(2);}
+inputFn := ParamStr(1);
+fontFn := ParamStr(2);
 writeLn('input file: ', inputFn);
 outputFn := 'bitmapgn.bin';
 assign(input, inputFn);
@@ -58,4 +67,7 @@ for textLine := 0 to 29 do
 {closing files}
 close(input);
 close(output);
+swapVectors;
+exec('fontvis.exe', '');
+swapVectors;
 end.
