@@ -1,22 +1,25 @@
-{creating bitmapped text image for ROM }
-{jjj just in case}
+{ creating bitmapped text image for ROM }
+{ testing 80 column display testing 80 column display testing 80 column }
 {$M $4000,0,0 }   { 16K stack, no heap }
 program BitMapGenerator;
 
-uses crt,
-     dos,
-     Font8x8;
+uses
+	crt,
+	dos,
+	Font8x8;
 
-const CHAR_PER_LINE = 64;
-      VISIBLE_CHARS = 40;
-
-var input: text;
+var
+	input: text;
     output: file of byte;
     inputFn, outputFn, fontFn: string;
     charLine, textLine: byte;
     line: string;
     charCount, i, b: byte;
     c: char;
+    width: byte;
+    widthStr: string[1];
+    visibleChars, charPerLine: byte;
+    code: integer;
 
 function min(a, b: byte): byte;
 begin
@@ -25,13 +28,27 @@ else min := b;
 end;
 
 begin
-if (ParamCount <> 2) or
+{ parsing command line arguments }
+if (ParamCount < 2) or
    (ParamStr(1) = '-h') or
    (ParamStr(1) = '?' ) then
-   begin
-   writeLn('bitmapgn <input file> <fontfile>');
-   exit;
-   end;
+	begin
+   	writeLn('bitmapgn <input file> <fontfile> (-w <font width>)');
+	exit;
+	end;
+width := 8;
+if ParamStr(3) = '-w' then
+	begin
+    Val(ParamStr(4), width, code);
+    if code <> 0 then
+    	begin
+        writeLn('Invalid font width');
+        exit;
+        end;
+    end;
+visibleChars := 320 div width;
+charPerLine := 512 div width;
+
 {initializing files}
 inputFn := ParamStr(1);
 fontFn := ParamStr(2);
@@ -43,6 +60,7 @@ assign(output, outputFn);
 rewrite(output);
 writeLn('font file: ', fontFn);
 loadFont8x8(fontFn);
+
 {processing}
 for textLine := 0 to 29 do
     if not eof(input) then
@@ -50,8 +68,8 @@ for textLine := 0 to 29 do
        readLn(input, line);
        for charLine := 0 to 7 do
            begin
-           charCount := min(VISIBLE_CHARS, length(line));
-           for i := 1 to CHAR_PER_LINE do
+           charCount := min(visibleChars, length(line));
+           for i := 1 to charPerLine do
                begin
                if i <= charCount then
                   begin
@@ -64,10 +82,15 @@ for textLine := 0 to 29 do
                end;
            end;
        end;
+
 {closing files}
 close(input);
 close(output);
+
+{ running FONT VISUALISER }
+str(width, widthStr);
 swapVectors;
-exec('fontvis.exe', '');
+exec('fontvis.exe', '-w ' + widthStr);
 swapVectors;
+clrScr;
 end.
