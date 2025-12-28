@@ -8,8 +8,8 @@ var inputFn, outputFn: string;
     b: byte;
 
 begin
-inputFn := 'rogue.fnt';
-outputFn := 'rogue_c.fnt';
+inputFn := 'eightbb.fnt';
+outputFn := 'eighbb_c.fnt';
 assign(input, inputFn);
 assign(output, outputFn);
 reset(input);
