@@ -28,6 +28,8 @@ Snake:		defb "snake", 0
 Vh:			defb "vh", 0
 Onp:		defb "onp", 0
 Edit:		defb "edit", 0
+Tar:		defb "tar", 0
+Man:        defb "man", 0
 Cpm: 		defb "cpm", 0
 ; DOS commands
 Pwd:		defb "pwd", 0
@@ -38,7 +40,6 @@ Cd:			defb "cd", 0
 Touch:		defb "touch", 0
 Rm:			defb "rm", 0
 Format:		defb "format", 0
-Tar:		defb "tar", 0
 Mv:			defb "mv", 0
 Cp:			defb "cp", 0
 
@@ -194,6 +195,10 @@ cmd_debug:
 		LD IY, Tar
 		CALL str_cmp
 		JP Z, .tar
+        ; man command
+        LD IY, Man
+        CALL str_cmp
+        JP Z, .man
 		; mv command
 		LD IY, Mv
 		CALL str_cmp
@@ -309,6 +314,9 @@ cmd_debug:
 .tar:
 		CALL tar_main
 		JP cmd_main
+.man:
+        CALL man_main
+        JP cmd_main
 .mv:	
 		CALL cmd_mv
 		JP cmd_main
