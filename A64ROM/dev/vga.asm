@@ -48,41 +48,41 @@ home:
 ; and impact performance slightly, but at least it ensures no data is sent
 ; to the display during blanking period
 clrScr:
-        ; TODO, move cursor to position 0,0
-        ; store register values
-        PUSH HL
-        PUSH BC
-        PUSH DE
+    ; TODO, move cursor to position 0,0
+    ; store register values
+    PUSH HL
+    PUSH BC
+    PUSH DE
 
-        XOR A           ;LD A, 0
-        LD HL, VRAM
-        LD DE, VRAM + 1
-        LD (HL), A   ; initialise the first byte of VRAM to 0
-        LD BC, 2048  ; set loop counter to the full size of VRAM
-        LDIR         ; repeatedly copy previous byte to the current byte
+    XOR A           ;LD A, 0
+    LD HL, VRAM
+    LD DE, VRAM + 1
+    LD (HL), A   ; initialise the first byte of VRAM to 0
+    LD BC, 2048  ; set loop counter to the full size of VRAM
+    LDIR         ; repeatedly copy previous byte to the current byte
 
-        CALL home    ; move the cursor to 0,0   
+    CALL home    ; move the cursor to 0,0   
 
-        ; restore register values
-        POP DE
-        POP BC
-        POP HL
-        RET
+    ; restore register values
+    POP DE
+    POP BC
+    POP HL
+    RET
 
  
  
 ; turns on the cursor for the character at the current cursor position
 cursorOn:
-	LD A, (Cursor)
+    LD A, (Cursor)
 	CP FALSE
 	JR Z, .noCursor
-        PUSH HL
-        CALL vga_XY2addr
-        LD A, (HL)      ; get character at current cursor position
-        OR 10000000b    ; set the cursor bit (D7)
-        LD (HL), A
+    PUSH HL
+    CALL vga_XY2addr
+    LD A, (HL)      ; get character at current cursor position
+    OR 10000000b    ; set the cursor bit (D7)
+    LD (HL), A
 	POP HL
-        RET
+    RET
 .noCursor:
 	CALL cursorOff
 	RET
@@ -92,12 +92,12 @@ cursorOn:
 ; turns off the cursor for the character at the current cursor position
 cursorOff:
 	PUSH HL
-        CALL vga_XY2addr
-        LD A, (HL)      ; get character at current cursor position
-        AND 01111111b    ; clear the cursor bit (D7)
-        LD (HL), A
+    CALL vga_XY2addr
+    LD A, (HL)      ; get character at current cursor position
+    AND 01111111b    ; clear the cursor bit (D7)
+    LD (HL), A
 	POP HL
-        RET
+    RET
 
 		
 writeLn:
@@ -111,13 +111,13 @@ writeLn:
 ; destroys A
 ; TODO: do error checking
 gotoXY:
-        CALL cursorOff
-        LD A, B
-        LD (CurX), A
-        LD A, C
-        LD (CurY), A
-        CALL cursorOn
-        RET
+    CALL cursorOff
+    LD A, B
+    LD (CurX), A
+    LD A, C
+    LD (CurY), A
+    CALL cursorOn
+    RET
 		
 
 cursorLShift:
@@ -197,10 +197,10 @@ writeStr:
 nextLine:
     CALL cursorOff
     XOR A           ; LD A, 0
-    LD (CurX), A ; move the cursor to the beginning of line
-    LD A, (CurY) ; load current cursor Y position (line number)
+    LD (CurX), A    ; move the cursor to the beginning of line
+    LD A, (CurY)    ; load current cursor Y position (line number)
     CP MAX_Y        ; if already at the bottom of the screen
-    JR NC, .scroll   ; then scroll the screen
+    JR NC, .scroll  ; then scroll the screen
     JR Z, .scroll
     INC A           ; else move to the next line down
     LD (CurY), A
@@ -212,21 +212,21 @@ nextLine:
     RET
 
 scroll:
-       ; store register values
-        PUSH HL
-        PUSH BC
-        PUSH DE
+    ; store register values
+    PUSH HL
+    PUSH BC
+    PUSH DE
+    
+    LD HL, VRAM + 64    ; 64 is the number of bytes for one display line
+    LD DE, VRAM
+    LD BC, 64 * 30      ; set loop counter to the size of visible memory (VRAM minus vertical blanking)
+    LDIR                ; repeatedly copy previous byte to the current byte
 
-        LD HL, VRAM + 64  ; 64 is the number of bytes for one display line
-        LD DE, VRAM
-        LD BC, 64 * 30  ; set loop counter to the size of visible memory (VRAM minus vertical blanking)
-        LDIR         ; repeatedly copy previous byte to the current byte
-
-        ; restore register values
-        POP DE
-        POP BC
-        POP HL
-        RET
+    ; restore register values
+    POP DE
+    POP BC
+    POP HL
+    RET
 
 ; ###################################################################################
 ; ########## private functions ######################################################
