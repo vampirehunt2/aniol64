@@ -3,7 +3,7 @@
 ; 09/05/2022
 
 ; This program turns the computer into a dumb terminal 
-; running on the B port of the DART at 38400kbaud.
+; running on the B port of the DART at 300baud.
 ; Connection parameters are
 ; 	- 2 stop bits
 ;	- even parity
@@ -15,7 +15,7 @@
 ; to exit the terminal program you have to reset the machine.
  
 Program defb "A-Term", 0
-Separator ds MAX_X, "="
+Separator ds MAX_X - 1, "="
  defb 0
 
 IntTable equ 0A000h
