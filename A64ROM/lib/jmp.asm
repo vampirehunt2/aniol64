@@ -59,8 +59,8 @@ Item:
 
 ; DOS       ###############################
 
-Load:       JP dos_load
-Save:       JP dos_save
+Load:       JP dos_loadFile
+Save:       JP dos_saveFile
 FLen:       
 Rm:         JP dos_rm
 RmDir:      JP dos_rmDir
