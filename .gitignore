@@ -93,3 +93,12 @@ casette/cassetteInterface/sym-lib-table
 A64ROM/symbols.txt
 A64ROM/symbols.txt
 VgaGenGen/FONTGEN.EXE
+VgaGenGen/BITMAPGN.BAK
+*.EXE
+*.EXE
+*.BAK
+VgaGenGen/FONTGEN.EXE
+*.EXE
+A64ROM/test/symbols.txt
+*.EXE
+A64ROM/symbols.txt
