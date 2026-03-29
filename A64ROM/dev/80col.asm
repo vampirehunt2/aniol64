@@ -26,15 +26,27 @@ ORANGE equ 0Ch
 PINK equ 0Dh
 WHITE equ 0Fh
 
+
+;BaseAddr equ 0000h
+;Offset equ 128 ; skipping the first 2 lines of display that are skewed.
+;MemSize equ 4000h
+
+BaseAddr equ 0C000h
+;Offset equ 128 ; skipping the first 2 lines of display that are skewed.
+MemSize equ 2000h
+
+
 ; Image memory addresses.
 ; These overlap the system ROM.
 ; ROM is accessed on read operations, and image memory on writes.
-PixelData equ 4000h + 128   ; + 128 is for skipping the first 2 lines of display that are skewed.
-ColourData equ 0000h + 128
+
+ColourData equ BaseAddr; + Offset
+PixelData equ ColourData + MemSize
+
 
 ; Constants
 MAX_X equ 79
-MAX_Y equ 29
+MAX_Y equ 14
 LF    equ 10
 CR	  equ 13
 
@@ -44,12 +56,12 @@ Blank:		defs 80, " "
             defb 0
 
 Font: 
- incbin dev/eightbb.fnt
+ incbin dev/4x7block.fnt
 
 dspInit:
     LD HL, Font         ; load predefined font address
     LD (FontAddr), HL   ; put it in the FontAddr, so that it can be redefined later
-    LD A, 0
+    XOR A               ; LD A, 0
     CALL vga_setScroll
     LD A, 0F0h
     LD (Colour), A
@@ -78,17 +90,12 @@ clrScr:
     PUSH BC
     ; clear colour and pixel data
     LD HL, ColourData
-    LD BC, 8000h - 128   ; total size of colour and pixel data
-.loop:              ; iterates through both colour and pixel data
-    XOR A           ; LD A, 0
+    LD DE, ColourData + 1
+    XOR A
     LD (HL), A
-    INC HL
-    DEC BC
-    LD A, B
-    OR C
-    JR NZ, .loop
-    ; 
-    CALL home       ; move the cursor to 0,0   
+    LD BC, MemSize * 2  ; total size of colour and pixel data
+    LDIR                ; zero out both colour and pixel data 
+    CALL home           ; move the cursor to 0, MAX_Y   
     ; restore register values
     POP BC
     POP HL
@@ -114,18 +121,13 @@ writeLn:
 	CALL nextLine
 	RET
 
-; moves the cursor to a new X, Y position on screen
-; B - X position
-; C - Y position
-; destroys A
-; TODO: do error checking
+; not implemented. This text mode only supports sequential character output.
 gotoXY:
-    ; not implemented
     RET
 		
 cursorLShift:
-    ; not implemented
-    ; TODO: display the backspace char instead.
+    LD A, 127   ; DEL character in ASCII
+    CALL putChar
 	RET
 
 ; puts a single character on the screen
@@ -143,20 +145,21 @@ putChar:
     LD A, B
     JP putOddChar
     
-putOddChar:
+putEvenChar:
 ; save register values
     PUSH HL
     PUSH BC
     PUSH DE
     PUSH IX
     LD E, A
+    LD (PrevChar), A
     CALL vga_findFont
     PUSH HL             ; transfer the pointer to IX
     POP IX
     CALL vga_XY2addr
 ; fill in pixel data
-    POP HL              ; restore the result of calling vga_XY2aadr
-    LD BC, 4000h        ; 16k
+    PUSH HL             ; store the result of calling vga_XY2aadr
+    LD BC, MemSize       
     ADD HL, BC          ; get pixel data pointer
     LD BC, 64           ; 64 characters per line
     LD D, 8             ; 8 screen lines per character line
@@ -167,6 +170,16 @@ putOddChar:
     ADD HL, BC          ; move to the next screen line in PixelData
     DEC D
     JR NZ, .pixloop
+; fill in colour data
+    POP HL              ; restore the result of calling vga_XY2aadr
+    LD BC, 64           ; 64 characters per line
+    LD D, 8             ; 8 screen lines per character line
+    LD A, (Colour)
+.colloop:
+    LD (HL), A          ; store colour data    
+    ADD HL, BC          ; move HL to the next screen line of the same character
+    DEC D
+    JR NZ, .colloop
 ; restore register values
     CALL vga_advanceCur
     LD A, E
@@ -177,7 +190,7 @@ putOddChar:
     RET
 
 
-putEvenChar:
+putOddChar:
 ; save register values
     PUSH HL
     PUSH BC
@@ -192,32 +205,21 @@ putEvenChar:
     CALL vga_findFont
     PUSH HL             ; transfer the pointer to previous character font data IY
     POP IY
- ; fill in colour data
     CALL vga_XY2addr
-    PUSH HL             ; save for later to avoid having to call vga_XY2addr again
-    LD BC, 64           ; 64 characters per line
-    LD D, 8             ; 8 screen lines per character line
-    LD A, (Colour)
-.colloop:
-    LD (HL), A          ; store colour data    
-    ADD HL, BC          ; move HL to the next screen line of the same character
-    DEC D
-    JR NZ, .colloop
 ; fill in pixel data
-    POP HL              ; restore the result of calling vga_XY2aadr
-    LD BC, 4000h        ; 16k
+    LD BC, MemSize      
     ADD HL, BC          ; get pixel data pointer
     LD BC, 64           ; 64 characters per line
     LD D, 8             ; 8 screen lines per character line
 .pixloop:
     LD A, (IY)          ; load the pixel data for the previous character from Fonts table
-    SLL A
-    SLL A
-    SLL A
-    SLL A               ; shift the font data over to the even character position
-    LD B, A
+    LD E, A
     LD A, (IX)          ; load the pixel data for the current character from Fonts table
-    OR B
+    SRL A
+    SRL A
+    SRL A
+    SRL A               ; shift the font data over to the odd character position
+    OR E
     LD (HL), A
     INC IX              ; move to the next line for the current character in the Fonts table
     INC IY              ; move to the next line for the previous character in the Fonts table
@@ -308,7 +310,7 @@ scroll:
 ; ###################################################################################
 
 
-vga_advanceCur:
+vga_advanceCur: RET ; debug
 	PUSH AF
     PUSH BC
     CALL cursorOff
@@ -358,7 +360,7 @@ vga_XY2addr:
     ADD HL, BC      ; add the cursor X position
     RET
 
-; checks whether screen coordinates are within the visible area [0..39, 0..29]
+; checks whether screen coordinates are within the visible area [0..79, 0..29]
 ; D - X position
 ; E - Y position
 ; result in HL
@@ -386,15 +388,24 @@ vga_toggleCursor:
     CALL vga_XY2addr
     LD BC, 7 * 64   ; only draw the cursor in the last line
     ADD HL, BC
+    LD BC, PixelData - ColourData
+    ADD HL, BC
     LD A, (Cursor)  ; check if cursor is supposed to be drawn
     CP TRUE            
-    LD A, (Colour)  ; load the current colour
     JR Z, .on       
-    JR .cont
-.on:
-    CPL             ; invert it
-.cont:
+    LD A, 00000000b
     LD (HL), A
+    JR .end
+.on:
+    LD A, (CurX)
+    AND 00000001b
+    JR Z, .even
+    LD A, 00001111b
+    LD (HL), A
+.even:
+    LD A, 11110000b
+    LD (HL), A
+.end:
     POP HL
     POP BC
 	RET

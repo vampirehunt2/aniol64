@@ -52,7 +52,7 @@ KeyClickHandler: defb 38h, 00h ; we're pointing back at the mode 1 INT handler
 
 
 Aniol: 
- ds (MAX_X / 2) - 5, ' '
+ ;ds (MAX_X / 2) - 5, ' '
  defb   "_ANIOL 64_"
  defb 0
 
@@ -67,6 +67,7 @@ TxChB				equ 8016h
 Scroll		    	equ 8017h	
 Colour              equ 8018h
 FontAddr            equ 8019h       ; 2 byte font address
+PrevChar            equ 8021h
 NmiCount 			equ 8035h		; 2 byte number
 Random 				equ 8037h		; 2 byte number
 Banks 				equ 8039h
@@ -167,14 +168,14 @@ resetNmiHandler:
  include dev/bzr.asm
  ;include dev/pal.asm
  ;include dev/colourvga.asm
+ include dev/80col.asm
  ;include dev/tm.asm
- include dev/vga.asm
+ ;include dev/vga.asm
 
  include dev/dart.asm
  include dev/cf.asm
  include dev/kbd.asm
  ;include dev/ps2.asm
- include dev/cas.asm
 
 ; libraries
  include lib/util.asm
@@ -200,6 +201,10 @@ resetNmiHandler:
  include prg/onp.asm
  include prg/edit.asm
  include prg/tar.asm
+ include prg/man.asm
+
+ display "Low ROM program size: ", $
+ assert $ < 3800h, "program leaks over the VRAM"
 
 
 ; high ROM code
