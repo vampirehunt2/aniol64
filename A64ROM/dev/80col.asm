@@ -31,9 +31,9 @@ WHITE equ 0Fh
 ;Offset equ 128 ; skipping the first 2 lines of display that are skewed.
 ;MemSize equ 4000h
 
-BaseAddr equ 0C000h
+BaseAddr equ 0000h
 ;Offset equ 128 ; skipping the first 2 lines of display that are skewed.
-MemSize equ 2000h
+MemSize equ 4000h
 
 
 ; Image memory addresses.
@@ -46,7 +46,7 @@ PixelData equ ColourData + MemSize
 
 ; Constants
 MAX_X equ 79
-MAX_Y equ 14
+MAX_Y equ 29
 LF    equ 10
 CR	  equ 13
 
@@ -90,11 +90,15 @@ clrScr:
     PUSH BC
     ; clear colour and pixel data
     LD HL, ColourData
-    LD DE, ColourData + 1
+    LD BC, MemSize * 2  ; total size of colour and pixel data
+.loop:
     XOR A
     LD (HL), A
-    LD BC, MemSize * 2  ; total size of colour and pixel data
-    LDIR                ; zero out both colour and pixel data 
+    INC HL
+    DEC BC
+    LD A, B
+    OR C
+    JR NZ, .loop        ; zero out both colour and pixel data 
     CALL home           ; move the cursor to 0, MAX_Y   
     ; restore register values
     POP BC
@@ -174,7 +178,7 @@ putEvenChar:
     POP HL              ; restore the result of calling vga_XY2aadr
     LD BC, 64           ; 64 characters per line
     LD D, 8             ; 8 screen lines per character line
-    LD A, (Colour)
+    LD A, GREEN * 16
 .colloop:
     LD (HL), A          ; store colour data    
     ADD HL, BC          ; move HL to the next screen line of the same character
@@ -310,37 +314,17 @@ scroll:
 ; ###################################################################################
 
 
-vga_advanceCur: RET ; debug
-	PUSH AF
-    PUSH BC
-    CALL cursorOff
+vga_advanceCur: 
     LD A, (CurX)
-    LD B, A         ; read in the X position
-    LD A, (CurY)
-    LD C, A         ; read in the Y position
-    INC B           ; move the cursor to the next charatcter
-    LD A, MAX_X     ; if we are over the line end
-    CP B             ; then wrap line
-    JR C, .wrapLine
-    JR .end
-.wrapLine:
-    LD B, 0       ; move cursor to beginning of line
-    INC C         ; move cursor to next line
-    LD A, MAX_Y   ; if we are over the end of screen
-    CP C          ; then wrap back to 0,0
-    JR C, .scroll
-    JR .end
-.scroll:
-    DEC C         ; move the cursor back to last line
-    ;CALL scroll
-.end:
-    LD A, B        ; store new cursor location
+    CP MAX_X
+    JR Z, .wrapLine
+    INC A
     LD (CurX), A
-    LD A, C
-    LD (CurY), A
-    CALL cursorOn
-    POP BC
-	POP AF
+    RET
+.wrapLine:
+    XOR A
+    LD (CurX), A
+    CALL scroll
     RET
 
 ; returns the VRAM address for current cursor position
@@ -388,7 +372,7 @@ vga_toggleCursor:
     CALL vga_XY2addr
     LD BC, 7 * 64   ; only draw the cursor in the last line
     ADD HL, BC
-    LD BC, PixelData - ColourData
+    LD BC, MemSize
     ADD HL, BC
     LD A, (Cursor)  ; check if cursor is supposed to be drawn
     CP TRUE            
@@ -402,6 +386,7 @@ vga_toggleCursor:
     JR Z, .even
     LD A, 00001111b
     LD (HL), A
+    JR .end
 .even:
     LD A, 11110000b
     LD (HL), A
