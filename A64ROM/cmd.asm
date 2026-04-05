@@ -52,6 +52,8 @@ Prompt: 	defb ">", 0
 
 
 cmd_main:
+        XOR A
+        LD (PrevLineBuff), A    ; clearing out previous line buffer for command recall
 		LD IX, Prompt
 		CALL writeStr
 		CALL cursorOn
@@ -218,7 +220,7 @@ cmd_debug:
         ; unknown command
         LD IX, UnknownCmd
         CALL writeStr
-        CALL bzr_beep
+        ; CALL bzr_beep too noisy
 .wrap:
 		CALL nextLine
 		JP cmd_main
@@ -339,6 +341,8 @@ cmd_readLn:
         LD A, GREEN  * 16
         LD (Colour), A
         LD IX, LineBuff
+        LD IY, PrevLineBuff
+        CALL str_copy
         RET
 
 

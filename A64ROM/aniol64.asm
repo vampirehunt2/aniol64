@@ -52,7 +52,7 @@ KeyClickHandler: defb 38h, 00h ; we're pointing back at the mode 1 INT handler
 
 
 Aniol: 
- ;ds (MAX_X / 2) - 5, ' '
+ ds (MAX_X / 2) - 5, ' ' ; center the title message
  defb   "_ANIOL 64_"
  defb 0
 
@@ -76,7 +76,8 @@ CurY 				equ 8041h
 customNmiHandler 	equ 8042h		; 3 byte procedure, either RET or JP **
 Ps2Shift			equ 8045h
 DOS_AREA			equ 8046h
-LineBuff 			equ 8100h		; 256 byte buffer
+LineBuff 			equ 8100h		; 128 byte buffer
+PrevLineBuff        equ 8180h
 PROGRAM_DATA 		equ 8200h
 
 
@@ -109,7 +110,7 @@ boot:
 	; greetings
 	CALL nextLine
 	LD IX, Aniol
-    LD A, CYAN * 16
+    LD A, CYAN
     LD (Colour), A
 	CALL writeLn
 	
@@ -166,14 +167,17 @@ resetNmiHandler:
 
 ; device drivers
  include dev/bzr.asm
- ;include dev/pal.asm
- ;include dev/colourvga.asm
- include dev/80col.asm
- ;include dev/tm.asm
- ;include dev/vga.asm
-
  include dev/dart.asm
  include dev/cf.asm
+
+; display drivers
+ ;include dev/pal.asm
+ ;include dev/colourvga.asm
+ ;include dev/80col.asm
+ ;include dev/tm.asm
+ include dev/vga.asm
+
+; keyboard drivers
  include dev/kbd.asm
  ;include dev/ps2.asm
 
@@ -183,10 +187,9 @@ resetNmiHandler:
  include lib/mem.asm
  include lib/list.asm
  include lib/math.asm
- include test/test.asm
 
 ; test routines
-;include test/test.asm
+ include test/test.asm
 
 ; OS components
  include cmd.asm
@@ -206,11 +209,13 @@ resetNmiHandler:
  display "Low ROM program size: ", $
  assert $ < 3800h, "program leaks over the VRAM"
 
-
+; 3800h-3FFFh reserved for VRAM in case vga.asm is used.
 ; high ROM code
-  ds HIGHROM - $, 0
+ ds HIGHROM - $, 0      ; skip assembly over VGA VRAM
  include apl/apl.asm
  include apl/run.asm
  include apl/sys.asm
-
+ 
+ display "High ROM program size: ", $
+ assert $ < 8000h, "program leaks over the RAM"
 

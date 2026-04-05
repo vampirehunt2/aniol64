@@ -28,22 +28,21 @@ handleInt:
         CP 08            	; check if BACKSPACE was pressed
         JR Z, .bkspc
         CP 20h              ; checks if the key corresponds to a control character
-        JR C, .noEcho   	; skip echo if less	
+        RET C   	        ; skip echo if less	
 		LD B, A
 		LD A, (Echo)
 		CP FALSE
-		JR Z, .noEcho
+		RET Z
 		LD A, B
         CALL putChar	; echo the character to screen, but don't remove it from the keyboard buffer
 		CALL bzr_click
-.noEcho:
         RET
 .bkspc:
         CALL cursorLShift  ; TODO: check if you're already in the beginning of line
         LD A, ' '
         CALL putChar
         CALL cursorLShift
-        JR .noEcho
+        RET
 
 
 
@@ -111,6 +110,8 @@ readLine:
         JR Z, .return
         CP 08                 ; check if BACKSPACE was pressed
         JR Z, .bkspc
+        CP 11h                ; check if [Up] arrow was pressed
+        JR Z, .recall
         CP 20h                ; checks if the key corresponds to a control character
         JR C, .loop           ; skip if less
         LD (BC), A            ; store the character in the keyboard buffer
@@ -121,6 +122,15 @@ readLine:
         CP 0
         JR Z, .loop             ; TODO: beep if buffer is empty
         DEC C                   ; go back one character
+        JR .loop
+.recall:
+        LD IX, PrevLineBuff
+        LD IY, LineBuff
+        CALL str_copy
+        LD IX, LineBuff
+        CALL writeStr
+        CALL str_len
+        LD C, A                 ; this only works because LineBuff starts at a page boundary
         JR .loop
 .return:
         LD A, 0                ; store end of line
