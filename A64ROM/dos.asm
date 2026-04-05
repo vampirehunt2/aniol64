@@ -390,11 +390,13 @@ dos_listDirs:
 .checkDir:
 	PUSH IX
 	LD A, (IX)
-	CP 0		; check if a directory entry is present
+	CP 0		        ; check if a directory entry is present
 	JR Z, .nextDir
 	LD B, MAX_DIRNAME_LEN
 	LD IY, LineBuff
 	CALL str_2str
+    LD A, '/'
+    CALL putChar
 	CALL writeLn
 .nextDir:
 	POP IX
@@ -403,7 +405,7 @@ dos_listDirs:
 	JP NZ, .checkDir	; if haven't reached the end of the directory sector, fetch the next directory
 .end:
 	POP IX
-	POP DE		; restore register state	
+	POP DE		        ; restore register state	
 	POP BC
 	RET
 
