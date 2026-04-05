@@ -7,7 +7,7 @@
 
 
 manExt: db ".man", 0
-prevPath equ LineBuff + 100 ; using the end of the line buffer as scratchpad, 
+prevPath equ LineBuff + 50  ; using the end of the line buffer as scratchpad, 
                             ;because the command line for this command will never be too long.
 
 man_main:   
