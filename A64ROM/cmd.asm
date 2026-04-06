@@ -52,8 +52,6 @@ Prompt: 	defb ">", 0
 
 
 cmd_main:
-        XOR A
-        LD (PrevLineBuff), A    ; clearing out previous line buffer for command recall
 		LD IX, Prompt
 		CALL writeStr
 		CALL cursorOn
