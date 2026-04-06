@@ -854,6 +854,10 @@ dos_touch:
 	JR Z, .diskFull
 	PUSH AF						; save file table sector number on stack
 	CALL str_copy				; copy the file name from the command line to the file record
+    PUSH IY
+    LD IY, CurrentFileName
+    CALL str_copy
+    POP IY
 	LD A, (CurrentDir)
 	LD (IY + FileDir), A		; copy the current directory to the file record
 	LD A, 0
@@ -861,6 +865,7 @@ dos_touch:
 	LD (IY + FileLen + 1), A
 	POP AF						; restore file table sector number from stack
 	CALL dos_saveFileTabSector
+    CALL dos_reset
 	LD A, DOS_OK
 	JR .end
 .diskFull:	
@@ -1421,7 +1426,7 @@ dos_fWrite:
 .skip:
 	LD A, B		; restore the byte to be written to A
 	LD HL, (FilePtr)
-	INC HL
+	;INC HL
 	LD BC, FileBuffer
 	ADD HL, BC
 	LD (HL), A

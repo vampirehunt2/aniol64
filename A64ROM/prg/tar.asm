@@ -5,16 +5,15 @@
 ; This program allows storing and loading text files through a serial interface. 
 ; running on the B port of the DART at 300baud.
 ; Connection parameters are
-; 	- 2 stop bits
-;	- even parity
+; 	- 1 stop bit
+;	- no parity
 ; 	- 8bits per character
-; It uses software handshaking with Xon/Xoff on the receiving side.
-; It uses no handshaking on the transmitting side, assuming the 
-; computer on the other side is able to handle keyclicks in time.
-; There is no teardown procedure implemented at this point,
-; to exit the terminal program you have to reset the machine.
+
 
 EOF equ 04h
+
+tar_FileSize equ PROGRAM_DATA ; 2 bytes
+
 tarHelp db "tar -s/-l <filename>", 0
  
 
@@ -35,6 +34,8 @@ tar_main:
     JR Z, tar_store
     CP 'l'
     JR Z, tar_load
+    CP 'b'
+    JR Z, tar_loadBin
 // run through, show help if the argument is not -s or -l
 .help:
     LD IX, tarHelp
@@ -49,13 +50,18 @@ tar_load:
     CALL dos_touch
     CP DOS_OK
 	JR NZ, .err
+    LD HL, FileBuffer
 .loop:
     CALL dart_getChar
     CP EOF
     JR Z, .cont
-    CALL dos_fWrite
+    LD (HL), A
+    INC HL
     JR .loop
 .cont:
+    LD BC, FileBuffer
+    SUB HL, BC
+    LD (CurrentFileSize), HL
     CALL dos_saveFile
     CP DOS_OK
 	JR NZ, .err
@@ -72,11 +78,11 @@ tar_store:
 	LD A, (DosErr)
 	CP DOS_OK
 	JR NZ, .err
-	LD BC, (CurrentFileSize)
+	LD HL, (CurrentFileSize)
 	LD IX, FileBuffer
 .loop:
-	LD A, 0
-	CP H
+    XOR A	
+    CP H
 	JR NZ, .cont
 	CP L
 	JR NZ, .cont
@@ -89,6 +95,48 @@ tar_store:
 	INC IX
 	DEC HL
 	JR .loop
+.err:
+	CALL dos_getStatusMsg
+	CALL writeLn
+    RET
+
+tar_loadBin:
+    INC IX                  ; skip over the '-'
+    INC IX                  ; skip over the 'b'
+    CALL str_tok
+    PUSH HL
+    CALL u16_parseDec
+    CP 0
+    JR NZ, .parseErr
+    LD (tar_FileSize), HL        
+    POP HL
+    CALL str_shift
+    CALL dos_touch
+    CP DOS_OK
+	JR NZ, .err
+    LD BC, (tar_FileSize)
+    LD HL, FileBuffer
+.loop:
+    LD A, B
+    OR C
+    JR Z, .cont
+    CALL dart_getChar
+    LD (HL), A
+    INC HL
+    DEC BC
+    JR .loop
+.cont:
+    LD BC, FileBuffer
+    SUB HL, BC
+    LD (CurrentFileSize), HL
+    CALL dos_saveFile
+    CP DOS_OK
+	JR NZ, .err
+    RET
+.parseErr:
+    LD IX, InvVal
+    CALL writeLn
+    RET
 .err:
 	CALL dos_getStatusMsg
 	CALL writeLn
