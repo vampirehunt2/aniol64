@@ -58,6 +58,7 @@ Aniol:
 
 RAMTOP 				equ 0BFFFh
 HIGHROM				equ 4000h
+JUMP_TABLE          equ 7E00h
 TestAddr 			equ 8001h  		; points to the beginning of RAM
 KbdBuff 			equ 8012h	   ; 1 byte buffer
 Echo 				equ 8013h
@@ -217,5 +218,7 @@ resetNmiHandler:
  include apl/sys.asm
  
  display "High ROM program size: ", $
- assert $ < 8000h, "program leaks over the RAM"
+ assert $ < JUMP_TABLE, "program leaks over the jump table"
 
+  ds JUMP_TABLE - $, 0      ; put the jump table in the last page of ROM
+  include lib/jmp.asm    
