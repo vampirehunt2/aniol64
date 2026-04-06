@@ -25,71 +25,19 @@ Key coluns: <font color="green">Green</font><br/>
 Special keys: <font color="yellow">Yellow</font><br/>
 
 <h2>Memory map</h2>
-<h3>Aniol 32</h3>
-0000-7FFF: ROM (28C256)<br/>
-8000-87FF: ROM 5264<br/>
 
 <h3>Aniol 64</h3>
 0000-7FFF: ROM (28C256)<br/>
 8000-FFFF: RAM (62256 or 1244Y)<br/>
 
 <h3>Aniol 640</h3>
-0000-3800: ROM (28F010)<br/>
-3800-4000: Video RAM (7132)<br/>
-4000-7FFF: bank-switchable ROM - 8x16KB (28F010)<br/>
-8000-BFFF: general purpose NVRAM (AS6C4008)<br/>
-C000-7FFF: bank-switchable NVRAM (AS6C4008) - 32x16KB<br/>
+TBD
 <br/>
 
 <h4>Bank switching schematic</h4>
 <img src="Design/bankSwitching.png"/>
 <br/>
  
-<h2>Bus organization</h2>
-<table>
-<tr> <th>Bus pin</th>	<th>CPU pin</th>	<th>Type</th>	<th>Symbol</th>	<th>Direction</th></tr>
-
-<tr> <td>1</td>	<td>17</td>	<td>C</td>	<td>NMI</td>	<td>IN</td></tr>
-<tr> <td>2</td>	<td>16</td>	<td>C</td>	<td>INT</td>	<td>IN</td></tr>
-<tr> <td>3</td>	<td>6</td>	<td>C</td>	<td>CLK</td>	<td>IN</td></tr>
-<tr> <td>4</td>	<td>5</td>	<td>A</td>	<td>A15</td>	<td>OUT</td></tr>
-<tr> <td>5</td>	<td>4</td>	<td>A</td>	<td>A14</td>	<td>OUT</td></tr>
-<tr> <td>6</td>	<td>3</td>	<td>A</td>	<td>A13</td>	<td>OUT</td></tr>
-<tr> <td>7</td>	<td>2</td>	<td>A</td>	<td>A12</td>	<td>OUT</td></tr>
-<tr> <td>8</td>	<td>1</td>	<td>A</td>	<td>A11</td>	<td>OUT</td></tr>
-<tr> <td>9</td>	<td>40</td>	<td>A</td>	<td>A10</td>	<td>OUT</td></tr>
-<tr> <td>10</td><td>39</td>	<td>A</td>	<td>A9</td>		<td>OUT</td></tr>
-<tr> <td>11</td><td>38</td>	<td>A</td>	<td>A8</td>		<td>OUT</td></tr>
-<tr> <td>12</td><td>37</td>	<td>A</td>	<td>A7</td>		<td>OUT</td></tr>
-<tr> <td>13</td><td>36</td>	<td>A</td>	<td>A6</td>		<td>OUT</td></tr>
-<tr> <td>14</td><td>35</td>	<td>A</td>	<td>A5</td>		<td>OUT</td></tr>
-<tr> <td>15</td><td>34</td>	<td>A</td>	<td>A4</td>		<td>OUT</td></tr>
-<tr> <td>16</td><td>33</td>	<td>A</td>	<td>A3</td>		<td>OUT</td></tr>
-<tr> <td>17</td><td>32</td>	<td>A</td>	<td>A2</td>		<td>OUT</td></tr>
-<tr> <td>18</td><td>31</td>	<td>A</td>	<td>A1</td>		<td>OUT</td></tr>
-<tr> <td>19</td><td>30</td>	<td>A</td>	<td>A0</td>		<td>OUT</td></tr>
-<tr> <td>20</td><td>29</td>	<td>P</td>	<td>GND</td>	<td></td></tr>
-<tr> <td>21</td><td>11</td>	<td>P</td>	<td>VCC</td>	<td></td></tr>
-<tr> <td>22</td><td>27</td>	<td>C</td>	<td>M1</td>		<td>OUT</td></tr>
-<tr> <td>23</td><td>26</td>	<td>C</td>	<td>RESET</td>	<td>IN</td></tr>
-<tr> <td>24</td><td>25</td>	<td>C</td>	<td>BUSRQ</td>	<td>IN</td></tr>
-<tr> <td>25</td><td>24</td>	<td>C</td>	<td>WAIT</td>	<td>IN</td></tr>
-<tr> <td>26</td><td>23</td>	<td>C</td>	<td>BUSACK</td>	<td>OUT</td></tr>
-<tr> <td>27</td><td>22</td>	<td>C</td>	<td>WR</td>		<td>OUT</td></tr>
-<tr> <td>28</td><td>21</td>	<td>C</td>	<td>RD</td>		<td>OUT</td></tr>
-<tr> <td>29</td><td>13</td>	<td>D</td>	<td>D7</td>		<td>BOTH</td></tr>
-<tr> <td>30</td><td>10</td>	<td>D</td>	<td>D6</td>		<td>BOTH</td></tr>
-<tr> <td>31</td><td>9</td>	<td>D</td>	<td>D5</td>		<td>BOTH</td></tr>
-<tr> <td>32</td><td>7</td>	<td>D</td>	<td>D4</td>		<td>BOTH</td></tr>
-<tr> <td>33</td><td>8</td>	<td>D</td>	<td>D3</td>		<td>BOTH</td></tr>
-<tr> <td>34</td><td>12</td>	<td>D</td>	<td>D2</td>		<td>BOTH</td></tr>
-<tr> <td>35</td><td>15</td>	<td>D</td>	<td>D1</td>		<td>BOTH</td></tr>
-<tr> <td>36</td><td>14</td>	<td>D</td>	<td>D0</td>		<td>BOTH</td></tr>
-<tr> <td>37</td><td>18</td>	<td>C</td>	<td>HALT</td>	<td>OUT</td></tr>
-<tr> <td>38</td><td>19</td>	<td>C</td>	<td>MEMRQ</td>	<td>OUT</td></tr>
-<tr> <td>39</td><td>10</td>	<td>C</td>	<td>IORQ</td>	<td>OUT</td></tr>
-</table>
-<br/>
 
 <h2>I/O</h2>
 <h3>Device address decoding</h3>
@@ -398,7 +346,7 @@ left to right
 <table>
 <tr><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th></tr>
 <tr><td>A12	<td>A13</td>	<td>A14</td> <td>Tx</td> <td>Rx</td> <td>D4</td>	<td>D3</td>	<td>D5</td>	<td>D6</td>	<td>+5V</td>	<td>D2</td>	<td>D7</td>	<td>D0</td>	<td>D1</td>	<td>NMI</td><td>A15+MEMRQ</td>	<td>IORQ+M1</td></tr>
-<tr><td>A11	<td>A10</td>	<td>A9</td>	<td>A8</td>	<td>A7</td>	<td>A6</td>	<td>A5</td>	<td>A4</td>	<td>A3</td>	<td>A2</td>	<td>A1</td>	<td>A0</td>	<td>WR</td>	<td>RD</td>	<td>WAIT</td>	<td>VRAM'</td>	<td>GND</td></tr>
+<tr><td>A11	<td>A10</td>	<td>A9</td>	<td>A8</td>	<td>A7</td>	<td>A6</td>	<td>A5</td>	<td>A4</td>	<td>A3</td>	<td>A2</td>	<td>A1</td>	<td>A0</td>	<td>WR</td>	<td>RD</td>	<td>CLK</td><td>VRAM'</td>	<td>GND</td></tr>
 </table>
 
 <h2>References</h2>
