@@ -2,70 +2,68 @@
 
 ; Keyboard  ###############################
 
-ReadKey:    JP readKey
-ReadLn:     JP readLine
-Read:       JP read
+jmp_ReadKey:    JP readKey
+jmp_ReadLn:     JP readLine
 
 ; Display   ###############################
 
-Goto:       JP gotoXY
-PutChar:    JP putChar
-GetChar:    JP getChar
-Write:      JP wriStr
-WriteLn:    JP writeLn
-Clr:        JP ClrScr
+jmp_Goto:       JP gotoXY
+jmp_PutChar:    JP putChar
+jmp_GetChar:    JP getChar
+jmp_Write:      JP writeStr
+jmp_WriteLn:    JP writeLn
+jmp_Clr:        JP clrScr
 
 ; Utils     ###############################
 
-Beep:       JP bzr_beep
-Click:      JP bzr_click
-Rnd:        JP rnd
-Parse:
-Format:
-Get:
-Put:
+jmp_Beep:       JP bzr_beep
+jmp_Click:      JP bzr_click
+jmp_Rnd:        JP rnd
+jmp_Parse:
+jmp_Format:
+jmp_Get:
+jmp_Put:
 
 ; Strings   ###############################
 
-Len:        JP str_len
-Copy:       JP str_copy
-Cmp:        JP str_cmp
-Cat:        JP str_cat
-Tok:        JP str_tok
-Shift:      JP str_shift
-LTrim:      JP str_ltrim
-RTrim:      JP str_rtrim
-CharAt:     JP str_charAt
-Starts:
-Ends:
-Contains:
-Index: 
+jmp_Len:        JP str_len
+jmp_Copy:       JP str_copy
+jmp_Cmp:        JP str_cmp
+jmp_Cat:        JP str_cat
+jmp_Tok:        JP str_tok
+jmp_Shift:      JP str_shift
+jmp_LTrim:      JP str_ltrim
+jmp_RTrim:      JP str_rtrim
+jmp_CharAt:     JP str_charAt
+jmp_Starts:
+jmp_Ends:
+jmp_Contains:
+jmp_Index: 
 
 ; Lists     ###############################
 
-Clear:
-Create:
-Full:
-Count:
-Expand:
-Append:
-Insert:
-Trunc:
-Push:
-Pull:
-Empty:
-Remove:
-Item:
+jmp_Clear:
+jmp_Create:
+jmp_Full:
+jmp_Count:
+jmp_Expand:
+jmp_Append:
+jmp_Insert:
+jmp_Trunc:
+jmp_Push:
+jmp_Pull:
+jmp_Empty:
+jmp_Remove:
+jmp_Item:
 
 ; DOS       ###############################
 
-Load:       JP dos_loadFile
-Save:       JP dos_saveFile
-FLen:       
-Rm:         JP dos_rm
-RmDir:      JP dos_rmDir
-Cd:         JP dos_cd
-FRead:
+jmp_Load:       JP dos_loadFile
+jmp_Save:       JP dos_saveFile
+jmp_FLen:       
+jmp_Rm:         JP dos_rm
+jmp_RmDir:      JP dos_rmDir
+jmp_FRead:
 FWrite:
-Seek:
-Exists:
+jmp_Seek:
+jmp_Exists:
