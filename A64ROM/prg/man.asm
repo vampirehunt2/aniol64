@@ -7,8 +7,6 @@
 
 
 manExt: db ".man", 0
-prevPath equ LineBuff + 50  ; using the end of the line buffer as scratchpad, 
-                            ;because the command line for this command will never be too long.
 
 man_main:   
     CALL man_saveDir
@@ -39,7 +37,7 @@ man_saveDir:
     PUSH IX
     PUSH IY
     LD IX, CurrentPath
-    LD IY, prevPath
+    LD IY, TempDirname
     CALL str_copy
     POP IY
     POP IX
@@ -47,7 +45,7 @@ man_saveDir:
 
 ; goes back to the original current directory
 man_restoreDir:
-    LD IX, prevPath
+    LD IX, TempDirname
     CALL dos_cd
     RET
 
