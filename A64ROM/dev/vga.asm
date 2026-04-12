@@ -135,27 +135,27 @@ cursorLShift:
 ; and moves the cursor over by one
 ; A - character to be written
 putChar:
-        PUSH HL
-        PUSH AF
-        CALL vga_XY2addr
-        POP AF
-        AND 01111111b   ; make sure cursor data is not stored
-        LD (HL), A
+    PUSH HL
+    PUSH AF
+    CALL vga_XY2addr
+    POP AF
+    AND 01111111b   ; make sure cursor data is not stored
+    LD (HL), A
 	CALL vga_advanceCur
-        POP HL
-        RET
+    POP HL
+    RET
 
 ; gets a single character from the screen at current cursor position
 ; and moves the cursor over by one
 ; result in A
 getChar:
-        PUSH HL
-        CALL vga_XY2addr
-        CALL vga_advanceCur ; TODO vga_advanceCur should go at the end?
-        LD A, (HL)
-        AND 01111111b   ; make sure cursor data is not returned
-        POP HL
-        RET
+    PUSH HL
+    CALL vga_XY2addr
+    CALL vga_advanceCur ; TODO vga_advanceCur should go at the end?
+    LD A, (HL)
+    AND 01111111b   ; make sure cursor data is not returned
+    POP HL
+    RET
 
 
 ; writes a string to the display at current cursor position
