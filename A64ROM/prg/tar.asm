@@ -9,6 +9,17 @@
 ;	- no parity
 ; 	- 8bits per character
 
+; MAN page for tar:
+; File Archiver program
+; Allows loading and storing files
+; through a serial port.
+; tar -s <file> 
+; stores an existing file
+; tar -l <file>
+; creates a new text file and fills it with data loaded from the serial port
+; tar -b<size> <file>
+; created a new binary file of a given size and fills it with data loaded from the serial port
+
 
 EOF equ 04h
 
