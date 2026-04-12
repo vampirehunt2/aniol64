@@ -1022,7 +1022,6 @@ apl_for:
 	LD (ProgramPtr), HL
 	CALL apl_storeSourceLineNum
 .skip:
-	INC HL
 	LD A, WHILE_B
 	LD (HL), A
 	INC HL
