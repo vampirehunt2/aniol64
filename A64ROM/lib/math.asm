@@ -461,7 +461,6 @@ u16_parseBin:
 ; errors reported in A
 ; in case of errors, address of first erroneous character is in IX
 ; destroys IX
-
 u16_parseDec:
         PUSH BC
         LD HL, 0   ; will be accumulating the value in HL
