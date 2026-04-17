@@ -31,6 +31,7 @@ Edit:		defb "edit", 0
 Tar:		defb "tar", 0
 Man:        defb "man", 0
 Cpm: 		defb "cpm", 0
+Dart:       defb "dart", 0
 ; DOS commands
 Pwd:		defb "pwd", 0
 Ls:			defb "ls", 0
@@ -159,6 +160,10 @@ cmd_debug:
 		LD IY, Cpm
 		CALL str_cmp
 		JP Z, .cpm
+        ; DART config command
+        LD IY, Dart
+        CALL str_cmp
+        JP Z, .dart
 		; pwd command
 		LD IY, Pwd
 		CALL str_cmp
@@ -290,6 +295,9 @@ cmd_debug:
 .pwd:
 		CALL dos_pwd
 		JP cmd_main
+.dart:
+        CALL dart_main
+        JP cmd_main
 .ls:
 		CALL dos_ls
 		JP cmd_main
