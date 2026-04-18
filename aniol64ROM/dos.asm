@@ -9,10 +9,11 @@
 
 ; dos supports the following:
 ; - 16kB files
-; - maximum of 64 directories per logical drive, 32MB each
+; - maximum of 31 directories per logical drive
+; - 64MB per logical drive
 ; - maximum of 256 logical drives per physical disk
 ; - maximum of 63 * 32 = 2016 files per logical drive
-; - up to 8 characters for a directory name
+; - up to 7 characters for a directory name (plus the terminating 0)
 ; - file names following the 8+3 convention
 ; - single level directory structure. 
 
@@ -26,7 +27,8 @@ SerialNum: 		defb "Serial: ", 0
 Model: 			defb "Model: ", 0
 FirmwareRev: 	defb "Firmware Rev: ", 0
 LbaSectors: 	defb "LBA Sectors: ", 0
-Bytes			defb " bytes", 0
+Bytes:			defb " bytes", 0
+Autoexec:		defb "autoexec.apl", 0
 
 ; status messages
 DosOk:				defb "I/O success", 0
@@ -73,23 +75,37 @@ DosErr			equ DOS_AREA + 24h	; status of the last disk I/O operation,
 DiskPresent		equ DOS_AREA + 25h
  
 ; filesystem constants:
-MAX_DIRNAME_LEN 		equ 8
-MAX_FILENAME_LEN		equ 12
+SECTOR_SIZE				equ 256
+MAX_DIRNAME_LEN 		equ 8	; includes terminating zero
+MAX_FILENAME_LEN		equ 12	; does not include terminating zero
 FS_INFO_LEN 			equ 8
-MAX_DIRS 				equ 63 
-MAX_FILES 				equ 4087	; 4096 -8 for the file table and -1 for the directory table
-FILE_RECORDS_PER_SECTOR equ 32
+MAX_DIRS 				equ 31 
+FILE_RECORDS_PER_SECTOR equ 16
 FILE_RECORD_SIZE		equ 16
 FILE_TABLE_SECTORS 		equ 63
-SECTOR_SIZE				equ 512
+MAX_FILES 				equ FILE_RECORDS_PER_SECTOR * FILE_TABLE_SECTORS
+
 
 ; file record structure:
 Filename 	equ 00h	; null-terminated string, 
 		; 12 (8+3) characters with a dot, plus the terminating zero
 		; contains a zero-length string if the file record is empty
-FileExists  equ 00h	; first charatcter of the file name is 0 if the file record is empty
+FileExists  equ 00h	; first character of the file name is 0 if the file record is empty
 FileDir 	equ 0Dh	; 1 byte directory index
 FileLen 	equ 0Eh	; 2 byte actual file length
+
+
+dos_autoExec:
+	LD A, (DiskPresent)
+	CP TRUE
+	RET NZ
+	LD IX, Autoexec
+	CALL dos_loadFile
+	CP DOS_OK
+	RET NZ
+	CALL apl_compile
+	CALL run_execute
+	RET
 
 dos_setUpCf:
 	CALL cf_exists
@@ -153,7 +169,7 @@ dos_printRecord:
 
 
 dos_checkNvram:
-	CALL memTest
+	CALL mem_test
 	CP 0
 	JR Z, .memTestOk
 	LD IX, NvRamNok
@@ -339,7 +355,7 @@ dos_loadDirs:
 	LD C, 0
 	CALL cf_setSector	; set sector zero, where the directory table is
 	LD HL, SectorBuffer
-	CALL cf_readSector	; read the directory table - 64 8-byte directory names
+	CALL cf_readSector	; read the directory table - 32 8-byte directory names
 	POP HL
 	POP DE
 	POP BC
@@ -374,11 +390,13 @@ dos_listDirs:
 .checkDir:
 	PUSH IX
 	LD A, (IX)
-	CP 0		; check if a directory entry is present
+	CP 0		        ; check if a directory entry is present
 	JR Z, .nextDir
 	LD B, MAX_DIRNAME_LEN
 	LD IY, LineBuff
 	CALL str_2str
+    LD A, '/'
+    CALL putChar
 	CALL writeLn
 .nextDir:
 	POP IX
@@ -387,13 +405,12 @@ dos_listDirs:
 	JP NZ, .checkDir	; if haven't reached the end of the directory sector, fetch the next directory
 .end:
 	POP IX
-	POP DE		; restore register state	
+	POP DE		        ; restore register state	
 	POP BC
 	RET
 
 
 ; lists on the screen all the files in the current directory
-
 dos_listFiles:
 	LD A, 01h		; the first sector of the file table. Counting sectors in A
 .loop:
@@ -461,10 +478,14 @@ dos_tabFileName:
 	RET
 
 
-
+cmd_rm:
+	CALL str_shift
+	CALL dos_rm
+	CP DOS_OK
+	JP NZ, dos_printError
+	RET
 
 dos_rm:
-	CALL str_shift
 	CALL dos_fileExists
 	CP 0
 	JR Z, .notFound
@@ -473,16 +494,20 @@ dos_rm:
 	LD (IY + FileExists), A
 	POP AF
 	CALL dos_saveFileTabSector
+	LD A, DOS_OK
 	RET
 .notFound:
-	LD IX, ErrFileNotFound
-	CALL writeLn
+	LD A, FILE_NOT_FOUND
 	RET
 
-
-
-dos_rmDir:
+cmd_rmDir:
 	CALL str_shift
+	CALL dos_rmDir
+	CP DOS_OK
+	JP NZ, dos_printError
+	RET
+
+dos_rmDir: ; TODO remove all files in the folder
 	CALL dos_loadDirs
 	LD E, MAX_DIRS
 	PUSH IX
@@ -495,25 +520,28 @@ dos_rmDir:
 	CALL dos_nextDir
 	DEC E
 	JR NZ, .loop
-	LD A, 0
-	LD IX, ErrNoSuchDir
-	CALL writeLn
-	JR .end
+	LD A, NO_SUCH_DIR
+	RET
 .rm:
 	LD A, 0
 	LD (IX), A
 	CALL dos_saveDirs
 .end:
+	LD A, DOS_OK
 	RET
 
 
-
+cmd_mkDir:
+	CALL str_shift
+	CALL dos_mkDir
+	CP DOS_OK
+	JP NZ, dos_printError
+	RET
 
 dos_mkDir:
 	PUSH BC		; save register state
 	PUSH DE
 	; check if dir name is valid
-	CALL str_shift
 	CALL dos_validateDirname
 	CP TRUE
 	JP NZ, .invName
@@ -536,21 +564,18 @@ dos_mkDir:
 	POP IY		; transfer buffer address from IX to IY
 	PUSH HL
 	POP IX		; transfer name of directory from HL to IX
-	CALL str_2mem
+	CALL str_copy
 	CALL dos_saveDirs
 	JP .end
 .invName:
-	LD IX, ErrInvDirName
-	CALL writeLn
+	LD A, INVALID_DIRNAME
 	JR .end
 .exists:
-	LD IX, ErrDirExists
-	CALL writeLn
+	LD A, DIR_EXISTS
 	JR .end
 .tooMany:
-	LD IX, ErrTooManyDirs
-	CALL writeLn
-	JR .end
+	LD A, TOO_MANY_DIRS
+;	JR .end
 .end:
 	POP DE		; restore register state	
 	POP BC
@@ -564,7 +589,7 @@ dos_validateDirname:
 	CALL str_len
 	CP 0
 	JR Z, .false
-	CP MAX_DIRNAME_LEN		
+	CP MAX_DIRNAME_LEN - 1	; subtracting one to account for the temrinating zero	
 	JR NC, .false
 .loop:
 	LD A, (IX)
@@ -675,9 +700,103 @@ dos_cdRoot:
 	LD (CurrentDir), A
 	RET
 	
-; changes the current directory
-dos_cd:
+
+cmd_cd:
 	CALL str_shift	; transfer folder name from HL to IX
+	CALL dos_cd
+	CP DOS_OK
+	RET Z
+	CALL dos_printError
+	RET	
+
+cmd_cp:
+	CALL str_shift
+	PUSH IX				; push the file name
+	CALL str_tok		; tokenize the directory name
+	CALL str_shift
+	POP IY				; pop the file name to IY
+	CALL dos_cp
+	CP DOS_OK
+	RET Z
+	CALL dos_printError
+	RET	
+
+; copies a file to a different folder
+; and changes the current folder to that folder
+; IX - folder name
+; IY - file name
+dos_cp:
+	PUSH IX					; save dir name on stack
+	PUSH IY					; transfer file name to IX
+	POP IX					
+	CALL dos_loadFile		; load the file from the current directory
+	CP 0					; check if loaded correctly
+	JR NZ, .err				; return error code if not
+	POP IX					; return dir name from stack
+	CALL dos_cd				; change directory
+	CALL dos_saveFile		; save the file to a new directory
+	RET						; returns the error code from dos_saveFile
+.err:
+	POP IY					; need to pop this to be able to return
+	RET
+
+cmd_mv:
+	CALL str_shift
+	PUSH IX				; push the file name
+	CALL str_tok		; tokenize the directory name
+	CALL str_shift
+	POP IY				; pop the file name to IY
+	CALL dos_mv
+	CP DOS_OK
+	RET Z
+	CALL dos_printError
+	RET	
+
+; moves a file to a different folder
+; IX - folder name
+; IY - file name
+dos_mv:
+	PUSH IY	; save file name on stack
+	LD IY, RootFolder		; check if user wants to move to the root folder
+	CALL str_cmp
+	JR Z, .root
+	LD IY, ParentFolder
+	CALL str_cmp
+	JR Z, .root
+	JR .cont
+.root:
+	LD E, 0			
+	JP .move				; if user isn't moving  to the root folder, find the appropriate folder
+.cont:
+	CALL dos_dirExists
+	CP 0
+	JR Z, .noDir
+	LD E, A
+.move:						; directory index in E
+	POP IX					; restore file name from stack to IX
+	CALL dos_fileExists
+	CP 0
+	JR Z, .fileNotFound
+	LD (IY + FileDir), E	; set the directory index in the file record
+	LD B, 0
+	LD C, 0
+	LD HL, SectorBuffer
+	CALL cf_setSector		; sector number already in A from calling dos_fileExists
+	CALL cf_writeSector		; TODO check for write errors?
+	LD A, DOS_OK
+	RET
+.fileNotFound:
+	LD A, FILE_NOT_FOUND
+	RET
+.noDir:
+	POP IY					; need to pop this to be able to return
+	LD A, NO_SUCH_DIR
+	RET
+
+
+; changes the current directory
+; directory name pointed to by IX
+dos_cd:
 	; check if user wants to go to the root folder
 	LD IY, RootFolder
 	CALL str_cmp
@@ -687,17 +806,18 @@ dos_cd:
 	JR Z, .root
 	; if user isn't going to the root folder, find the appropriate folder
 	CALL dos_dirExists
+	CP 0
 	JR Z, .noDir
 	LD (CurrentDir), A
 	LD IY, CurrentPath
 	CALL str_copy
+	LD A, DOS_OK
 	RET
 .noDir:
-	LD IX, ErrNoSuchDir
-	CALL writeLn
+	LD A, NO_SUCH_DIR
 	RET
 .root:
-	CALL dos_cdRoot
+	JP dos_cdRoot
 
 dos_ls:
 	LD A, (CurrentDir)
@@ -734,6 +854,10 @@ dos_touch:
 	JR Z, .diskFull
 	PUSH AF						; save file table sector number on stack
 	CALL str_copy				; copy the file name from the command line to the file record
+    PUSH IY
+    LD IY, CurrentFileName
+    CALL str_copy
+    POP IY
 	LD A, (CurrentDir)
 	LD (IY + FileDir), A		; copy the current directory to the file record
 	LD A, 0
@@ -741,6 +865,7 @@ dos_touch:
 	LD (IY + FileLen + 1), A
 	POP AF						; restore file table sector number from stack
 	CALL dos_saveFileTabSector
+    CALL dos_reset
 	LD A, DOS_OK
 	JR .end
 .diskFull:	
@@ -759,25 +884,55 @@ dos_touch:
 ; prints out an error message to the screen
 ; error code in A
 dos_printError:
-	CP DISK_FULL
-	JR Z, .diskFull
-	CP FILE_EXISTS
-	JR Z, .fileExists
-	CP INVALID_FILENAME
-	JR Z, .invFilename
+	CP INVALID_SECTOR
+	JR Z, .invalidSector
 	CP INVALID_DIRNAME
 	JR Z, .invDirname
-.diskFull:
-	LD IX, ErrDiskFull
+	CP INVALID_FILENAME
+	JR Z, .invFilename
+	CP DIR_EXISTS
+	JR Z, .dirExists
+	CP FILE_EXISTS
+	JR Z, .fileExists
+	CP FILE_NOT_FOUND
+	JR Z, .fileNotFound
+	CP TOO_MANY_DIRS
+	JR Z, .tooManyDirs
+	CP NO_SUCH_DIR
+	JR Z, .noSuchDir
+	CP DISK_FULL
+	JR Z, .diskFull
+	CP NO_DISK
+	JR Z, .noDisk
+.invalidSector
+	LD IX, ErrInvalidSector
+	JR .end
+.invDirname:
+	LD IX, ErrInvDirName
+ 	JR .end
+.invFilename:
+	LD IX, ErrInvFileName
+	JR .end
+.dirExists:
+	LD IX, ErrDirExists
 	JR .end
 .fileExists:
 	LD IX, ErrFileExists
 	JR .end
-.invFilename:
-	LD IX, ErrInvFileName
+.fileNotFound:
+	LD IX, ErrFileNotFound
 	JR .end
-.invDirname:
-	LD IX, ErrInvDirName
+.tooManyDirs:
+	LD IX, ErrTooManyDirs
+	JR .end
+.noSuchDir:
+	LD IX, ErrNoSuchDir
+	JR .end
+.diskFull:
+	LD IX, ErrDiskFull
+	JR .end
+.noDisk:
+	LD IX, ErrNoDisk
 ; 	JR .end
 .end:
 	CALL writeLn
@@ -950,7 +1105,7 @@ dos_requiredSectors:
 	PUSH AF
 	PUSH BC
 	LD A, 0
-	LD B, 9
+	LD B, 8
 .div:			; divides the number of bytes by sector size
 	SRL D
 	RR E
@@ -972,9 +1127,9 @@ dos_requiredSectors:
 dos_computeSector:
 	PUSH DE
 	DEC A 		; decreasing A by one to account for the directory table sector
-	LD B, 5
+	LD B, 4
 	LD D, 0
-.mul:			; multiply AD by 32, as in 32 file records per sector
+.mul:			; multiply AD by 16, as in 16 file records per sector
 	AND A 		; clear carry
 	RLA			; multiply A by 2
 	RL D		; multiply D by 2
@@ -984,8 +1139,8 @@ dos_computeSector:
 	JR NC, .skip
 	INC D
 .skip:
-	LD B, 5
-.mul2:			; multiply AD by 32, as in 32 sectors per file
+	LD B, 6
+.mul2:			; multiply AD by 64, as in 64 sectors per file
 	AND A 		; clear carry
 	RLA			; multiply A by 2
 	RL D		; multiply D by 2
@@ -1082,13 +1237,14 @@ dos_saveFile:
 cmd_loadFile:
 	CALL str_shift
 	CALL dos_loadFile
-	LD A, (DosErr)
 	CP DOS_OK
 	RET Z
-	CALL dos_getStatusMsg
-	CALL writeLn
-	RET
+	CALL dos_printError
+	RET	
 
+; loads a file from disk
+; file name in IX
+; returns status in A
 dos_loadFile:
 	LD A, (DiskPresent)
 	CP TRUE
@@ -1270,7 +1426,7 @@ dos_fWrite:
 .skip:
 	LD A, B		; restore the byte to be written to A
 	LD HL, (FilePtr)
-	INC HL
+	;INC HL
 	LD BC, FileBuffer
 	ADD HL, BC
 	LD (HL), A

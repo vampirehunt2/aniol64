@@ -1,6 +1,6 @@
 ; apl tokenizer
 
-SpecialChars: defb ".~+-*/\\:=[]()<>{}#&|!@^,;\n\r", 0
+SpecialChars: defb ".~+-*/\\:=[]()<>{}#&|!?@^,;\n\r", 0
 
 
 ;
@@ -33,6 +33,7 @@ CONJUNCTION_T: 	defb "&", 	0
 ALTERNATIVE_T: 	defb "|", 	0
 NOT_T: 			defb "!", 	0
 ADDR_T: 		defb "@", 	0
+INTERROGATION_T defb "?", 	0
 DEREFERENCE_T: 	defb "^", 	0
 INDEX_T:		defb ".", 	0
 STRINDEX_T:		defb "#", 	0
@@ -64,6 +65,7 @@ CONJUNCTION_B 	equ '&'
 ALTERNATIVE_B 	equ '|' 	
 NOT_B 			equ '!' 			
 ADDR_B 			equ '@' 	
+INTERROGATION_B	equ '?'
 DEREFERENCE_B 	equ '^' 	
 INDEX_B			equ '.' 
 STRINDEX_B		equ '#'
@@ -83,12 +85,15 @@ ELSE_B			equ "E"
 ENDIF_B			equ 'e'
 LOOP_B			equ 'L'
 WHILE_B			equ 'W'
+FOR_B			equ 'f'
+NEXT_B 			equ 'N'
 END_B			equ 'D'
 PROC_B			equ 'p'
 RET_B			equ 'R'
 STOP_B			equ 'T'
 ARRAY_B			equ 'A'
 STRING_B		equ 'S'
+SOURCELINE_B	equ 'i'
 NL_B			equ 00h
 
 ; keyword tokens and their corresponding bytecodes
@@ -103,13 +108,17 @@ ELSE_T:		defb "ELSE", 	0, ELSE_B
 ENDIF_T:	defb "ENDIF", 	0, ENDIF_B
 WHILE_T:	defb "WHILE", 	0, WHILE_B
 LOOP_T:		defb "LOOP", 	0, LOOP_B
-FOR_T:		defb "FOR", 	0, 'f'
-NEXT_T:		defb "NEXT", 	0, 'N'
+FOR_T:		defb "FOR", 	0, FOR_B
+NEXT_T:		defb "NEXT", 	0, NEXT_B
 ARRAY_T:	defb "ARR", 	0, ARRAY_B
 RECORD_T:	defb "REC", 	0, ARRAY_B	; records are internally represented identically to arrays.
 STRING_T:	defb "STR", 	0, STRING_B
 STOP_T: 	defb "STOP", 	0, STOP_B
  defb 0
+
+; miscellanous string:
+TRUE_STR: defb "True", 0
+FALSE_STR: defb "False", 0
 
 ; Built-In Functions
 SYS_READ_B		equ 00h
@@ -145,6 +154,32 @@ SYS_FWRITE_B	equ 1Dh
 SYS_DOSERR_B	equ 1Eh
 SYS_EXISTS_B	equ 1Fh
 SYS_TOUCH_B		equ 20h
+SYS_CHDIR_B		equ 21h
+SYS_SIZE_B		equ 22h
+SYS_MKDIR_B		equ 23h
+SYS_RMDIR_B		equ 24h
+SYS_DELETE_B	equ 25h
+SYS_PWD_B		equ 26h
+SYS_EOF_B		equ 27h
+SYS_STARTS_B	equ 28h
+SYS_LIST_B		equ 29h
+SYS_NEXTFILE_B	equ 2Ah
+SYS_LISTDIRS_B	equ 2Bh
+SYS_NEXTDIR_B	equ 2Ch
+SYS_TRIM_B		equ 2Dh
+SYS_TOK_B		equ 2Eh
+SYS_SUBSTR_B	equ 2Fh
+SYS_BANK_B		equ 30h
+SYS_MAXX_B		equ 31h
+SYS_MAXY_B		equ 32h
+SYS_MOVE_B		equ 33h
+SYS_WRITEH_B	equ 34h
+SYS_WRITEB_B	equ 35h
+SYS_CALL_B		equ 36h
+SYS_SHOWCUR_B 	equ 37h
+SYS_HIDECUR_B 	equ 38h
+SYS_KEYPRESSED_B equ 39h
+SYS_ARGS_B		equ 3Ah
 
 BuiltInFunctions:
 
@@ -154,6 +189,8 @@ BuiltInFunctions:
  defb "Get",		0, SYS_GET_B
  defb "Put",		0, SYS_PUT_B
  defb "Delay",		0, SYS_DELAY_B
+ defb "Bank",		0, SYS_BANK_B
+ defb "Call",		0, SYS_CALL_B
 
 ; Console functions
  defb "Read", 		0, SYS_READ_B
@@ -168,6 +205,13 @@ BuiltInFunctions:
  defb "GotoXY",		0, SYS_GOTOXY_B
  defb "ClrScr",		0, SYS_CLRSCR_B
  defb "ReadKey",	0, SYS_READKEY_B
+ defb "MaxX",		0, SYS_MAXX_B
+ defb "MaxY", 		0, SYS_MAXY_B
+ defb "WriteH",		0, SYS_WRITEH_B
+ defb "WriteB",		0, SYS_WRITEB_B
+ defb "ShowCursor", 0, SYS_SHOWCUR_B
+ defb "HideCursor",	0, SYS_HIDECUR_B
+ defb "KeyPressed",	0, SYS_KEYPRESSED_B
 
 ; Math functions:
  defb "Abs", 		0, SYS_ABS_B
@@ -179,6 +223,10 @@ BuiltInFunctions:
  defb "Copy",		0, SYS_COPY_B
  defb "Upper",		0, SYS_UPPER_B
  defb "Lower",		0, SYS_LOWER_B
+ defb "Starts",		0, SYS_STARTS_B
+ defb "Trim", 		0, SYS_TRIM_B
+ defb "Tok",		0, SYS_TOK_B
+ defb "SubStr",		0, SYS_SUBSTR_B
 
 ; DOS functions:
  defb "Open", 		0, SYS_OPEN_B
@@ -187,17 +235,22 @@ BuiltInFunctions:
  defb "Seek", 		0, SYS_SEEK_B
  defb "FRead",		0, SYS_FREAD_B
  defb "FWrite", 	0, SYS_FWRITE_B
-; defb "ChDir", 	0, SYS_CHDIR_B
-; defb "NextFile",0, SYS_NEXTFILE_B
-; defb "NextDir", 0, SYS_NEXTDIR_B
-; defb "Size", 	0, SYS_SIZE_B	
-; defb "MkDir", 	0, SYS_MKDIR_B
-; defb "RmDir", 	0, SYS_RMDIR_B
+ defb "ChDir", 		0, SYS_CHDIR_B
+ defb "Size", 		0, SYS_SIZE_B	
  defb "DosErr", 	0, SYS_DOSERR_B
-; defb "Delete", 	0, SYS_DELETE_B
-; defb "Pwd", 	0, SYS_PWD_B
- defb "Touch", 	0, SYS_TOUCH_B
+ defb "Touch", 		0, SYS_TOUCH_B
  defb "Exists", 	0, SYS_EXISTS_B
+ defb "MkDir", 		0, SYS_MKDIR_B
+ defb "RmDir", 		0, SYS_RMDIR_B
+ defb "Delete", 	0, SYS_DELETE_B
+ defb "Pwd", 		0, SYS_PWD_B
+ defb "Eof",		0, SYS_EOF_B
+ defb "Move",		0, SYS_MOVE_B
+ defb "ListFiles",	0, SYS_LIST_B
+ defb "NextFile",	0, SYS_NEXTFILE_B
+ defb "ListDirs", 	0, SYS_LISTDIRS_B
+ defb "NextDir",	0, SYS_NEXTDIR_B
+ defb "Args", 		0, SYS_ARGS_B
  defb 0
 
 ; 128 variables with names of up to 8 characters, 
@@ -207,24 +260,70 @@ FUNNAMES_SIZE equ 128 * 8
 ; bytecode types
 ; TODO
 
-VarnamePtr	equ PROGRAM_DATA + 00h	; 2 byte pointer into the variable name table
+SourceLine	equ PROGRAM_DATA + 00h	
 ProgramPtr 	equ PROGRAM_DATA + 02h 	; 2 bytes
 IsOperator	equ PROGRAM_DATA + 04h
 IfOrWhile	equ PROGRAM_DATA + 05h
-Token 		equ PROGRAM_DATA + 08h	; 256 bytes for current token
+Token 		equ PROGRAM_DATA + 08h	; 128 bytes for current token. Most tokens are 8 character max, but string literals can be up to 128 bytes
+ForStackPtr	equ PROGRAM_DATA + 88h
+ForStack	equ PROGRAM_DATA + 8Ah
+DebugMode 	equ PROGRAM_DATA + 107h 
+
 Varnames 	equ PROGRAM_DATA + 108h	; need to be aligned to 8 byte boundary
 Funnames    equ PROGRAM_DATA + 108h + VARNAMES_SIZE
 Bytecodes 	equ PROGRAM_DATA + 108h + VARNAMES_SIZE + FUNNAMES_SIZE
 
 
 apl_main:
+	CALL str_shift				; check for parameter of the apl command
+	; check for command line switches:
+	LD A, FALSE
+	LD (DebugMode), A
+	LD A, (IX)
+	CP '-'
+	JR NZ, .cont
+	LD A, (IX + 1)
+	CP 'd'
+	JR NZ, .cont
+	LD A, TRUE
+	LD (DebugMode), A
+	CALL str_tok				; move to the next argument
+	CALL str_shift				; presumably, that's the source file name
+.cont:
+	CALL str_len				; find out if the parameter exists TODO: check for .apl file extension
+	CP 0
+	JR Z, apl_compile			; if not, proceed to compiling the already-loaded file in the file buffer
+	CALL dos_loadFile			; if yes, load the file from disk
+	CP 0						; check return code to confirm the file was loaded successfully
+	JR Z, apl_compile			; if yes, proceed to to compiling the just-loaded file in the file buffer
+	CALL dos_printError			; otherwise print error and quit
+	RET
+; compile the loaded .apl file
+apl_compile:	
+; init the compiler:					
 	LD A, FALSE
 	LD (IsOperator), A
+	LD HL, ForStack
+	LD (ForStackPtr), HL	
+	LD HL, 1
+	LD (SourceLine), HL
 	CALL apl_initIdentifierTabs
 	LD HL, Bytecodes
 	LD (ProgramPtr), HL
 	CALL apl_tokenize
-	; CALL run_main DEBUG ONLY
+; save resulting compiled file	  
+	LD A, (DiskPresent)			; check if disk is present
+	CP TRUE						
+	RET NZ						; if not, do nothing
+	CALL apl_moveFile			; move the bytecodes to the file buffer
+	CALL apl_btcFilename		; change the filename from .apl to .btc
+	LD IX, CurrentFileName		
+	CALL dos_fileExists			; check if the .btc file already exists
+	CP 0
+	JR Z, .save					; if no, just save it
+	CALL dos_rm					; if yes, remove the previous version before saving the new one
+.save:
+	CALL dos_saveFile			; save the .btc file
 	RET
 
 ; fills the identifier tables with all zeroes
@@ -240,7 +339,7 @@ apl_initIdentifierTabs:
 ; moves the tokenised program file from Bytecodes to FilBuffer
 ; and sets the file length
 apl_moveFile:
-	LD HL, ProgramPtr
+	LD HL, (ProgramPtr)
 	LD BC, Bytecodes
 	SUB HL, BC			; output file length in HL
 	PUSH HL
@@ -249,6 +348,82 @@ apl_moveFile:
 	LD HL, Bytecodes
 	LD DE, FileBuffer
 	LDIR				; transfer the output file to the file buffer
+	RET
+
+
+apl_findExtension:
+	LD IX, CurrentFileName
+.loop:
+	LD A, (IX)
+	INC IX
+	CP '.'				; search for the beginning of the
+	JR NZ, .loop
+	RET
+
+apl_btcFilename:
+	CALL apl_findExtension
+	LD (IX + 0), 'b'
+	LD (IX + 1), 't'
+	LD (IX + 2), 'c'
+	RET
+
+apl_symFilename:
+	CALL apl_findExtension
+	LD (IX + 0), 's'
+	LD (IX + 1), 'y'
+	LD (IX + 2), 'm'
+	RET
+
+
+; stores a source line number at (ProgramPtr) and advances the ProgramPtr
+; does noting if source lines are not enabled.
+apl_storeSourceLineNum:
+	LD A, (DebugMode)		; check if source lines are enabled
+	CP TRUE
+	RET NZ					; if not, do nothing
+	LD HL, (ProgramPtr)		; get current program pointer
+	LD A, SOURCELINE_B	
+	LD (HL), A				; store the source line marker
+	INC HL
+	LD A, (SourceLine)
+	LD (HL), A				; and the line number, first the LSB
+	INC HL
+	LD A, (SourceLine + 1)
+	LD (HL), A				; then the MSB
+	INC HL
+	LD (ProgramPtr), HL
+	RET
+
+apl_nextStatement:
+	CALL dos_fPeek
+	CP COMMENT_B
+	JR Z, .loop
+	CP CR
+	JR Z, .loop
+	CP LF
+	JR Z, .loop
+	CALL apl_storeSourceLineNum
+.loop:
+	CALL apl_nextToken
+	LD IX, Token
+	LD A, (IX)
+	CP SEPARATOR_B
+	RET Z
+	CP CR
+	JR Z, .nl
+	CP LF
+	JR Z, .nl
+	CP COMMENT_B
+	JR Z, .nl
+	LD IY, END_T
+	CALL str_cmp
+	CP 0
+	RET Z
+	JR .loop
+.nl:
+	LD HL, (SourceLine)
+	INC HL
+	LD (SourceLine), HL
 	RET
 
 ; reads the next token from the input source code file
@@ -288,18 +463,24 @@ apl_nextToken:
 	CP FALSE
 	JP Z, apl_tokenizeMinus
 	JP NZ, apl_tokenizeDec
-.cont:	
+.cont:
+	CALL apl_isParen
+	CP TRUE
+	JP Z, apl_tokenizeParen
+	;	
 	CALL apl_isSpecialChar
 	CP TRUE
 	JP Z, apl_tokenizeOperator
 	;
-	CALL apl_isBracket
-	CP TRUE
-	JP Z, apl_tokenizeBracket
-	;
 	LD A, B
 	CP '$'
 	JP Z, apl_tokenizeHex
+	;
+	CP 39 ; apostrophe
+	JP Z, apl_tokenizeChar
+	;
+	CP '@'
+	JP Z, apl_tokenizeVarAddr
 	;
 	LD A, B
 	CP '"'
@@ -314,7 +495,7 @@ apl_nextToken:
 apl_tokenize:
 	CALL dos_reset
 .loop:
-	CALL apl_nextToken
+	CALL apl_nextStatement
 	LD IX, Token
 	LD IY, END_T		; TODO: check for end of file
 	CALL str_cmp
@@ -361,8 +542,9 @@ apl_tokenizeLiteral:
 	CALL apl_processBuiltInFunction
 	JR .end
 .var:
-	CALL apl_processVar		; TODO add checking for keywords, constants, system calls, users calls
+	CALL apl_processVar		
 .end:
+	LD B, A				; save the variable bytecode in B, just in case
 	LD A, FALSE
 	LD (IsOperator), A
 	RET
@@ -484,6 +666,30 @@ apl_processDec:
 	CALL apl_processNumber
 	RET
 
+apl_tokenizeVarAddr:
+	LD HL, Token
+	CALL dos_fRead	; reading in the '@' symbol
+	LD (HL), A		; store it in the token
+	INC HL
+	CALL dos_fRead 	; read in the variable
+	LD (HL), A		; store it in the token
+	; TODO incomplete
+	RET
+
+apl_tokenizeChar:
+	LD HL, Token
+	CALL dos_fRead	; reading in the '$' symbol
+	LD (HL), A		; store it in the token
+	INC HL
+	CALL dos_fRead 	; read in the character
+	LD (HL), A		; store it in the token
+	INC HL
+	LD (HL), 0		; store the terminating null-character
+	CALL apl_processChar
+	LD A, FALSE
+	LD (IsOperator), A
+	RET 
+
 apl_tokenizeHex:
 	LD HL, Token
 	CALL dos_fRead	; reading in the '$' symbol
@@ -515,6 +721,20 @@ apl_processHex:
 	CALL apl_processNumber
 	RET
 
+apl_processChar:
+	LD A, NUM_B
+	LD IX, (ProgramPtr)
+	LD (IX), A
+	INC IX
+	LD A, (Token + 1)
+	LD (IX), A
+	INC IX
+	LD A, 0
+	LD (IX), A
+	INC IX
+	LD (ProgramPtr), IX
+	RET
+
 apl_processNumber:
 	LD A, NUM_B
 	LD IX, (ProgramPtr)
@@ -529,19 +749,49 @@ apl_processNumber:
 	LD (ProgramPtr), IX
 	RET
 
-apl_tokenizeBracket:
+apl_tokenizeParen:
 	LD HL, Token
 	CALL dos_fRead
 	LD (HL), A
 	INC HL
 	LD (HL), 0
 	INC HL
-	CALL apl_processBracket
+	CALL apl_processParen
+	CP RIGHT_PAREN_B
+	JR NZ, .oper
 	LD A, FALSE
 	LD (IsOperator), A
 	RET
+.oper:
+	LD A, TRUE
+	LD (IsOperator), A
+	RET
 
-apl_processBracket:
+apl_processParen:
+	CP RIGHT_PAREN_B
+	JR Z, .right
+	JR .cont
+.right:
+	LD HL, (ProgramPtr)
+	DEC HL
+	LD A, (HL)
+	CP LEFT_PAREN_B
+	JR Z, .empty
+	LD A, RIGHT_PAREN_B
+	JR .cont
+.empty:
+	LD HL, (ProgramPtr)
+	LD A, NUM_B
+	LD (HL), A
+	INC HL
+	LD A, 0
+	LD (HL), A
+	INC HL
+	LD (HL), A
+	INC HL
+	LD (ProgramPtr), HL
+	LD A, RIGHT_PAREN_B
+.cont:
 	LD HL, (ProgramPtr)
 	LD (HL), A
 	INC HL
@@ -590,6 +840,12 @@ apl_tokenizeOperator:
 	LD (HL), 0
 	INC HL
 	CALL apl_processOperator
+	CP RIGHT_PAREN_B
+	JR NZ, .oper
+	LD A, FALSE
+	LD (IsOperator), A
+	RET
+.oper:
 	LD A, TRUE
 	LD (IsOperator), A
 	RET
@@ -681,6 +937,10 @@ apl_processKeyword:
 	JR Z, .ifOrwhile
 	CP IF_B
 	JR Z, .ifOrwhile
+	CP FOR_B
+	JP Z, apl_for
+	CP NEXT_B
+	JP Z, apl_next
 	JR .cont
 .ifOrwhile:
 	LD (IfOrWhile), A
@@ -689,6 +949,98 @@ apl_processKeyword:
 	LD (HL), B
 	INC HL
 	LD (ProgramPtr), HL
+	RET
+
+
+; takes the FOR loop index variable from the dedicated stack
+; and constructs a loop incrementation statement
+; i<-i+1
+apl_next:
+	LD HL, (ForStackPtr)
+	DEC HL
+	LD BC, ForStack
+	CALL u16_cmp
+	CP -1
+	JR Z, .syntaxErr	; FOR stack underflow, i.e. one NEXT too many
+	LD D, (HL)
+	LD (ForStackPtr), HL
+	LD HL, (ProgramPtr)
+	LD (HL), D
+	INC HL
+	LD A, ASSIGNMENT_B
+	LD (HL), A
+	INC HL
+	LD (HL), D
+	INC HL
+	LD A, ADD_B
+	LD (HL), A
+	INC HL
+	LD A, NUM_B
+	LD (HL), A
+	INC HL
+	LD A, 1
+	LD (HL), A
+	INC HL
+	LD A, 0
+	LD (HL), A
+	INC HL
+	LD A, SEPARATOR_B
+	LD (HL), A
+	INC HL
+	LD (ProgramPtr), HL
+	CALL apl_storeSourceLineNum
+.skip:
+	LD A, LOOP_B
+	LD (HL), A
+	INC HL
+	LD A, SEPARATOR_B
+	LD (HL), A
+	INC HL
+	LD (ProgramPtr), HL
+	RET
+.syntaxErr:
+	; TODO
+	RET
+
+apl_for:
+	CALL apl_nextToken		; process the variable used as the FOR loop counter, returns it in B
+	LD HL, (ForStackPtr)	; load the For Stack pointer to HL
+	LD (HL), B				; save the variable bytecode
+	INC HL
+	LD (ForStackPtr), HL
+.forloop1:					; processes the FOR loop initialisation statement
+	CALL dos_fPeek			; peek the next character
+	CP COMMA_B				; check if it's a comma
+	JR Z, .forcont			; if so, end of initialisation statement, move on
+	CALL apl_nextToken		; otherwise, process the next token
+	JR .forloop1			; and repeat
+.forcont:
+	LD HL, (ProgramPtr)
+	LD A, SEPARATOR_B		
+	LD (HL), A
+	INC HL
+	LD (ProgramPtr), HL
+	CALL apl_storeSourceLineNum
+.skip:
+	LD A, WHILE_B
+	LD (HL), A
+	INC HL
+	LD (ProgramPtr), HL
+	CALL dos_fRead
+	CP COMMA_B
+	JP NZ, .syntaxErr
+.forloop2:
+	CALL dos_fPeek
+	CP SEPARATOR_B
+	RET Z
+	CP CR
+	RET Z
+	CP LF
+	RET Z
+	CALL apl_nextToken
+	JR .forloop2
+.syntaxErr:
+	; TODO
 	RET
 
 ; adds built-in function bytecodes to the output file 
@@ -719,10 +1071,20 @@ apl_tokenizeComment:
 	JR .loop
 .end:
 	PUSH HL
+	LD HL, (ProgramPtr) 	; check the previous bytecode
+	LD BC, Bytecodes
+	CALL u16_cmp
+	CP 0
+	JR Z, .skip				; avoid leading separators
+	DEC HL
+	LD A, (HL)
+	CP SEPARATOR_B
+	JR Z, .skip				; avoid double separators
 	LD HL, (ProgramPtr)
 	LD (HL), SEPARATOR_B
 	INC HL
 	LD (ProgramPtr), HL
+.skip:
 	POP HL
 	LD (HL), 0
 	INC HL
@@ -872,7 +1234,7 @@ apl_isHexDigit:
 
 ; checks whether the character in B is a bracket
 ; result in A
-apl_isBracket:
+apl_isParen:
 	LD A, B
 	CP '('
 	JR Z, .true
@@ -1101,3 +1463,20 @@ apl_keywordCmp:
 	RET Z
 	LD A, (IX - 1)
 	RET
+
+
+; ####################### Private routines #####################################
+
+; gets the variable address from variable bytecode
+; HL points to the bytecode of the variable
+; returns the address of the variable in memory in HL
+_apl_getVar:
+    INC HL              ; move to the variable bytecode
+    LD A, (HL)          ; load the variable bytecode
+    AND 01111111b       ; get the variable index
+    SLA A               ; multiply it by 2, as numeric variables are 2 bytes long
+    LD C, A
+    LD B, 0
+    LD HL, Vars         
+    ADD HL, BC          ; get the variable address
+    RET

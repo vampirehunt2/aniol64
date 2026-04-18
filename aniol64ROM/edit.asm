@@ -1,5 +1,15 @@
 ; editor
 
+; MAN page for 'edit'
+; Text editor
+; :w (<filename>) - save
+; :k<number> | :8<number> - move up number of lines
+; :n<number> | :2<number> - move down number of lines
+; :d<number> - delete number of lines
+; :h - home
+; :e - go to end of file
+
+
 FileLine		equ PROGRAM_DATA + 00h	; 2 bytes
 ScreenLine		equ PROGRAM_DATA + 02h
 StartLine		equ PROGRAM_DATA + 03h	; 2 bytes, line of the file from which the screen starts
@@ -24,7 +34,13 @@ ed_main:
 	CP 0
 	JR Z, .newFile
 .loadFile:
+    CALL dos_fileExists
+    JR NZ, .load
+    CALL dos_touch
+    JR .cont
+.load:
 	CALL dos_loadFile
+.cont:
 	LD A, (DosErr)
 	CP DOS_OK
 	JR NZ, .error
@@ -35,14 +51,19 @@ ed_main:
 	JR .loop
 .newFile:
 	CALL ed_newFile
-	JR .loop
+	JR .loop            // TODO redundant
 .loop:
 	CALL ed_showPage
 	LD B, 0
 	LD C, MAX_Y
 	CALL gotoXY
-	LD IX, Blank
-	CALL writeStr
+	LD A, ' '
+    LD B, MAX_X
+.loop1:             ; blank out the input line
+    CALL putChar
+    DJNZ .loop1
+    LD B, 0
+	LD C, MAX_Y
 	CALL gotoXY
 	CALL readLine
 	LD IX, LineBuff
@@ -68,7 +89,7 @@ ed_init:
 	LD (CursorLine), A
 	LD HL, FileBuffer
 	LD (CursorAddr), HL
-	CALL clrScr
+	CALL clrScr             ; TODO redundant?
 	POP HL
 	RET
 
@@ -108,7 +129,10 @@ ed_processCmds:
 	RET
 .esc:
 	LD A, FALSE
+    PUSH IX
+    POP IY
 	INC IX	; escaping the colon (replace two colons with one)
+    CALL str_copy
 	RET
 .exit:
 	POP IX	; jumping one routine level up (EVIL)

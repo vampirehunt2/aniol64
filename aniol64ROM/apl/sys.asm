@@ -2,6 +2,8 @@
 
 ParseError:     defb "Parse error", 0
 
+; #################### Console functions ########################
+
 
 ; Writes a decimal number to screen
 ; procedure
@@ -9,18 +11,43 @@ ParseError:     defb "Parse error", 0
 sys_write:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD HL, (Expression + 1)
     LD IX, LineBuff 
     CALL i16_formatDec
     CALL trimDec
     CALL writeStr
     RET
-.syntaxErr:
-    ; TODO
+
+
+sys_writeh:
+    CALL run_evaluate
+    CP 0
+    JP NZ, run_syntaxError
+    LD HL, (Expression + 1)
+    LD IX, LineBuff 
+    CALL u16_formatHex
+    CALL writeStr
     RET
 
-; TODO: add a second argument for max string length
+sys_writeb:
+    CALL run_evaluate
+    CP 0
+    JP NZ, run_syntaxError
+    LD A, (Expression + 1)
+    CP 0
+    JR NZ, .true
+    LD A, (Expression + 2)
+    CP 0
+    JR NZ, .true
+    LD IX, FALSE_STR
+    JR .cont
+.true:
+    LD IX, TRUE_STR
+.cont:
+    CALL writeStr
+    RET
+
 ; reads a line of text from the keyboard into a variable
 ; procedure
 ; syntax: ReadS <Variable>
@@ -29,8 +56,7 @@ sys_readString:
     CALL readLine
     LD IX, LineBuff
     CALL nextLine
-    INC HL              ; move to the variable bytecode
-    CALL run_getVar     ; get variable to which to read the string 
+    CALL _apl_getVar    ; get variable to which to read the string 
     LD C, (HL)          ; put the value of the variable...
     INC HL              ; ... (i.e. address of the string)...            
     LD B, (HL)          ; ...in BC  
@@ -63,8 +89,7 @@ sys_read:
     LD D, H             ; store the read value in DE for safekeeping
     LD E, L
     POP HL              ; restore the pointer into the statement bytecode from the stack
-    INC HL              ; move to the variable 
-    CALL run_getVar
+    CALL _apl_getVar
     LD (HL), DE
     RET
 .parseErr:
@@ -72,19 +97,6 @@ sys_read:
     LD IX, ParseError
     CALL writeLn
     JR sys_read
-
-; gets the variable address from variable bytecode
-; HL points to the bytecode of the variable
-; returns the address of the variable in memory in HL
-run_getVar:
-    LD A, (HL)          ; load the variable bytecode
-    AND 01111111b       ; get the variable index
-    SLA A               ; multiply it by 2, as numeric variables are 2 bytes long
-    LD C, A
-    LD B, 0
-    LD HL, Vars         
-    ADD HL, BC          ; get the variable address
-    RET
 
 ; Makes a beep sound on the system speaker
 ; procedure
@@ -107,6 +119,110 @@ sys_nextLn:
     CALL nextLine
     RET
 
+; Returns the maximum horizontal position of a character on screen (Screen width minus 1)
+; function
+; syntax: MaxX()
+sys_maxX:
+    LD L, MAX_X
+    LD H, 0
+    RET
+
+; Returns the maximum vertical position of a character on screen (Screen height minus 1)
+; function
+; syntax: MaxY()
+sys_maxY:
+    LD L, MAX_Y
+    LD H, 0
+    RET
+
+; moves the cursor to the given screen coordinates
+; procedure
+; syntax: GotoXY <Expression>, <Expression>
+; argument1: Column (8bit)
+; argument2: Row (8bit)
+sys_gotoxy:
+    CALL run_evaluate           ; evaluate the X coefficient
+    CP 0                        ; check if a valid expression
+    JP NZ, run_syntaxError      ; if not, report error
+    LD A, (Expression + 1)      ; load the X coefficient to B...
+    LD B, A                     ; ...ignoring the higher byte
+    CALL run_evaluate           ; evaluate the Y coefficient
+    CP 0                        ; check if a valid expression
+    JP NZ, run_syntaxError      ; if not, report error
+    LD A, (Expression + 1)      ; load the Y coefficient to C...
+    LD C, A                     ; ...ignoring the higher byte
+    call gotoXY
+    RET
+
+; puts a character on the screen
+; procedure
+; syntax: PutChar <Expression>
+; argument1: character to print (8bit)
+sys_putChar:
+    CALL run_evaluate           ; evaluate the character
+    CP 0                        ; check if a valid expression
+    JP NZ, run_syntaxError      ; if not, report error
+    LD A, (Expression + 1)      ; load the character ASCII code to A
+    call putChar
+    RET
+
+sys_getChar:
+    ; ignores the parameter
+    CALL getChar
+    LD L, A
+    LD H, 0
+    RET
+
+sys_readKey:
+    ; ignores the parameter
+    CALL readKey
+    LD L, A
+    LD H, 0
+    RET
+
+; clear the screen
+; procedure
+; syntax: ClrScr
+sys_clrScr:
+    CALL clrScr
+    CALL home
+    RET
+
+; show the cursor
+; procedure
+; syntax: ShowCursor
+sys_showCursor:
+    CALL cursorOn
+    RET
+
+; hide the cursor
+; procedure
+; syntax: HideCursor
+sys_hideCursor:
+    CALL cursorOff
+    RET
+
+sys_keyPressed:
+    CALL keyPressed
+    JR Z, .no
+    LD H, TRUE
+    LD L, TRUE
+    RET
+.no:
+    LD H, FALSE
+    LD L, FALSE
+    RET
+
+; Returns a string correspomding to the command line arguments of the program
+; the string is only valid until the first call of ReadLine
+; function
+; syntax: Args()
+;sys_args:
+    ;LD HL, (Args)
+;    RET
+
+; #################### Math functions ########################
+
 ; Returns absolute value of an expression
 ; function
 ; syntax: Abs(<Expression>)
@@ -124,24 +240,47 @@ sys_rnd:
     LD L, A
     RET
 
+
+; #################### Miscallenous functions ########################
+
 ; Stops the program execution for approximately (argument * 10ms)
 ; procedue
 ; syntax: Delay <Expression>
 sys_delay:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD A, (Expression + 1)  ; only use the lower bit of the argument
     CALL delay
     RET
-.syntaxErr:
-    ; TODO
+
+
+; switches the memory bank in the top 16k of memory
+; procedure
+; syntax: Bank <Expression>
+; argument1: number of the bank to switch in
+sys_switchBank:
+    CALL run_evaluate
+    CP 0
+    JP NZ, run_syntaxError
+    LD A, L
+    CALL mem_switchBank
+    RET
+
+; Calls a machine code procedure
+; function
+; syntax: Call(<Expression>)
+; argument1: the address of the procedure
+; returns whatever value the machine code procedure left in the HL register.
+sys_call:
+    CALL _sys_jumpTo
     RET
 
 ; 8-bit peek of a memory location pointed to by the argument
 ; function
 ; syntax: Peek(<Expression>)
 ; argument1: Address (16bit)
+; returns a value from the memory address passed as parameter. Lower 8-bits are significant, upper 8-bits are 0. 
 sys_peek:
     PUSH IX
     PUSH HL
@@ -151,7 +290,6 @@ sys_peek:
     POP IX
     RET
 
-
 ; 8-bit poke
 ; procedure
 ; syntax: Poke <Expression>, <Expression>
@@ -160,53 +298,26 @@ sys_peek:
 sys_poke:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD IY, (Expression + 1)
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD A, (Expression + 1)      ; load lower byte of the expression, ignore the higher byte
     LD (IY), A
     RET
-.syntaxErr:
-    ; TODO
-    RET
 
-; moves the cursor to the given screen coordinates
-; procedure
-; syntax: GotoXY <Expression>, <Expression>
-; argument1: Column (8bit)
-; argument2: Row (8bit)
-sys_gotoxy:
-    CALL run_evaluate           ; evaluate the X coefficient
-    CP 0                        ; check if a valid expression
-    JR NZ, .syntaxErr           ; if not, report error
-    LD A, (Expression + 1)      ; load the X coefficient to B...
-    LD B, A                     ; ...ignoring the higher byte
-    CALL run_evaluate           ; evaluate the Y coefficient
-    CP 0                        ; check if a valid expression
-    JR NZ, .syntaxErr           ; if not, report error
-    LD A, (Expression + 1)      ; load the Y coefficient to C...
-    LD C, A                     ; ...ignoring the higher byte
-    call gotoXY
-    RET
-.syntaxErr:
-    ; TODO
-    RET
-
-; puts a character on the screen
-; procedure
-; syntax: PutChar <Expression>
-; argument1: character to print (8bit)
-sys_putChar:
-    CALL run_evaluate           ; evaluate the character
-    CP 0                        ; check if a valid expression
-    JR NZ, .syntaxErr           ; if not, report error
-    LD A, (Expression + 1)      ; load the character ASCII code to A
-    call putChar
-    RET
-.syntaxErr:
-    ; TODO
+; one-byte get
+; port number is one byte, passed in L
+; function
+; syntax Get(<Expression>)
+; argument1: port number
+; returns: a byte read from the port
+sys_get:
+    LD C, L
+    IN A, (C)
+    LD L, A
+    LD H, 0
     RET
 
 ; Writes a byte to a port
@@ -217,37 +328,36 @@ sys_putChar:
 sys_put:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD A, (Expression + 1)      ; load lower byte of the expression, ignore the higher byte
     LD C, A
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD A, (Expression + 1)      ; load lower byte of the expression, ignore the higher byte
     OUT (C), A
     RET
-.syntaxErr:
-    ; TODO
-    RET
+
+
+; #################### String functions ########################
 
 ; TODO incomplete
 sys_startsWith:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
-    LD IX, (Expression + 1)      
+    JP NZ, run_syntaxError
+    LD IY, (Expression + 1)      
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
-    LD IY, (Expression + 1)      
+    JP NZ, run_syntaxError
+    LD IX, (Expression + 1)      
     CALL str_startsWith
-    CP TRUE
-    JR .true
-.true:
-    ; TODO
-    RET
-.syntaxErr:
-    ; TODO
+    PUSH AF
+    CALL _apl_getVar
+    POP AF
+    LD (HL), A
+    INC HL
+    LD (HL), A
     RET
     
 ; Writes a string to the screen
@@ -257,37 +367,32 @@ sys_startsWith:
 sys_writeString:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD IX, (Expression + 1)
     CALL writeStr
-    RET
-.syntaxErr:
-    ; TODO
     RET
 
 sys_upper:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD IX, (Expression + 1)
     CALL str_toUpper
-    RET
-.syntaxErr:
-    ; TODO
     RET
 
 sys_lower:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
     LD IX, (Expression + 1)
     CALL str_toLower
     RET
-.syntaxErr:
-    ; TODO
-    RET
 
 ; returns the length of a string
+; function
+; syntax Len(<Expression>)
+; argument1: the string
+; returns the length of the string, not including the terminating zero
 sys_len:
     PUSH IX
     PUSH HL
@@ -298,54 +403,120 @@ sys_len:
     POP IX
     RET
 
-sys_cmp:
-    RET
-
-sys_copy:
+; removes trailing spaces from a string
+; does not change the string address
+; procedure
+; syntax: Trim <Expression>
+; argument1: string to trim
+sys_trim:
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
+    LD IX, (Expression + 1)
+    CALL str_rtrim
+    RET
+
+
+; tokenizes a string
+; modifies the input string to end at the end of the first token 
+; function
+; syntax: Tok(<Expression>)
+; argument1: string to tokenise
+; returns: a pointer to the beginning of the second token of the input string
+sys_tok:
+    PUSH HL
+    POP IX
+    CALL str_tok
+    RET
+
+; produces a substring from a string.
+; note that the input string gets modified.
+; procedure
+; syntax: SubStr <Expression>, <Expression>, <Expression>, <Variable>
+; argument1: input string
+; argument2: starting index. If larger than the length of the input string, an empty string is returned
+; argument3: maximum length of the substring. If starting index + maximum length 
+;            are larger than the length of the input string
+;            the output string is truncated at the end of the input string
+; argument4: output variable 
+sys_subStr:
+    CALL run_evaluate
+    CP 0
+    JP NZ, run_syntaxError
+    LD IX, (Expression + 1)
+    PUSH IX
+    CALL run_evaluate
+    CP 0
+    JP NZ, run_syntaxError
+    LD A, (Expression + 1)
+    LD B, A
+    CALL run_evaluate
+    CP 0
+    JP NZ, run_syntaxError
+    LD A, (Expression + 1)
+    LD C, A
+    POP IX
+    CALL str_sub
+    PUSH IX
+    CALL _apl_getVar
+    POP BC
+    LD (HL), C          
+    INC HL                      
+    LD (HL), B          
+    RET
+
+; compares two strings
+; procedure
+; syntax: Cmp <Expression>, <Expression>, <Variable>
+; argument1: first string to compare
+; argument2: second string to compare
+; argument3: a variable in which the result is stored
+; the result is a boolean value
+sys_cmp:
+    CALL run_evaluate
+    CP 0
+    JP NZ, run_syntaxError
     LD IY, (Expression + 1)      
     CALL run_evaluate
     CP 0
-    JR NZ, .syntaxErr
+    JP NZ, run_syntaxError
+    LD IX, (Expression + 1)
+    CALL str_cmp
+    PUSH AF
+    CALL _apl_getVar
+    POP AF
+    CP 0
+    JR Z, .equal
+    LD (HL), FALSE
+    INC HL
+    LD (HL), FALSE
+    RET
+.equal:
+    LD (HL), TRUE
+    INC HL
+    LD (HL), TRUE
+.end:
+    RET
+
+    
+; copies a string to a buffer
+; procedure
+; syntax: Copy <Expression>, <Expression>
+; argument1: target buffer address
+; argument2: source string
+sys_copy:
+    CALL run_evaluate
+    CP 0
+    JP NZ, run_syntaxError
+    LD IY, (Expression + 1)      
+    CALL run_evaluate
+    CP 0
+    JP NZ, run_syntaxError
     LD IX, (Expression + 1)
     CALL str_copy
     RET
-.syntaxErr:
-    ; TODO
-    RET
 
-sys_getChar:
-    ; ignores the parameter
-    CALL getChar
-    LD L, A
-    LD H, 0
-    RET
 
-// TODO: idea - make the parameter specify if this call is supposed to bt sycnhronous
-sys_readKey:
-    ; ignores the parameter
-    CALL readKey
-    LD L, A
-    LD H, 0
-    RET
-
-; one-byte get
-; port number is one byte, passed in L
-sys_get:
-    LD C, L
-    IN A, (C)
-    LD L, A
-    LD H, 0
-    RET
-
-; clear the screen
-; syntax: ClrScr
-sys_clrScr:
-    CALL clrScr
-    CALL home
-    RET
 
 ; #################### DOS functions ########################
 
@@ -353,22 +524,15 @@ sys_clrScr:
 ; function
 ; syntax: Open(<Expression>)
 ; argument1: filename
-; returns: 0000h in case of error, FFFFh in case of success
+; returns True if the operation is successful and False when there's an error.
+; in the latter case, it sets DosErr
 sys_open:  
     PUSH HL                     
     POP IX                      ; transfer file name pointer to IX
 	CALL dos_loadFile           ; load the file
-	LD A, (DosErr)             ; check if loading was successful
-    CP 0
-    JR NZ, .err
-    LD H, TRUE
-    LD L, TRUE
-    RET
-.err:
-    LD H, FALSE
-    LD L, FALSE
-    RET
+	JP _sys_return
 
+    
 ; Returns the DOS error status
 ; Error code or 0 for no error
 ; function
@@ -384,22 +548,25 @@ sys_dosError:
     LD (DosErr), A
     RET
 
-
 ; Save a file to disk
 ; procedure
 ; syntax: Save
 sys_save:
     LD IX, Filename             ; transfer file name pointer to IX
     CALL dos_saveFile
-    LD A, (DosErr)              ; check if loading was successful
-	CP DOS_OK
-	RET Z
-.ioErr:
-    ; TODO I/O error handling
-    RET                         ; otherwise drop through to the IO error handling
-.syntaxErr:
-    ; TODO
-    RET
+    JP _sys_return
+
+sys_move:
+    CALL run_evaluate           ; evaluate the file name
+    CP 0
+    JP NZ, run_syntaxError
+    LD IY, (Expression + 1)      
+    CALL run_evaluate           ; evaluate the directory name
+    CP 0
+    JP NZ, run_syntaxError
+    LD IX, (Expression + 1)
+    CALL dos_mv
+    JP _sys_return
 
 ; Restart reading/writing the file from the first byte
 ; procedure
@@ -415,12 +582,11 @@ sys_reset:
 sys_seek:
     CALL run_evaluate       ; evaluate the new file pointer
     CP 0
-    JR NZ, .syntaxErr 
+    JP NZ, run_syntaxError    
+    LD HL, (Expression + 1)   
     CALL dos_seek
     RET
-.syntaxErr:
-    ; TODO  
-    RET
+
 
 ; Reads a byte from file
 ; and advances the file pointer
@@ -430,14 +596,12 @@ sys_seek:
 ; L will contain the value read
 ; H is 0
 sys_fread:
-    INC HL              ; move to the variable bytecode
-    CALL run_getVar     ; get the address of the variable in memory
+    CALL _apl_getVar     ; get the address of the variable in memory
     CALL dos_fRead      ; read from the file
     LD (HL), A          ; transfer the result of the read into the lower byte of the variable
     INC HL
     LD (HL), 0          ; zero-out the higher byte of the variable
     RET
-
 
 ; Writes a byte to a file
 ; and advances the file pointer
@@ -449,13 +613,11 @@ sys_fread:
 sys_fwrite:
     CALL run_evaluate       ; evaluate the expression to be written
     CP 0
-    JR NZ, .syntaxErr 
+    JP NZ, run_syntaxError 
     LD A, L
     CALL dos_fWrite
     RET
-.syntaxErr:
-    ; TODO  
-    RET
+
 
 ; Indicates whether a file exists
 ; function
@@ -476,11 +638,202 @@ sys_exists:
     LD L, FALSE
     RET
 
+; returns the size of the currently opened file
+; function
+; syntax: Size()
+sys_size:
+    ; ignore the parameter
+    LD HL, (CurrentFileSize)
+    RET
 
+; creates a new directory
+; function
+; syntax: MkDir(<Expression>)
+; argument1: directory name
+; returns True if the operation is successful and False when there's an error.
+; in the latter case, it sets DosErr
+sys_mkdir:
+    PUSH HL
+    POP IX
+    CALL dos_mkDir
+    JP _sys_return
+
+; deletes a directory
+; function
+; syntax: RmDir(<Expression>)
+; argument1: directory name
+; returns True if the operation is successful and False when there's an error.
+; in the latter case, it sets DosErr
+sys_rmdir:
+    PUSH HL
+    POP IX
+    CALL dos_rmDir
+    JP _sys_return
+
+; deletes a file
+; function
+; syntax: Delete(<Expression>)
+; argument1: file name
+; returns True if the operation is successful and False when there's an error.
+; in the latter case, it sets DosErr
+sys_rm:
+    PUSH HL
+    POP IX              ; transfer file name pointer to IX
+    CALL dos_rm
+    JP _sys_return
+
+; creates an empty file
+; function
+; syntax: Touch(<Expression>)
+; argument1: file name
+; returns True if the operation is successful and False when there's an error.
+; in the latter case, it sets DosErr
 sys_touch:
     PUSH HL
     POP IX              ; transfer file name pointer to IX
     CALL dos_touch
+    JP _sys_return
+
+; changes the current directory
+; function
+; syntax: ChDir(<Expression>)
+; argument1: directory name
+; returns True if the operation is successful and False when there's an error.
+; in the latter case, it sets DosErr
+sys_chdir:
+    PUSH HL
+    POP IX
+    CALL dos_cd
+    JP _sys_return
+
+; returns the current directory
+; note, the value is only valid until the next I/O operation
+; if it's supposed to be persisted, it needs to be copied over to a safe buffer
+; function
+; syntax: Pwd()
+sys_pwd:
+    ; ignore the parameter
+    LD HL, CurrentPath
+    RET
+
+; indicates whether end of file has been reached
+; function
+; syntax: Eof()
+; returns a boolean value
+sys_eof:
+    ; ignore the parameter
+    LD HL, (CurrentFileSize)
+    DEC HL
+    LD BC, (FilePtr)
+    CALL i16_cmp
+    CP -1
+    JR Z, .yes
+    LD H, FALSE
+    LD L, FALSE
+    RET
+.yes:
+    LD H, TRUE
+    LD L, TRUE
+    RET
+
+; resets the file listig process
+; procedure
+; syntax: List
+sys_listFiles:
+    LD A, 00h
+    LD (FileIndex), A
+    LD A, 01h		    ; the first sector of the file table. Counting sectors in A
+    LD (FileSector), A
+    CALL dos_loadFileTabSector
+    LD HL, SectorBuffer
+    LD (FileSecPtr), HL
+    RET
+
+; resets the directory listig process
+; procedure
+; syntax: ListDirs
+sys_listDirs:
+    LD A, 00h
+    LD (FileIndex), A
+    LD HL, SectorBuffer
+    LD (FileSecPtr), HL
+    CALL dos_loadDirs
+    RET
+
+; returns the name of the next file from the filesystem
+; if the last available file has been reached, returns a null string
+; note, the value is only valid until the next I/O operation
+; if it's supposed to be persisted, it needs to be copied over to a safe buffer
+; function
+; syntax NextFile()
+sys_nextFile:
+    ; ignore the parameter
+	LD A, (FileIndex)           ; load the current index into the file table sector
+    INC A
+    LD (FileIndex), A
+    CP FILE_RECORDS_PER_SECTOR  ; check if this is the last file record in the sector
+    JR NZ, .cont                ; if not, move on...
+    ;                           ... if yes, try load the next sector of the file table
+    LD A, (FileSector)          ; load the current file table sector number
+    INC A                       ; increment the file table sector number
+    LD (FileSector), A
+    CP FILE_TABLE_SECTORS       ; check if last file table sector reached
+    JR NZ, .load                ; if not,load the next sector
+    LD HL, 0                    ; if yes, return an null string to indicate end of file table
+    RET
+.load:   
+    CALL dos_loadFileTabSector
+    LD A, 0
+    LD (FileIndex), A
+    LD HL, SectorBuffer
+    LD (FileSecPtr), HL
+.cont:
+    LD HL, (FileSecPtr)
+    PUSH HL
+    LD B, 0
+    LD C, FILE_RECORD_SIZE
+    ADD HL, BC
+    LD (FileSecPtr), HL
+    POP HL
+    LD A, (HL)                  ; check if there is a non-empty file name 
+    CP 0                        ; at the beginning of the file record
+    RET NZ                      ; if there is, return it in HL
+    JR sys_nextFile             ; if not, try with the next file record
+	RET
+
+; returns the name of the next directory from the filesystem
+; if the last available directory has been reached, returns a null string
+; note, the value is only valid until the next I/O operation
+; if it's supposed to be persisted, it needs to be copied over to a safe buffer
+; function
+; syntax NextDir()
+sys_nextDir:
+    LD A, (FileIndex)
+    INC A
+    CP MAX_DIRS
+    JR Z, .end
+    LD (FileIndex), A
+    LD HL, (FileSecPtr)
+    LD C, MAX_DIRNAME_LEN
+    LD B, 0
+    ADD HL, BC
+    LD (FileSecPtr), HL
+    LD A, (HL)
+    CP 0
+    JR Z, sys_nextDir
+    RET
+.end:
+    LD HL, 0
+    RET
+
+
+; ####################### Private routines #####################################
+
+; return the status of the last I/O operation in HL
+; true if the operation was successful
+; false is the operation was not successful
+; input: DOS error code in A
+_sys_return:
     CP DOS_OK
     JR NZ, .err
     LD H, TRUE
@@ -491,11 +844,5 @@ sys_touch:
     LD L, FALSE
     RET
 
-
-
-sys_chdir:  // TODO incomplete
-    CALL dos_cd
-    RET
-
-sys_mkdir:
-    RET
+_sys_jumpTo:
+    JP (HL)

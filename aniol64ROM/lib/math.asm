@@ -133,6 +133,7 @@ i16_neg:
 ; returns the logical negation of a 16-bit value
 ; argument in HL
 ; result in HL
+; destroys A
 i16_not:
         LD A, H    ; inverting all the bits
         XOR 0FFh
@@ -206,7 +207,6 @@ i16_cmp:
 ; division result in DE
 ; mod result in HL
 ; errors reported in A
-
 u16_div:
         LD A, B    ; checking if it's not a division by zero
         CP 0
@@ -395,17 +395,28 @@ u8_mul:
 ; result in C
 ; rest in A
 u8_div:
-		LD C, 0
+	LD C, 0
 .loop:
-		CP B
-		JR C, .end
-		SUB B
-		INC C
-		JP .loop
+	CP B
+	JR C, .end
+	SUB B
+	INC C
+	JP .loop
 .end:
-		RET
+	RET
 
-
+u16_boolenise:
+        LD A, H
+        CP 0
+        JR NZ, .true
+        LD A, L
+        CP 0
+        JR NZ, .true
+        RET
+.true:
+        LD H, 0FFh
+        LD L, 0FFh
+        RET
 
 i16_parseDec:
 	LD A, (IX)
@@ -413,7 +424,9 @@ i16_parseDec:
 	JR NZ, .pos
 	INC IX		; move past the minus sign
 	CALL u16_parseDec ; parse the absolute value of the number
+        PUSH AF
 	CALL i16_neg
+        POP AF
 	RET
 .pos:
 	CALL u16_parseDec  
@@ -448,7 +461,6 @@ u16_parseBin:
 ; errors reported in A
 ; in case of errors, address of first erroneous character is in IX
 ; destroys IX
-
 u16_parseDec:
         PUSH BC
         LD HL, 0   ; will be accumulating the value in HL
@@ -565,19 +577,19 @@ i16_formatDec:
 
 
 u16_formatHex:
-		LD (IX), '$'
-		LD A, H
-		CALL byte2asc
-		LD (IX + 2), A
-		LD A, B
-		LD (IX + 1), A
-		LD A, L
-		CALL byte2asc
-		LD (IX + 4), A
-		LD A, B
-		LD (IX + 3), A
-		LD A, 0
-		LD (IX + 5), A
+	LD (IX), '$'
+	LD A, H
+	CALL byte2asc
+	LD (IX + 2), A
+	LD A, B
+	LD (IX + 1), A
+	LD A, L
+	CALL byte2asc
+	LD (IX + 4), A
+	LD A, B
+	LD (IX + 3), A
+	LD A, 0
+	LD (IX + 5), A
         RET
 
 

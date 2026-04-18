@@ -19,6 +19,10 @@ DataSeg         equ PROGRAM_DATA + 14h
 ProcAddr        equ PROGRAM_DATA + 16h
 ArrIndex        equ PROGRAM_DATA + 18h
 ArrAddr         equ PROGRAM_DATA + 1Ah
+FileSector 	    equ PROGRAM_DATA + 1Ch
+FileIndex       equ PROGRAM_DATA + 1Dh
+FileSecPtr	    equ PROGRAM_DATA + 1Eh	; 2 byte pointer into the file list sector
+CurrSourceLine  equ PROGRAM_DATA + 20
 RunStack        equ 8240h   
 Expression      equ 8280h
 Vars            equ 8300h
@@ -26,15 +30,18 @@ Procedures      equ 8400h
 
 
 run_debug:
-    CALL apl_main
-    CALL run_main
+    CALL apl_compile
+    CALL run_execute
     RET
 
 ; initialises the apl interpreter
 run_init:
     CALL run_findProcedures
+    LD HL, 0
+    LD (CurrSourceLine), HL
     LD HL, Bytecodes
-    LD (StmtStart), HL      ; initilise the line pointer to the beginning of the program
+    LD (StmtStart), HL          ; initilise the line pointer to the beginning of the program
+    CALL run_skipLineMarker
     LD HL, RunStack            ; initialise the soft stack
     LD (StackPtr), HL
     LD HL, (ProgramPtr)
@@ -79,9 +86,40 @@ run_findProcedures:
 
 run_syntaxError:
     LD SP, (Trap)
+    LD IX, SyntaxError
+    CALL writeStr
+    CALL nextLine
+    LD HL, (CurrSourceLine)      ; check if source lines are included in the executable
+    LD A, H
+    OR A, L
+    CP 0
+    JR Z, .addr                 ; if not, print the address of the statement
+    LD IX, LineBuff             ; print the source line number
+    CALL u16_formatDec
+    CALL writeStr
+    RET
+.addr:
+    LD HL, (StmtStart)          ; print the statement address
+    LD IX, LineBuff 
+    CALL u16_formatHex            
     RET
 
 run_main:
+	CALL str_shift				; check for parameter of the run command
+	CALL str_len				; find out if the parameter exists TODO: check for .btc file extension
+	CP 0
+	JR Z, run_execute			; if not, proceed to running the already-loaded file at the Bytecodes address
+	CALL dos_loadFile			; if yes, load the file from disk
+	CP 0						; check return code to confirm the file was loaded successfully
+	JR Z, .copy					; if yes, proceed to to running the just-loaded file at the Bytecodes address
+	CALL dos_printError			; otherwise print error and quit
+	RET
+.copy:                          ; copy the loaded file from the file buffer to the Bytecodes address
+    LD HL, FileBuffer
+    LD DE, Bytecodes
+    LD BC, (CurrentFileSize)
+    LDIR
+run_execute:
     CALL run_init
     LD (Trap), SP
 .loop:
@@ -99,12 +137,21 @@ run_main:
 ; FALSE returned in A if end of program is reached
 run_findStmtEnd:
     LD HL, (StmtStart)
-.loop:
-    INC HL 
     LD A, (HL)
+    CP SEPARATOR_B      ; check if statement starts with a stray separator
+    JR NZ, .cont:       ; if not, just proceed as normal
+    INC HL
+    LD (StmtStart), HL  ; if yes, skip over the stray separator
+.cont:
+    LD A, (HL) 
+    CP END_B          ; END bytecode
+    JR Z, .notFound
+.loop:
+    INC HL
+    LD A, (HL) 
     CP SEPARATOR_B
     JR Z, .found:
-    CP 'D'          ; END token
+    CP END_B          ; END bytecode
     JR Z, .notFound
     JR .loop
 .found:
@@ -119,7 +166,24 @@ run_nextStmt:
     LD HL, (StmtEnd)
     INC HL
     LD (StmtStart), HL
+    CALL run_skipLineMarker
+.cont:
     CALL run_findStmtEnd
+    RET
+
+
+run_skipLineMarker:
+    LD A, (HL)
+    CP SOURCELINE_B         ; is it a line number marker?
+    RET NZ                  ; if not, carry on
+    INC HL                  ; if yes, skip it
+    LD A, (HL)
+    LD (CurrSourceLine), A
+    INC HL                  ; and skip the line number itself
+    LD A, (HL)
+    LD (CurrSourceLine + 1), A
+    INC HL
+    LD (StmtStart), HL      ; set the new statement start
     RET
 
 ; executes the current statement
@@ -150,7 +214,11 @@ run_execStmt:
     JP Z, run_declareArray
     CP STRING_B
     JP Z, run_declareString
-    ; TODO: handle unrecognised token
+    CP ENDIF_B
+    RET Z
+    CP SEPARATOR_B
+    RET Z
+    JP run_syntaxError
 
 ; moves HL to the next bytecode
 run_nextBC:
@@ -174,6 +242,7 @@ run_nextBC:
 ; evaluates an expression
 ; assuming HL is pointing to the byte before the expression
 run_evaluate:   
+    PUSH BC
     LD IX, Expression
     INC HL              ; assuming HL is pointing to the byte before the expression
 .loop:                  ; this loop copies the expression to Expression, evaluating all the variables in the process
@@ -262,7 +331,7 @@ run_evaluate:
 .evalloop:
     LD A, FALSE
     LD (EvalProgress), A
-    CALL run_sanitiseParens
+    CALL run_sanitiseParens ; the order of these lines controls the order of operations when evaluating an expression 
     CALL run_evalFunction
     CALL run_evalIndex
     CALL run_evalStrIndex
@@ -283,11 +352,13 @@ run_evaluate:
     JR NZ, .syntaxErr
     LD A, 0
     POP HL              ; restore the end of the current expression to HL
+    POP BC
     RET                 ; success
-.syntaxErr:             ; TODO: handle the syntax error
+.syntaxErr:             
     LD A, 1             
     POP HL
-    RET
+    POP BC
+    JP run_syntaxError
 
 
 ; removes redundant parenthesis from Expression
@@ -418,6 +489,8 @@ run_evalUnary:
     JR Z, .addr
     CP DEREFERENCE_B
     JR Z, .der
+    CP INTERROGATION_B
+    JR Z, .int
 .not:                   ; perform bitwise negation
     CALL i16_not
     JR .cont
@@ -426,6 +499,9 @@ run_evalUnary:
     JR .cont
 .addr:                   
    ; TODO
+    JR .cont
+.int:
+    CALL u16_boolenise
     JR .cont
 .der:                   ; perform dereference
     LD C, (HL)
@@ -855,6 +931,8 @@ run_isUnaryOperator:
     JR Z, .true
     CP MINUS_B
     JR Z, .true
+    CP INTERROGATION_B
+    JR Z, .true
     LD A, FALSE
     RET 
 .true:
@@ -926,7 +1004,7 @@ run_execAssignment:
     LD (HL), A
     RET
 .syntaxError:
-    ; TODO raise syntax error
+    JP run_syntaxError
     RET
 
 run_execArrAssignment:
@@ -971,7 +1049,7 @@ run_execArrAssignment:
     LD (IX+1), H
     RET
 .syntaxErr:
-    ; TODO
+    JP run_syntaxError
     RET
 
 ; performs an assignment to a string element
@@ -1015,7 +1093,7 @@ run_execStrAssignment:
     LD (IX), L
     RET
 .syntaxErr:
-    ; TODO
+    JP run_syntaxError
     RET
 
 
@@ -1051,7 +1129,7 @@ run_else:
 .end:
     RET
 .syntaxErr:
-    ; TODO handle syntax error
+    JP run_syntaxError
     RET
 
 ; executes a loop (end of while) statement
@@ -1111,7 +1189,7 @@ run_while:
 .end:
     RET
 .syntaxErr:
-    ; TODO handle syntax error
+    JP run_syntaxError
     RET
     
 ; executes a conditional statement
@@ -1139,7 +1217,7 @@ run_if:
     JR .loop
 .else:
     LD A, (NestingLevel)
-    CP 0                    ; check if we're in a nexted IF statement
+    CP 0                    ; check if we're in a nested IF statement
     JR Z, .end              ; if no, end the loop
     JR .loop
 .endif:
@@ -1157,7 +1235,7 @@ run_if:
 .end:
     RET
 .syntaxErr:
-    ; TODO handle syntax error
+    JP run_syntaxError
     RET
 
 ; executes a system procedure
@@ -1208,7 +1286,35 @@ run_execSyscall:
     JP Z, sys_fread
     CP SYS_FWRITE_B
     JP Z, sys_fwrite
-    RET
+    CP SYS_STARTS_B
+    JP Z, sys_startsWith
+    CP SYS_LIST_B
+    JP Z, sys_listFiles
+    CP SYS_LISTDIRS_B
+    JP Z, sys_listDirs
+    CP SYS_TRIM_B
+    JP Z, sys_trim
+    CP SYS_SUBSTR_B
+    JP Z, sys_subStr
+    CP SYS_BANK_B
+    JP Z, sys_switchBank
+    CP SYS_WRITEB_B
+    JP Z, sys_writeb
+    CP SYS_WRITEH_B
+    JP Z, sys_writeh
+    CP SYS_SHOWCUR_B
+    JP Z, sys_showCursor
+    CP SYS_HIDECUR_B
+    JP Z, sys_hideCursor
+
+    
+    PUSH AF             ; store the function bytecode on stack
+    CALL run_evaluate   ; evaluate the expression that's the function's argument
+    CP 0
+    ; JR NZ, .syntaxErr TODO
+    LD HL, (Expression + 1)
+    POP AF              ; restore the function bytecode from stack
+    ; fall through to allow to call a function like a procedure
 
 ; executes a system function
 ; syscall index in A
@@ -1237,6 +1343,38 @@ run_execFunction:
     JP Z, sys_exists
     CP SYS_TOUCH_B
     JP Z, sys_touch
+    CP SYS_CHDIR_B
+    JP Z, sys_chdir
+    CP SYS_SIZE_B
+    JP Z, sys_size
+    CP SYS_MKDIR_B
+    JP Z, sys_mkdir
+    CP SYS_RMDIR_B
+    JP Z, sys_rmdir
+    CP SYS_DELETE_B
+    JP Z, sys_rm
+    CP SYS_PWD_B
+    JP Z, sys_pwd
+    CP SYS_EOF_B
+    JP Z, sys_eof
+    CP SYS_NEXTFILE_B
+    JP Z, sys_nextFile
+    CP SYS_NEXTDIR_B
+    JP Z, sys_nextDir
+    CP SYS_TOK_B
+    JP Z, sys_tok
+    CP SYS_MAXX_B
+    JP Z, sys_maxX
+    CP SYS_MAXY_B
+    JP Z, sys_maxY
+    CP SYS_CALL_B
+    JP Z, sys_call
+    CP SYS_KEYPRESSED_B
+    JP Z, sys_keyPressed
+    CP SYS_MOVE_B
+    JP Z, sys_move
+    ;CP SYS_ARGS_B
+    ;JP Z, sys_args
     RET
 
 
@@ -1277,9 +1415,9 @@ run_ret:
     LD (StmtEnd), BC        ; so that the next run_nextStmt call goes to the next statement after the user call
     RET
 
-run_stop:
-    LD IX, Terminated
-    CALL writeLn
+run_stop: //TODO END should invoke HALT?
+    ;LD IX, Terminated
+    ;CALL writeLn
     LD SP, (Trap)
     RET
 

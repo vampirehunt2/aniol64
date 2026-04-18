@@ -38,6 +38,17 @@ keyInput:
 	POP BC
     RET
 
+; checks if a key has been pressed and a character is available
+; returns the NZ flag if key was pressed, Z flag if no key was pressed
+keyPressed:
+    PUSH BC
+    LD B, 0         ; making sure bits A15-A8 of the I/O port number are 0 for the subsequent I/O operations
+    LD C, STAT1     
+    IN A, (C)       ; read the ASCI1 status word
+    BIT 7, A        ; check the Receive Data Register Full bit
+    POP BC
+    RET
+
 readKey:
 	PUSH BC
 	CALL keyInput
