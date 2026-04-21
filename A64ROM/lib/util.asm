@@ -141,7 +141,8 @@ isHexDigit:
 	CP 67h
 	JR NC, .no ; if equal or more than 'g' then it's not a hex digit
 	CP 3Ah
-	JR C, .yes ; if less than ':' (which is the next ascii code after '9' then it's a hex digit
+    JR Z, .no; if equal to ':' (which is the next ascii code after '9') then it's not a hex digit
+	JR C, .yes ; if less than ':' (which is the next ascii code after '9') then it's a hex digit
 	CP 61h
 	JR C, .yes ; if equal or more than 'a' then it's a hex digit
 .yes
