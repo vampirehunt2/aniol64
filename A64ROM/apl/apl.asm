@@ -697,7 +697,6 @@ apl_tokenizeHex:
 	INC HL
 .loop:
 	CALL dos_fPeek
-	LD B, A
 	CALL apl_isHexDigit 
 	CP TRUE
 	JR Z, .next
@@ -1223,7 +1222,6 @@ apl_isDecDigit:
 ; checks whether the character in B is a hexadecimal digit
 ; result in A
 apl_isHexDigit:
-	LD A, B
 	CALL isHexDigit
 	CP FALSE
 	JR NZ, .true
