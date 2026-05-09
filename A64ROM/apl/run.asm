@@ -31,7 +31,7 @@ Procedures      equ 8400h
 
 run_debug:
     CALL apl_compile
-    CALL run_execute
+    CALL run_resident
     RET
 
 ; initialises the apl interpreter
@@ -104,11 +104,7 @@ run_syntaxError:
     CALL u16_formatHex            
     RET
 
-run_main:
-	CALL str_shift				; check for parameter of the run command
-	CALL str_len				; find out if the parameter exists TODO: check for .btc file extension
-	CP 0
-	JR Z, run_execute			; if not, proceed to running the already-loaded file at the Bytecodes address
+run_btcFile:
 	CALL dos_loadFile			; if yes, load the file from disk
 	CP 0						; check return code to confirm the file was loaded successfully
 	JR Z, .copy					; if yes, proceed to to running the just-loaded file at the Bytecodes address
@@ -119,7 +115,7 @@ run_main:
     LD DE, Bytecodes
     LD BC, (CurrentFileSize)
     LDIR
-run_execute:
+run_resident:
     CALL run_init
     LD (Trap), SP
 .loop:

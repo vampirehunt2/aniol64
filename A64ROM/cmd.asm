@@ -11,6 +11,7 @@ Clr: 		defb "clr", 0
 Mon: 		defb "mon", 0
 Reset: 		defb "rst", 0
 EchoCmd:	defb "echo", 0
+DelayCmd:   defb "delay", 0
 Rnd: 		defb "rnd", 0
 Peek: 		defb "peek", 0
 Poke: 		defb "poke", 0
@@ -51,26 +52,32 @@ AplRun: 	defb "run", 0
 UnknownCmd: defb "Unknown cmd", 0
 Prompt: 	defb ">", 0
 
+; executable file extensions
+ExtExe: defb ".exe", 0
+ExtBtc: defb ".btc", 0
+ExtBat: defb ".bat", 0
+NotExecutable:  defb "Not Executable", 0
+
 
 cmd_main:
 		LD IX, Prompt
 		CALL writeStr
 		CALL cursorOn
         CALL cmd_readLn
-cmd_debug:
-		LD IX, LineBuff 		; redundant, used for debugging only
+        CALL cmd_exec
+        JR cmd_main
+cmd_exec:
+		;LD IX, LineBuff 		; redundant, used for debugging only
         CALL str_tok
-		;LD (Args), HL
 		LD A, (IX)
 		CP '.'
 		JR NZ, .cont
 		LD A, (IX + 1)
 		CP '/'
 		JR NZ, .cont
-		LD A, ' '				; hack :)
-		LD (IX + 1), A
-		CALL str_tok
-		JP .run
+		INC IX          ; skip the '.' character
+        INC IX          ; skip the '/' character
+		JP .runFile
 .cont:
 		; clear screen command
         LD IY, Clr
@@ -84,6 +91,10 @@ cmd_debug:
         LD IY, EchoCmd
         CALL str_cmp
         JP Z, .echo
+        ; delay cmd
+        LD IY, DelayCmd
+        CALL str_cmp
+        JP Z, .delay
         ; rnd command
         LD IY, Rnd
         CALL str_cmp
@@ -226,40 +237,43 @@ cmd_debug:
         ; CALL bzr_beep too noisy
 .wrap:
 		CALL nextLine
-		JP cmd_main
+		RET
 .clr:
         CALL clrScr
-        CALL home
-        JP cmd_main
+        CALL home // TODO redundant?
+        RET
 .rst:
         RST 00h
 .echo:
         CALL cmd_echo
-        JP cmd_main
+        RET
+.delay:
+        CALL cmd_delay
+        RET
 .peek:
         CALL mon_peek
         JP .wrap
 .poke:
         CALL mon_poke
-        JP cmd_main
+        RET
 .put:
         CALL mon_put
-        JP cmd_main
+        RET
 .get:
 		CALL mon_get
 		JP .wrap
 .load:
 		CALL cmd_loadFile
-		JP cmd_main
+		RET
 .save:
 		CALL cmd_saveFileAs
-		JP cmd_main
+		RET
 .cat:
 		CALL dos_cat
-		JP cmd_main
+		RET
 .beep:
         CALL bzr_beep
-        JP cmd_main
+        RET
 .rnd:
         CALL rnd
         CALL byte2asc
@@ -278,79 +292,128 @@ cmd_debug:
 		JP .wrap
 .test:
 		CALL test_main
-		JP cmd_main
+		RET
 .mon:
         CALL mon_main
         JP .wrap
-        RET
 .onp:
 		CALL onp_main
-		JP cmd_main
+		RET
 .edit:
 		CALL ed_main
-		JP cmd_main
+		RET
 .cpm:
 		CALL cpm_main
-		JP cmd_main
+		RET
 .pwd:
 		CALL dos_pwd
-		JP cmd_main
+		RET
 .dart:
         CALL dart_main
-        JP cmd_main
+        RET
 .ls:
 		CALL dos_ls
-		JP cmd_main
+		RET
 .mkdir:
 		CALL cmd_mkDir
-		JP cmd_main
+		RET
 .rmdir:
 		CALL cmd_rmDir
-		JP cmd_main
+		RET
 .cd:
 		CALL cmd_cd
-		JP cmd_main
+		RET
 .touch:
 		CALL cmd_touch
-		JP cmd_main
+		RET
 .rm:
 		CALL cmd_rm
-		JP cmd_main
+		RET
 .format:
 		CALL dos_format
-		JP cmd_main
+		RET
 .tar:
 		CALL tar_main
-		JP cmd_main
+		RET
 .man:
         CALL man_main
-        JP cmd_main
+        RET
 .mv:	
 		CALL cmd_mv
-		JP cmd_main
+		RET
 .cp:
 		CALL cmd_cp
-		JP cmd_main
+		RET
 .apl:
 		CALL apl_main
-		JP cmd_main
+		RET
 .run:
-		CALL run_main
-		JP cmd_main
+        CALL run_resident
+        RET
+.runFile:
+        PUSH IX         ; save file name on stack
+        CALL dos_getExt ; check file extension
+        LD IY, ExtBtc
+        CALL str_cmp
+        JR Z, .runBtc
+        LD IY, ExtBat
+        CALL str_cmp
+        JR Z, .runBat
+        LD IY, ExtExe
+        CALL str_cmp
+        JR Z, .runExe
+        POP IX
+        LD IX, NotExecutable
+        CALL writeLn
+        RET
+.runBtc:
+        POP IX
+		CALL run_btcFile
+		RET
+.runBat:
+        POP IX
+        CALL bat_main
+        RET
+.runExe:
+        POP IX
+        CALL dos_loadFile
+        CP DOS_OK
+        JR NZ, .err
+        LD HL, FileBuffer
+        LD DE, PROGRAM_DATA
+        LD BC, (CurrentFileName)
+        LDIR
+        CALL PROGRAM_DATA
+        RET
+.err:
+        CALL dos_printError
+        RET
 
 
 cmd_readLn:
-        LD A, WHITE  * 16
-        LD (Colour), A
-        CALL readLine
-        CALL nextLine
-        LD A, GREEN  * 16
-        LD (Colour), A
-        LD IX, LineBuff
-        LD IY, PrevLineBuff
-        CALL str_copy
-        RET
+    LD A, WHITE  * 16
+    LD (Colour), A
+    CALL readLine
+    CALL nextLine
+    LD A, GREEN  * 16
+    LD (Colour), A
+    LD IX, LineBuff
+    LD IY, PrevLineBuff
+    CALL str_copy
+    RET
 
+cmd_delay:
+    CALL str_shift
+    CALL u16_parseDec
+    CP 0
+    JR NZ, .err
+    LD A, L
+    CALL delay
+    RET
+.err:
+    LD IX, InvVal
+    CALL writeStr
+    RET
 
 cmd_echo:
 	CALL str_shift
