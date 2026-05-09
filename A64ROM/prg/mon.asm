@@ -51,10 +51,20 @@ LINE_NUM 	equ MAX_Y - 2
 
 
 mon_main:
-	CALL clrScr
+    CALL str_shift
+    CALL str_len
+    CP 0
+    JR Z, .zero
+    CALL parseDByte
+    CP 0
+    JR NZ, .zero
+    LD (MonCurrAddr), HL
+	JR .cont
+.zero:
     LD A, 0  
     LD (MonCurrAddr), A
     LD (MonCurrAddr + 1), A
+.cont:
 	CALL mon_refresh
 mon_main_loop:
 	CALL cursorOn
