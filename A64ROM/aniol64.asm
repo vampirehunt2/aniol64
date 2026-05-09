@@ -86,13 +86,13 @@ Ready: defb	 "Ready", 0
 
 
 boot:
-	CALL bzr_beep	
-	LD A, 25
-	CALL delay
-	CALL bzr_beep
-	LD A, 25
-	CALL delay
-	CALL bzr_beep
+	;CALL bzr_beep	
+	;LD A, 25
+	;CALL delay
+	;CALL bzr_beep
+	;LD A, 25
+	;CALL delay
+	;CALL bzr_beep
 
 	; init the RNG:
 	LD A, 0
@@ -122,8 +122,8 @@ boot:
 	CALL dos_checkNvram
 	CALL dos_autoExec
 
-    LD IX, Ready
-	CALL writeLn
+    ;LD IX, Ready
+	;CALL writeLn
 	
 	; wait for user input from here on in
 	CALL cmd_main
@@ -191,6 +191,7 @@ resetNmiHandler:
 
 ; test routines
  include test/test.asm
+ include test/bat.asm
 
 ; OS components
  include cmd.asm
