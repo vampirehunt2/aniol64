@@ -2,12 +2,9 @@
 ; terminal program
 ; 09/05/2022
 
-; This program turns the computer into a dumb terminal 
-; running on the B port of the DART at 300baud.
-; Connection parameters are
-; 	- 2 stop bits
-;	- even parity
-; 	- 8bits per character
+; This program turns the computer into a dumb terminal.
+; running on the B port of the DART.
+; requires UART setup with the 'dart' command.
 ; It uses software handshaking with Xon/Xoff on the receiving side.
 ; It uses no handshaking on the transmitting side, assuming the 
 ; computer on the other side is able to handle keyclicks in time.
@@ -33,10 +30,10 @@ term_main:
 		AND 01111111b		; make sure cursor is not stored
 		CP 13				; check if it's a carriage return
 		JR Z, .wrapLine
-		CALL putChar	; put the received character on screen
+		CALL putChar	    ; put the received character on screen
 		LD A, (CurY)		; check if we're at the end of the screen
 		CP MAX_Y
-		CALL Z, term_wrapScreen	; if yes, wrap around to the top
+		CALL Z, scroll	
 		JR .loop
 .wrapLine:
 		CALL term_wrapLine
@@ -52,7 +49,7 @@ term_wrapScreen:
 		
 term_wrapLine:
 		CALL cursorOff
-        XOR A           ; LD A, 0
+        XOR A        ; LD A, 0
         LD (CurX), A ; move the cursor to the beginning of line
         LD A, (CurY) ; load current cursor Y position (line number)
         INC A           
