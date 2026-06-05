@@ -28,7 +28,7 @@ Model: 			defb "Model: ", 0
 FirmwareRev: 	defb "Firmware Rev: ", 0
 LbaSectors: 	defb "LBA Sectors: ", 0
 Bytes:			defb " bytes", 0
-Autoexec:		defb "autoexec.apl", 0
+Autoexec:		defb "autoexec.bat", 0
 
 ; status messages
 DosOk:				defb "I/O success", 0
@@ -100,11 +100,10 @@ dos_autoExec:
 	CP TRUE
 	RET NZ
 	LD IX, Autoexec
-	CALL dos_loadFile
-	CP DOS_OK
-	RET NZ
-	CALL apl_compile
-	CALL run_execute
+	CALL dos_fileExists
+    CP 0
+    RET Z
+	CALL bat_main
 	RET
 
 dos_setUpCf:
@@ -159,6 +158,20 @@ dos_cfDiskInfo:
 	CALL mon_printByteA
 	RET 
 	
+
+; returns the extension of a file name
+; or a null string if the file has no extension
+; file name passed in IX
+; result in IX
+dos_getExt:
+    LD A, (IX)
+    CP 0
+    RET Z
+    CP '.'
+    RET Z
+    INC IX
+    JR dos_getExt
+
 ; prints B bytes from address IX
 dos_printRecord:
 	LD A, (IX)
