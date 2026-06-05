@@ -1,4 +1,4 @@
-c:\8bit\sjasmplus-1.20.2.win\sjasmplus.exe --sym=symbols.txt  --raw=altair8k.bin --sld=altair8k.sld --fullpath 8k.asm
+c:\8bit\sjasmplus-1.20.2.win\sjasmplus.exe --sym=symbols.txt  --raw=altair4k.bin --sld=altair4k.sld --fullpath 4k.asm
 
 
 
