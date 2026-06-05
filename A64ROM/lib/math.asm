@@ -208,33 +208,48 @@ i16_cmp:
 ; mod result in HL
 ; errors reported in A
 u16_div:
-        LD A, B    ; checking if it's not a division by zero
-        CP 0
-        JR NZ, .proceed
-        LD A, C
-        CP 0
-        JR NZ, .proceed
-        LD A, DIVBY0
-        RET
-.proceed:
-        LD D, 0
-        LD E, 0
-.loop:
-        CALL u16_cmp
-        CP SMALLER
-        JR Z, .end
-        AND A   ; clear carry
-        CALL u16_sub
-        INC E
-        LD A, E
-        CP 0
-        JR NZ, .loop
-        INC D
-        JR .loop
-.end:
-        LD A, OK
-        RET
-
+    LD A, B         ; checking if it's not a division by zero
+    OR C
+    JR NZ, .cont
+    LD A, DIVBY0
+    RET
+.cont:
+    PUSH HL
+    PUSH BC
+    POP DE
+    POP BC
+    LD HL,0
+    LD A,B
+    LD B,8
+.loop1:
+    RLA
+    ADC HL,HL
+    SBC HL,DE
+    JR NC, .noAdd1
+    ADD HL,DE
+.noAdd1:
+    DJNZ .loop1
+    RLA
+    CPL
+    LD B,A
+    LD A,C
+    LD C,B
+    LD B,8
+.loop2:
+    RLA
+    ADC HL,HL
+    SBC HL,DE
+    JR NC, .noAdd2
+    ADD HL,DE
+.noAdd2:
+    DJNZ .loop2
+    RLA
+    CPL
+    LD B,C
+    LD C,A
+    PUSH BC
+    POP DE
+    RET
 
 ; calculates the sign of multiplication or division result
 ; operands in HL and BC
@@ -321,29 +336,28 @@ i16_is0:
 ; arguments in HL and BC
 ; result in HL
 ; errors reported in A
-u16_mul:
-        PUSH DE        ; store register state on stack
-        LD D, H        ; transfer HL to DE
-        LD E, L
-        LD HL, 0
+u16_mul:                          
+    PUSH HL
+    POP DE
+    LD HL, 0
+    LD A, 16
 .loop:
-        CALL i16_is0
-        CP TRUE
-        JR Z, .correct
-        AND A           ; clear carry
-        ADD HL, BC      ; accumulate values into HL
-        JR C, .overflow
-        DEC DE          ; use DE as loop counter
-        JR .loop
+    ADD HL,HL
+    JR C, .overflow    ; carry out of HL → overflow
+    RL E
+    RL D
+    JR NC, .noMul
+    ADD HL,BC
+    JR NC, .noMul
+    INC DE                         ; This instruction (with the jump) is like an "ADC DE,0"
+.noMul:
+    DEC A
+    JR NZ, .loop
+    LD A, OK
+    RET
 .overflow:
-        LD A, OVERFLOW
-        JR .end
-.correct:
-        LD A, OK
-        JR .end
-.end:
-        POP DE         ; restore register state
-        RET
+    LD A, OVERFLOW
+    RET
 
 
 ; multiplies two signed 16-bit integers
