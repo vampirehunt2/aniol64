@@ -37,8 +37,10 @@ Build: defw 0000h
  ds 0066h - $, 0
 	; NMI handler
 	PUSH AF
+    PUSH HL
 	CALL handleNmi
 	CALL customNmiHandler
+    POP HL
 	POP AF
 	EI
 	RETN
@@ -86,13 +88,6 @@ Ready: defb	 "Ready", 0
 
 
 boot:
-	;CALL bzr_beep	
-	;LD A, 25
-	;CALL delay
-	;CALL bzr_beep
-	;LD A, 25
-	;CALL delay
-	;CALL bzr_beep
 
 	; init the RNG:
 	LD A, 0
@@ -111,7 +106,7 @@ boot:
 	; greetings
 	CALL nextLine
 	LD IX, Aniol
-    LD A, CYAN
+    LD A, CYAN * 16
     LD (Colour), A
 	CALL writeLn
 	
@@ -122,8 +117,6 @@ boot:
 	CALL dos_checkNvram
 	CALL dos_autoExec
 
-    ;LD IX, Ready
-	;CALL writeLn
 	
 	; wait for user input from here on in
 	CALL cmd_main
@@ -133,17 +126,9 @@ loop:
 
 
 handleNmi:
-	LD A, (NmiCount)
-	INC A
-	LD (NmiCount), A
-	CP 0
-	JR Z, .inc2
-	JR .end
-.inc2:
-	LD A, (NmiCount + 1)
-	INC A
-	LD (NmiCount + 1), A
-.end:
+	LD HL, (NmiCount)
+	INC HL
+	LD (NmiCount), HL
 	RET
 
 
