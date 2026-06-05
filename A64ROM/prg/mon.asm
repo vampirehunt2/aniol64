@@ -364,6 +364,8 @@ mon_prevLine:
 
 mon_dsp:
 	PUSH BC
+    LD A, FALSE
+    LD (Cursor), A
     CALL cursorOff
     LD HL, (MonCurrAddr) 
     LD A, L 
@@ -379,6 +381,8 @@ mon_dsp:
 	CALL mon_nextAddrs
 	POP BC
 	DJNZ .loop
+    LD A, TRUE
+    LD (Cursor), A
 	CALL cursorOn
 	POP BC
     RET
@@ -389,7 +393,11 @@ mon_dsp:
 mon_printAddrs:
     PUSH HL
     POP IX
+    LD A, GREEN * 16
+    LD (Colour), A
     CALL mon_printDByte
+    LD A, BLUE * 16
+    LD (Colour), A
     LD A, ":"
     CALL putChar
     RET
@@ -401,6 +409,8 @@ mon_printVals:
     PUSH BC
     PUSH HL
     POP IX
+    LD A, WHITE * 16
+    LD (Colour), A
 	LD B, 8
 .loop:
 	LD A, 8
@@ -416,8 +426,12 @@ mon_printVals:
 	DJNZ .loop
 	POP BC
 	; print the actual characters
+    LD A, BLUE * 16
+    LD (Colour), A
 	LD A, '|'
 	CALL putChar
+    LD A, PURPLE * 16
+    LD (Colour), A
 	LD A, (IX - 8)
 	CALL mon_printChar
 	LD A, (IX - 7)
