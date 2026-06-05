@@ -30,12 +30,12 @@ WHITE equ 0Fh
 ; Image memory addresses.
 ; These overlap the system ROM.
 ; ROM is accessed on read operations, and image memory on writes.
-PixelData equ 4000h + 128   ; + 128 is for skipping the first 2 lines of display that are skewed.
-ColourData equ 0000h + 128
+PixelData equ 4000h + 512   ; + 512 is for skipping the first line of display that are skewed.
+ColourData equ 0000h + 512
 
 ; Constants
 MAX_X equ 39
-MAX_Y equ 29
+MAX_Y equ 28
 LF    equ 10
 CR	  equ 13
 
@@ -78,7 +78,7 @@ clrScr:
     PUSH BC
     ; clear colour and pixel data
     LD HL, ColourData
-    LD BC, 8000h - 128   ; total size of colour and pixel data
+    LD BC, 8000h - 512   ; total size of colour and pixel data
 .loop:              ; iterates through both colour and pixel data
     XOR A           ; LD A, 0
     LD (HL), A
@@ -96,16 +96,32 @@ clrScr:
 
 ; turns off the cursor for the character at the current cursor position
 cursorOff:
-    LD A, FALSE
-    LD (Cursor), A
-    CALL vga_toggleCursor
+    PUSH BC
+    PUSH HL
+    CALL vga_XY2addr
+    LD BC, 7 * 64   ; only draw the cursor in the last line
+    ADD HL, BC         
+    LD A, (Colour)  ; load the current colour
+    LD (HL), A
+    POP HL
+    POP BC    
     RET
 
 ; turns on the cursor for the character at the current cursor position
 cursorOn:
-    LD A, TRUE
-    LD (Cursor), A
-    CALL vga_toggleCursor
+    LD A, (Cursor)
+    CP FALSE
+    RET Z
+    PUSH BC
+    PUSH HL
+    CALL vga_XY2addr
+    LD BC, 7 * 64   ; only draw the cursor in the last line
+    ADD HL, BC         
+    LD A, (Colour)  ; load the current colour
+    CPL             ; invert it
+    LD (HL), A
+    POP HL
+    POP BC 
     RET
 
 
@@ -357,22 +373,3 @@ vga_setScroll:
     LD (Scroll), A
     OUT (SCROLL_PORT), A
     RET
-
-vga_toggleCursor:
-    PUSH BC
-    PUSH HL
-    CALL vga_XY2addr
-    LD BC, 7 * 64   ; only draw the cursor in the last line
-    ADD HL, BC
-    LD A, (Cursor)  ; check if cursor is supposed to be drawn
-    CP TRUE            
-    LD A, (Colour)  ; load the current colour
-    JR Z, .on       
-    JR .cont
-.on:
-    CPL             ; invert it
-.cont:
-    LD (HL), A
-    POP HL
-    POP BC
-	RET
