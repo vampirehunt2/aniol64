@@ -8,6 +8,20 @@ ESC   equ 1Bh
 LF    equ 10
 CR	  equ 13
 
+; Colour codes (this card is b&w, but colour codes are needed for compatibility):
+BLACK equ 00h
+BLUE equ 01h
+GREEN equ 02h
+CYAN equ 03h
+OLIVE equ 04h
+SAPPHIRE equ 05h
+RED equ 08h
+PURPLE equ 09h
+YELLOW equ 0Ah
+ORANGE equ 0Ch
+PINK equ 0Dh
+WHITE equ 0Fh
+
 tm_initSeq:
 	defb 0, 00011000b	; channel reset
 	defb 4, 00000100b	; x1 clock, no parity, 1 stop bit
