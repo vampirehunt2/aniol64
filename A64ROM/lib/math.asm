@@ -208,6 +208,7 @@ i16_cmp:
 ; mod result in HL
 ; errors reported in A
 u16_div:
+    PUSH BC
     LD A, B         ; checking if it's not a division by zero
     OR C
     JR NZ, .cont
@@ -249,6 +250,7 @@ u16_div:
     LD C,A
     PUSH BC
     POP DE
+    POP BC
     RET
 
 ; calculates the sign of multiplication or division result
@@ -574,7 +576,7 @@ u16_formatDec:
 
 
 i16_formatDec:
-        PUSH IX
+    PUSH IX
 	LD A, H
 	AND 10000000b	; isolate the sign of the number
 	CP 0
@@ -582,10 +584,10 @@ i16_formatDec:
 	LD A, '-'
 	LD (IX), A
 	INC IX
-        CALL i16_neg
+    CALL i16_neg
 .pos:
 	CALL u16_formatDec
-        POP IX
+    POP IX
 	RET
 
 
