@@ -1,6 +1,7 @@
 ; apl bytecode interpreter
 
 Terminated:     defb "Program terminated", 0
+LineStr:        defb "Line: ", 0
 
 MAX_EXPR_BCS    equ 64
 
@@ -22,7 +23,7 @@ ArrAddr         equ PROGRAM_DATA + 1Ah
 FileSector 	    equ PROGRAM_DATA + 1Ch
 FileIndex       equ PROGRAM_DATA + 1Dh
 FileSecPtr	    equ PROGRAM_DATA + 1Eh	; 2 byte pointer into the file list sector
-CurrSourceLine  equ PROGRAM_DATA + 20
+CurrSourceLine  equ PROGRAM_DATA + 20h
 RunStack        equ 8240h   
 Expression      equ 8280h
 Vars            equ 8300h
@@ -40,6 +41,13 @@ run_init:
     LD HL, 0
     LD (CurrSourceLine), HL
     LD HL, Bytecodes
+.loop:                          ; skip leading junk
+    LD A, (HL)
+    CP SEPARATOR_B
+    JR NZ, .cont
+    INC HL
+    JR .loop
+.cont:
     LD (StmtStart), HL          ; initilise the line pointer to the beginning of the program
     CALL run_skipLineMarker
     LD HL, RunStack            ; initialise the soft stack
@@ -88,20 +96,28 @@ run_syntaxError:
     LD SP, (Trap)
     LD IX, SyntaxError
     CALL writeStr
-    CALL nextLine
     LD HL, (CurrSourceLine)      ; check if source lines are included in the executable
     LD A, H
-    OR A, L
+    OR L
     CP 0
     JR Z, .addr                 ; if not, print the address of the statement
+    LD A, ' '
+    CALL putChar
+    LD IX, LineStr
+    CALL writeStr
     LD IX, LineBuff             ; print the source line number
     CALL u16_formatDec
     CALL writeStr
+    CALL nextLine
     RET
 .addr:
+    LD A, '@'
+    CALL putChar
     LD HL, (StmtStart)          ; print the statement address
     LD IX, LineBuff 
-    CALL u16_formatHex            
+    CALL u16_formatHex
+    CALL writeStr
+    CALL nextLine            
     RET
 
 run_btcFile:
