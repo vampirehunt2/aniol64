@@ -63,7 +63,7 @@ RootFolder: 	defb "/", 0
 ParentFolder: 	defb "..", 0
  
 ; dos variables:
-SectorBuffer 	equ 08400h
+SectorBuffer 	equ 08100h
 FileBuffer		equ 0C000h
 CurrentPath 	equ DOS_AREA + 00h	; 9 bytes: 8 for the folder name and 1 for the terminating zero
 CurrentDir 		equ	DOS_AREA + 09h	; index of the current directory in the directory table
