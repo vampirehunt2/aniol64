@@ -78,13 +78,12 @@ CurX 				equ 8040h
 CurY 				equ 8041h
 customNmiHandler 	equ 8042h		; 3 byte procedure, either RET or JP **
 Ps2Shift			equ 8045h
-DOS_AREA			equ 8046h
-LineBuff 			equ 8100h		; 128 byte buffer
-PrevLineBuff        equ 8180h
+DOS_AREA			equ 8046h       ; ends at 806Bh
+LineBuff 			equ 8080h		; 64 byte buffer
+PrevLineBuff        equ 80C0h
+
+; DOS sector buffer goes here, starting at 8100h
 PROGRAM_DATA 		equ 8200h
-
-
-Ready: defb	 "Ready", 0
 
 
 boot:
