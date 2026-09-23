@@ -826,6 +826,21 @@ sys_nextDir:
     LD HL, 0
     RET
 
+; allocates the given number of bytes on the heap 
+; and returns a pointer to the beginning of the allocated memory area.
+; the allocated memory is guaranteed to form a continuous area.
+; function
+; syntax Alloc(<expression>)
+; argument1: number of bytes to allocate
+sys_alloc:
+    CALL run_evaluate
+    LD BC, (DataSeg)
+    ADD HL, BC
+    LD (DataSeg), HL
+    PUSH BC
+    POP HL
+    RET
+
 
 ; ####################### Private routines #####################################
 

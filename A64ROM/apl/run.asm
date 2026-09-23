@@ -60,6 +60,14 @@ run_init:
     RET
 
 run_findProcedures:
+    ; clear out the procedures table by filling it with zeroes
+    LD HL, Procedures
+    LD DE, Procedures
+    INC DE
+    LD BC, 255
+    LD (HL), 0
+    LDIR
+    ; scan the compiled program looking for procedure definitions
     LD HL, Bytecodes
 .loop:
     LD A, (HL)
@@ -92,15 +100,33 @@ run_findProcedures:
 .end:
     RET
 
+run_invalidProcedure:
+    LD SP, (Trap)
+    LD IX, UnknownProcedure
+    CALL writeStr
+    CALL _run_printSourceLine
+    RET
+
 run_syntaxError:
     LD SP, (Trap)
     LD IX, SyntaxError
     CALL writeStr
+    LD A, '@'
+    CALL putChar
+    LD HL, (StmtStart)          ; print the statement address
+    LD IX, LineBuff 
+    CALL u16_formatHex
+    CALL writeStr
+    CALL nextLine  
+    CALL _run_printSourceLine
+    RET
+
+_run_printSourceLine:
     LD HL, (CurrSourceLine)      ; check if source lines are included in the executable
     LD A, H
     OR L
     CP 0
-    JR Z, .addr                 ; if not, print the address of the statement
+    RET Z                       ; if not, just quit
     LD A, ' '
     CALL putChar
     LD IX, LineStr
@@ -108,16 +134,7 @@ run_syntaxError:
     LD IX, LineBuff             ; print the source line number
     CALL u16_formatDec
     CALL writeStr
-    CALL nextLine
-    RET
-.addr:
-    LD A, '@'
-    CALL putChar
-    LD HL, (StmtStart)          ; print the statement address
-    LD IX, LineBuff 
-    CALL u16_formatHex
-    CALL writeStr
-    CALL nextLine            
+    CALL nextLine          
     RET
 
 run_btcFile:
@@ -151,7 +168,7 @@ run_findStmtEnd:
     LD HL, (StmtStart)
     LD A, (HL)
     CP SEPARATOR_B      ; check if statement starts with a stray separator
-    JR NZ, .cont:       ; if not, just proceed as normal
+    JR NZ, .cont        ; if not, just proceed as normal
     INC HL
     LD (StmtStart), HL  ; if yes, skip over the stray separator
 .cont:
@@ -163,9 +180,17 @@ run_findStmtEnd:
     LD A, (HL) 
     CP SEPARATOR_B
     JR Z, .found:
+    CP QUOTE_B        ; skip over string constants
+    JR Z, .str
     CP END_B          ; END bytecode
     JR Z, .notFound
     JR .loop
+.str:
+    INC HL
+    LD A, (HL)
+    CP 0              ; check if end of string reached
+    JR Z, .loop       ; if so, jump back to main loop
+    JR .str           ; if not, keep looking for end of string 
 .found:
     LD (StmtEnd), HL
     RET
@@ -1385,8 +1410,8 @@ run_execFunction:
     JP Z, sys_keyPressed
     CP SYS_MOVE_B
     JP Z, sys_move
-    ;CP SYS_ARGS_B
-    ;JP Z, sys_args
+    CP SYS_ALLOC_B
+    JP Z, sys_alloc
     RET
 
 
@@ -1410,7 +1435,11 @@ run_execUserCall:
     LD C, (HL)
     INC HL
     LD B, (HL)
-    DEC BC
+    LD A, B 
+    OR C
+    CP 0                ; check for a valid procedure address
+    JP Z, run_invalidProcedure
+    DEC BC              ; move BC back to point to the end of the previous statement
     LD (StmtEnd), BC
     RET
 

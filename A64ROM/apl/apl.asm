@@ -179,7 +179,8 @@ SYS_CALL_B		equ 36h
 SYS_SHOWCUR_B 	equ 37h
 SYS_HIDECUR_B 	equ 38h
 SYS_KEYPRESSED_B equ 39h
-SYS_ARGS_B		equ 3Ah
+SYS_ALLOC_B		equ 3Ah
+
 
 BuiltInFunctions:
 
@@ -250,7 +251,7 @@ BuiltInFunctions:
  defb "NextFile",	0, SYS_NEXTFILE_B
  defb "ListDirs", 	0, SYS_LISTDIRS_B
  defb "NextDir",	0, SYS_NEXTDIR_B
- defb "Args", 		0, SYS_ARGS_B
+ defb "Alloc",      0, SYS_ALLOC_B
  defb 0
 
 ; 128 variables with names of up to 8 characters, 
@@ -400,7 +401,7 @@ apl_nextStatement:
 	JR Z, .loop
 	CP CR
 	JR Z, .loop
-	CP LF
+	CP LF           // TODO this is basically a syntax error. Only happens on the sim though
 	JR Z, .loop
 	CALL apl_storeSourceLineNum
 .loop:
