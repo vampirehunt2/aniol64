@@ -1,0 +1,1 @@
+..\..\..\asmx\asmx20.exe -C 8085 -b -e -w -l tb_std.lst  tb_std.a85

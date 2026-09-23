@@ -1,0 +1,13 @@
+ org 0
+ 
+SIM     .equ    030h    ; ASMX doesn't seem to recognize these 8085 instructions
+
+loop:
+	MVI A, C0h
+ db SIM
+	MVI A, 40h
+ db SIM
+	JMP loop
+	
+	
+	

@@ -1,0 +1,17 @@
+0000                     org 0
+
+      = 0030            SIM     .equ    030h    ; ASMX doesn't seem to recognize these 8085 instructions
+
+0000                    loop:
+0000  3E C0             	MVI A, C0h
+0002  30                 db SIM
+0003  3E 40             	MVI A, 40h
+0005  30                 db SIM
+0006  C3 0000           	JMP loop
+                        	
+                        	
+                        	
+
+00000 Total Error(s)
+
+LOOP               0000    SIM                0030 E
