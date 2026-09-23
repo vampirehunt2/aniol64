@@ -20,6 +20,7 @@ ARITHMETIC_ERROR equ 1
 SYNTAX_ERROR equ 2
  
 SyntaxError: defb "Syntax error", 0
+UnknownProcedure: defb "Unknown procedure", 0
 ArithmeticError: defb "Arithmetic error", 0
 
 
