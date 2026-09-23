@@ -231,6 +231,10 @@ cmd_exec:
 		LD IY, AplRun
 		CALL str_cmp
 		JP Z, .run
+        ; run file
+        CALL dos_fileExists
+        CP 0
+        JP NZ, .runFile
         ; unknown command
         LD IX, UnknownCmd
         CALL writeStr
