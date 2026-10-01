@@ -98,16 +98,21 @@ STACK   equ RAM + 2048 - 1  ; top of RAM
 
 
 ; variables for the program ***********************************************************************
-CharFeed   equ RAM + 00h    ; pointer into the screen memory 
+;CharFeed   equ RAM + 00h    ; pointer into the screen memory 
                             ; indicating next character to be fed to the 8276
                             ; 2 bytes
 
-CursorAddr equ RAM + 02h   ; pointer into the screen memory
+CursorAddr  equ RAM + 02h   ; pointer into the screen memory
                             ; indicating the position at which next character
                             ; is to be inserted from the UART
                             ; 2 bytes
 
-Screen     equ RAM + 20h   ; screen memory
+Screen      equ RAM + 20h   ; screen memory
+
+LINE_LEN    equ 40          ; number of character in a row
+LINE_NUM    equ 30          ; number of rows
+SCREEN_SIZE equ LINE_LEN * LINE_NUM ; size of the Screen memory, 
+                            ; ignoring the extra line used for the front porch
 
 
 ; ************************************************************************************************
@@ -122,20 +127,19 @@ Screen     equ RAM + 20h   ; screen memory
     EI
     JP main
 
- ds RST55 - $, 0
 ; RST 5.5 interrupt controls the vertical blanking interrupt
 ; from the 8276
+ ds RST55 - $, 0
+    IN A, (CRT_STATUS)      ; clear the interrupt
     LD HL, TEST_SCREEN      ; point HL to the beginning of screen memory
-    LD (CharFeed), HL       ; so that the next frame starts from the first
-                            ; screen memory address.
     EI
     RET
 
- ds RST75 - $, 0
 ; RST 7.5 responds to the Buffer Ready signal from the 8276
-; it sends one line of character data, incrementing HL each time
+; it sends one row of character data, incrementing HL each time
 ; the loop is completely unrolled for performance
-    LD HL, (CharFeed)       ; load the current pointer into the screen memory
+ ds RST75 - $, 0
+    ;LD HL, (CharFeed)       ; load the current pointer into the screen memory
     ; repeat 40 times
     LD A, (HL)              ; load a character from the screen memory
     OUT (CRT_BUFF), A       ; send it to the 8276 buffer
@@ -166,7 +170,7 @@ Screen     equ RAM + 20h   ; screen memory
     INC HL
     LD A, (HL)              
     OUT (CRT_BUFF), A       
-    INC HL 
+    INC HL
     LD A, (HL)              
     OUT (CRT_BUFF), A       
     INC HL
@@ -226,7 +230,7 @@ Screen     equ RAM + 20h   ; screen memory
     INC HL
     LD A, (HL)              
     OUT (CRT_BUFF), A       
-    INC HL 
+    INC HL
     LD A, (HL)              
     OUT (CRT_BUFF), A       
     INC HL
@@ -258,8 +262,20 @@ Screen     equ RAM + 20h   ; screen memory
     OUT (CRT_BUFF), A       
     INC HL
     ; done with 40 iterations
+    OUT (CRT_BUFF), A ; send out the last character again. This will form the front porch
+    LD A, R75   ; reset the interrupt flip-flop
+ db SIM         ; Z80 assembler doesn't recognise the SIM instruction
     EI
     RET
+
+    ; DEBUG
+    ;LD A, 11110001b     ; end of row, stop loading
+    ;OUT (CRT_BUFF), A
+    ;OUT (CRT_BUFF), A   ; dummy character required after the end-of-row 
+    ;LD (CharFeed), HL   ; store the current pointer into the screen memory
+    ;EI
+    ;RET
+    ; /DEBUG
 
 ; initialise the hardware
 init:
@@ -296,6 +312,7 @@ init8251:
     RET
 
 ; main program loop
+; TODO: 
 ; queries the 8251 for new characters received
 ; and puts them into the screen memory - if they're characters
 ; or processes them - if they're escape codes.
@@ -303,10 +320,53 @@ main:
     HALT
     JP main
 
+clrScr:
+    PUSH HL
+    PUSH BC
+    PUSH AF
+    LD HL, Screen
+    LD BC, SCREEN_SIZE
+.loop
+    LD (HL), 0
+    INC HL
+    DEC BC
+    LD A, B
+    OR C
+    CP 0
+    JR NZ, .loop
+    POP AF
+    POP BC
+    POP HL
+    RET
+
+scroll:
+    PUSH HL
+    PUSH BC
+    PUSH DE
+    PUSH AF
+    LD HL, Screen
+    LD DE, Screen + LINE_LEN
+    LD BC, SCREEN_SIZE - LINE_LEN
+.loop
+    LD A, (DE)
+    LD (HL), A
+    INC HL
+    INC DE
+    DEC BC
+    LD A, B
+    OR C
+    CP 0
+    JR NZ, .loop
+    POP AF
+    POP DE
+    POP BC
+    POP HL
+    RET
+
  ds 2048 - $, 0
 TEST_SCREEN:
  db "0123456789012345678901234567890123456789"
- db "1234567890123456789012345678901234567890"
+ db "test1test2test3test4test5test6test7test8"
  db "2345678901234567890123456789012345678901"
  db "3456789012345678901234567890123456789012"
  db "4567890123456789012345678901234567890123"
