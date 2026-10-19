@@ -208,33 +208,6 @@ i16_cmp:
 ; mod result in HL
 ; errors reported in A
 u16_div:
-    LD A, B    ; checking if it's not a division by zero
-    CP 0
-    JR NZ, .proceed
-    LD A, C
-    CP 0
-    JR NZ, .proceed
-    LD A, DIVBY0
-    RET
-.proceed:
-    LD D, 0
-    LD E, 0
-.loop:
-    CALL u16_cmp
-    CP SMALLER
-    JR Z, .end
-    AND A   ; clear carry
-    CALL u16_sub
-    INC E
-    LD A, E
-    CP 0
-    JR NZ, .loop
-    INC D
-    JR .loop
-.end:
-    LD A, OK
-    RET
-/*
     PUSH BC
     LD A, B         ; checking if it's not a division by zero
     OR C
@@ -275,11 +248,12 @@ u16_div:
     CPL
     LD B,C
     LD C,A
+    XOR A       ; return success status
     PUSH BC
     POP DE
     POP BC
     RET
-*/
+
 
 
 ; calculates the sign of multiplication or division result
