@@ -197,7 +197,7 @@ SORRY:  DB   'SORRY'
 ;
 RSTART: LXI  SP,STACK
 		MVI A, 0
-		MOV (Saving), A
+		STA Saving
 		OUT 0BFh						; send the contents of the accumulator to port 0
 ST1:    CALL CRLF                       ;AND JUMP TO HERE
         LXI  D,OK                       ;DE->STRING
@@ -360,7 +360,7 @@ GOTO:   RST  3                          ;*** GOTO EXPR ***
 ;
 SAVE:
 		MVI A, 0FFh
-		MOV (Saving), A
+		STA Saving
 		OUT 0BFh						; send the contents of the accumulator to mode selection port
 LIST:   CALL TSTNUM                     ;TEST IF THERE IS A #
         CALL ENDCHK                     ;IF NO # WE GET A 0
@@ -1693,7 +1693,7 @@ offs		equ 8					; first character is displayed starting from pos. 8 in the line,
 									; previous characters are covered by the horizontal blanking
 
 cout:
-	mov a, Saving
+	lda Saving
 	cpi 0
 	jz cout0
 	call tapeout
