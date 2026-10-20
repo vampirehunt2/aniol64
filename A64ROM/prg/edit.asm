@@ -170,7 +170,7 @@ ed_showPage:
 	LD A, '~'			; otherwise draw beginning of line marker
 	JR .cont
 .cursor:
-	LD A, '*'
+	LD A, '>'
 .cont:
 	CALL putChar
 	CALL dos_eof
