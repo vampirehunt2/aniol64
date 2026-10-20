@@ -262,7 +262,7 @@ SCREEN_SIZE equ LINE_LEN * LINE_NUM ; size of the Screen memory,
     OUT (CRT_BUFF), A       
     INC HL
     ; done with 40 iterations
-    OUT (CRT_BUFF), A ; send out the last character again. This will form the front porch
+    ;OUT (CRT_BUFF), A ; send out the last character again. This will form the front porch ??!!
     LD A, R75   ; reset the interrupt flip-flop
  db SIM         ; Z80 assembler doesn't recognise the SIM instruction
     EI
