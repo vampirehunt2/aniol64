@@ -118,3 +118,7 @@ A64kiCad/A64Classic/A64Classic-backups/A64Classic-2026-05-24_193204.zip
 A64kiCad/A64Classic/A64Classic-backups/A64Classic-2026-05-24_182322.zip
 A32kiCad/aniol32-backups/aniol32-2026-05-24_121757.zip
 A32kiCad/aniol32-rescue.lib
+A64ROM/symbols.txt
+A64ROM/test/symbols.txt
+*.zip
+*.lst
