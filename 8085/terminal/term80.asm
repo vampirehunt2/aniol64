@@ -36,6 +36,7 @@ CRT_STOP   equ 40h          ; stop display command
 CRT_CURSOR equ 80h          ; load cursor command
 CRT_EI     equ 0A0h         ; enable interrupts command
 CRT_DI     equ 0C0h         ; disable interrupts command
+EOSSB       equ 0F3h        ; End Of Screen, Stop Buffering
 
 
 ; port numbers ***********************************************************************************
@@ -45,6 +46,16 @@ CRT_STATUS equ 00000001b    ; the status register of the 8276
                             ; same address as command register,
                             ; but read from rather than written to 
 CRT_BUFF   equ 01000000b    ; buffer select for the 8276 
+
+; screen composition ****************************************************************************
+
+LINE_LEN    equ 80          ; number of character in a row
+LINE_NUM    equ 25          ; number of visible rows
+                            ; there are 30 rows in the visible region, 
+                            ; but we only have enough RAM to use 25
+SCREEN_SIZE equ LINE_LEN * LINE_NUM ; size of the Screen memory, 
+                            ; ignoring the unused lines in the visible region
+                            ; extra line used for the front porch
 
 
 ; Intel 8276 screen composition bytes ************************************************************
@@ -100,7 +111,7 @@ STACK       equ RAM + RAM_SIZE  ; top of RAM
 
 
 ; variables for the program ***********************************************************************
-;CharFeed   equ RAM + 00h    ; pointer into the screen memory 
+CharFeed   equ RAM + 00h    ; pointer into the screen memory 
                             ; indicating next character to be fed to the 8276
                             ; 2 bytes
 
@@ -108,16 +119,9 @@ CursorAddr  equ RAM + 02h   ; pointer into the screen memory
                             ; indicating the position at which next character
                             ; is to be inserted from the UART
                             ; 2 bytes
+CurrLine    equ RAM + 04h   ; current screen line
 
-Screen      equ RAM + 20h   ; screen memory
-
-LINE_LEN    equ 80          ; number of character in a row
-LINE_NUM    equ 25          ; number of visible rows
-                            ; there are 30 rows in the visible region, 
-                            ; but we only have enough RAM to use 25
-SCREEN_SIZE equ LINE_LEN * LINE_NUM ; size of the Screen memory, 
-                            ; ignoring the unused lines in the visible region
-                            ; extra line used for the front porch
+Screen      equ RAM + 10h   ; screen memory
 
 
 ; ************************************************************************************************
@@ -137,6 +141,8 @@ SCREEN_SIZE equ LINE_LEN * LINE_NUM ; size of the Screen memory,
  ds RST55 - $, 0
     IN A, (CRT_STATUS)      ; clear the interrupt
     LD HL, TEST_SCREEN      ; point HL to the beginning of screen memory
+    XOR A
+    LD (CurrLine), A
     EI
     RET
 
@@ -144,7 +150,16 @@ SCREEN_SIZE equ LINE_LEN * LINE_NUM ; size of the Screen memory,
 ; it sends one row of character data, incrementing HL each time
 ; the loop is completely unrolled for performance
  ds RST75 - $, 0
-    ;LD HL, (CharFeed)       ; load the current pointer into the screen memory
+printLine:
+    LD A, (CurrLine)
+    CP LINE_NUM
+    JP NZ, .cont
+    LD A, EOSSB
+    OUT (CRT_BUFF), A
+    JP .end
+.cont:
+    INC A
+    LD (CurrLine), A
     ; repeat 80 times
     LD A, (HL)              ; load a character from the screen memory
     OUT (CRT_BUFF), A       ; send it to the 8276 buffer
@@ -387,6 +402,7 @@ SCREEN_SIZE equ LINE_LEN * LINE_NUM ; size of the Screen memory,
     OUT (CRT_BUFF), A       
     INC HL
     ; done with 80 iterations
+.end:
     LD A, R75   ; reset the interrupt flip-flop
  db SIM         ; Z80 assembler doesn't recognise the SIM instruction
     EI
@@ -412,6 +428,13 @@ init8276:
     OUT (CRT_PARAM), A
     LD A, SCREEN_COMP_BYTE4
     OUT (CRT_PARAM), A
+
+    ; load cursor
+ ;   LD A, CRT_CURSOR
+ ;   OUT (CRT_CMD), A
+ ;   XOR A                       ; LD A, 0
+ ;   OUT (CRT_PARAM), A
+ ;   OUT (CRT_PARAM), A
     
     ; enable interrupts
     LD A, CRT_EI
@@ -425,6 +448,10 @@ init8276:
 ; initialise the UART
 init8251:
     RET
+
+; handle the 8276 vertical retrace interrupt
+handleInt:
+
 
 ; main program loop
 ; TODO: 
@@ -458,9 +485,15 @@ TEST_SCREEN:
  db "xviii                     ###########+#         #...............#          xviii"
  db "xix                                 #.#         #...............#            xix"
  db "xx                 ########         #.#         #...............#             xx"
- db "xxi                #      #         #.#         #...............#             xxi"
- db "xxii               #      ###########.###########............>..#            xxii"
- db "xxiii              #      +.....................................#           xxiii"
- db "xxiv               ##############################################            xxiv"
- db "xxv xxv xxv xxv xxv xxv xxv xxv xxv xxv   xxv xxv xxv xxv xxv xxv xxv xxv xxv xxv 
+ db "xxi                #      #         #.#         #...............#            xxi"
+ db "xxii               #      ###########.###########............>..#           xxii"
+ db "xxiii              #      +.....................................#          xxiii"
+ db "xxiv               ##############################################           xxiv"
+ db "xxv                                                                          xxv" 
+ db "xxvi                                                                        xxvi" 
+ db "xxvii                                                                      xxvii" 
+ db "xxviii                                                                    xxviii" 
+ db "xxix                                                                        xxix" 
+ db "xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx  xxx" 
+
 
