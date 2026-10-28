@@ -471,29 +471,25 @@ TEST_SCREEN:
  db "iv                                                                            iv"
  db "v                                                                              v"
  db "vi                                                                            vi"
- db "vii                                                                          vii"
- db "viii                     This is a test screen                              viii"
- db "ix                                                                            ix"
- db "x                                                                              x"
- db "xi           ######                                                           xi"
- db "xii          #....#       #########################                          xii"
- db "xiii         #.<..#########.........../.........#.#                         xiii"
- db "xiv          #....+......./...........###########.#                          xiv"
- db "xv           ##############...........#         #.#                           xv"
- db "xvi                       #...........#         #.#                          xvi"
- db "xvii                      #...........#         #+###############           xvii"
- db "xviii                     ###########+#         #...............#          xviii"
- db "xix                                 #.#         #...............#            xix"
- db "xx                 ########         #.#         #...............#             xx"
- db "xxi                #      #         #.#         #...............#            xxi"
- db "xxii               #      ###########.###########............>..#           xxii"
- db "xxiii              #      +.....................................#          xxiii"
- db "xxiv               ##############################################           xxiv"
+ db "                                                                               ", 10000000b
+ db "                         This is a test screen                                 ", 10000001b
+ db "                         This is a test screen                                 ", 10000100b
+ db "                         This is a test screen                                 ", 10000101b
+ db "                         This is a test screen                                 ", 10001000b
+ db "                         This is a test screen                                 ", 10001001b
+ db "                         This is a test screen                                 ", 10001100b
+ db "                         This is a test screen                                 ", 10001101b
+ db "                         This is a test screen                                 ", 10010000b
+ db "                         This is a test screen                                 ", 10010001b
+ db "                         This is a test screen                                 ", 10010100b
+ db "                         This is a test screen                                 ", 10010101b
+ db "                         This is a test screen                                 ", 10011000b
+ db "                         This is a test screen                                 ", 10011001b
+ db "                         This is a test screen                                 ", 10011100b
+ db "                         This is a test screen                                 ", 10011101b
+ db "                         This is a test screen                                 ", 10000010b
+ db "                           Blinking Text                                       ", 10000000b 
  db "xxv                                                                          xxv" 
- db "xxvi                                                                        xxvi" 
- db "xxvii                                                                      xxvii" 
- db "xxviii                                                                    xxviii" 
- db "xxix                                                                        xxix" 
- db "xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx  xxx" 
+
 
 
