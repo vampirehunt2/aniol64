@@ -187,9 +187,9 @@ snake_putChar:
     PUSH HL
     PUSH BC
     PUSH AF
-    LD A, (CurY)
+    CALL getCurY
     LD H, A
-    LD A, (CurX)
+    CALL getCurX
     LD L, A
     LD BC, SnakeScreen
     ADD HL, BC
@@ -203,9 +203,9 @@ snake_putChar:
 snake_getChar:
     PUSH HL
     PUSH BC
-    LD A, (CurY)
+    CALL getCurY
     LD H, A
-    LD A, (CurX)
+    CALL getCurX
     LD L, A
     LD BC, SnakeScreen
     ADD HL, BC
@@ -352,7 +352,7 @@ snake_drawFrame:
 	CALL writeStr
 	LD B, 0
 	LD C, VOFFSET
-	    CALL gotoXY
+	CALL gotoXY
 	LD IX, FRAME1
 	CALL snake_writeStr
 	LD C, 2

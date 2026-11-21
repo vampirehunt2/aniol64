@@ -84,6 +84,10 @@ writeLn:
 ; destroys A
 ; TODO: do error checking
 gotoXY:
+	LD A, B
+	LD (CurX), A
+	LD A, C
+	LD (CurY), A
 	LD A, ESC
 	OUT (DART_B_DAT), A
 	LD A, 'Y'
@@ -174,6 +178,17 @@ scroll:
 	CALL nextLine
 	CALL tm_restoreCursor
 	RET
+
+getCurX:
+	CALL tm_getCursorPos
+	;LD A, (CurX)			CurX already in A after tm_getCursorPos
+	RET
+
+getCurY:
+	CALL tm_getCursorPos
+	LD A, (CurY)
+	RET
+
 	
 	
 ; ###########################################################################
@@ -219,4 +234,38 @@ tm_restoreCursor:
 	LD A, 'k'
 	OUT (DART_B_DAT), A
 	RET
+
+tm_getCursorPos:
+	PUSH BC
+.empty:
+	IN A, (DART_B_CMD)
+	BIT 0, A
+	JR Z, .cont
+	IN A, (DART_B_DAT)
+	JR .empty				; make sure the transmitter buffer is empty
+.cont:
+	LD A, ESC				; send the transfer command
+	OUT (DART_B_DAT), A
+	LD A, '^'				; "special command" marker
+	OUT (DART_B_DAT), A
+	LD A, '6'				; get cursor special command
+	OUT (DART_B_DAT), A
+	LD B, 50				; give some time the tm to respond
+.delay:						; 50x13 clock cycles...
+	DJNZ .delay				; ...is enough to send 10 bits at x64 UART clock
+.loop:
+	IN A, (DART_B_CMD)
+	BIT 0, A
+	JR Z, .loop
+	IN A, (DART_B_DAT)
+	LD (CurY), A
+.loop1:
+	IN A, (DART_B_CMD)
+	BIT 0, A
+	JR Z, .loop1
+	IN A, (DART_B_DAT)
+	LD (CurX), A
+	POP BC
+	RET
+
 	
