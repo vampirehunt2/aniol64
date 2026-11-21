@@ -1011,6 +1011,9 @@ dos_findFreeFileSlotInSector:
 ; -- index of file record within sector in C
 ; -- file record address in memory in IY
 dos_fileExists:
+	LD A, (DiskPresent)
+	CP FALSE
+	RET Z
 	LD A, 01h		; the first sector of the file table
 .loop:
 	PUSH AF
