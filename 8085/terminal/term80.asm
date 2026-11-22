@@ -36,16 +36,40 @@ CRT_STOP   equ 40h          ; stop display command
 CRT_CURSOR equ 80h          ; load cursor command
 CRT_EI     equ 0A0h         ; enable interrupts command
 CRT_DI     equ 0C0h         ; disable interrupts command
-EOSSB       equ 0F3h        ; End Of Screen, Stop Buffering
+EOSSB      equ 0F3h        ; End Of Screen, Stop Buffering
+
+; Intel 8251 commands ****************************************************************************
+UART_MODE   equ 01001111b   ; D7:6 - 1 stop bit, 
+                            ; D5:4 - parity disable, 
+                            ; D3:2 - 8 data bits,
+                            ; D1:0 - x64 clock (300 baud)
+                        
+UART_RESET  equ 40h
+
+UART_COMMAND equ 00010100b  ; D7 - hunt disabled
+                            ; D6 - reset disabled
+                            ; D5 - reset /RTS disabled
+                            ; D4 - error reset
+                            ; D3 - no break
+                            ; D2 - receive enable
+                            ; D1 - reset /DTR disabled
+                            ; D0 - transmit disable
 
 
 ; port numbers ***********************************************************************************
-CRT_PARAM  equ 00000000b    ; the parameter register of the 8276
-CRT_CMD    equ 00000001b    ; the command register of the 8276
-CRT_STATUS equ 00000001b    ; the status register of the 8276 
+CRT_PARAM   equ 00000000b   ; the parameter register of the 8276
+CRT_CMD     equ 00000001b   ; the command register of the 8276
+CRT_STATUS  equ 00000001b   ; the status register of the 8276 
                             ; same address as command register,
                             ; but read from rather than written to 
-CRT_BUFF   equ 01000000b    ; buffer select for the 8276 
+CRT_BUFF    equ 01000000b   ; buffer select for the 8276 
+
+UART_CMD    equ 10000001b   ; command register for the 8251
+UART_STATUS equ 10000001b   ; status register for the 825   
+                            ; same address as command register,
+                            ; but read from rather than written to 
+UART_DATA   equ 10000000b   ; data register for the 8251  
+RxREADY     equ 00000010b
 
 ; screen composition ****************************************************************************
 
@@ -56,6 +80,9 @@ LINE_NUM    equ 25          ; number of visible rows
 SCREEN_SIZE equ LINE_LEN * LINE_NUM ; size of the Screen memory, 
                             ; ignoring the unused lines in the visible region
                             ; extra line used for the front porch
+
+CURSOR_START equ Screen + LINE_LEN * (LINE_NUM - 1) ; starting address of the cursor 
+                            ; at the beginning of the last line of the screen
 
 
 ; Intel 8276 screen composition bytes ************************************************************
@@ -114,21 +141,17 @@ STACK       equ RAM + RAM_SIZE  ; top of RAM
 CharFeed   equ RAM + 00h    ; pointer into the screen memory 
                             ; indicating next character to be fed to the 8276
                             ; 2 bytes
-
-CursorAddr  equ RAM + 02h   ; pointer into the screen memory
-                            ; indicating the position at which next character
-                            ; is to be inserted from the UART
-                            ; 2 bytes
-CurrLine    equ RAM + 04h   ; current screen line
+CurrLine    equ RAM + 02h   ; current screen line
+CursorCol   equ RAM + 03h   ; column in which the cursor is displayed
 
 Screen      equ RAM + 10h   ; screen memory
+
 
 
 ; ************************************************************************************************
 ; ************************* Start of program *****************************************************
 ; ************************************************************************************************
- org 0000h  ; cold boot
-    
+ org 0000h  ; cold boot 
     LD SP, STACK
     LD A, 0 | MSE | M65     ; mask RST 6.5, unmask RST 5.5 and RTS 7.5
  db SIM                     ; Z80 assembler doesn't recognise the SIM instruction
@@ -136,21 +159,20 @@ Screen      equ RAM + 10h   ; screen memory
     EI
     JP main
 
+
 ; RST 5.5 interrupt controls the vertical blanking interrupt
 ; from the 8276
  ds RST55 - $, 0
-    IN A, (CRT_STATUS)      ; clear the interrupt
-    LD HL, TEST_SCREEN      ; point HL to the beginning of screen memory
-    XOR A
-    LD (CurrLine), A
-    EI
-    RET
+    JP handleInt
+
 
 ; RST 7.5 responds to the Buffer Ready signal from the 8276
 ; it sends one row of character data, incrementing HL each time
 ; the loop is completely unrolled for performance
  ds RST75 - $, 0
 printLine:
+    PUSH AF
+    PUSH HL
     LD A, (CurrLine)
     CP LINE_NUM
     JP NZ, .cont
@@ -160,6 +182,7 @@ printLine:
 .cont:
     INC A
     LD (CurrLine), A
+    LD HL, (CharFeed)
     ; repeat 80 times
     LD A, (HL)              ; load a character from the screen memory
     OUT (CRT_BUFF), A       ; send it to the 8276 buffer
@@ -402,20 +425,30 @@ printLine:
     OUT (CRT_BUFF), A       
     INC HL
     ; done with 80 iterations
+    LD (CharFeed), HL
 .end:
     LD A, R75   ; reset the interrupt flip-flop
  db SIM         ; Z80 assembler doesn't recognise the SIM instruction
+    POP HL
+    POP AF
     EI
     RET
 
-; initialise the hardware
+
+; =======================================
+; initialise the hardware               +
+;========================================
 init:
+    XOR A                   ; LD A, 0
+    LD (CursorCol), A
     CALL init8276
     CALL init8251
     RET
 
-    
-; initialise the CRT controller
+
+; =======================================        
+; initialise the CRT controller         +
+; =======================================   
 init8276:
     ; set screen composition
     LD A, CRT_RESET
@@ -430,11 +463,24 @@ init8276:
     OUT (CRT_PARAM), A
 
     ; load cursor
- ;   LD A, CRT_CURSOR
- ;   OUT (CRT_CMD), A
- ;   XOR A                       ; LD A, 0
- ;   OUT (CRT_PARAM), A
- ;   OUT (CRT_PARAM), A
+    LD A, CRT_CURSOR
+    OUT (CRT_CMD), A
+    XOR A                       ; LD A, 0
+    OUT (CRT_PARAM), A
+    LD A, LINE_NUM - 1
+    OUT (CRT_PARAM), A
+
+    ; clear screen memory
+    LD HL, Screen
+    LD BC, SCREEN_SIZE
+.loop:
+    LD A, 20h                   ; SPACE
+    LD (HL), A
+    INC HL
+    DEC BC
+    LD A, B
+    OR C
+    JP NZ, .loop
     
     ; enable interrupts
     LD A, CRT_EI
@@ -445,23 +491,123 @@ init8276:
     OUT (CRT_CMD), A
     RET
 
-; initialise the UART
+
+; =======================================
+; initialise the UART                   +
+; =======================================
 init8251:
+    LD A, UART_MODE
+    OUT (UART_CMD), A
+    LD A, UART_COMMAND
+    OUT (UART_CMD), A
     RET
 
-; handle the 8276 vertical retrace interrupt
-handleInt:
 
-
-; main program loop
-; TODO: 
-; queries the 8251 for new characters received
-; and puts them into the screen memory - if they're characters
-; or processes them - if they're escape codes.
+; ===================================================================
+; main program loop                                                 +
+; queries the 8251 for new characters received                      +
+; and puts them into the screen memory - if they're characters      +
+; or processes them - if they're escape codes.                      +
+;====================================================================
 main:
-    HALT
+    IN A, (UART_STATUS) ; read the 8251 UART status
+    AND RxREADY         ; check if charater is eceived
+    CP 0
+    JP Z, main          ; if not, try again
+    IN A, (UART_DATA)   ; if character received, read it in
+    CALL putChar
     JP main
 
+
+;====================================================================
+; puts the char on the screen at current cursor position            +
+; and advances the cursor                                           +
+; character ASCII code passed in A                                  +
+; ===================================================================
+putChar:
+    CP 13                   ; check for newline character
+    JP Z, scroll            ; if found, scroll
+    PUSH AF                 ; save character on stack 
+    LD HL, CURSOR_START
+    LD B, 0
+    LD A, (CursorCol)
+    LD C, A
+    ADD HL, BC              ; current address into Screen memory at cursor position in HL
+    POP AF                  ; restore character from stack
+    LD (HL), A              ; put character into screen memory
+    LD A, (CursorCol)       ; increment the column counter
+    INC A
+    LD (CursorCol), A
+    CP LINE_LEN             ; check if we've reached the end of the line
+    JP Z, scroll
+    ; move the cursor on screen 
+    LD A, CRT_CURSOR
+    OUT (CRT_CMD), A
+    LD A, (CursorCol) 
+    OUT (CRT_PARAM), A
+    LD A, LINE_NUM - 1      ; last line
+    OUT (CRT_PARAM), A
+    RET
+
+
+; =======================================================
+; Scroll the screen by shifting the Screen memory up    +
+; by one line and clearing the last line                +
+; =======================================================
+scroll:
+    ; iterate through the Screen memory to shift the contents up by one line
+    LD HL, Screen
+    LD DE, Screen + LINE_LEN
+    LD BC, SCREEN_SIZE - LINE_LEN
+.loop           
+    LD A, (DE)
+    LD (HL), A
+    INC HL
+    INC DE
+    DEC BC
+    LD A, B
+    OR C
+    JP NZ, .loop
+
+    ; clear the last line of display
+    LD HL, CURSOR_START
+    LD B, LINE_LEN
+    LD A, 20h               ; SPACE
+.loop2:
+    LD (HL), A
+    INC HL
+    DEC B
+    JP NZ, .loop2
+
+    ; move the cursor on screen 
+    LD A, CRT_CURSOR
+    OUT (CRT_CMD), A
+    XOR A                   ; LD A, 0
+    LD (CursorCol), A       ; store new cursor X position
+    OUT (CRT_PARAM), A
+    LD A, LINE_NUM - 1      ; last line
+    OUT (CRT_PARAM), A
+    RET
+
+
+; =======================================
+; handle vertical blank interrupt       +
+; =======================================
+handleInt:
+    PUSH AF
+    PUSH HL
+    IN A, (CRT_STATUS)      ; clear the interrupt
+    LD HL, Screen           ; point HL to the beginning of screen memory
+    LD (CharFeed), HL
+    XOR A
+    LD (CurrLine), A
+    POP HL
+    POP AF
+    EI
+    RET
+
+
+    
 
  ds 2048 - $, 0
 TEST_SCREEN:
