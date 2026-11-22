@@ -3,11 +3,11 @@
 cpm_InvalidParam: db "Invalid parameter", 0
 cpm_Version: db "CP/M v2.2", 0
 
-CpmRomImage equ 5C00h
+CpmRomImage equ 6000h
 CpmBase equ 0DC00h
 CpmSectorSize equ 128
 CpmSectorCounter equ PROGRAM_DATA
-CpmSize equ 9 * 1024
+CpmSize equ 7 * 1024
 CpmWarmBoot equ 0F203h
 
 
