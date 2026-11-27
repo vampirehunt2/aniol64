@@ -12,12 +12,12 @@
  org 0000h
 
 	LD SP, RAMTOP   ; initialise stack pointer to the top of available RAM
+	CALL resetNmiHandler
 	IM 2			; set interupt mode to 2
 	LD A, 01h	   	; higher byte of the interrupt vector table
 	LD I, A		 	; set the vector table address
-	;CALL copyRom2Ram
+	CALL mem_copyRom2Ram
 	EI				; enable interrupts
-	CALL resetNmiHandler
 	JP boot		 	; jump over the interrupt handlers for NMI and mode 1 INT
 
  ds 0020h - $, 0
@@ -94,12 +94,23 @@ boot:
 	LD (Random + 1), A
 
 	;CALL mem_copyRom2Ram
+	;LD A, 50
+	;CALL delay
+	;CALL bzr_beep
 	
 	; init the display
 	CALL dspInit
 
+	;LD A, 50
+	;CALL delay
+	;CALL bzr_beep
+
 	; initialise the keyboard
 	CALL keyInit
+
+	;LD A, 50
+	;CALL delay
+	;CALL bzr_beep
 
 
 	; greetings
@@ -159,12 +170,12 @@ resetNmiHandler:
  ;include dev/pal.asm
  ;include dev/colourvga.asm
  ;include dev/80col.asm
- ;include dev/tm.asm
- include dev/vga.asm
+ include dev/tm.asm
+ ;include dev/vga.asm
 
 ; keyboard drivers
- include dev/kbd.asm
- ;include dev/ps2.asm
+ ;include dev/kbd.asm
+ include dev/ps2.asm
 
 ; libraries
  include lib/util.asm
